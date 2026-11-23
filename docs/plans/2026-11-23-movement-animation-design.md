@@ -8,7 +8,11 @@ Use original code-native sprite frames rasterized lazily into existing canvas ca
 
 Pause visual clocks during Help, health/retreat, hidden tabs, boss-defeat/ending. Reset timestamps to avoid catch-up. Clear transient tracks/callbacks on travel, respawn, retreat, death, ending and restart; never save animation in floors/templates. Bind callbacks to their state object so stale callbacks cannot alter a new run. No-rAF environments retain immediate static rendering for the external smoke harness.
 
-- [ ] Transient movement clock, retargeting and smooth camera/overlay integration.
-- [ ] Walking/wing frames and slime poses with cached rasterization.
-- [ ] Meaningful tests for interpolation, timing, lifecycle, frame variation, RNG and visibility; browser checks and recorded preview.
-- [ ] Documentation/handover/task updates; no staging or commits.
+- [x] Transient movement clock, retargeting and smooth camera/overlay integration.
+- [x] Walking/wing frames and slime poses with cached rasterization.
+- [x] Meaningful tests for interpolation, timing, lifecycle, frame variation, RNG and visibility; browser checks and recorded preview.
+- [x] Documentation/handover/task updates; no staging or commits.
+
+The user additionally requested animated wall flames during implementation. Wall torches now have cached flame poses and subtle light flicker; active vents share the visual clock. Torch fixtures remain still, unknown fixtures do not keep the loop alive, and hazard damage/cycles retain the original gameplay clock.
+
+Completed in v0.12.0: 78 tests, syntax/external smoke, and isolated Chrome checks pass. Native canvas recording and stills are in `docs/previews/2026-11-23-movement/`. The browser verified actual interpolated positions, wing pixel changes, Help/hidden freezing, travel/restart/stale callbacks, and mobile fit. Observed 27 redraws/second in a visible animated scene; local warm median/p95 draw+minimap cost 0.3/0.4ms. No commit or staging.

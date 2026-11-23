@@ -1,6 +1,6 @@
 # Tasks — Dungeon Crawler
 
-Last reviewed: 2026-11-23. Build v0.11.0 adds the ? Help & settings dialog to 2× world zoom (18×12 view) and the approved static graphics refresh to boss-defeat flourishes, the explored-area minimap, monster combat quotes, larger bosses/arenas, persistence/recovery/audio, campaign/balance, scrolling/keys/hazards, and plot-twist ending. See `handover.md` for details and `README.md` for controls.
+Last reviewed: 2026-11-23. Build v0.12.0 adds smooth movement, walking/wing/flame animation, and the ? Help & settings dialog to 2× world zoom (18×12 view) and the approved static graphics refresh to boss-defeat flourishes, the explored-area minimap, monster combat quotes, larger bosses/arenas, persistence/recovery/audio, campaign/balance, scrolling/keys/hazards, and plot-twist ending. See `handover.md` for details and `README.md` for controls.
 
 ## Existing gameplay
 - [x] Keep a thin HTML shell, CSS, and two plain scripts with no runtime dependencies or build step; launch over `file://`.
@@ -76,7 +76,7 @@ Last reviewed: 2026-11-23. Build v0.11.0 adds the ? Help & settings dialog to 2�
 
 ## Verification
 - [x] `node --check js/game.js` and `node --check js/sprites.js`.
-- [x] `node --test tests/game.test.cjs`: 72 tests pass, including 130 varied floor-generation checks, eight monster-speech tests, and three boss-defeat animation tests.
+- [x] `node --test tests/game.test.cjs`: 78 tests pass, including 130 varied floor-generation checks, eight monster-speech tests, and three boss-defeat animation tests.
 - [x] Existing external startup/input smoke prints `SMOKE_OK`.
 - [x] Isolated Chrome over `file://`: floor round trip, stored potion/HUD, health and critical dialogs, frozen movement, focus restoration, retreat confirm/cancel, healing HUD, running audio context, and mute/unmute pass without JavaScript errors. Follow-up checks cover campaign gates/final rescue victory, boss persistence, active retreat cooldown/dialogs, scaled healing, separate volume buses and preferences. Launch/layout checks also verify click/Enter start, paused launch, branding hidden across restart, top stats, left journal history/scroll, right equipment panel/icons/bonuses, and desktop width behavior. Scrolling checks also verify a 58-step real keyboard path beyond old bounds, key drop/collection/return persistence, invisible-spike pixel equality before trigger, rock warnings/dodge, flame damage, and hazard pauses. Ending checks cover all story phases, hidden-tab/skip/restart timing, frozen world state, once-only rewards/events, and screen-coordinate rendering. Real-time ending playback took 14.05 seconds, with all six scenes, world freeze, skip, and restart checked without JavaScript errors; a native canvas preview was recorded. Screenshots inspected.
 - [x] Chrome check over `file://` played both boss-defeat flourishes in real time, verified frozen player/monster/activeTime/hazardTime during key input, confirmed Escape skip, and reported no JavaScript errors. Five animation-frame captures were saved to `/tmp` for human visual review.
@@ -90,6 +90,9 @@ Last reviewed: 2026-11-23. Build v0.11.0 adds the ? Help & settings dialog to 2�
 - [x] Cover timing, lifecycle, visibility, rendering, and RNG independence in eight automated tests; verify real keyboard combat and bubbles in Chrome over file://.
 
 ## Remaining follow-up
+- [x] Add smooth actor/camera movement, walking poses, visible bat/dragon wing cycles, slime hops, and wall-torch/active-vent flame animation. Keep logical collisions, AI, combat and damage timing unchanged; move overlays/minimap with rendered positions.
+- [x] Cache sprite poses, cap drawing at 30fps with viewport overscan, freeze on all pauses/hidden/cinematics, and clear tracks/callbacks across travel/respawn/retreat/death/restart. No extra combat RNG or saved animation state.
+- [x] Verify 78 tests, syntax/smoke, actual browser interpolation/pixel changes/pause/cleanup/mobile/performance; save a native canvas WebM preview and link it in README.
 - [x] Move permanent instructions/audio controls into Help & settings, toggled by ? and a HUD ? button, closed by ?/Esc/Close. Pause world/cinematic clocks, preserve nested health/retreat dialogs and audio settings, trap/restore focus, and fit mobile screens. Move merchant stock into equipment and ending buttons over the canvas; remove footer controls. All 72 tests plus browser/smoke/syntax checks pass.
 - [x] Apply approved 2× whole-map zoom with an 18×12 viewport, camera bounds/culling, smaller minimap outline, enlarged in-world overlays, and readable boss health bars above fog. Preserve HUD/sidebar sizes and cinematic framing. All 68 tests and browser/smoke/syntax checks pass.
 - [x] Implement the approved static graphics preview: full-body cast, cohesive large bosses, blue-grey stonework, worn floors/recessed walls, static torches/light, ground shadows, and matching item/stair/trap/equipment art.

@@ -13,7 +13,7 @@ Local LLM playground, tooks ~30h to get to v0.11.0 with "better" graphics
 - gemma
 
 
-A plain HTML5 canvas dungeon game, version 0.11.0. Open `index.html` directly in a browser (`file://`); there is no install, build step, server, or network dependency.
+A plain HTML5 canvas dungeon game, version 0.12.0. Open `index.html` directly in a browser (`file://`); there is no install, build step, server, or network dependency.
 
 The fantasy logo and version appear on the launch screen only. Click **Enter the dungeon** or press a key to begin; the game waits until you start. During play, stats sit at the top and a scrolling adventure log sits to the left of the map, and equipment with icons and bonuses sits to its right. On narrow screens the log moves below the map. R starts a fresh run without showing the launch screen again; reloading the page shows it.
 
@@ -38,9 +38,13 @@ Help & settings opens with **?** or the HUD button and pauses play while you rea
 
 The dungeon is displayed at **2× zoom**, with 18×12 tiles visible in the same canvas. Characters, tiles, loot, bubbles, warnings, and world health bars are twice as large. The camera follows you and the minimap outline tracks the smaller view. HUD/sidebar sizes and screen-space cinematic framing stay consistent.
 
-The static artwork uses worn slate masonry, recessed wall faces, moss/cracks, warm wall torches, and shaded full-body characters. Stairs, loot, equipment icons, and hazards share the same original pixel-art palette. [View the character, item, and dungeon design sheets](docs/previews/2026-11-23-static-graphics/index.html). The reference asset pack inspired the general direction; its artwork is not bundled.
+The original pixel artwork uses worn slate masonry, recessed wall faces, moss/cracks, warm wall torches, and shaded full-body characters. Stairs, loot, equipment icons, and hazards share the same original pixel-art palette. [View the character, item, and dungeon design sheets](docs/previews/2026-11-23-static-graphics/index.html). The reference asset pack inspired the general direction; its artwork is not bundled.
 
-Sprites and terrain variations are rasterized into small local canvas caches and reused, with crisp nearest-neighbor rendering. The four runtime files total about 169 KiB, with no external art/font/network loading and no new animation. Existing boss-defeat and ending scenes use the refreshed figures.
+Sprites and terrain variations are rasterized into small local canvas caches and reused, with crisp nearest-neighbor rendering. The four runtime files total about 179 KiB, with no external art/font/network loading and a capped animation drawing loop. Existing boss-defeat and ending scenes use the refreshed figures.
+
+Movement now eases between tiles with walking poses. Bats and the dragon flap their wings, moving slimes hop and squash, and wall torches and active fire vents flicker. Animations freeze during Help, health/retreat pauses, and hidden tabs. Combat, collision, and trap timing still use the original logical tiles and gameplay clocks.
+
+[Watch the movement, wing, and flame animation preview (WebM)](docs/previews/2026-11-23-movement/movement.webm).
 
 ## Controls
 
