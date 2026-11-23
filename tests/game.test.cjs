@@ -1224,3 +1224,95 @@ test('help traps Tab and Shift-Tab, closes from an input, and restores keyboard 
   g.key('Escape',{target:{tagName:'INPUT'}});
   assert.equal(g.run('state.helpOpen'),false);assert.equal(g.run('document.activeElement===canvas'),true);
 });
+
+function enableMotion(g) {
+  g.run(`window.motionCallbacks=[];window.motionCancelled=[];
+    window.requestAnimationFrame=cb=>{window.motionCallbacks.push(cb);return window.motionCallbacks.length;};
+    window.cancelAnimationFrame=id=>window.motionCancelled.push(id);
+    state.monsters=[];state.hazards=[];clearMovementAnimation();
+    state.player.x=40;state.player.y=30;state.map[30][40]=0;state.map[30][41]=0;state.map[30][42]=0;updateCamera()`);
+}
+
+test('movement is logically immediate while actors, camera, health bars, speech and minimap interpolate',()=>{
+  const g=game();enableMotion(g);
+  g.run('movePlayer(1,0)');
+  assert.equal(g.run('state.player.x'),41);assert.equal(g.run('actorRenderPosition(state.player).x'),40);
+  assert.equal(g.run('renderCamera().x'),31);
+  g.run('advanceMotion(0.09)');
+  assert.ok(Math.abs(g.run('actorRenderPosition(state.player).x')-40.5)<1e-9);
+  assert.ok(Math.abs(g.run('renderCamera().x')-31.5)<1e-9);
+  const before=g.json('actorRenderPosition(state.player)');g.run('movePlayer(1,0)');
+  assert.deepEqual(g.json('actorRenderPosition(state.player)'),before,'retargeting starts at current rendered point');
+  g.run('advanceMotion(1)');assert.equal(g.run('actorRenderPosition(state.player).x'),42);
+  g.run(`state.monsters=[{...MONSTER_TYPES[4],id:500,x:43,y:30,hp:100,maxHp:100}];
+    clearMonsterSpeech();monsterTalk(state.monsters[0]);moveActorTo(state.monsters[0],44,30);advanceMotion(0.09)`);
+  assert.equal(g.run('state.monsters[0].x'),44);
+  assert.ok(Math.abs(g.run('monsterVisual(state.monsters[0]).x')-(43.5*32+16))<1e-9);
+  assert.equal(g.run('monsterSpeechLayout().anchorX'),g.run('monsterVisual(state.monsters[0]).x'));
+  g.minimapCalls.length=0;g.run('renderMinimap()');
+  assert.equal(g.minimapCalls.some(c=>c[0]==='strokeRect'&&c[1]===g.run('renderCamera().x')*3+0.5),true);
+});
+
+test('animation frames vary legs and wings, keep logical dimensions, and moving slimes use a grounded hop',()=>{
+  const g=game();enableMotion(g);
+  for(const name of ['knight','goblin','skeleton','orc','bat','dragonBoss']) {
+    assert.notDeepEqual(g.json(`spriteFrameGrid('${name}',0)`),g.json(`spriteFrameGrid('${name}',1)`),name);
+    assert.equal(g.run(`spriteFrameGrid('${name}',2).length===SPRITES['${name}'].length && spriteFrameGrid('${name}',2).every(row=>row.length===SPRITES['${name}'][0].length)`),true);
+  }
+  g.run('state.monsters=[{...MONSTER_TYPES[0],id:3,x:42,y:30,hp:10}];moveActorTo(state.monsters[0],43,30);advanceMotion(0.09)');
+  assert.equal(g.run('actorAnimationPose("slime",state.monsters[0]).rise<0'),true);
+  g.run('advanceMotion(1)');assert.deepEqual(g.json('actorAnimationPose("slime",state.monsters[0])'),{frame:0,sx:1,sy:1,rise:0,facing:1});
+  g.run('state.monsters[0].sprite="bat"');assert.equal(g.run('motionNeeded()'),true);
+  g.run('state.monsters[0].x=1');assert.equal(g.run('motionNeeded()'),false,'unseen wings do not run a draw loop');
+});
+
+test('visual animation freezes during help, health pauses, hidden tabs and cinematics without advancing game clocks or RNG',()=>{
+  const g=game();enableMotion(g);g.run('movePlayer(1,0);advanceMotion(0.04)');
+  const world=g.run('JSON.stringify([state.player,state.activeTime,state.hazardTime,state.turn,state.retreatReadyAt])');
+  g.run('window.randomCalls=0;Math.random=()=>{window.randomCalls++;return 0.9;};advanceMotion(0.02);draw()');
+  assert.equal(g.run('JSON.stringify([state.player,state.activeTime,state.hazardTime,state.turn,state.retreatReadyAt])'),world);
+  assert.equal(g.run('window.randomCalls'),0);
+  for(const block of ['state.helpOpen=true','state.pause={kind:"health"}','document.hidden=true','state.bossDefeat={completed:false}']) {
+    const time=g.run('state.motion.time');g.run(`${block};advanceMotion(60);requestMotionFrame()`);
+    assert.equal(g.run('state.motion.time'),time);assert.equal(g.run('state.motion.lastTimestamp'),null);
+    g.run('state.helpOpen=false;state.pause=null;document.hidden=false;state.bossDefeat=null');
+  }
+});
+
+test('animation clears across travel/respawn/restart/death and rejects stale callbacks',()=>{
+  const g=game();enableMotion(g);g.run('movePlayer(1,0);window.oldMotion=state.motion;window.oldMotionFrame=window.motionCallbacks.at(-1)');
+  g.run('enterFloor(2,false)');assert.equal(g.run('Object.keys(state.motion.moves).length'),0);
+  const fresh=g.run('state.motion');g.run('window.oldMotionFrame(100000)');assert.equal(g.run('state.motion'),fresh);assert.equal(g.run('state.motion.time'),0);
+  assert.equal(g.run('FLOOR_FIELDS.includes("motion")'),false);
+  g.run('newGame();state.monsters=[];state.map[state.player.y][state.player.x+1]=0;movePlayer(1,0);recreateMonsters()');
+  assert.equal(g.run('Object.keys(state.motion.moves).length'),0);
+  g.run('movePlayer(1,0);hurtPlayer(9999,"fatal")');assert.equal(g.run('Object.keys(state.motion.moves).length'),0);
+  g.key('r');assert.equal(g.run('state.motion.time'),0);assert.equal(g.run('state.motion.frameId'),null);
+});
+
+test('camera overscans only the entering tile strip during smooth steps and frame timing is capped',()=>{
+  const g=game();enableMotion(g);g.run('movePlayer(1,0);advanceMotion(0.09)');
+  assert.deepEqual(g.json('renderViewport()'),{camera:{x:31.5,y:24},x0:31,y0:24,x1:50,y1:36});
+  g.run('window.motion=state.motion;motionFrame(1000,window.motion);motionFrame(31000,window.motion)');
+  assert.ok(g.run('state.motion.time')<=0.14+1e-9,'return from a stalled frame adds at most 50ms');
+  assert.equal(g.run('window.motionCallbacks.length>0'),true);
+});
+
+test('discovered wall torches and active vents animate without moving their fixtures or advancing trap damage',()=>{
+  const g=game();enableMotion(g);
+  g.run('state.map[24][42]=1;state.map[25][42]=0;state.visited.add("42,24")');
+  assert.equal(g.run('wallTorchAt(42,24)'),true);assert.equal(g.run('motionNeeded()'),true);
+  for(const name of ['torch','flameOn']) {
+    assert.notDeepEqual(g.json(`spriteFrameGrid('${name}',0)`),g.json(`spriteFrameGrid('${name}',1)`));
+    assert.deepEqual(g.json(`spriteFrameGrid('${name}',0).slice(25)`),g.json(`spriteFrameGrid('${name}',1).slice(25)`),'fixture stays still');
+  }
+  const first=g.run('environmentAnimationFrame(42,24)');g.run('advanceMotion(0.12)');
+  assert.notEqual(g.run('environmentAnimationFrame(42,24)'),first);
+  g.run('state.helpOpen=true');const paused=g.run('environmentAnimationFrame(42,24)');g.run('advanceMotion(60)');
+  assert.equal(g.run('environmentAnimationFrame(42,24)'),paused);
+  assert.equal(g.run('state.hazardTime'),0);
+  g.run('state.helpOpen=false;state.visited.delete("42,24")');assert.equal(g.run('motionNeeded()'),false,'unknown wall fixtures do not keep the loop running');
+  g.run('state.hazards=[{type:"flame",x:42,y:30,revealed:true,offset:0,nextDamageAt:0}];state.visited.add("42,30")');
+  assert.equal(g.run('motionNeeded()'),true);
+  g.run('state.hazardTime=3');assert.equal(g.run('motionNeeded()'),false,'inactive vent does not require animation');
+});

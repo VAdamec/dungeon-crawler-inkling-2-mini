@@ -1,8 +1,38 @@
 # Dungeon Crawler
 
+Local LLM playground, tooks ~30h to get to v0.11.0 with "better" graphics
+
+## used HW
+1x Apple M1
+1x Apple M5
+1x PC with RTX 4070Ti
+
+## LLM models
+- inkling-2-mini
+- qwen3
+- gemma
+
+
 A plain HTML5 canvas dungeon game, version 0.11.0. Open `index.html` directly in a browser (`file://`); there is no install, build step, server, or network dependency.
 
 The fantasy logo and version appear on the launch screen only. Click **Enter the dungeon** or press a key to begin; the game waits until you start. During play, stats sit at the top and a scrolling adventure log sits to the left of the map, and equipment with icons and bonuses sits to its right. On narrow screens the log moves below the map. R starts a fresh run without showing the launch screen again; reloading the page shows it.
+
+## Screenshots
+
+Desktop gameplay at 2× zoom, with the adventure log, minimap, equipment, and HUD help button.
+
+![Dungeon gameplay with the hero, left-side adventure log, right-side minimap and equipment, and question-mark help button](docs/previews/2026-11-23-help-dialog/gameplay.png)
+
+Help & settings opens with **?** or the HUD button and pauses play while you read instructions or adjust audio.
+
+![Help and settings window with game controls, mute button, and music and effects volume sliders](docs/previews/2026-11-23-help-dialog/help.png)
+
+<details>
+<summary>Mobile help window</summary>
+
+![Help and settings fitted to a mobile screen](docs/previews/2026-11-23-help-dialog/mobile.png)
+
+</details>
 
 ## Graphics
 

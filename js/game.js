@@ -22,7 +22,7 @@ const ITEM_TABLE = [
   { name: 'Shield',   sprite: 'shield',  gold: 55, kind: 'armor', def: 5 },
 ];
 
-const GAME_VERSION = '0.11.0';
+const GAME_VERSION = '0.12.0';
 // Brief quotations from Monty Python and the Holy Grail; official sources in README.
 const MONSTER_QUOTES = ['Ni!', 'None shall pass!', "'Tis but a scratch.", 'Run away!'];
 const MONSTER_SPEECH_DURATION = 5, MONSTER_SPEECH_INTERVAL = 5;
@@ -37,6 +37,7 @@ const FLOOR_FIELDS = ['map', 'rooms', 'potions', 'stairs', 'upstairs', 'treasure
 let state;
 
 function newGame() {
+  stopMotionAnimation();
   stopEndingAnimation();
   stopBossDefeatAnimation();
   const started = state ? state.started : false;
@@ -55,7 +56,7 @@ function newGame() {
     upstairs: null, monsterSpawns: [], pause: null, warnedLow: false, warnedCritical: false,
     combatElapsed: 0, healElapsed: 0, activeTime: 0, retreatReadyAt: 0, bossDefeated: false,
     camera: { x: 0, y: 0 }, floorKey: null, obstacles: [], hazards: [], hazardTime: 0,
-    lastTick: Date.now(), audio, art,
+    lastTick: Date.now(), audio, art, motion: freshMotionState(),
   };
   document.getElementById('endingControls').hidden = true;
   document.getElementById('helpOverlay').hidden = true;
@@ -326,6 +327,122 @@ function inCamera(x, y) {
   return x >= state.camera.x && y >= state.camera.y && x < state.camera.x + VIEW_W && y < state.camera.y + VIEW_H;
 }
 
+function freshMotionState() {
+  return { time: 0, moves: {}, facing: {}, camera: null, frameId: null, lastTimestamp: null, lastPaint: null };
+}
+
+function stopMotionAnimation() {
+  const motion = state && state.motion;
+  if (!motion) return;
+  if (motion.frameId !== null && typeof window.cancelAnimationFrame === 'function') window.cancelAnimationFrame(motion.frameId);
+  motion.frameId = null; motion.lastTimestamp = null; motion.lastPaint = null;
+}
+
+function clearMovementAnimation() {
+  stopMotionAnimation();
+  state.motion = freshMotionState();
+}
+
+function actorMotionKey(actor) {
+  return actor === state.player ? 'player' : `monster:${actor.id}`;
+}
+
+function motionProgress(move) {
+  return Math.max(0, Math.min(1, (state.motion.time - move.at) / move.duration));
+}
+
+function actorRenderPosition(actor) {
+  const move = state.motion.moves[actorMotionKey(actor)];
+  if (!move || move.x !== actor.x || move.y !== actor.y || typeof window.requestAnimationFrame !== 'function') return { x: actor.x, y: actor.y };
+  const t = motionProgress(move);
+  return { x: move.fromX + (move.x - move.fromX) * t, y: move.fromY + (move.y - move.fromY) * t };
+}
+
+function renderCamera() {
+  const move = state.motion.moves.player, camera = state.motion.camera;
+  if (!move || !camera || move.x !== state.player.x || move.y !== state.player.y || camera.x !== state.camera.x || camera.y !== state.camera.y || typeof window.requestAnimationFrame !== 'function') return state.camera;
+  const t = motionProgress(move);
+  return { x: camera.fromX + (camera.x - camera.fromX) * t, y: camera.fromY + (camera.y - camera.fromY) * t };
+}
+
+function renderViewport() {
+  const camera = renderCamera();
+  return { camera, x0: Math.max(0, Math.floor(camera.x)), y0: Math.max(0, Math.floor(camera.y)),
+    x1: Math.min(W, Math.ceil(camera.x + VIEW_W)), y1: Math.min(H, Math.ceil(camera.y + VIEW_H)) };
+}
+
+function inRenderCamera(x, y) {
+  const view = renderViewport();
+  return x >= view.x0 && y >= view.y0 && x < view.x1 && y < view.y1;
+}
+
+function moveActorTo(actor, x, y) {
+  updateCamera();
+  const key = actorMotionKey(actor);
+  const dx = x - actor.x;
+  if (dx) state.motion.facing[key] = Math.sign(dx);
+  if (actor !== state.player && (!inRenderCamera(actor.x, actor.y) || fogLevel(actor.x, actor.y) >= 3)) {
+    actor.x = x; actor.y = y; delete state.motion.moves[key]; return;
+  }
+  const from = actorRenderPosition(actor), camera = { ...renderCamera() };
+  actor.x = x; actor.y = y;
+  const distance = Math.max(1, Math.hypot(x - from.x, y - from.y));
+  state.motion.moves[key] = { fromX: from.x, fromY: from.y, x, y, at: state.motion.time, duration: Math.max(0.04, 0.18 / (distance * distance)) };
+  if (actor === state.player) {
+    updateCamera();
+    state.motion.camera = { fromX: camera.x, fromY: camera.y, x: state.camera.x, y: state.camera.y };
+  }
+}
+
+function motionPlayable() {
+  return state.started && !state.gameOver && !state.helpOpen && !state.pause && !document.hidden && !bossDefeatActive();
+}
+
+function actorIsMoving(actor) {
+  const move = state.motion.moves[actorMotionKey(actor)];
+  return !!(move && move.x === actor.x && move.y === actor.y && motionProgress(move) < 1 && typeof window.requestAnimationFrame === 'function');
+}
+
+function motionNeeded() {
+  if (actorIsMoving(state.player) || state.monsters.some(m => m.hp > 0 &&
+    inRenderCamera(m.x, m.y) && fogLevel(m.x, m.y) < 3 && (actorIsMoving(m) || m.sprite === 'bat' || m.isDragon))) return true;
+  const view = renderViewport();
+  for (let y = view.y0; y < view.y1; y++) for (let x = view.x0; x < view.x1; x++) {
+    if (state.visited.has(`${x},${y}`) && wallTorchAt(x, y)) return true;
+  }
+  return state.hazards.some(h => h.type === 'flame' && h.revealed && flameActive(h) && inRenderCamera(h.x, h.y) && state.visited.has(`${h.x},${h.y}`));
+}
+
+function requestMotionFrame() {
+  if (!motionPlayable() || !motionNeeded()) { stopMotionAnimation(); return; }
+  const motion = state.motion;
+  if (motion.frameId !== null || typeof window.requestAnimationFrame !== 'function') return;
+  motion.frameId = window.requestAnimationFrame(timestamp => motionFrame(timestamp, motion));
+}
+
+function advanceMotion(elapsed) {
+  if (!motionPlayable()) return;
+  state.motion.time += Math.max(0, elapsed);
+  for (const [key, move] of Object.entries(state.motion.moves)) {
+    if (motionProgress(move) >= 1) delete state.motion.moves[key];
+  }
+  if (!state.motion.moves.player) state.motion.camera = null;
+}
+
+function motionFrame(timestamp, motion) {
+  if (state.motion !== motion) return;
+  motion.frameId = null;
+  if (!motionPlayable()) { stopMotionAnimation(); return; }
+  const elapsed = motion.lastTimestamp === null ? 0 : Math.min(0.05, Math.max(0, (timestamp - motion.lastTimestamp) / 1000));
+  motion.lastTimestamp = timestamp;
+  advanceMotion(elapsed);
+  if (motion.lastPaint === null || motion.time - motion.lastPaint >= 1 / 30 || !motionNeeded()) {
+    motion.lastPaint = motion.time;
+    draw(); renderMinimap();
+  }
+  requestMotionFrame();
+}
+
 function flameActive(hazard) {
   return (state.hazardTime + hazard.offset) % 6 < 3;
 }
@@ -444,6 +561,7 @@ function damageMonster(m, dmg) {
       saveFloor();
       startBossDefeat(m);
     }
+    delete state.motion.moves[actorMotionKey(m)];
     while (p.xp >= p.xpNext) {
       p.xp -= p.xpNext;
       p.lvl++;
@@ -502,13 +620,15 @@ function monsterSpeechLayout() {
   const speech = state.monsterSpeech;
   if (!speech || state.gameOver || state.ending || state.activeTime >= speech.expiresAt) return null;
   const monster = state.monsters.find(m => m.id === speech.monsterId && m.hp > 0);
-  if (!monster || !inCamera(monster.x, monster.y) || fogLevel(monster.x, monster.y) >= 3) return null;
+  if (!monster || !inRenderCamera(monster.x, monster.y) || fogLevel(monster.x, monster.y) >= 3) return null;
   ctx.save(); ctx.font = '12px monospace';
   const width = ctx.measureText(speech.text).width + 20;
   ctx.restore();
-  const height = 28, anchorX = monster.x * TILE + TILE / 2;
+  const position = actorRenderPosition(monster);
+  const height = 28, anchorX = position.x * TILE + TILE / 2;
   const visual = monsterVisual(monster);
-  const viewportLeft = state.camera.x * TILE, viewportTop = state.camera.y * TILE;
+  const camera = renderCamera();
+  const viewportLeft = camera.x * TILE, viewportTop = camera.y * TILE;
   const x = Math.max(viewportLeft + 6, Math.min(viewportLeft + VIEW_W * TILE - width - 6, anchorX - width / 2));
   const below = visual.top - 44 < viewportTop + 4;
   const y = Math.max(viewportTop + 4, Math.min(viewportTop + VIEW_H * TILE - height - 4, below ? visual.bottom + 12 : visual.top - 44));
@@ -521,8 +641,9 @@ function monsterVisual(monster) {
   const scale = monster.isBoss ? 3 : 2;
   const size = spriteDimensions(sprite);
   const width = size.width * scale, height = size.height * scale;
-  const x = monster.x * TILE + TILE / 2;
-  const y = monster.isBoss ? (monster.y + 1) * TILE - height / 2 : monster.y * TILE + TILE / 2;
+  const position = actorRenderPosition(monster);
+  const x = position.x * TILE + TILE / 2;
+  const y = monster.isBoss ? (position.y + 1) * TILE - height / 2 : position.y * TILE + TILE / 2;
   return { sprite, scale, x, y, width, height, left: x - width / 2, right: x + width / 2, top: y - height / 2, bottom: y + height / 2 };
 }
 
@@ -544,6 +665,7 @@ function gameOver(won) {
   if (won) { startEnding(); return; }
   clearBossDefeat();
   clearMonsterSpeech();
+  clearMovementAnimation();
   state.gameOver = true; state.won = won; state.pause = null;
   const ov = document.getElementById('overlay');
   document.getElementById('ovTitle').textContent = 'GAME OVER';
@@ -600,6 +722,7 @@ function startBossDefeat(m) {
   if (!m || !m.isBoss || state.gameOver || state.ending || state.bossDefeat) return;
   const isDragon = !!m.isDragon;
   const visual = monsterVisual(m);
+  clearMovementAnimation();
   const kind = isDragon ? 'dragon' : 'mimic';
   state.bossDefeat = {
     kind, elapsed: 0, phase: isDragon ? 'roar' : 'snap', completed: false,
@@ -706,7 +829,7 @@ function movePlayer(dx, dy) {
   const m = monsterAt(nx, ny);
   if (m) { state.turn++; attackMonster(m); render(); return; }
   state.bubble = null;
-  p.x = nx; p.y = ny;
+  moveActorTo(p, nx, ny);
   state.turn++;
   revealAroundPlayer();
   applyPlayerHazards();
@@ -745,6 +868,7 @@ function saveFloor() {
 }
 
 function recreateMonsters() {
+  clearMovementAnimation();
   clearMonsterSpeech();
   state.monsters = [];
   const p = state.player;
@@ -1140,7 +1264,7 @@ function enemyTick() {
         continue;
       }
       if (monsterAt(nx, ny)) continue;
-      m.x = nx; m.y = ny;
+      moveActorTo(m, nx, ny);
     }
   }
   recoveryTick(elapsed);
@@ -1149,29 +1273,29 @@ function enemyTick() {
 
 function drawFloorDetails() {
   for (const obstacle of state.obstacles) {
-    if (!inCamera(obstacle.x, obstacle.y) || !state.visited.has(`${obstacle.x},${obstacle.y}`)) continue;
+    if (!inRenderCamera(obstacle.x, obstacle.y) || !state.visited.has(`${obstacle.x},${obstacle.y}`)) continue;
     drawSprite(obstacle.type, obstacle.x * TILE + TILE / 2, obstacle.y * TILE + TILE / 2, 2);
   }
   for (const hazard of state.hazards) {
-    if (!hazard.revealed || !inCamera(hazard.x, hazard.y) || !state.visited.has(`${hazard.x},${hazard.y}`)) continue;
+    if (!hazard.revealed || !inRenderCamera(hazard.x, hazard.y) || !state.visited.has(`${hazard.x},${hazard.y}`)) continue;
     const x = hazard.x * TILE, y = hazard.y * TILE;
     const sprite = hazard.type === 'flame' ? (flameActive(hazard) ? 'flameOn' : 'flameOff')
       : hazard.type === 'rocks' ? (hazard.stage === 'spent' ? 'rockSpent' : 'rockCrack') : 'spikes';
-    drawSprite(sprite, x + TILE / 2, y + TILE / 2, 2);
+    drawSprite(sprite, x + TILE / 2, y + TILE / 2, 2, sprite === 'flameOn' ? environmentAnimationFrame(hazard.x, hazard.y) : 0);
     if (hazard.type === 'rocks' && hazard.stage === 'warning') {
       const fall = Math.max(0, Math.min(1, 1 - (hazard.impactAt - state.hazardTime) / 1.2));
       ctx.fillStyle = '#ac9981'; ctx.fillRect(x + 6, y - 10 + Math.round(fall * 20), 7, 6); ctx.fillRect(x + 22, y - 8 + Math.round(fall * 20), 5, 5);
     }
   }
   const drop = state.floorKey && state.floorKey.drop;
-  if (drop && inCamera(drop.x, drop.y) && state.visited.has(`${drop.x},${drop.y}`)) {
+  if (drop && inRenderCamera(drop.x, drop.y) && state.visited.has(`${drop.x},${drop.y}`)) {
     drawSprite('key', drop.x * TILE + TILE / 2, drop.y * TILE + TILE / 2, 2);
   }
 }
 
 function drawHazardWarnings() {
   for (const hazard of state.hazards) {
-    if (hazard.type !== 'rocks' || hazard.stage !== 'warning' || !inCamera(hazard.x, hazard.y) || fogLevel(hazard.x, hazard.y) >= 3) continue;
+    if (hazard.type !== 'rocks' || hazard.stage !== 'warning' || !inRenderCamera(hazard.x, hazard.y) || fogLevel(hazard.x, hazard.y) >= 3) continue;
     const x = hazard.x * TILE, y = hazard.y * TILE;
     ctx.fillStyle = '#ffd07a'; ctx.fillRect(x + 8, y - 23, 16, 19);
     ctx.fillStyle = '#211b15'; ctx.font = 'bold 18px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
@@ -1181,7 +1305,7 @@ function drawHazardWarnings() {
 
 function drawMimicDefeat(scene) {
   const visual = state.bossDefeat.visual;
-  if (!inCamera(visual.tileX, visual.tileY)) return;
+  if (!inRenderCamera(visual.tileX, visual.tileY)) return;
   ctx.save();
   ctx.globalAlpha = scene.alpha;
   ctx.translate(visual.x + scene.shake, visual.y + scene.rise);
@@ -1256,50 +1380,50 @@ function draw() {
   const p = state.player;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   updateCamera();
+  const view = renderViewport();
   ctx.save();
   ctx.scale(MAP_ZOOM, MAP_ZOOM);
-  ctx.translate(-state.camera.x * TILE, -state.camera.y * TILE);
-  for (let y = state.camera.y; y < state.camera.y + VIEW_H; y++) {
-    for (let x = state.camera.x; x < state.camera.x + VIEW_W; x++) {
+  ctx.translate(-Math.round(view.camera.x * TILE * MAP_ZOOM) / MAP_ZOOM, -Math.round(view.camera.y * TILE * MAP_ZOOM) / MAP_ZOOM);
+  for (let y = view.y0; y < view.y1; y++) {
+    for (let x = view.x0; x < view.x1; x++) {
       drawDungeonTile(x, y);
     }
   }
   drawDungeonTorches();
   drawFloorDetails();
   for (const [stairs, glyph] of [[state.depth < FINAL_DEPTH ? state.stairs : null, '▼'], [state.depth > 1 ? state.upstairs : null, '▲']]) {
-    if (!stairs || !inCamera(stairs.x, stairs.y) || !state.visited.has(`${stairs.x},${stairs.y}`)) continue;
+    if (!stairs || !inRenderCamera(stairs.x, stairs.y) || !state.visited.has(`${stairs.x},${stairs.y}`)) continue;
     const spriteName = glyph === '▼' ? 'stairsDown' : 'stairsUp';
     drawSprite(spriteName, stairs.x * TILE + TILE / 2, stairs.y * TILE + TILE / 2, 2);
   }
   for (const t of state.treasures) {
-    if (!inCamera(t.x, t.y) || !state.visited.has(`${t.x},${t.y}`)) continue;
+    if (!inRenderCamera(t.x, t.y) || !state.visited.has(`${t.x},${t.y}`)) continue;
     drawSprite('chest', t.x * TILE + TILE / 2, t.y * TILE + TILE / 2, 2);
   }
   for (const pot of state.potions) {
-    if (!inCamera(pot.x, pot.y) || !state.visited.has(`${pot.x},${pot.y}`)) continue;
+    if (!inRenderCamera(pot.x, pot.y) || !state.visited.has(`${pot.x},${pot.y}`)) continue;
     drawSprite('potion', pot.x * TILE + TILE / 2, pot.y * TILE + TILE / 2, 2);
   }
-  if (state.prisoner && inCamera(state.prisoner.x, state.prisoner.y) && !state.prisoner.rescued && fogLevel(state.prisoner.x, state.prisoner.y) < 3) {
+  if (state.prisoner && inRenderCamera(state.prisoner.x, state.prisoner.y) && !state.prisoner.rescued && fogLevel(state.prisoner.x, state.prisoner.y) < 3) {
     const px = state.prisoner.x * TILE + TILE / 2, py = state.prisoner.y * TILE + TILE / 2;
     drawActorSprite('prisoner', px, py, 2);
   }
-  if (state.princess && inCamera(state.princess.x, state.princess.y) && !state.princess.rescued && fogLevel(state.princess.x, state.princess.y) < 3) {
+  if (state.princess && inRenderCamera(state.princess.x, state.princess.y) && !state.princess.rescued && fogLevel(state.princess.x, state.princess.y) < 3) {
     const px = state.princess.x * TILE + TILE / 2, py = state.princess.y * TILE + TILE / 2;
     drawActorSprite('princess', px, py, 2);
   }
-  if (state.merchant && inCamera(state.merchant.x, state.merchant.y) && fogLevel(state.merchant.x, state.merchant.y) < 3) {
+  if (state.merchant && inRenderCamera(state.merchant.x, state.merchant.y) && fogLevel(state.merchant.x, state.merchant.y) < 3) {
     const px = state.merchant.x * TILE + TILE / 2, py = state.merchant.y * TILE + TILE / 2;
     drawActorSprite('merchant', px, py, 2);
   }
   for (const m of state.monsters) {
-    if (m.hp <= 0 || !inCamera(m.x, m.y)) continue;
+    if (m.hp <= 0 || !inRenderCamera(m.x, m.y)) continue;
     if (fogLevel(m.x, m.y) >= 3) continue;
     const visual = monsterVisual(m);
-    drawActorSprite(visual.sprite, visual.x, visual.y, visual.scale);
-
+    drawActorSprite(visual.sprite, visual.x, visual.y, visual.scale, m);
   }
-  for (let y = state.camera.y; y < state.camera.y + VIEW_H; y++) {
-    for (let x = state.camera.x; x < state.camera.x + VIEW_W; x++) {
+  for (let y = view.y0; y < view.y1; y++) {
+    for (let x = view.x0; x < view.x1; x++) {
       const d = Math.max(Math.abs(x - p.x), Math.abs(y - p.y));
       if (d <= 1) continue;
       const key = `${x},${y}`;
@@ -1315,7 +1439,7 @@ function draw() {
   }
   // Keep visible actors' health bars readable above the terrain fog.
   for (const m of state.monsters) {
-    if (m.hp <= 0 || !inCamera(m.x, m.y) || fogLevel(m.x, m.y) >= 3) continue;
+    if (m.hp <= 0 || !inRenderCamera(m.x, m.y) || fogLevel(m.x, m.y) >= 3) continue;
     const visual = monsterVisual(m);
     const barWidth = m.isBoss ? visual.width - 12 : 24;
     ctx.fillStyle = '#333'; ctx.fillRect(visual.x - barWidth / 2, visual.top - 7, barWidth, 4);
@@ -1323,7 +1447,8 @@ function draw() {
   }
   if (state.bubble && state.bubble.ttl > 0) {
     const text = state.bubble.text;
-    const px = p.x * TILE + TILE / 2, py = p.y * TILE - 8;
+    const position = actorRenderPosition(p);
+    const px = position.x * TILE + TILE / 2, py = position.y * TILE - 8;
     ctx.font = '11px monospace';
     const w = ctx.measureText(text).width + 12;
     ctx.fillStyle = '#f4f1e6';
@@ -1332,15 +1457,17 @@ function draw() {
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(text, px, py - 13);
   }
-  const px = p.x * TILE + TILE / 2, py = p.y * TILE + TILE / 2;
+  const position = actorRenderPosition(p);
+  const px = position.x * TILE + TILE / 2, py = position.y * TILE + TILE / 2;
   ctx.save(); ctx.translate(px, py);
-  drawActorSprite('knight', 0, 0, 2);
+  drawActorSprite('knight', 0, 0, 2, p);
   ctx.restore();
   drawMonsterSpeech();
   drawHazardWarnings();
   if (defeat && defeat.kind === 'mimic') drawMimicDefeat(defeat);
   ctx.restore();
   if (defeat && defeat.kind === 'dragon') drawDragonDefeat(defeat);
+  requestMotionFrame();
 }
 
 function endingPhase(time) {
@@ -1368,6 +1495,7 @@ function startEnding() {
     lastTimestamp: null, events: new Set(), dragon: { ...dragon, hp: 0 } };
   clearBossDefeat();
   clearMonsterSpeech();
+  clearMovementAnimation();
   state.gameOver = true; state.won = true; state.pause = null; state.bubble = null;
   document.getElementById('overlay').style.display = 'none';
   log('At last, you reach the princess.');
@@ -1700,13 +1828,15 @@ function renderMinimap() {
     mapCtx.fillRect(x * scale, y * scale, scale, scale);
   }
   mapCtx.strokeStyle = '#9aaac1'; mapCtx.lineWidth = 1;
-  mapCtx.strokeRect(state.camera.x * scale + 0.5, state.camera.y * scale + 0.5, VIEW_W * scale - 1, VIEW_H * scale - 1);
+  const camera = renderCamera();
+  mapCtx.strokeRect(camera.x * scale + 0.5, camera.y * scale + 0.5, VIEW_W * scale - 1, VIEW_H * scale - 1);
   for (const [stairs, color] of [[state.depth > 1 ? state.upstairs : null, '#8ecaff'], [state.depth < FINAL_DEPTH ? state.stairs : null, '#f4cf78']]) {
     if (!stairs || !state.visited.has(`${stairs.x},${stairs.y}`)) continue;
     mapCtx.fillStyle = color;
     mapCtx.fillRect(stairs.x * scale, stairs.y * scale, scale, scale);
   }
-  const px = state.player.x * scale, py = state.player.y * scale;
+  const position = actorRenderPosition(state.player);
+  const px = position.x * scale, py = position.y * scale;
   mapCtx.fillStyle = '#07151a'; mapCtx.fillRect(px - 1, py - 1, scale + 2, scale + 2);
   mapCtx.fillStyle = '#86f2c3'; mapCtx.fillRect(px, py, scale, scale);
   document.getElementById('minimapDepth').textContent = `D${state.depth}`;
@@ -1716,6 +1846,7 @@ function resetHelpClock() {
   state.lastTick = Date.now();
   if (state.ending) state.ending.lastTimestamp = null;
   if (state.bossDefeat) state.bossDefeat.lastTimestamp = null;
+  state.motion.lastTimestamp = null;
 }
 
 function openHelp() {
@@ -1857,6 +1988,7 @@ document.addEventListener('visibilitychange', () => {
   state.lastTick = Date.now();
   if (state.ending) state.ending.lastTimestamp = null;
   if (state.bossDefeat) state.bossDefeat.lastTimestamp = null;
+  stopMotionAnimation(); requestMotionFrame();
 });
 
 for (const [id, action] of [

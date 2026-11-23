@@ -1802,8 +1802,52 @@ function spriteDimensions(name) {
   return { width: Math.max(...grid.map(row => row.length)) / ART_DENSITY, height: grid.length / ART_DENSITY };
 }
 
-function paintSprite(target, name, x = 0, y = 0, scale = 1) {
-  const grid = SPRITES[name], palette = SPRITE_PALETTES[name];
+function spriteFrameGrid(name, frame) {
+  const source = SPRITES[name];
+  if (!frame || !['knight', 'goblin', 'skeleton', 'orc', 'bat', 'dragonBoss', 'torch', 'flameOn'].includes(name)) return source;
+  const width = source[0].length, height = source.length;
+  const grid = Array.from({ length: height }, () => Array(width).fill('.'));
+  const wings = name === 'bat' || name === 'dragonBoss';
+  const fire = name === 'torch' || name === 'flameOn';
+  const phase = [0, -0.28, 0.85, 0.42][frame % 4];
+  // Move wing columns / alternating feet first, then retain the body above them.
+  for (const movingParts of [true, false]) {
+    for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
+      const ch = source[y][x];
+      if (ch === '.') continue;
+      let dx = 0, dy = 0, moving = false;
+      if (fire) {
+        moving = ['o', 'y', 'Y'].includes(ch) || (ch === 'k' && y < (name === 'torch' ? 19 : 21));
+        if (moving) {
+          dx = Math.round(Math.sin(y * 0.7 + frame * 1.6) * 0.8);
+          dy = frame === 1 ? -1 : frame === 2 ? 1 : 0;
+        }
+      } else if (wings) {
+        moving = name === 'bat' ? (x < 12 || x > 20) && y >= 6
+          : ((x < 28 && y < 43) || (x > 65 && y < 22 && ch !== 'h'));
+        if (moving) {
+          const hinge = name === 'bat' ? (x < 16 ? 12 : 20) : (x < 40 ? 32 : 56);
+          dy = Math.round(Math.abs(x - hinge) * phase * (name === 'bat' ? 0.7 : 0.5));
+        }
+      } else if (frame % 2) {
+        const stride = frame === 1 ? 1 : -1;
+        if (y >= 25 && x >= 9 && x <= 24) {
+          moving = true;
+          dx = (x < 17 ? -1 : 1) * stride;
+          dy = (x < 17) === (stride > 0) ? -1 : 0;
+        } else if (y >= 14 && y < 26 && (x < 9 || x > 24)) {
+          moving = true; dy = (x < 16 ? 1 : -1) * stride;
+        }
+      }
+      if (moving !== movingParts) continue;
+      if (x + dx >= 0 && x + dx < width && y + dy >= 0 && y + dy < height) grid[y + dy][x + dx] = ch;
+    }
+  }
+  return grid.map(row => row.join(''));
+}
+
+function paintSprite(target, name, x = 0, y = 0, scale = 1, frame = 0) {
+  const grid = spriteFrameGrid(name, frame), palette = SPRITE_PALETTES[name];
   for (let row = 0; row < grid.length; row++) for (let col = 0; col < grid[row].length; col++) {
     const color = palette[grid[row][col]];
     if (!color) continue;
@@ -1812,20 +1856,21 @@ function paintSprite(target, name, x = 0, y = 0, scale = 1) {
   }
 }
 
-function drawSprite(name, cx, cy, scale) {
+function drawSprite(name, cx, cy, scale, frame = 0) {
   const size = spriteDimensions(name), width = size.width * scale, height = size.height * scale;
   const x = Math.round(cx - width / 2), y = Math.round(cy - height / 2);
   const cache = graphicsCache().sprites;
-  if (!cache[name]) {
+  const key = frame ? `${name}:${frame}` : name;
+  if (!cache[key]) {
     const surface = graphicsSurface(size.width * ART_DENSITY, size.height * ART_DENSITY);
-    if (surface) { paintSprite(surface.getContext('2d'), name); cache[name] = surface; }
+    if (surface) { paintSprite(surface.getContext('2d'), name, 0, 0, 1, frame); cache[key] = surface; }
   }
-  if (cache[name]) {
+  if (cache[key]) {
     ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(cache[name], x, y, width, height);
+    ctx.drawImage(cache[key], x, y, width, height);
   } else {
     // Preserve the dependency-free no-DOM smoke harness.
-    paintSprite(ctx, name, x, y, scale / ART_DENSITY);
+    paintSprite(ctx, name, x, y, scale / ART_DENSITY, frame);
   }
 }
 
@@ -1844,11 +1889,36 @@ function drawEquipmentIcon(slot, item) {
   }
 }
 
-function drawActorSprite(name, cx, cy, scale) {
+function actorAnimationPose(name, actor) {
+  const pose = { frame: 0, sx: 1, sy: 1, rise: 0, facing: 1 };
+  if (!actor || typeof window.requestAnimationFrame !== 'function') return pose;
+  const moving = actorIsMoving(actor), key = actorMotionKey(actor), time = state.motion.time;
+  pose.facing = state.motion.facing[key] || 1;
+  if (name === 'bat' || name === 'dragonBoss') {
+    pose.frame = Math.floor(time * 8 + (actor.id || 0) % 4) % 4;
+    if (name === 'bat') pose.rise = Math.sin(time * 8) * 0.8;
+  } else if (moving && name === 'slime') {
+    const progress = motionProgress(state.motion.moves[key]), hop = Math.sin(progress * Math.PI);
+    pose.sx = 1.12 - hop * 0.18; pose.sy = 0.85 + hop * 0.25; pose.rise = -hop * 4;
+  } else if (moving && name === 'mimic') {
+    pose.rise = -Math.sin(motionProgress(state.motion.moves[key]) * Math.PI) * 2;
+  } else if (moving) {
+    pose.frame = Math.floor(time * 12) % 4;
+    pose.rise = -Math.abs(Math.sin(time * Math.PI * 12)) * 0.7;
+  }
+  return pose;
+}
+
+function drawActorSprite(name, cx, cy, scale, actor = null) {
   const size = spriteDimensions(name);
   ctx.save(); ctx.fillStyle = 'rgba(7, 14, 26, 0.45)';
   ctx.beginPath(); ctx.ellipse(cx, cy + size.height * scale / 2 - 3, size.width * scale * 0.34, Math.max(3, scale * 1.5), 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
-  drawSprite(name, cx, cy, scale);
+  const pose = actorAnimationPose(name, actor);
+  if (pose.sx !== 1 || pose.sy !== 1 || pose.rise || pose.facing !== 1) {
+    const foot = size.height * scale / 2;
+    ctx.save(); ctx.translate(cx, cy + foot + pose.rise); ctx.scale(pose.sx * pose.facing, pose.sy);
+    drawSprite(name, 0, -foot, scale, pose.frame); ctx.restore();
+  } else drawSprite(name, cx, cy, scale, pose.frame);
 }
 
 function drawDungeonTile(x, y) {
@@ -1876,9 +1946,11 @@ function drawDungeonTile(x, y) {
 
 function drawDungeonTorches() {
   const cache = graphicsCache().lights;
-  for (let y = state.camera.y; y < state.camera.y + VIEW_H; y++) for (let x = state.camera.x; x < state.camera.x + VIEW_W; x++) {
-    if (state.map[y][x] !== 1 || y + 1 >= H || state.map[y + 1][x] === 1 || (x * 7 + y * 13) % 6 !== 0) continue;
+  const view = renderViewport();
+  for (let y = view.y0; y < view.y1; y++) for (let x = view.x0; x < view.x1; x++) {
+    if (!wallTorchAt(x, y)) continue;
     const cx = x * TILE + TILE / 2, cy = y * TILE + TILE / 2;
+    const frame = environmentAnimationFrame(x, y);
     if (!cache.torch) {
       const surface = graphicsSurface(156, 156);
       if (surface) {
@@ -1888,9 +1960,20 @@ function drawDungeonTorches() {
         target.fillStyle = glow; target.fillRect(0, 0, 156, 156); cache.torch = surface;
       }
     }
-    if (cache.torch) ctx.drawImage(cache.torch, cx - 78, cy - 78);
-    drawSprite('torch', cx, cy, 2);
+    if (cache.torch) {
+      ctx.save(); ctx.globalAlpha = [0.94, 1, 0.88, 0.97][frame];
+      ctx.drawImage(cache.torch, cx - 78, cy - 78); ctx.restore();
+    }
+    drawSprite('torch', cx, cy, 2, frame);
   }
+}
+
+function wallTorchAt(x, y) {
+  return state.map[y][x] === 1 && y + 1 < H && state.map[y + 1][x] !== 1 && (x * 7 + y * 13) % 6 === 0;
+}
+
+function environmentAnimationFrame(x, y) {
+  return typeof window.requestAnimationFrame === 'function' ? Math.floor(state.motion.time * 9 + (x * 3 + y) % 4) % 4 : 0;
 }
 
 function paintDungeonTile(c, wall, variant, front = false) {
