@@ -110,4 +110,4 @@ Last reviewed: 2026-11-23. Build v0.12.0 adds smooth movement, walking/wing/flam
 - State persists in memory within a run; R/reload resets floors and progression.
 - Keep functions flat and mutable game state in `state`; no modules, dependencies, or build step.
 - Keep the legacy smoke test outside the repo: `/var/folders/lp/737kz569419gglsqmvs0x0200000gn/T/opencode/smoke.js`.
-- Branch `main` latest commit is `e69e024` (`v0.7.0, minimap`); the v0.8.0 boss-defeat changes are uncommitted. Do not stage or commit unless explicitly asked; preserve user staging.
+- Branch `main` has existing history. Check current git status rather than relying on old handover commit IDs; preserve user changes/staging and do not stage or commit unless explicitly asked.
