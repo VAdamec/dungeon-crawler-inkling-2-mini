@@ -224,7 +224,7 @@ test('remembered stairs, loot, and terrain render without showing distant monste
     drawSprite=function(...args) { window.drawnSprites.push(args); originalDrawSprite(...args); }`);
   g.calls.length = 0; g.run('draw()');
   assert.equal(g.run("window.drawnSprites.some(([name,x,y])=>name==='stairsDown' && x===state.stairs.x*TILE+TILE/2 && y===state.stairs.y*TILE+TILE/2)"), true);
-  assert.equal(g.calls.some(c => c[0] === 'strokeRect'), true);
+  assert.equal(g.run("window.drawnSprites.some(([name])=>name==='chest')"), true);
 });
 
 test('equipment with absent optional stats keeps combat numbers finite', () => {
@@ -527,7 +527,7 @@ test('larger generated worlds keep all floor tiles, key carriers, stairs and NPC
   const g = game();
   for (let i = 0; i < 50; i++) {
     g.run(`newGame(); enterFloor(${1 + i % 10},false)`);
-    assert.deepEqual(g.json('[state.map[0].length,state.map.length,VIEW_W,VIEW_H]'), [72,48,36,24]);
+    assert.deepEqual(g.json('[state.map[0].length,state.map.length,VIEW_W,VIEW_H]'), [72,48,18,12]);
     assert.equal(g.run('state.rooms.length >= 18 && state.rooms.length <= 22'), true);
     assert.equal(g.run('floorDistances(state.map,state.upstairs).size === state.map.flat().filter(t=>t===0).length'), true);
     assert.equal(g.run('floorDistances(state.map,state.upstairs).get(`${state.stairs.x},${state.stairs.y}`) > VIEW_W'), true);
@@ -692,7 +692,7 @@ test('blocking obstacles stop both player movement and monster movement without 
 
 test('camera follows full-world movement, clamps at every edge, and draws only a viewport', () => {
   const g = game();
-  for (const [x,y,camX,camY] of [[1,1,0,0],[40,30,22,18],[71,47,36,24],[0,47,0,24],[71,0,36,0]]) {
+  for (const [x,y,camX,camY] of [[1,1,0,0],[40,30,31,24],[71,47,54,36],[0,47,0,36],[71,0,54,0]]) {
     g.run(`state.player.x=${x};state.player.y=${y};updateCamera()`);
     assert.deepEqual(g.json('[state.camera.x,state.camera.y]'), [camX,camY]);
   }
@@ -702,7 +702,7 @@ test('camera follows full-world movement, clamps at every edge, and draws only a
   g.calls.length=0;g.run('draw()');
   const translate=g.calls.find(c=>c[0]==='translate');
   assert.deepEqual(translate, ['translate', -g.run('state.camera.x')*32, -g.run('state.camera.y')*32]);
-  assert.equal(g.calls.filter(c=>c[0]==='fillRect'&&c[3]===32&&c[4]===32).length <= 36*24*2, true);
+  assert.equal(g.calls.filter(c=>c[0]==='fillRect'&&c[3]===32&&c[4]===32).length <= 18*12*2, true);
   assert.equal(g.calls.filter(c=>c[0]==='save').length, g.calls.filter(c=>c[0]==='restore').length);
   assert.equal(g.run('inCamera(0,0)'), false);
 });
@@ -712,7 +712,7 @@ test('falling-rock warning is drawn above the player instead of hidden under the
   g.run(`state.monsters=[];state.hazards=[{type:'rocks',x:state.player.x,y:state.player.y,revealed:true,triggered:true,stage:'warning',impactAt:1.2}];revealAroundPlayer()`);
   g.calls.length=0;g.run('draw()');
   const warning=g.calls.findIndex(c=>c[0]==='fillText'&&c[1]==='!');
-  const playerTransform=g.calls.findLastIndex(c=>c[0]==='rotate');
+  const playerTransform=g.calls.findLastIndex(c=>c[0]==='translate');
   assert.equal(warning > playerTransform, true);
   assert.equal(g.calls[warning][3] < g.run('state.player.y')*32, true);
 });
@@ -924,8 +924,8 @@ test('speech follows its actor, hides with fog/offscreen/death, and stays clampe
     g.run(`state.player.x=${px};state.player.y=${py};state.monsters[0].x=${mx};state.monsters[0].y=${my};state.monsterQuoteIndex=2;updateCamera();clearMonsterSpeech();monsterTalk(state.monsters[0])`);
     const b=g.json('monsterSpeechLayout()');const cam=g.json('state.camera');
     assert.notEqual(b,null);
-    assert.equal(b.x>=cam.x*32&&b.x+b.width<=(cam.x+36)*32,true);
-    assert.equal(b.y>=cam.y*32&&b.y+b.height<=(cam.y+24)*32,true);
+    assert.equal(b.x>=cam.x*32&&b.x+b.width<=(cam.x+18)*32,true);
+    assert.equal(b.y>=cam.y*32&&b.y+b.height<=(cam.y+12)*32,true);
     if(my===0) assert.equal(b.below,true);
   }
   g.run('state.monsters[0].hp=0');assert.equal(g.run('monsterSpeechLayout()'),null);
@@ -946,7 +946,7 @@ test('speech draws after world/player layers without replacing NPC bubbles or le
   g.run('state.bubble={text:"NPC hello",ttl:90};monsterTalk(state.monsters[0])');
   const text=g.run('state.monsterSpeech.text');g.calls.length=0;g.run('draw()');
   const bubble=g.calls.findIndex(c=>c[0]==='fillText'&&c[1]===text);
-  const player=g.calls.findLastIndex(c=>c[0]==='rotate');
+  const player=g.calls.findLastIndex(c=>c[0]==='translate');
   assert.equal(bubble>player,true);
   assert.equal(g.calls.some(c=>c[0]==='fillText'&&c[1]==='NPC hello'),true);
   assert.equal(g.calls.filter(c=>c[0]==='save').length,g.calls.filter(c=>c[0]==='restore').length);
@@ -1009,7 +1009,7 @@ test('minimap draws only explored terrain, discovered stairs, player and viewpor
   g.minimapCalls.length=0;g.run('renderMinimap()');
   const first=JSON.stringify(g.minimapCalls);
   assert.equal(g.minimapCalls.filter(c=>c[0]==='fillRect').length,6,'background, three known tiles, player border and player');
-  assert.equal(g.minimapCalls.some(c=>c[0]==='strokeRect'&&c[1]===0.5&&c[2]===0.5&&c[3]===107&&c[4]===71),true);
+  assert.equal(g.minimapCalls.some(c=>c[0]==='strokeRect'&&c[1]===0.5&&c[2]===0.5&&c[3]===53&&c[4]===35),true);
   assert.equal(g.minimapCalls.some(c=>c[0]==='set'&&c[2]==='#f4cf78'),false,'undiscovered stair is hidden');
   g.run(`state.map[20][20]=0;state.monsters=[{id:1,x:3,y:2,hp:10}];state.floorKey.carrierId=1;
     state.floorKey.drop={x:3,y:2};state.hazards=[{x:3,y:2,type:'spikes',revealed:false}];state.treasures=[{x:3,y:2}]`);
@@ -1026,11 +1026,201 @@ test('minimap follows floor-local exploration, scrolling and restart without mut
   const before=g.run('JSON.stringify(state)');
   g.minimapCalls.length=0;g.run('renderMinimap();renderMinimap()');
   assert.equal(g.run('JSON.stringify(state)'),before);
-  assert.equal(g.minimapCalls.some(c=>c[0]==='strokeRect'&&c[1]===66.5&&c[2]===54.5),true);
+  assert.equal(g.minimapCalls.some(c=>c[0]==='strokeRect'&&c[1]===93.5&&c[2]===72.5),true);
   down(g);assert.equal(g.elements.minimapDepth.textContent,'D2');
   assert.equal(g.run("state.visited.has('40,30')"),false);
   up(g);assert.equal(g.elements.minimapDepth.textContent,'D1');
   assert.equal(g.run("state.visited.has('40,30')"),true);
   g.key('r');assert.equal(g.elements.minimapDepth.textContent,'D1');
   assert.equal(g.run("state.visited.has('40,30')"),false);
+});
+
+test('Mimic defeat plays a short in-world flourish and freezes play until it finishes',()=>{
+  const g=game();
+  g.run('enterFloor(5,false);state.player.x=state.boss.x-1;state.player.y=state.boss.y;updateCamera()');
+  g.run('damageMonster(state.boss,state.boss.hp)');
+  assert.equal(g.run('state.bossDefeat.kind'),'mimic');
+  assert.equal(g.run('state.bossDefeat.phase'),'snap');
+  assert.equal(g.run('bossDefeatActive()'),true);
+  assert.equal(g.run('state.floors[5].bossDefeated'),true,'boss rewards stay immediate');
+  const frozen=g.json('[state.player,state.monsters,state.activeTime,state.hazardTime]');
+  g.key('ArrowRight');g.run('enemyTick()');
+  assert.deepEqual(g.json('[state.player,state.monsters,state.activeTime,state.hazardTime]'),frozen);
+  g.calls.length=0;g.run('draw()');
+  assert.equal(g.calls.some(c=>c[0]==='fillText'&&c[1]==='MIMIC DEFEATED'),true);
+  assert.equal(g.calls.filter(c=>c[0]==='save').length,g.calls.filter(c=>c[0]==='restore').length);
+  const initial=g.json('bossDefeatScene()');
+  g.run('advanceBossDefeat(0.5)');
+  const coins=g.json('bossDefeatScene()');
+  assert.equal(coins.phase,'coins');
+  assert.equal(coins.coins.length,12);
+  assert.equal(coins.coins.some((c,i)=>Math.abs(c.x-initial.coins[i].x)>1),true);
+  g.run('advanceBossDefeat(2)');
+  assert.equal(g.run('state.bossDefeat'),null);
+  assert.equal(g.run('bossDefeatActive()'),false);
+});
+
+test('Dragon defeat uses a screen-space cinematic and clears before the romance ending',()=>{
+  const g=game();
+  g.run('enterFloor(10,false);damageMonster(state.boss,state.boss.hp)');
+  assert.equal(g.run('state.bossDefeat.kind'),'dragon');
+  assert.equal(g.run('state.gameOver'),false,'dragon kill is not the final victory');
+  const frozen=g.json('[state.player,state.monsters,state.activeTime,state.hazardTime]');
+  g.key('ArrowRight');g.run('enemyTick()');
+  assert.deepEqual(g.json('[state.player,state.monsters,state.activeTime,state.hazardTime]'),frozen);
+  g.calls.length=0;g.run('draw()');
+  assert.equal(g.calls.some(c=>c[0]==='setTransform'&&c[1]===1&&c[5]===0&&c[6]===0),true);
+  assert.equal(g.calls.some(c=>c[0]==='fillText'&&c[1]==='DRAGON SLAIN'),true);
+  assert.equal(g.calls.filter(c=>c[0]==='save').length,g.calls.filter(c=>c[0]==='restore').length);
+  const initial=g.json('bossDefeatScene()');
+  g.run('advanceBossDefeat(1)');
+  assert.equal(g.run('bossDefeatScene().phase'),'fall');
+  assert.equal(g.run('bossDefeatScene().dragonY')>initial.dragonY,true);
+  g.run('state.player.x=state.princess.x;state.player.y=state.princess.y;pickup()');
+  assert.equal(g.run('state.ending.phase'),'reveal');
+  assert.equal(g.run('state.bossDefeat'),null);
+});
+
+test('boss defeat frames are clamped, hidden-tab safe, identity-bound, and skippable',()=>{
+  const g=game();
+  g.run(`window.bossFrames=new Map();window.bossCancelled=[];window.bossNextFrame=0;
+    window.requestAnimationFrame=fn=>{const id=++window.bossNextFrame;window.bossFrames.set(id,fn);return id;};
+    window.cancelAnimationFrame=id=>{window.bossCancelled.push(id);window.bossFrames.delete(id);}`);
+  g.run('enterFloor(5,false);damageMonster(state.boss,state.boss.hp)');
+  assert.equal(g.run('window.bossFrames.size'),1);
+  g.run('window.oldBossAnim=state.bossDefeat;window.oldBossCallback=window.bossFrames.get(state.bossDefeat.frameId)');
+  g.run('bossDefeatFrame(1000,state.bossDefeat);bossDefeatFrame(1100,state.bossDefeat)');
+  assert.equal(g.run('state.bossDefeat.elapsed'),0.1);
+  g.run('bossDefeatFrame(9000,state.bossDefeat)');
+  assert.equal(g.run('state.bossDefeat.elapsed'),0.2);
+  g.run('document.hidden=true;bossDefeatFrame(20000,state.bossDefeat);advanceBossDefeat(50)');
+  assert.equal(g.run('state.bossDefeat.elapsed'),0.2);
+  g.run('document.hidden=false');g.visibility();
+  g.run('bossDefeatFrame(30000,state.bossDefeat)');
+  assert.equal(g.run('state.bossDefeat.elapsed'),0.2);
+  g.run('bossDefeatFrame(30050,state.bossDefeat)');
+  assert.ok(Math.abs(g.run('state.bossDefeat.elapsed')-0.25)<1e-9);
+  const frameId=g.run('state.bossDefeat.frameId');
+  g.key('r');
+  assert.equal(g.run('state.bossDefeat'),null);
+  assert.equal(g.run(`window.bossCancelled.includes(${frameId})`),true);
+  const messages=g.run('JSON.stringify(state.messages)');
+  g.run('window.oldBossCallback(50000)');
+  assert.equal(g.run('state.bossDefeat'),null);
+  assert.equal(g.run('JSON.stringify(state.messages)'),messages);
+  g.run('enterFloor(5,false);damageMonster(state.boss,state.boss.hp)');
+  g.key('Escape');
+  assert.equal(g.run('state.bossDefeat'),null);
+  assert.equal(g.run('state.floors[5].bossDefeated'),true);
+});
+
+test('refreshed sprite grids have complete palettes and retain logical boss dimensions',()=>{
+  const g=game();
+  assert.equal(g.run(`Object.entries(SPRITES).every(([name,grid])=>grid.length>0 && grid.every(row=>row.length===grid[0].length && [...row].every(c=>c==='.'||SPRITE_PALETTES[name][c])))`),true);
+  assert.deepEqual(g.json('spriteDimensions("knight")'),{width:16,height:16});
+  assert.deepEqual(g.json('spriteDimensions("mimic")'),{width:32,height:22});
+  assert.deepEqual(g.json('spriteDimensions("dragonBoss")'),{width:40,height:32});
+});
+
+test('static sprite and terrain raster caches reuse surfaces and survive restart without becoming floor state',()=>{
+  const g=game();
+  g.run(`window.surfaceCount=0;document.createElement=()=>{window.surfaceCount++;return {width:0,height:0,getContext:()=>ctx};};
+    drawSprite('knight',100,100,2);drawDungeonTile(6,5)`);
+  const count=g.run('window.surfaceCount');
+  assert.equal(count,2);
+  g.calls.length=0;g.run("drawSprite('knight',100,100,2);drawDungeonTile(6,5)");
+  assert.equal(g.run('window.surfaceCount'),count);
+  assert.equal(g.calls.filter(c=>c[0]==='drawImage').length,2);
+  const cache=g.run('state.art');g.key('r');
+  assert.equal(g.run('state.art'),cache);
+  assert.equal(g.run('FLOOR_FIELDS.includes("art")'),false);
+  assert.equal(g.run('Object.values(state.floors).some(f=>f.art)'),false);
+});
+
+test('terrain decoration is deterministic without consuming combat RNG or revealing hidden spikes',()=>{
+  const g=game();
+  g.run(`state.monsters=[];state.hazards=[];window.rngCalls=0;Math.random=()=>{window.rngCalls++;return 0.9;}`);
+  g.calls.length=0;g.run('draw()');const before=JSON.stringify(g.calls);
+  assert.equal(g.run('window.rngCalls'),0);
+  g.calls.length=0;g.run(`state.hazards=[{type:'spikes',x:state.player.x+1,y:state.player.y,revealed:false}];draw()`);
+  assert.equal(JSON.stringify(g.calls),before);
+  assert.equal(g.run('window.rngCalls'),0);
+});
+
+test('two-times zoom scales only the world, draws 18 by 12 tiles, and leaves ending framing unscaled',()=>{
+  const g=game();
+  g.run(`state.monsters=[];state.hazards=[];state.player.x=71;state.player.y=47;
+    window.drawnTiles=[];const originalTile=drawDungeonTile;
+    drawDungeonTile=function(x,y){window.drawnTiles.push([x,y]);originalTile(x,y);}`);
+  g.calls.length=0;g.run('draw()');
+  assert.equal(g.calls.some(c=>c[0]==='scale'&&c[1]===2&&c[2]===2),true);
+  assert.equal(g.calls.findIndex(c=>c[0]==='scale')<g.calls.findIndex(c=>c[0]==='translate'),true);
+  assert.equal(g.run('window.drawnTiles.length'),216);
+  assert.equal(g.run('window.drawnTiles.every(([x,y])=>x>=54&&x<72&&y>=36&&y<48)'),true);
+  assert.equal(g.run('VIEW_W*TILE*MAP_ZOOM===1152 && VIEW_H*TILE*MAP_ZOOM===768'),true);
+  reachEnding(g);g.calls.length=0;g.run('draw()');
+  assert.equal(g.calls.some(c=>c[0]==='scale'&&c[1]===2&&c[2]===2),false);
+  assert.equal(g.calls.some(c=>c[0]==='setTransform'&&c[1]===1&&c[4]===1),true);
+});
+
+test('help toggles by question mark and button, freezes gameplay and timers, and retains audio changes',()=>{
+  const g=game();speechEncounter(g);g.run('monsterTalk(state.monsters[0])');
+  g.key('?');assert.equal(g.run('state.helpOpen'),true);
+  const world=g.run('JSON.stringify([state.player,state.monsters,state.activeTime,state.hazardTime,state.combatElapsed,state.healElapsed,state.monsterSpeech,state.turn,state.pause])');
+  for(const key of ['w',' ','h','r','Enter'])g.key(key);
+  g.key('?',{repeat:true});assert.equal(g.run('state.helpOpen'),true);
+  g.run('advanceActiveTime(60);recoveryTick(60);hazardTick();enemyTick();attackMonster(state.monsters[0]);hurtPlayer(1000,"blocked")');
+  assert.equal(g.run('JSON.stringify([state.player,state.monsters,state.activeTime,state.hazardTime,state.combatElapsed,state.healElapsed,state.monsterSpeech,state.turn,state.pause])'),world);
+  g.click('audioToggle');g.run('setAudioVolume("music",22);setAudioVolume("effects",37)');
+  assert.equal(g.run('state.helpOpen'),true);g.key('Escape');
+  assert.equal(g.run('state.helpOpen'),false);
+  assert.deepEqual(g.json('[state.audio.enabled,state.audio.musicVolume,state.audio.effectsVolume]'),[false,0.22,0.37]);
+  g.click('helpToggle');assert.equal(g.run('state.helpOpen'),true);g.click('closeHelp');
+  assert.equal(g.elements.gameLayout.inert,false);
+  assert.equal(g.elements.helpOverlay.hidden,true);
+  assert.equal(g.run('FLOOR_FIELDS.includes("helpOpen")'),false);
+});
+
+test('help on launch does not start play and preserves health or retreat dialogs underneath',()=>{
+  const g=game(42,false);g.key('?');assert.equal(g.run('state.started'),false);
+  g.key('Enter');assert.equal(g.run('state.started'),false);
+  g.key('Escape');assert.equal(g.run('state.started'),false);g.key('Enter');
+  assert.equal(g.run('state.started'),true);
+  g.run('hurtPlayer(51,"test")');assert.equal(g.run('state.pause.kind'),'health');
+  g.key('?');g.key('h');g.key('Escape');
+  assert.equal(g.run('state.helpOpen'),false);assert.equal(g.run('state.pause.kind'),'health');
+  g.key('Escape');assert.equal(g.run('state.pause'),null);
+  g.run('retreat()');g.key('?');g.key('y');g.key('Escape');
+  assert.equal(g.run('state.pause.kind'),'retreat');assert.equal(g.run('state.player.hp'),9);
+  g.key('Escape');assert.equal(g.run('state.pause'),null);
+});
+
+test('help freezes cinematic progression and resets their timestamps without consuming Escape',()=>{
+  const g=game();g.run('enterFloor(5,false);damageMonster(state.boss,state.boss.hp);advanceBossDefeat(0.5)');
+  g.key('?');g.run('advanceBossDefeat(10);skipBossDefeat()');
+  assert.equal(g.run('state.bossDefeat.elapsed'),0.5);
+  g.key('Escape');assert.notEqual(g.run('state.bossDefeat'),null);
+  assert.equal(g.run('state.bossDefeat.lastTimestamp'),null);
+  g.run('advanceBossDefeat(0.1)');assert.equal(g.run('state.bossDefeat.elapsed'),0.6);
+  reachEnding(g);g.run('advanceEnding(2.5)');g.key('?');
+  g.run('advanceEnding(20);skipEnding()');assert.equal(g.run('state.ending.elapsed'),2.5);
+  g.key('Escape');assert.equal(g.run('state.ending.completed'),false);
+  assert.equal(g.run('state.ending.lastTimestamp'),null);
+  g.run('advanceEnding(0.1)');assert.equal(g.run('state.ending.elapsed'),2.6);
+  g.key('?');g.run('newGame();render()');assert.equal(g.run('state.helpOpen'),false);
+  assert.equal(g.elements.helpOverlay.hidden,true);assert.equal(g.elements.gameLayout.inert,false);
+});
+
+test('help traps Tab and Shift-Tab, closes from an input, and restores keyboard focus',()=>{
+  const g=game();g.run(`window.helpControls=['closeHelp','audioToggle','musicVolume','effectsVolume'].map(id=>document.getElementById(id));
+    for(const el of [...window.helpControls,canvas]) { el.isConnected=true;el.focus=()=>document.activeElement=el; }
+    document.getElementById('pauseOverlay').contains=()=>false;
+    document.getElementById('helpOverlay').querySelectorAll=()=>window.helpControls;
+    canvas.focus()`);
+  g.key('?');assert.equal(g.run('document.activeElement===window.helpControls[0]'),true);
+  g.key('Tab',{shiftKey:true});assert.equal(g.run('document.activeElement===window.helpControls[3]'),true);
+  g.key('Tab');assert.equal(g.run('document.activeElement===window.helpControls[0]'),true);
+  g.key('Tab');g.key('Tab');assert.equal(g.run('document.activeElement===window.helpControls[2]'),true);
+  g.key('Escape',{target:{tagName:'INPUT'}});
+  assert.equal(g.run('state.helpOpen'),false);assert.equal(g.run('document.activeElement===canvas'),true);
 });

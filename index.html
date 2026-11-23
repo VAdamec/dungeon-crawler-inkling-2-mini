@@ -46,6 +46,7 @@
   <div class="stat">Key <b id="keyStatus"></b></div>
   <div class="stat">Pos <b id="posText"></b></div>
   <div class="stat">Retreat <b id="retreatStatus"></b></div>
+  <button id="helpToggle" type="button" aria-label="Help and settings (?)" aria-controls="helpOverlay" aria-expanded="false" title="Help and settings (?)">?</button>
 </div>
 <div id="objective" aria-live="polite"></div>
 <div id="playArea">
@@ -71,6 +72,7 @@
     <p id="ovText"></p>
     <p>Press <b>R</b> to restart</p>
   </div>
+<div id="endingControls" hidden><button id="skipEnding" type="button">Skip to sunset (Esc)</button><button id="restartEnding" type="button">New adventure (R)</button></div>
 </div>
 <div id="rightSidebar">
   <section id="minimapPanel" aria-labelledby="minimapTitle">
@@ -84,15 +86,15 @@
   <h2 id="equipTitle">Equipment</h2>
   <div id="equipContent">
     <section id="weaponSlot" class="gear-slot empty" aria-labelledby="weaponLabel">
-      <div class="gear-heading"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="m29 5 6 0 0 6-17 17-6-6Z" fill="#cbd4d6"/><path d="m9 19 12 12-4 4L5 23Z" fill="#d9b55e"/><path d="m8 29 3 3-6 6-3-3Z" fill="#9c7040"/><path d="m31 8-16 16" stroke="#7f999f" stroke-width="2"/></svg><div><h3 id="weaponLabel">Weapon</h3><p id="weaponName"></p></div></div>
+      <div class="gear-heading"><canvas id="weaponIcon" class="gear-icon" width="32" height="32" aria-hidden="true"></canvas><div><h3 id="weaponLabel">Weapon</h3><p id="weaponName"></p></div></div>
       <p id="weaponBonuses" class="gear-bonuses"></p>
     </section>
     <section id="armorSlot" class="gear-slot empty" aria-labelledby="armorLabel">
-      <div class="gear-heading"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3 35 9v12c-2 8-8 13-15 17C13 34 7 29 5 21V9Z" fill="#364b5a" stroke="#d9b55e" stroke-width="3"/><path d="M20 7v26M9 17h22" stroke="#a3bac3" stroke-width="3"/></svg><div><h3 id="armorLabel">Armor / shield</h3><p id="armorName"></p></div></div>
+      <div class="gear-heading"><canvas id="armorIcon" class="gear-icon" width="32" height="32" aria-hidden="true"></canvas><div><h3 id="armorLabel">Armor / shield</h3><p id="armorName"></p></div></div>
       <p id="armorBonuses" class="gear-bonuses"></p>
     </section>
     <section id="ringSlot" class="gear-slot empty" aria-labelledby="ringLabel">
-      <div class="gear-heading"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="24" r="11" fill="none" stroke="#d9b55e" stroke-width="5"/><path d="m13 8 7-5 7 5-7 10Z" fill="#7bc7ad" stroke="#deca82" stroke-width="2"/><path d="m13 8 14 0" stroke="#c1eedc"/></svg><div><h3 id="ringLabel">Ring</h3><p id="ringName"></p></div></div>
+      <div class="gear-heading"><canvas id="ringIcon" class="gear-icon" width="32" height="32" aria-hidden="true"></canvas><div><h3 id="ringLabel">Ring</h3><p id="ringName"></p></div></div>
       <p id="ringBonuses" class="gear-bonuses"></p>
     </section>
     <div class="gear-summary"><h3>Gear bonuses</h3><div><span>Max HP</span><b id="gearHpBonus"></b></div><div><span>Strength</span><b id="gearStrBonus"></b></div></div>
@@ -103,12 +105,19 @@
       <div><dt>Defense</dt><dd id="heroDefense"></dd></div>
       <div><dt>Dexterity</dt><dd id="heroDexterity"></dd></div>
     </dl></div>
+    <div id="merchantStock" hidden></div>
   </div>
 </aside>
 </div>
 </div>
-<div id="endingControls" hidden><button id="skipEnding" type="button">Skip to sunset (Esc)</button><button id="restartEnding" type="button">New adventure (R)</button></div>
-<div id="merchantStock"></div>
+
+</main>
+
+<div id="helpOverlay" role="dialog" aria-modal="true" aria-labelledby="helpTitle" aria-describedby="helpHint" hidden>
+  <section class="help-dialog">
+    <header class="help-header"><div><h2 id="helpTitle">Help &amp; settings</h2><p id="helpHint">Time pauses while this window is open.</p></div><button id="closeHelp" type="button" aria-label="Close help">Close (Esc)</button></header>
+    <div class="help-content">
+      <h3>Controls</h3>
 <div id="help">Arrows/WASD: move · Space: collect / buy / use stairs · H: drink potion · X: sell all gear<br>
 Q/Backspace: ascend at ▲ · Enter: retreat · C/Esc: continue from health pause · R: restart<br>
 Find a monster’s key to unlock ▼. Space collects keys. Avoid fire, falling rocks, and hidden spikes.<br>
@@ -119,8 +128,10 @@ Potions are stored. Low HP pauses time; critical HP offers retreat. Retreat has 
   <label for="effectsVolume">Effects <input id="effectsVolume" type="range" min="0" max="100" value="80"> <output id="effectsVolumeText" for="effectsVolume">80%</output></label>
 </div>
 
-</main>
-
+      <p class="help-shortcuts">? opens or closes this window · M mutes sound · Esc skips a boss flourish or the ending.</p>
+    </div>
+  </section>
+</div>
 <script src="js/sprites.js"></script>
 <script src="js/game.js"></script>
 </body>

@@ -1,6 +1,6 @@
 # Tasks — Dungeon Crawler
 
-Last reviewed: 2026-11-23. Build v0.7.0 adds the approved explored-area minimap to monster combat quotes, larger bosses/arenas, persistence/recovery/audio, campaign/balance, scrolling/keys/hazards, and plot-twist ending. See `handover.md` for details and `README.md` for controls.
+Last reviewed: 2026-11-23. Build v0.11.0 adds the ? Help & settings dialog to 2× world zoom (18×12 view) and the approved static graphics refresh to boss-defeat flourishes, the explored-area minimap, monster combat quotes, larger bosses/arenas, persistence/recovery/audio, campaign/balance, scrolling/keys/hazards, and plot-twist ending. See `handover.md` for details and `README.md` for controls.
 
 ## Existing gameplay
 - [x] Keep a thin HTML shell, CSS, and two plain scripts with no runtime dependencies or build step; launch over `file://`.
@@ -49,7 +49,7 @@ Last reviewed: 2026-11-23. Build v0.7.0 adds the approved explored-area minimap 
 - [x] Freeze simulation before start; prevent the start key from also triggering a gameplay action. Keep canvas resolution and file:// support.
 
 ## Scrolling floors, keys, and hazards — complete
-- [x] Generate 72×48-tile worlds with about 22 rooms, branching corridors, loops, and distant stairs; keep a fixed 36×24-tile camera viewport.
+- [x] Generate 72×48-tile worlds with about 22 rooms, branching corridors, loops, and distant stairs; use an 18×12-tile camera viewport at 2× zoom.
 - [x] Follow the player with a clamped camera, cull every drawing layer to the viewport, and retain world-coordinate exploration on revisits.
 - [x] Secretly assign one ordinary key carrier per floor 1–9; drop/Space-collect the key, permanently unlock stairs, and preserve dropped/collected state without duplicates.
 - [x] Keep depth-5 Mimic defeat as an additional gate; retain depth-10 dragon-then-rescue victory.
@@ -66,11 +66,20 @@ Last reviewed: 2026-11-23. Build v0.7.0 adds the approved explored-area minimap 
 - [x] Add Esc/skip and R/restart controls. Cancel pending frames, reject stale callbacks, freeze hidden-tab timing, and prevent repeat interaction rewards.
 - [x] Keep the generic victory overlay out of the ending; retain normal death behavior.
 
+## Boss defeat flourishes — complete
+- [x] Commit boss XP/gold/flags/floor saves/logs first, then start a transient visual-only animation snapshot outside `FLOOR_FIELDS`.
+- [x] Give the Mimic a short in-world snap, coin burst, collapse, and **MIMIC DEFEATED** banner.
+- [x] Give the dragon a longer screen-space cinematic with darkened hall, lightning, embers, drooping wings, falling dragon, and **DRAGON SLAIN** banner.
+- [x] Freeze enemy ticks, hazards, recovery, and gameplay input during the flourish while keeping sound controls and R available; Esc skips.
+- [x] Use clamped identity-bound rAF frames with hidden-tab freeze and one-shot audio; clear on completion, travel, death, ending, skip, and restart, rejecting stale callbacks.
+- [x] Verify both animations, scene phases, rendering transforms, timing/lifecycle cleanup, and unchanged boss rewards in automated tests.
+
 ## Verification
 - [x] `node --check js/game.js` and `node --check js/sprites.js`.
-- [x] `node --test tests/game.test.cjs`: 61 tests pass, including 130 varied floor-generation checks and eight monster-speech tests.
+- [x] `node --test tests/game.test.cjs`: 72 tests pass, including 130 varied floor-generation checks, eight monster-speech tests, and three boss-defeat animation tests.
 - [x] Existing external startup/input smoke prints `SMOKE_OK`.
 - [x] Isolated Chrome over `file://`: floor round trip, stored potion/HUD, health and critical dialogs, frozen movement, focus restoration, retreat confirm/cancel, healing HUD, running audio context, and mute/unmute pass without JavaScript errors. Follow-up checks cover campaign gates/final rescue victory, boss persistence, active retreat cooldown/dialogs, scaled healing, separate volume buses and preferences. Launch/layout checks also verify click/Enter start, paused launch, branding hidden across restart, top stats, left journal history/scroll, right equipment panel/icons/bonuses, and desktop width behavior. Scrolling checks also verify a 58-step real keyboard path beyond old bounds, key drop/collection/return persistence, invisible-spike pixel equality before trigger, rock warnings/dodge, flame damage, and hazard pauses. Ending checks cover all story phases, hidden-tab/skip/restart timing, frozen world state, once-only rewards/events, and screen-coordinate rendering. Real-time ending playback took 14.05 seconds, with all six scenes, world freeze, skip, and restart checked without JavaScript errors; a native canvas preview was recorded. Screenshots inspected.
+- [x] Chrome check over `file://` played both boss-defeat flourishes in real time, verified frozen player/monster/activeTime/hazardTime during key input, confirmed Escape skip, and reported no JavaScript errors. Five animation-frame captures were saved to `/tmp` for human visual review.
 - Audible output quality was not assessed; audio initialization/scheduling and mute behavior were checked.
 
 ## Monster combat quotes — complete
@@ -81,16 +90,21 @@ Last reviewed: 2026-11-23. Build v0.7.0 adds the approved explored-area minimap 
 - [x] Cover timing, lifecycle, visibility, rendering, and RNG independence in eight automated tests; verify real keyboard combat and bubbles in Chrome over file://.
 
 ## Remaining follow-up
+- [x] Move permanent instructions/audio controls into Help & settings, toggled by ? and a HUD ? button, closed by ?/Esc/Close. Pause world/cinematic clocks, preserve nested health/retreat dialogs and audio settings, trap/restore focus, and fit mobile screens. Move merchant stock into equipment and ending buttons over the canvas; remove footer controls. All 72 tests plus browser/smoke/syntax checks pass.
+- [x] Apply approved 2× whole-map zoom with an 18×12 viewport, camera bounds/culling, smaller minimap outline, enlarged in-world overlays, and readable boss health bars above fog. Preserve HUD/sidebar sizes and cinematic framing. All 68 tests and browser/smoke/syntax checks pass.
+- [x] Implement the approved static graphics preview: full-body cast, cohesive large bosses, blue-grey stonework, worn floors/recessed walls, static torches/light, ground shadows, and matching item/stair/trap/equipment art.
+- [x] Cache sprite/terrain/light canvases under disposable `state.art`, preserve logical sprite bounds with source density, avoid scenery RNG, and retain file:// plus existing boss/ending animations. Save all preview sheets in `docs/previews/2026-11-23-static-graphics/`.
+- [x] Verify 67 tests, syntax, external smoke, real keyboard exploration, hidden-spike pixel equality, both boss-defeat scenes/ending/restart, mobile layout, no remote requests, and warm browser rendering cost.
 - [x] Add a right-side explored-area minimap above equipment, with floor label, player, discovered stairs, and camera outline; preserve secrets and floor-local exploration without new state. Verify hidden-content drawing, travel/restart, and responsive layout.
 - [x] Extend combat bubbles to five active seconds without early replacement; log each accepted quote once with the speaker name.
 - [x] Add dedicated winged/horned dragon artwork (120×96) and a large toothed Mimic (96×66), with shared bounds for health bars and bubbles; preserve single-tile combat.
 - [x] Generate larger boss arenas (18×14/22×18), three-tile halls, separated stairs, and clear spawn buffers; retain floor connectivity/persistence/campaign gates.
 - [x] Correct local-LLM staircase sprites that duplicated the knight: use stone steps with distinct gold up/down arrows. Keep existing stair discovery/camera/travel rules; update the rendering check for sprite-based stairs.
-- [ ] Human difficulty/feel playtest across an entire run and subjective music/effect assessment. Controlled tests and prepared encounters pass, but do not estimate a human completion rate; volume can now be adjusted independently.
+- [ ] Human difficulty/feel, boss-defeat animation pacing, and subjective music/effect playtest across an entire run. Controlled tests and prepared encounters pass, but do not estimate a human completion rate; volume can now be adjusted independently.
 
 ## Constraints
 - All runtime files are in this project directory. No runtime installation or server is needed.
 - State persists in memory within a run; R/reload resets floors and progression.
 - Keep functions flat and mutable game state in `state`; no modules, dependencies, or build step.
 - Keep the legacy smoke test outside the repo: `/var/folders/lp/737kz569419gglsqmvs0x0200000gn/T/opencode/smoke.js`.
-- Branch `main` has existing history (latest observed `b35f653`, `v0.6.0, larger bosses`). Do not stage or commit unless explicitly asked; preserve user staging.
+- Branch `main` latest commit is `e69e024` (`v0.7.0, minimap`); the v0.8.0 boss-defeat changes are uncommitted. Do not stage or commit unless explicitly asked; preserve user staging.

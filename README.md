@@ -1,13 +1,23 @@
 # Dungeon Crawler
 
-A plain HTML5 canvas dungeon game, version 0.7.0. Open `index.html` directly in a browser (`file://`); there is no install, build step, server, or network dependency.
+A plain HTML5 canvas dungeon game, version 0.11.0. Open `index.html` directly in a browser (`file://`); there is no install, build step, server, or network dependency.
 
 The fantasy logo and version appear on the launch screen only. Click **Enter the dungeon** or press a key to begin; the game waits until you start. During play, stats sit at the top and a scrolling adventure log sits to the left of the map, and equipment with icons and bonuses sits to its right. On narrow screens the log moves below the map. R starts a fresh run without showing the launch screen again; reloading the page shows it.
+
+## Graphics
+
+The dungeon is displayed at **2× zoom**, with 18×12 tiles visible in the same canvas. Characters, tiles, loot, bubbles, warnings, and world health bars are twice as large. The camera follows you and the minimap outline tracks the smaller view. HUD/sidebar sizes and screen-space cinematic framing stay consistent.
+
+The static artwork uses worn slate masonry, recessed wall faces, moss/cracks, warm wall torches, and shaded full-body characters. Stairs, loot, equipment icons, and hazards share the same original pixel-art palette. [View the character, item, and dungeon design sheets](docs/previews/2026-11-23-static-graphics/index.html). The reference asset pack inspired the general direction; its artwork is not bundled.
+
+Sprites and terrain variations are rasterized into small local canvas caches and reused, with crisp nearest-neighbor rendering. The four runtime files total about 169 KiB, with no external art/font/network loading and no new animation. Existing boss-defeat and ending scenes use the refreshed figures.
 
 ## Controls
 
 | Key | Action |
 | --- | --- |
+| ? / HUD ? button | Open or close Help & settings; pauses play |
+| Esc in Help | Close Help & settings |
 | Arrows / WASD | Move; attack by walking into a monster |
 | Space | Collect a key/item, buy the first merchant item, rescue an NPC, or use the staircase under you |
 | Q / Backspace | Ascend while standing on ▲ |
@@ -16,6 +26,7 @@ The fantasy logo and version appear on the launch screen only. Click **Enter the
 | Enter | Request retreat during normal play |
 | C / Escape | Continue from a health pause |
 | Escape during the ending | Skip to the final sunset scene |
+| Escape during a boss defeat | Skip the short victory flourish |
 | T | Request retreat from the critical-health dialog |
 | Y | Confirm a retreat; N / Escape cancels |
 | M | Toggle music and effects |
@@ -37,11 +48,11 @@ Retreat asks for confirmation, takes you one floor up, and restores full HP. On 
 
 Resting restores 2% maximum HP (rounded, minimum 1 HP) every two seconds after six seconds without combat, provided no living monster is within three tiles. Paused or hidden-tab time does not accumulate healing or cooldown time.
 
-Sound starts after your first keyboard/button interaction if browser audio is available. Music and effects are synthesized locally; M or the Sound button mutes both. Separate Music and Effects sliders adjust their volume independently. Mute silences both, and adjusting a slider while muted keeps them muted. Volume and mute choices survive R within the current page. Click the map to return keyboard focus to gameplay after adjusting a slider.
+Sound starts after your first keyboard/button interaction if browser audio is available. Music and effects are synthesized locally; M or the Sound button mutes both. Separate Music and Effects sliders adjust their volume independently. Mute silences both, and adjusting a slider while muted keeps them muted. Volume and mute choices survive R within the current page. The Sound button and volume sliders live in **Help & settings**: press **?** or click the HUD **?** button. Close with **?**, **Esc**, or **Close**; focus returns to the previous control or game. Gameplay and cinematic clocks pause while help is open, and an existing health/retreat dialog resumes afterward. There is no permanent help/audio footer. Merchant stock appears in the equipment panel; ending buttons appear over the ending canvas.
 
 ## Larger floors, keys, and hazards
 
-Each floor is **72×48 tiles**, larger than the **36×24-tile viewport**. The camera follows you and stops at the world edges; HUD, log, and equipment stay in place. Rooms connect through branching corridors and loops. Pillars and rubble block movement, and generation checks that all remaining floor tiles and important objects stay reachable. The HUD shows your world position.
+Each floor is **72×48 tiles**, larger than the **18×12-tile viewport at 2× zoom**. The camera follows you and stops at the world edges; HUD, log, and equipment stay in place. Rooms connect through branching corridors and loops. Pillars and rubble block movement, and generation checks that all remaining floor tiles and important objects stay reachable. The HUD shows your world position.
 
 The **Floor chart** above the equipment on the right shows explored terrain for the current floor. Green marks you, blue/gold mark discovered up/down stairs, and the pale outline shows the main camera area. Unexplored terrain, monsters, items, keys, and traps are hidden. Exploration returns when you revisit a floor; R/reload clears it. The chart stacks below the map/log on narrow screens.
 
@@ -70,6 +81,8 @@ Living monsters trade short Monty Python quotes in speech bubbles when hit or at
 Each spoken quote also appears once in the left adventure log with the monster's name, so it remains readable after the bubble disappears.
 
 Boss floors have larger chambers and three-tile-wide connecting halls. The Mimic has an 18×14-tile arena; the dragon has a 22×18-tile hall. Their central spawn areas stay clear of loot and ordinary monsters, and the arenas contain no traps or blocking props. The Mimic is three tiles wide; the winged, horned dragon spans nearly four tiles across and three high. Health bars and speech sit above the larger artwork. Their combat target and movement still use one tile.
+
+Defeating a boss pauses play briefly for a victory flourish. The Mimic snaps shut, sprays coins, and collapses in place with a **MIMIC DEFEATED** banner. The dragon gets a screen-space cinematic: a darkened hall, lightning, embers, drooping wings, a falling dragon, and **DRAGON SLAIN**. Rewards, defeat flags, and objectives are applied immediately; Esc skips the flourish. The dragon animation clears before the later princess interaction starts the full ending.
 
 The brief quotations are from *Monty Python and the Holy Grail*: [official Monty Python media](https://www.montypython.com/media), [Black Knight scene](https://www.youtube.com/watch?v=KlYrn2bXsc4), and [Knights Who Say Ni scene](https://www.youtube.com/watch?v=zIV4poUZAQo). Only text is included; no film audio or media assets are bundled.
 

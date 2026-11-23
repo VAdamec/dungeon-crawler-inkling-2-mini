@@ -1,6 +1,7 @@
-const TILE = 32, W = 72, H = 48, VIEW_W = 36, VIEW_H = 24;
+const TILE = 32, W = 72, H = 48, MAP_ZOOM = 2, VIEW_W = 18, VIEW_H = 12;
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
+ctx.imageSmoothingEnabled = false;
 
 
 const MONSTER_TYPES = [
@@ -21,11 +22,12 @@ const ITEM_TABLE = [
   { name: 'Shield',   sprite: 'shield',  gold: 55, kind: 'armor', def: 5 },
 ];
 
-const GAME_VERSION = '0.7.0';
+const GAME_VERSION = '0.11.0';
 // Brief quotations from Monty Python and the Holy Grail; official sources in README.
 const MONSTER_QUOTES = ['Ni!', 'None shall pass!', "'Tis but a scratch.", 'Run away!'];
 const MONSTER_SPEECH_DURATION = 5, MONSTER_SPEECH_INTERVAL = 5;
 const ENDING_DURATION = 14;
+const MIMIC_DEFEAT_DURATION = 1.6, DRAGON_DEFEAT_DURATION = 2.6;
 const GOLD_PER_LEVEL = 3;
 const FINAL_DEPTH = 10, ENEMY_ATTACK_INTERVAL = 0.8, RETREAT_COOLDOWN = 60;
 const HEAL_FRACTION = 0.02;
@@ -36,24 +38,30 @@ let state;
 
 function newGame() {
   stopEndingAnimation();
+  stopBossDefeatAnimation();
   const started = state ? state.started : false;
+  const art = state ? state.art : null;
   const audio = state ? state.audio : { context: null, master: null, musicBus: null, effectsBus: null, musicVolume: 0.45, effectsVolume: 0.8, enabled: true, step: 0, nextNote: 0 };
   document.getElementById('overlay').style.display = 'none';
   state = {
-    depth: 1, kills: 0, turn: 0, started, messages: [],
+    depth: 1, kills: 0, turn: 0, started, messages: [], helpOpen: false, helpFocus: null,
     player: { x: 0, y: 0, hp: 60, maxHp: 60, str: 12, dex: 10, def: 3, lvl: 1, xp: 0, xpNext: 40 },
     inventory: [],
     gold: 0, equipment: { weapon: null, armor: null, ring: null },
     map: null, rooms: [], monsters: [], potions: [], stairs: null,
     treasures: [], merchant: null, boss: null, prisoner: null, princess: null,
     monsterSpeech: null, monsterSpeechReadyAt: 0, monsterQuoteIndex: 0,
-    gameOver: false, won: false, ending: null, bubble: null, visited: new Set(), floors: {},
+    gameOver: false, won: false, ending: null, bossDefeat: null, bubble: null, visited: new Set(), floors: {},
     upstairs: null, monsterSpawns: [], pause: null, warnedLow: false, warnedCritical: false,
     combatElapsed: 0, healElapsed: 0, activeTime: 0, retreatReadyAt: 0, bossDefeated: false,
     camera: { x: 0, y: 0 }, floorKey: null, obstacles: [], hazards: [], hazardTime: 0,
-    lastTick: Date.now(), audio,
+    lastTick: Date.now(), audio, art,
   };
   document.getElementById('endingControls').hidden = true;
+  document.getElementById('helpOverlay').hidden = true;
+  document.getElementById('helpToggle').ariaExpanded = 'false';
+  document.getElementById('gameLayout').inert = false;
+  document.getElementById('launchScreen').inert = false;
   document.getElementById('launchScreen').hidden = started;
   document.getElementById('gameLayout').hidden = !started;
   document.getElementById('launchVersion').textContent = `v${GAME_VERSION}`;
@@ -323,7 +331,7 @@ function flameActive(hazard) {
 }
 
 function applyPlayerHazards() {
-  if (!state.started || state.gameOver || state.pause || document.hidden) return;
+  if (!state.started || state.gameOver || state.helpOpen || state.pause || document.hidden) return;
   const p = state.player;
   const hazard = state.hazards.find(h => h.x === p.x && h.y === p.y);
   if (!hazard) return;
@@ -342,13 +350,13 @@ function applyPlayerHazards() {
 }
 
 function hazardTick() {
-  if (!state.started || state.gameOver || state.pause || document.hidden) return;
+  if (!state.started || state.gameOver || state.helpOpen || state.pause || document.hidden) return;
   for (const hazard of state.hazards) {
     if (hazard.type !== 'rocks' || hazard.stage !== 'warning' || state.hazardTime < hazard.impactAt) continue;
     hazard.stage = 'spent';
     if (state.player.x === hazard.x && state.player.y === hazard.y) {
       hurtPlayer(8 + 2 * state.depth, 'Falling rocks strike you!');
-      if (state.gameOver || state.pause) return;
+      if (state.gameOver || state.helpOpen || state.pause) return;
     }
   }
   applyPlayerHazards();
@@ -434,6 +442,7 @@ function damageMonster(m, dmg) {
     if (m.isBoss) {
       state.bossDefeated = true;
       saveFloor();
+      startBossDefeat(m);
     }
     while (p.xp >= p.xpNext) {
       p.xp -= p.xpNext;
@@ -448,7 +457,7 @@ function damageMonster(m, dmg) {
 }
 
 function attackMonster(m) {
-  if (state.gameOver || state.pause) return;
+  if (state.gameOver || state.helpOpen || state.pause) return;
   markCombat();
   playSound('slash');
   const dmg = Math.max(1, effectiveAtk() - m.def);
@@ -457,7 +466,7 @@ function attackMonster(m) {
 }
 
 function enemyAttack(m) {
-  if (state.gameOver || state.pause || m.hp <= 0 || state.activeTime < (m.nextAttackAt || 0)) return;
+  if (state.gameOver || state.helpOpen || state.pause || m.hp <= 0 || state.activeTime < (m.nextAttackAt || 0)) return;
   m.nextAttackAt = state.activeTime + ENEMY_ATTACK_INTERVAL;
   monsterTalk(m);
   markCombat();
@@ -475,7 +484,7 @@ function clearMonsterSpeech() {
 }
 
 function monsterTalk(monster) {
-  if (!state.started || state.gameOver || state.ending || state.pause || document.hidden || monster.hp <= 0) return;
+  if (!state.started || state.gameOver || state.ending || state.helpOpen || state.pause || document.hidden || monster.hp <= 0) return;
   if (!Number.isInteger(monster.id) || !state.monsters.includes(monster) || !inCamera(monster.x, monster.y) || fogLevel(monster.x, monster.y) >= 3) return;
   if (state.activeTime < state.monsterSpeechReadyAt) return;
   state.monsterSpeech = { monsterId: monster.id, text: MONSTER_QUOTES[state.monsterQuoteIndex], expiresAt: state.activeTime + MONSTER_SPEECH_DURATION };
@@ -510,8 +519,8 @@ function monsterSpeechLayout() {
 function monsterVisual(monster) {
   const sprite = monster.isDragon ? 'dragonBoss' : monster.sprite;
   const scale = monster.isBoss ? 3 : 2;
-  const grid = SPRITES[sprite];
-  const width = Math.max(...grid.map(row => row.length)) * scale, height = grid.length * scale;
+  const size = spriteDimensions(sprite);
+  const width = size.width * scale, height = size.height * scale;
   const x = monster.x * TILE + TILE / 2;
   const y = monster.isBoss ? (monster.y + 1) * TILE - height / 2 : monster.y * TILE + TILE / 2;
   return { sprite, scale, x, y, width, height, left: x - width / 2, right: x + width / 2, top: y - height / 2, bottom: y + height / 2 };
@@ -533,6 +542,7 @@ function drawMonsterSpeech() {
 
 function gameOver(won) {
   if (won) { startEnding(); return; }
+  clearBossDefeat();
   clearMonsterSpeech();
   state.gameOver = true; state.won = won; state.pause = null;
   const ov = document.getElementById('overlay');
@@ -542,8 +552,153 @@ function gameOver(won) {
   ov.style.display = 'flex';
 }
 
+function bossDefeatActive() {
+  return !!(state && state.bossDefeat && !state.bossDefeat.completed);
+}
+
+function defeatClamp(value) {
+  return Math.max(0, Math.min(1, value));
+}
+
+function stopBossDefeatAnimation() {
+  const anim = state && state.bossDefeat;
+  if (!anim) return;
+  if (anim.frameId !== null && typeof window.cancelAnimationFrame === 'function') window.cancelAnimationFrame(anim.frameId);
+  anim.frameId = null;
+}
+
+function clearBossDefeat() {
+  stopBossDefeatAnimation();
+  if (state) state.bossDefeat = null;
+}
+
+function bossDefeatPhase(anim) {
+  const t = anim.elapsed;
+  if (anim.kind === 'dragon') {
+    if (t < 0.9) return 'roar';
+    if (t < 1.8) return 'fall';
+    return 'legacy';
+  }
+  if (t < 0.4) return 'snap';
+  if (t < 0.9) return 'coins';
+  return 'collapse';
+}
+
+function playBossDefeatSound(kind) {
+  if (kind === 'dragon') {
+    tone(65, 0.9, 'sawtooth', 0.35, 0, 'effects');
+    [196, 233.08, 261.63, 392].forEach((note, i) => tone(note, 0.55, 'triangle', 0.26, i * 0.18, 'music'));
+    tone(130.81, 0.8, 'square', 0.18, 0.3, 'effects');
+  } else {
+    tone(110, 0.18, 'square', 0.32, 0, 'effects');
+    tone(82.41, 0.34, 'square', 0.28, 0.12, 'effects');
+    tone(330, 0.14, 'triangle', 0.24, 0.28, 'effects');
+  }
+}
+
+function startBossDefeat(m) {
+  if (!m || !m.isBoss || state.gameOver || state.ending || state.bossDefeat) return;
+  const isDragon = !!m.isDragon;
+  const visual = monsterVisual(m);
+  const kind = isDragon ? 'dragon' : 'mimic';
+  state.bossDefeat = {
+    kind, elapsed: 0, phase: isDragon ? 'roar' : 'snap', completed: false,
+    duration: isDragon ? DRAGON_DEFEAT_DURATION : MIMIC_DEFEAT_DURATION,
+    frameId: null, lastTimestamp: null, events: new Set(),
+    visual: { sprite: visual.sprite, scale: visual.scale, x: visual.x, y: visual.y,
+      width: visual.width, height: visual.height, left: visual.left, right: visual.right,
+      top: visual.top, bottom: visual.bottom, tileX: m.x, tileY: m.y },
+  };
+  clearMonsterSpeech();
+  playBossDefeatSound(kind);
+  draw();
+  requestBossDefeatFrame(state.bossDefeat);
+}
+
+function requestBossDefeatFrame(anim) {
+  if (state.bossDefeat !== anim || anim.completed || typeof window.requestAnimationFrame !== 'function') return;
+  anim.frameId = window.requestAnimationFrame(timestamp => bossDefeatFrame(timestamp, anim));
+}
+
+function bossDefeatFrame(timestamp, anim) {
+  if (state.bossDefeat !== anim || anim.completed) return;
+  anim.frameId = null;
+  if (document.hidden || state.helpOpen) {
+    anim.lastTimestamp = null;
+    requestBossDefeatFrame(anim);
+    return;
+  }
+  const elapsed = anim.lastTimestamp === null ? 0 : Math.min(0.1, Math.max(0, (timestamp - anim.lastTimestamp) / 1000));
+  anim.lastTimestamp = timestamp;
+  advanceBossDefeat(elapsed);
+  draw();
+  requestBossDefeatFrame(anim);
+}
+
+function advanceBossDefeat(elapsed) {
+  const anim = state && state.bossDefeat;
+  if (!anim || anim.completed || document.hidden || state.helpOpen) return;
+  anim.elapsed = Math.min(anim.duration, anim.elapsed + Math.max(0, elapsed));
+  anim.phase = bossDefeatPhase(anim);
+  const milestones = anim.kind === 'dragon' ? [[0.9, 'roar'], [1.8, 'fall']] : [[0.4, 'snap'], [0.9, 'coins']];
+  for (const [at, event] of milestones) {
+    if (anim.elapsed < at || anim.events.has(event)) continue;
+    anim.events.add(event);
+    if (anim.kind === 'dragon' && event === 'roar') tone(72, 0.7, 'sawtooth', 0.34, 0, 'effects');
+    else if (anim.kind === 'dragon') tone(98, 0.5, 'square', 0.22, 0, 'effects');
+    else if (event === 'snap') tone(160, 0.08, 'square', 0.34, 0, 'effects');
+    else tone(880, 0.1, 'triangle', 0.22, 0, 'effects');
+  }
+  if (anim.elapsed >= anim.duration) {
+    anim.completed = true;
+    clearBossDefeat();
+  }
+}
+
+function skipBossDefeat() {
+  if (!bossDefeatActive() || document.hidden || state.helpOpen) return;
+  clearBossDefeat();
+  draw();
+  canvas.focus?.();
+}
+
+function bossDefeatScene() {
+  const anim = state && state.bossDefeat;
+  if (!anim) return null;
+  const t = anim.elapsed, progress = defeatClamp(t / anim.duration);
+  if (anim.kind === 'mimic') {
+    const snap = 1 - defeatClamp(t / 0.4);
+    const fall = defeatClamp((t - 0.6) / 1);
+    const reveal = defeatClamp((t - 0.2) / 0.3);
+    const fade = defeatClamp((t - 1.2) / 0.4);
+    const coins = Array.from({ length: 12 }, (_, i) => {
+      const angle = i / 12 * Math.PI * 2;
+      const travel = Math.max(0, t - 0.25 - (i % 3) * 0.06);
+      const radius = 18 + travel * 52;
+      return { x: Math.cos(angle) * radius,
+        y: -6 + Math.sin(angle) * radius * 0.55 - travel * 18 + travel * travel * 34,
+        alpha: 1 - defeatClamp(travel / 1.1), size: 3 + i % 3 };
+    });
+    return { kind: 'mimic', phase: anim.phase, t, progress, shake: Math.sin(t * 90) * 4 * snap,
+      squash: fall * 0.55, rise: fall * 16, alpha: 1 - fade, coins,
+      bannerAlpha: reveal * (1 - defeatClamp((t - 1.3) / 0.3)), bannerRise: reveal * 10 };
+  }
+  const fall = defeatClamp((t - 0.8) / 1);
+  const flare = 1 - defeatClamp(t / 0.9);
+  const fade = defeatClamp((t - 2) / 0.6);
+  const banner = defeatClamp((t - 0.5) / 0.4);
+  return { kind: 'dragon', phase: anim.phase, t, progress,
+    shake: Math.sin(t * 60) * 6 * flare + Math.sin(t * 30) * 4 * fall * (1 - fall),
+    dragonY: 430 + fall * 120, alpha: 1 - fade,
+    wing: 18 + 50 * fall + Math.sin(t * 14) * 10 * (1 - fall),
+    boltAlpha: 1 - defeatClamp(t / 1.3),
+    emberAlpha: defeatClamp(t / 0.4) * (1 - defeatClamp((t - 1.6) / 1)),
+    bannerAlpha: banner * (1 - defeatClamp((t - 2.35) / 0.25)),
+    dim: (0.25 + 0.47 * defeatClamp(t / 0.5)) * (1 - defeatClamp((t - 2.1) / 0.5)) };
+}
+
 function movePlayer(dx, dy) {
-  if (state.gameOver || state.pause) return;
+  if (state.gameOver || state.helpOpen || state.pause) return;
   const p = state.player;
   const nx = p.x + dx, ny = p.y + dy;
   if (nx < 0 || ny < 0 || nx >= W || ny >= H) return;
@@ -613,6 +768,7 @@ function recreateMonsters() {
 
 function enterFloor(depth, fromBelow) {
   if (depth < 1 || depth > FINAL_DEPTH) return;
+  clearBossDefeat();
   saveFloor();
   state.depth = depth;
   const floor = state.floors[depth];
@@ -631,7 +787,7 @@ function enterFloor(depth, fromBelow) {
 }
 
 function descendStairs() {
-  if (state.gameOver || state.pause) return;
+  if (state.gameOver || state.helpOpen || state.pause) return;
   const p = state.player;
   if (p.x !== state.stairs.x || p.y !== state.stairs.y) return;
   if (state.depth === FINAL_DEPTH) { log('The dungeon ends here. Defeat the dragon, then rescue the princess.'); render(); return; }
@@ -652,7 +808,7 @@ function descendStairs() {
 }
 
 function ascendStairs() {
-  if (state.gameOver || state.pause) return;
+  if (state.gameOver || state.helpOpen || state.pause) return;
   const p = state.player;
   if (state.depth <= 1) { log('There is no floor above this entrance.'); return; }
   if (p.x !== state.upstairs.x || p.y !== state.upstairs.y) {
@@ -677,7 +833,7 @@ function merchantAt(x, y) {
   return state.merchant && state.merchant.x === x && state.merchant.y === y ? state.merchant : null;
 }
 function buyFromMerchant() {
-  if (state.gameOver || state.pause) return;
+  if (state.gameOver || state.helpOpen || state.pause) return;
   const p = state.player;
   const m = merchantAt(p.x, p.y);
   if (!m || !m.stock || m.stock.length === 0) { log('Nothing for sale here.'); render(); return; }
@@ -704,7 +860,7 @@ function buyFromMerchant() {
   render();
 }
 function sellToMerchant() {
-  if (state.gameOver || state.pause) return;
+  if (state.gameOver || state.helpOpen || state.pause) return;
   const p = state.player;
   const m = merchantAt(p.x, p.y);
   if (!m) { log('No merchant here.'); render(); return; }
@@ -729,7 +885,7 @@ function prisonerAt(x, y) {
   return state.prisoner && state.prisoner.x === x && state.prisoner.y === y ? state.prisoner : null;
 }
 function rescuePrisoner() {
-  if (state.gameOver || state.pause) return;
+  if (state.gameOver || state.helpOpen || state.pause) return;
   const p = state.player;
   const pr = prisonerAt(p.x, p.y);
   if (!pr) { log('Nothing to rescue here.'); render(); return; }
@@ -748,7 +904,7 @@ function princessAt(x, y) {
   return state.princess && state.princess.x === x && state.princess.y === y ? state.princess : null;
 }
 function rescuePrincess() {
-  if (state.gameOver || state.pause) return;
+  if (state.gameOver || state.helpOpen || state.pause) return;
   const p = state.player;
   const pr = princessAt(p.x, p.y);
   if (!pr) { log('Nothing to rescue here.'); render(); return; }
@@ -766,7 +922,7 @@ function rescuePrincess() {
 }
 
 function pickup() {
-  if (state.gameOver || state.pause) return;
+  if (state.gameOver || state.helpOpen || state.pause) return;
   const p = state.player;
   const key = state.floorKey;
   if (key && key.drop && key.drop.x === p.x && key.drop.y === p.y) {
@@ -818,7 +974,7 @@ function storePotion(item) {
 }
 
 function drinkPotion() {
-  if (state.gameOver || (state.pause && state.pause.kind !== 'health')) return;
+  if (state.gameOver || state.helpOpen || (state.pause && state.pause.kind !== 'health')) return;
   const p = state.player;
   if (!state.inventory.length) { log('No potions stored.'); return; }
   if (p.hp >= p.maxHp) { log('Already at full health.'); return; }
@@ -836,7 +992,7 @@ function markCombat() {
 }
 
 function hurtPlayer(damage, message) {
-  if (state.gameOver || state.pause) return;
+  if (state.gameOver || state.helpOpen || state.pause) return;
   markCombat();
   state.player.hp -= damage;
   log(message);
@@ -846,7 +1002,7 @@ function hurtPlayer(damage, message) {
 }
 
 function checkHealth() {
-  if (state.gameOver) return;
+  if (state.gameOver || state.helpOpen) return;
   const ratio = state.player.hp / state.player.maxHp;
   if (ratio >= 0.2) state.warnedLow = false;
   if (ratio >= 0.1) state.warnedCritical = false;
@@ -861,7 +1017,7 @@ function checkHealth() {
 }
 
 function continueGame() {
-  if (!state.pause || state.pause.kind !== 'health') return;
+  if (state.helpOpen || !state.pause || state.pause.kind !== 'health') return;
   state.pause = null;
   state.lastTick = Date.now();
   render();
@@ -872,28 +1028,28 @@ function retreatRemaining() {
 }
 
 function advanceActiveTime(elapsed) {
-  if (!state.started || state.gameOver || state.pause || document.hidden) return;
+  if (!state.started || state.gameOver || state.helpOpen || state.pause || document.hidden) return;
   state.activeTime += Math.max(0, elapsed);
   state.hazardTime += Math.max(0, elapsed);
   updateMonsterSpeech();
 }
 
 function retreat() {
-  if (state.gameOver || (state.pause && state.pause.kind === 'retreat')) return;
+  if (state.gameOver || state.helpOpen || (state.pause && state.pause.kind === 'retreat')) return;
   if (retreatRemaining() > 0) { log(`Retreat recovers in ${Math.ceil(retreatRemaining())} active seconds.`); render(); return; }
   state.pause = { kind: 'retreat', previous: state.pause };
   render();
 }
 
 function cancelRetreat() {
-  if (!state.pause || state.pause.kind !== 'retreat') return;
+  if (state.helpOpen || !state.pause || state.pause.kind !== 'retreat') return;
   state.pause = state.pause.previous;
   state.lastTick = Date.now();
   render();
 }
 
 function confirmRetreat() {
-  if (state.gameOver || !state.pause || state.pause.kind !== 'retreat' || retreatRemaining() > 0) return;
+  if (state.gameOver || state.helpOpen || !state.pause || state.pause.kind !== 'retreat' || retreatRemaining() > 0) return;
   state.retreatReadyAt = state.activeTime + RETREAT_COOLDOWN;
   state.pause = null;
   if (state.depth > 1) enterFloor(state.depth - 1, true);
@@ -912,7 +1068,7 @@ function confirmRetreat() {
 }
 
 function recoveryTick(elapsed) {
-  if (!state.started || state.gameOver || state.pause) return;
+  if (!state.started || state.gameOver || state.helpOpen || state.pause) return;
   const before = state.combatElapsed;
   state.combatElapsed += elapsed;
   const p = state.player;
@@ -928,6 +1084,7 @@ function recoveryTick(elapsed) {
 function renderPause() {
   const pause = state.pause;
   const overlay = document.getElementById('pauseOverlay');
+  if (state.helpOpen) { overlay.style.display = 'none'; return; }
   overlay.style.display = pause ? 'flex' : 'none';
   if (!pause) {
     if (document.activeElement && overlay.contains(document.activeElement)) canvas.focus();
@@ -955,13 +1112,13 @@ function enemyTick() {
   const now = Date.now();
   const elapsed = Math.min(0.5, Math.max(0, (now - state.lastTick) / 1000));
   state.lastTick = now;
-  if (!state.started || state.gameOver || state.pause || document.hidden) return;
+  if (!state.started || state.gameOver || state.helpOpen || state.pause || document.hidden || bossDefeatActive()) return;
   checkHealth();
   if (state.pause) { render(); return; }
   advanceActiveTime(elapsed);
   musicTick();
   hazardTick();
-  if (state.gameOver || state.pause) { render(); return; }
+  if (state.gameOver || state.helpOpen || state.pause) { render(); return; }
   const p = state.player;
   if (state.bubble && state.bubble.ttl > 0) state.bubble.ttl--;
   for (const m of state.monsters) {
@@ -979,7 +1136,7 @@ function enemyTick() {
       if (state.map[ny][nx] !== 0) continue;
       if (nx === p.x && ny === p.y) {
         enemyAttack(m);
-        if (state.gameOver || state.pause) { render(); return; }
+        if (state.gameOver || state.helpOpen || state.pause) { render(); return; }
         continue;
       }
       if (monsterAt(nx, ny)) continue;
@@ -993,42 +1150,22 @@ function enemyTick() {
 function drawFloorDetails() {
   for (const obstacle of state.obstacles) {
     if (!inCamera(obstacle.x, obstacle.y) || !state.visited.has(`${obstacle.x},${obstacle.y}`)) continue;
-    const x = obstacle.x * TILE, y = obstacle.y * TILE;
-    ctx.fillStyle = obstacle.type === 'pillar' ? '#6c6e78' : '#514b48';
-    ctx.fillRect(x + 4, y + 4, 24, 24);
-    ctx.strokeStyle = '#93908a'; ctx.lineWidth = 2;
-    ctx.strokeRect(x + 7, y + 7, obstacle.type === 'pillar' ? 18 : 9, 17);
-    if (obstacle.type === 'rubble') ctx.fillRect(x + 18, y + 13, 10, 13);
+    drawSprite(obstacle.type, obstacle.x * TILE + TILE / 2, obstacle.y * TILE + TILE / 2, 2);
   }
   for (const hazard of state.hazards) {
     if (!hazard.revealed || !inCamera(hazard.x, hazard.y) || !state.visited.has(`${hazard.x},${hazard.y}`)) continue;
     const x = hazard.x * TILE, y = hazard.y * TILE;
-    if (hazard.type === 'flame') {
-      ctx.fillStyle = '#553a2b'; ctx.fillRect(x + 5, y + 21, 22, 7);
-      ctx.fillStyle = flameActive(hazard) ? '#f69832' : '#945632';
-      ctx.beginPath(); ctx.moveTo(x + 7, y + 25); ctx.lineTo(x + 13, y + 6); ctx.lineTo(x + 19, y + 20); ctx.lineTo(x + 24, y + 10); ctx.lineTo(x + 26, y + 25); ctx.fill();
-    } else if (hazard.type === 'rocks') {
-      ctx.strokeStyle = hazard.stage === 'warning' ? '#ffc46b' : '#888078'; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(x + 5, y + 9); ctx.lineTo(x + 15, y + 17); ctx.lineTo(x + 10, y + 26); ctx.moveTo(x + 15, y + 17); ctx.lineTo(x + 26, y + 14); ctx.stroke();
-      if (hazard.stage === 'warning') {
-        const fall = Math.max(0, Math.min(1, 1 - (hazard.impactAt - state.hazardTime) / 1.2));
-        ctx.fillStyle = '#ac9981'; ctx.fillRect(x + 6, y - 10 + Math.round(fall * 20), 7, 6); ctx.fillRect(x + 22, y - 8 + Math.round(fall * 20), 5, 5);
-      } else if (hazard.stage === 'spent') {
-        ctx.fillStyle = '#7b7267'; ctx.fillRect(x + 7, y + 20, 8, 6); ctx.fillRect(x + 19, y + 21, 7, 5);
-      }
-    } else {
-      ctx.fillStyle = '#a6a1a0';
-      for (let i = 0; i < 3; i++) {
-        ctx.beginPath(); ctx.moveTo(x + 4 + i * 9, y + 25); ctx.lineTo(x + 8 + i * 9, y + 13); ctx.lineTo(x + 12 + i * 9, y + 25); ctx.fill();
-      }
+    const sprite = hazard.type === 'flame' ? (flameActive(hazard) ? 'flameOn' : 'flameOff')
+      : hazard.type === 'rocks' ? (hazard.stage === 'spent' ? 'rockSpent' : 'rockCrack') : 'spikes';
+    drawSprite(sprite, x + TILE / 2, y + TILE / 2, 2);
+    if (hazard.type === 'rocks' && hazard.stage === 'warning') {
+      const fall = Math.max(0, Math.min(1, 1 - (hazard.impactAt - state.hazardTime) / 1.2));
+      ctx.fillStyle = '#ac9981'; ctx.fillRect(x + 6, y - 10 + Math.round(fall * 20), 7, 6); ctx.fillRect(x + 22, y - 8 + Math.round(fall * 20), 5, 5);
     }
   }
   const drop = state.floorKey && state.floorKey.drop;
   if (drop && inCamera(drop.x, drop.y) && state.visited.has(`${drop.x},${drop.y}`)) {
-    const x = drop.x * TILE, y = drop.y * TILE;
-    ctx.strokeStyle = '#ffe38a'; ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.arc(x + 11, y + 11, 5, 0, Math.PI * 2); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(x + 15, y + 15); ctx.lineTo(x + 26, y + 26); ctx.moveTo(x + 22, y + 22); ctx.lineTo(x + 26, y + 18); ctx.stroke();
+    drawSprite('key', drop.x * TILE + TILE / 2, drop.y * TILE + TILE / 2, 2);
   }
 }
 
@@ -1042,25 +1179,92 @@ function drawHazardWarnings() {
   }
 }
 
+function drawMimicDefeat(scene) {
+  const visual = state.bossDefeat.visual;
+  if (!inCamera(visual.tileX, visual.tileY)) return;
+  ctx.save();
+  ctx.globalAlpha = scene.alpha;
+  ctx.translate(visual.x + scene.shake, visual.y + scene.rise);
+  ctx.scale(1 + scene.squash * 0.25, 1 - scene.squash);
+  drawSprite(visual.sprite, 0, 0, visual.scale);
+  ctx.restore();
+  ctx.save();
+  ctx.globalAlpha = scene.alpha;
+  for (const coin of scene.coins) {
+    ctx.fillStyle = coin.size % 2 ? '#f4cf78' : '#ffe9a8';
+    ctx.fillRect(visual.x + coin.x, visual.y + coin.y, coin.size + 2, coin.size);
+  }
+  ctx.fillStyle = `rgba(180, 160, 130, ${0.42 * scene.alpha})`;
+  for (let i = 0; i < 7; i++) {
+    const spread = (i - 3) * 14 + scene.shake;
+    ctx.fillRect(visual.x + spread, visual.bottom - 6 - Math.abs(spread) * 0.12 + scene.rise, 16, 7);
+  }
+  ctx.restore();
+  ctx.save();
+  ctx.globalAlpha = scene.bannerAlpha;
+  ctx.font = 'bold 18px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  const y = visual.top - 28 - scene.bannerRise;
+  ctx.strokeStyle = '#14110e'; ctx.lineWidth = 4; ctx.strokeText('MIMIC DEFEATED', visual.x, y);
+  ctx.fillStyle = '#ffdf8a'; ctx.fillText('MIMIC DEFEATED', visual.x, y);
+  ctx.restore();
+}
+
+function drawDragonDefeatDragon(scene) {
+  ctx.save();
+  ctx.globalAlpha = scene.alpha;
+  ctx.translate(576 + scene.shake, scene.dragonY);
+  ctx.fillStyle = '#23432d'; ctx.strokeStyle = '#6b9b69'; ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.moveTo(-30, -10); ctx.lineTo(-150, -70 + scene.wing); ctx.lineTo(-134, 12); ctx.lineTo(-48, 34); ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(30, -10); ctx.lineTo(150, -70 + scene.wing); ctx.lineTo(134, 12); ctx.lineTo(48, 34); ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(30, 30); ctx.quadraticCurveTo(100, 80, 150, 40); ctx.stroke();
+  drawSprite('dragonBoss', 0, 0, 4);
+  ctx.restore();
+}
+
+function drawDragonDefeat(scene) {
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.fillStyle = `rgba(5, 7, 14, ${scene.dim})`; ctx.fillRect(0, 0, 1152, 768);
+  const glow = ctx.createRadialGradient(576, scene.dragonY - 20, 10, 576, scene.dragonY - 20, 240);
+  glow.addColorStop(0, 'rgba(255, 96, 60, 0.45)'); glow.addColorStop(1, 'rgba(255, 96, 60, 0)');
+  ctx.fillStyle = glow; ctx.fillRect(336, scene.dragonY - 260, 480, 480);
+  ctx.strokeStyle = `rgba(156, 220, 255, ${scene.boltAlpha})`; ctx.lineWidth = 3;
+  for (let i = 0; i < 4; i++) {
+    const x = 300 + i * 190, top = 140 + i % 2 * 48;
+    ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x + 22, top + 62); ctx.lineTo(x - 12, top + 108);
+    ctx.lineTo(x + 16, top + 168); ctx.lineTo(x - 8, top + 220); ctx.stroke();
+  }
+  for (let i = 0; i < 18; i++) {
+    const rise = (scene.t * (40 + i * 3) + i * 37) % 260;
+    const alpha = scene.emberAlpha * (1 - rise / 260);
+    if (alpha <= 0) continue;
+    ctx.fillStyle = `rgba(255, ${120 + i % 4 * 30}, 60, ${alpha})`;
+    ctx.fillRect(240 + (i * 79) % 680 + Math.sin(i + scene.t * 4) * 20, 610 - rise, 3, 3);
+  }
+  drawDragonDefeatDragon(scene);
+  ctx.globalAlpha = scene.bannerAlpha;
+  ctx.fillStyle = '#080b12'; ctx.fillRect(0, 624, 1152, 144);
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#ffe4ac'; ctx.font = 'bold 44px Georgia, serif'; ctx.fillText('DRAGON SLAIN', 576, 672);
+  ctx.fillStyle = '#d8c5ad'; ctx.font = '16px monospace'; ctx.fillText('The princess is waiting…', 576, 716);
+  ctx.restore();
+}
+
 function draw() {
   if (state.ending) { drawEnding(); return; }
+  const defeat = state.bossDefeat ? bossDefeatScene() : null;
   const p = state.player;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   updateCamera();
   ctx.save();
+  ctx.scale(MAP_ZOOM, MAP_ZOOM);
   ctx.translate(-state.camera.x * TILE, -state.camera.y * TILE);
   for (let y = state.camera.y; y < state.camera.y + VIEW_H; y++) {
     for (let x = state.camera.x; x < state.camera.x + VIEW_W; x++) {
-      const px = x * TILE, py = y * TILE;
-      if (state.map[y][x] === 1) {
-        ctx.fillStyle = '#232838'; ctx.fillRect(px, py, TILE, TILE);
-        ctx.fillStyle = '#1a1e2b'; ctx.fillRect(px + 2, py + 2, TILE - 4, TILE - 4);
-      } else {
-        ctx.fillStyle = (x + y) % 2 === 0 ? '#2c2419' : '#2e261b';
-        ctx.fillRect(px, py, TILE, TILE);
-      }
+      drawDungeonTile(x, y);
     }
   }
+  drawDungeonTorches();
   drawFloorDetails();
   for (const [stairs, glyph] of [[state.depth < FINAL_DEPTH ? state.stairs : null, '▼'], [state.depth > 1 ? state.upstairs : null, '▲']]) {
     if (!stairs || !inCamera(stairs.x, stairs.y) || !state.visited.has(`${stairs.x},${stairs.y}`)) continue;
@@ -1069,39 +1273,30 @@ function draw() {
   }
   for (const t of state.treasures) {
     if (!inCamera(t.x, t.y) || !state.visited.has(`${t.x},${t.y}`)) continue;
-    const x = t.x * TILE + 8, y = t.y * TILE + 10;
-    ctx.fillStyle = '#b78030'; ctx.fillRect(x, y, 16, 13);
-    ctx.strokeStyle = '#f4d36c'; ctx.lineWidth = 2; ctx.strokeRect(x, y, 16, 13);
-    ctx.fillStyle = '#f4d36c'; ctx.fillRect(x + 6, y + 4, 4, 5);
+    drawSprite('chest', t.x * TILE + TILE / 2, t.y * TILE + TILE / 2, 2);
   }
   for (const pot of state.potions) {
     if (!inCamera(pot.x, pot.y) || !state.visited.has(`${pot.x},${pot.y}`)) continue;
-    const px = pot.x * TILE + TILE / 2, py = pot.y * TILE + TILE / 2;
-    ctx.fillStyle = '#e0393e';
-    ctx.beginPath(); ctx.arc(px, py, 8, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(px - 2, py - 6, 4, 12); ctx.fillRect(px - 6, py - 2, 12, 4);
+    drawSprite('potion', pot.x * TILE + TILE / 2, pot.y * TILE + TILE / 2, 2);
   }
   if (state.prisoner && inCamera(state.prisoner.x, state.prisoner.y) && !state.prisoner.rescued && fogLevel(state.prisoner.x, state.prisoner.y) < 3) {
     const px = state.prisoner.x * TILE + TILE / 2, py = state.prisoner.y * TILE + TILE / 2;
-    drawSprite('prisoner', px, py, 2);
+    drawActorSprite('prisoner', px, py, 2);
   }
   if (state.princess && inCamera(state.princess.x, state.princess.y) && !state.princess.rescued && fogLevel(state.princess.x, state.princess.y) < 3) {
     const px = state.princess.x * TILE + TILE / 2, py = state.princess.y * TILE + TILE / 2;
-    drawSprite('princess', px, py, 2);
+    drawActorSprite('princess', px, py, 2);
   }
   if (state.merchant && inCamera(state.merchant.x, state.merchant.y) && fogLevel(state.merchant.x, state.merchant.y) < 3) {
     const px = state.merchant.x * TILE + TILE / 2, py = state.merchant.y * TILE + TILE / 2;
-    drawSprite('merchant', px, py, 2);
+    drawActorSprite('merchant', px, py, 2);
   }
   for (const m of state.monsters) {
     if (m.hp <= 0 || !inCamera(m.x, m.y)) continue;
     if (fogLevel(m.x, m.y) >= 3) continue;
     const visual = monsterVisual(m);
-    drawSprite(visual.sprite, visual.x, visual.y, visual.scale);
-    const barWidth = m.isBoss ? visual.width - 12 : 24;
-    ctx.fillStyle = '#333'; ctx.fillRect(visual.x - barWidth / 2, visual.top - 7, barWidth, 4);
-    ctx.fillStyle = '#ff3d3d'; ctx.fillRect(visual.x - barWidth / 2, visual.top - 7, barWidth * (m.hp / m.maxHp), 4);
+    drawActorSprite(visual.sprite, visual.x, visual.y, visual.scale);
+
   }
   for (let y = state.camera.y; y < state.camera.y + VIEW_H; y++) {
     for (let x = state.camera.x; x < state.camera.x + VIEW_W; x++) {
@@ -1118,6 +1313,14 @@ function draw() {
       }
     }
   }
+  // Keep visible actors' health bars readable above the terrain fog.
+  for (const m of state.monsters) {
+    if (m.hp <= 0 || !inCamera(m.x, m.y) || fogLevel(m.x, m.y) >= 3) continue;
+    const visual = monsterVisual(m);
+    const barWidth = m.isBoss ? visual.width - 12 : 24;
+    ctx.fillStyle = '#333'; ctx.fillRect(visual.x - barWidth / 2, visual.top - 7, barWidth, 4);
+    ctx.fillStyle = '#ff3d3d'; ctx.fillRect(visual.x - barWidth / 2, visual.top - 7, barWidth * (m.hp / m.maxHp), 4);
+  }
   if (state.bubble && state.bubble.ttl > 0) {
     const text = state.bubble.text;
     const px = p.x * TILE + TILE / 2, py = p.y * TILE - 8;
@@ -1130,27 +1333,14 @@ function draw() {
     ctx.fillText(text, px, py - 13);
   }
   const px = p.x * TILE + TILE / 2, py = p.y * TILE + TILE / 2;
-  drawSprite('knight', px, py, 2);
-  ctx.fillStyle = '#11131c';
-  ctx.beginPath(); ctx.arc(px - 11, py + 1, 8, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#c0392b';
-  ctx.beginPath(); ctx.arc(px - 11, py + 1, 6, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#d8b45a';
-  ctx.beginPath(); ctx.arc(px - 11, py + 1, 6, 0, Math.PI * 2); ctx.lineWidth = 2; ctx.strokeStyle = '#d8b45a'; ctx.stroke();
-  ctx.fillRect(px - 13, py - 1, 4, 4);
-  ctx.save();
-  ctx.translate(px + 11, py - 4);
-  ctx.rotate(0.5);
-  ctx.fillStyle = '#11131c'; ctx.fillRect(-3, -17, 6, 24);
-  ctx.fillStyle = '#e8e6df'; ctx.fillRect(-2, -16, 4, 22);
-  ctx.fillStyle = '#8a8f9c'; ctx.fillRect(0, -16, 2, 22);
-  ctx.fillStyle = '#11131c'; ctx.fillRect(-2, -16, 4, 2);
-  ctx.fillStyle = '#d8b45a'; ctx.fillRect(-5, 6, 10, 3);
-  ctx.fillStyle = '#4a2e14'; ctx.fillRect(-2, 9, 4, 6);
+  ctx.save(); ctx.translate(px, py);
+  drawActorSprite('knight', 0, 0, 2);
   ctx.restore();
   drawMonsterSpeech();
   drawHazardWarnings();
+  if (defeat && defeat.kind === 'mimic') drawMimicDefeat(defeat);
   ctx.restore();
+  if (defeat && defeat.kind === 'dragon') drawDragonDefeat(defeat);
 }
 
 function endingPhase(time) {
@@ -1176,6 +1366,7 @@ function startEnding() {
   const dragon = state.boss || state.monsterSpawns.find(m => m.isDragon);
   state.ending = { elapsed: 0, phase: 'reveal', completed: false, frameId: null,
     lastTimestamp: null, events: new Set(), dragon: { ...dragon, hp: 0 } };
+  clearBossDefeat();
   clearMonsterSpeech();
   state.gameOver = true; state.won = true; state.pause = null; state.bubble = null;
   document.getElementById('overlay').style.display = 'none';
@@ -1199,7 +1390,7 @@ function stopEndingAnimation() {
 function endingFrame(timestamp, ending) {
   if (state.ending !== ending || ending.completed) return;
   ending.frameId = null;
-  if (document.hidden) {
+  if (document.hidden || state.helpOpen) {
     ending.lastTimestamp = null;
     requestEndingFrame(ending);
     return;
@@ -1213,7 +1404,7 @@ function endingFrame(timestamp, ending) {
 
 function advanceEnding(elapsed, silent = false) {
   const ending = state.ending;
-  if (!ending || ending.completed || document.hidden) return;
+  if (!ending || ending.completed || document.hidden || state.helpOpen) return;
   ending.elapsed = Math.min(ENDING_DURATION, ending.elapsed + Math.max(0, elapsed));
   ending.phase = endingPhase(ending.elapsed);
   const milestones = [
@@ -1240,7 +1431,7 @@ function advanceEnding(elapsed, silent = false) {
 }
 
 function skipEnding() {
-  if (!state.ending || state.ending.completed || document.hidden) return;
+  if (!state.ending || state.ending.completed || document.hidden || state.helpOpen) return;
   stopEndingAnimation();
   advanceEnding(ENDING_DURATION, true);
   render();
@@ -1479,6 +1670,7 @@ function signedBonus(value) {
 function renderEquipment() {
   for (const slot of ['weapon', 'armor', 'ring']) {
     const item = state.equipment[slot];
+    drawEquipmentIcon(slot, item);
     document.getElementById(`${slot}Slot`).className = item ? 'gear-slot equipped' : 'gear-slot empty';
     document.getElementById(`${slot}Name`).textContent = item ? item.name : 'Empty slot';
     const bonuses = [`HP ${signedBonus(item ? item.maxHp || 0 : 0)}`, `STR ${signedBonus(item ? item.str || 0 : 0)}`];
@@ -1520,6 +1712,44 @@ function renderMinimap() {
   document.getElementById('minimapDepth').textContent = `D${state.depth}`;
 }
 
+function resetHelpClock() {
+  state.lastTick = Date.now();
+  if (state.ending) state.ending.lastTimestamp = null;
+  if (state.bossDefeat) state.bossDefeat.lastTimestamp = null;
+}
+
+function openHelp() {
+  if (state.helpOpen) return;
+  state.helpFocus = document.activeElement;
+  state.helpOpen = true;
+  resetHelpClock();
+  document.getElementById('helpOverlay').hidden = false;
+  document.getElementById('gameLayout').inert = true;
+  document.getElementById('launchScreen').inert = true;
+  document.getElementById('helpToggle').ariaExpanded = 'true';
+  render();
+  document.getElementById('closeHelp').focus?.();
+}
+
+function closeHelp() {
+  if (!state.helpOpen) return;
+  const focus = state.helpFocus;
+  state.helpOpen = false; state.helpFocus = null;
+  resetHelpClock();
+  document.getElementById('helpOverlay').hidden = true;
+  document.getElementById('gameLayout').inert = false;
+  document.getElementById('launchScreen').inert = false;
+  document.getElementById('helpToggle').ariaExpanded = 'false';
+  render();
+  if (state.pause) return; // renderPause restores the health/retreat dialog's focus.
+  const target = focus && focus.isConnected && focus !== document.body ? focus : state.started ? canvas : document.getElementById('startGame');
+  target.focus?.();
+}
+
+function toggleHelp() {
+  if (state.helpOpen) closeHelp(); else openHelp();
+}
+
 function render() {
   checkHealth();
   renderPause();
@@ -1553,11 +1783,28 @@ function render() {
   const m = state.merchant;
   const stock = m && m.stock && m.stock.length ? m.stock.map(i => i.name).join(', ') : '(sold out)';
   document.getElementById('merchantStock').textContent = m ? `Merchant: ${stock}` : '';
+  document.getElementById('merchantStock').hidden = !m;
 }
 
 document.addEventListener('keydown', e => {
-  if (e.target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;
   const k = e.key.toLowerCase();
+  if (k === '?') {
+    e.preventDefault();
+    if (!e.repeat) toggleHelp();
+    return;
+  }
+  if (state.helpOpen) {
+    if (k === 'escape') { e.preventDefault(); closeHelp(); }
+    else if (k === 'm' && !e.repeat) toggleAudio();
+    else if (k === 'tab') {
+      const controls = [...document.getElementById('helpOverlay').querySelectorAll('button, input, select, textarea, a[href], [tabindex="0"]')].filter(el => !el.disabled && !el.hidden);
+      const index = controls.indexOf(document.activeElement);
+      const next = index < 0 ? (e.shiftKey ? controls.length - 1 : 0) : (index + (e.shiftKey ? -1 : 1) + controls.length) % controls.length;
+      e.preventDefault(); controls[next].focus();
+    }
+    return;
+  }
+  if (e.target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;
   if (e.target && e.target.tagName === 'BUTTON' && [' ', 'enter'].includes(k)) return;
   if (k === 'tab' && state.pause) {
     const buttons = [...document.getElementById('pauseOverlay').querySelectorAll('button')].filter(b => !b.hidden && !b.disabled);
@@ -1573,6 +1820,10 @@ document.addEventListener('keydown', e => {
   startAudio();
   if (k === 'm') { toggleAudio(); return; }
   if (k === 'r') { restartFromEnding(); return; }
+  if (bossDefeatActive()) {
+    if (k === 'escape' && !e.repeat) skipBossDefeat();
+    return;
+  }
   if (state.ending) {
     if (k === 'escape' && !e.repeat) { e.preventDefault(); skipEnding(); }
     return;
@@ -1605,11 +1856,13 @@ document.addEventListener('keydown', e => {
 document.addEventListener('visibilitychange', () => {
   state.lastTick = Date.now();
   if (state.ending) state.ending.lastTimestamp = null;
+  if (state.bossDefeat) state.bossDefeat.lastTimestamp = null;
 });
 
 for (const [id, action] of [
   ['skipEnding', skipEnding], ['restartEnding', restartFromEnding], ['startGame', startGame], ['drinkPotion', drinkPotion], ['continueGame', continueGame], ['retreatChoice', retreat],
   ['confirmRetreat', confirmRetreat], ['cancelRetreat', cancelRetreat], ['audioToggle', toggleAudio],
+  ['helpToggle', toggleHelp], ['closeHelp', closeHelp],
 ]) document.getElementById(id).addEventListener('click', () => { startAudio(); action(); });
 
 for (const channel of ['music', 'effects']) {
