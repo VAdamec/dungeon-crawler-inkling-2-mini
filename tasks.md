@@ -1,6 +1,6 @@
 # Tasks — Dungeon Crawler
 
-Last reviewed: 2026-11-23. Build v0.5.0 includes the approved monster combat quotes, persistence/recovery/audio, campaign/balance, scrolling/keys/hazards, and plot-twist ending. See `handover.md` for details and `README.md` for controls.
+Last reviewed: 2026-11-23. Build v0.6.0 includes the approved monster combat quotes, persistence/recovery/audio, campaign/balance, scrolling/keys/hazards, and plot-twist ending. See `handover.md` for details and `README.md` for controls.
 
 ## Existing gameplay
 - [x] Keep a thin HTML shell, CSS, and two plain scripts with no runtime dependencies or build step; launch over `file://`.
@@ -68,19 +68,23 @@ Last reviewed: 2026-11-23. Build v0.5.0 includes the approved monster combat quo
 
 ## Verification
 - [x] `node --check js/game.js` and `node --check js/sprites.js`.
-- [x] `node --test tests/game.test.cjs`: 56 tests pass, including 110 varied floor-generation checks and eight monster-speech tests.
+- [x] `node --test tests/game.test.cjs`: 59 tests pass, including 130 varied floor-generation checks and eight monster-speech tests.
 - [x] Existing external startup/input smoke prints `SMOKE_OK`.
 - [x] Isolated Chrome over `file://`: floor round trip, stored potion/HUD, health and critical dialogs, frozen movement, focus restoration, retreat confirm/cancel, healing HUD, running audio context, and mute/unmute pass without JavaScript errors. Follow-up checks cover campaign gates/final rescue victory, boss persistence, active retreat cooldown/dialogs, scaled healing, separate volume buses and preferences. Launch/layout checks also verify click/Enter start, paused launch, branding hidden across restart, top stats, left journal history/scroll, right equipment panel/icons/bonuses, and desktop width behavior. Scrolling checks also verify a 58-step real keyboard path beyond old bounds, key drop/collection/return persistence, invisible-spike pixel equality before trigger, rock warnings/dodge, flame damage, and hazard pauses. Ending checks cover all story phases, hidden-tab/skip/restart timing, frozen world state, once-only rewards/events, and screen-coordinate rendering. Real-time ending playback took 14.05 seconds, with all six scenes, world freeze, skip, and restart checked without JavaScript errors; a native canvas preview was recorded. Screenshots inspected.
 - Audible output quality was not assessed; audio initialization/scheduling and mute behavior were checked.
 
 ## Monster combat quotes — complete
 - [x] Rotate a brief attributed Monty Python quote pool on surviving player hits and eligible monster attacks, without changing combat RNG, damage, or cooldowns.
-- [x] Display one monster-anchored bubble for 2.5 active seconds, with a global four-second interval; keep NPC dialogue independent.
+- [x] Display one monster-anchored bubble for five active seconds, with a global five-second interval; keep NPC dialogue independent.
 - [x] Follow actor/camera movement, clamp to the viewport, place below top-edge actors, and hide dead/unseen/offscreen actors. Preserve hazard-warning priority.
 - [x] Freeze timers during pauses/hidden tabs and clear speech on actor death, travel/respawn, restart, player death, and ending; exclude it from floor saves/templates.
 - [x] Cover timing, lifecycle, visibility, rendering, and RNG independence in eight automated tests; verify real keyboard combat and bubbles in Chrome over file://.
 
 ## Remaining follow-up
+- [x] Extend combat bubbles to five active seconds without early replacement; log each accepted quote once with the speaker name.
+- [x] Add dedicated winged/horned dragon artwork (120×96) and a large toothed Mimic (96×66), with shared bounds for health bars and bubbles; preserve single-tile combat.
+- [x] Generate larger boss arenas (18×14/22×18), three-tile halls, separated stairs, and clear spawn buffers; retain floor connectivity/persistence/campaign gates.
+- [x] Correct local-LLM staircase sprites that duplicated the knight: use stone steps with distinct gold up/down arrows. Keep existing stair discovery/camera/travel rules; update the rendering check for sprite-based stairs.
 - [ ] Human difficulty/feel playtest across an entire run and subjective music/effect assessment. Controlled tests and prepared encounters pass, but do not estimate a human completion rate; volume can now be adjusted independently.
 
 ## Constraints
@@ -88,4 +92,4 @@ Last reviewed: 2026-11-23. Build v0.5.0 includes the approved monster combat quo
 - State persists in memory within a run; R/reload resets floors and progression.
 - Keep functions flat and mutable game state in `state`; no modules, dependencies, or build step.
 - Keep the legacy smoke test outside the repo: `/var/folders/lp/737kz569419gglsqmvs0x0200000gn/T/opencode/smoke.js`.
-- Branch `main` has no commits and files remain untracked. Do not commit unless explicitly asked.
+- Branch `main` has existing history (latest observed `7f8200d`, `v4`). Do not stage or commit unless explicitly asked; preserve user staging.

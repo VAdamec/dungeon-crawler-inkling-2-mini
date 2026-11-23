@@ -214,9 +214,11 @@ test('hidden tabs and visibility changes do not accumulate recovery time', () =>
 
 test('remembered stairs, loot, and terrain render without showing distant monsters', () => {
   const g = game();
-  g.run('state.player.x=state.stairs.x; state.player.y=state.stairs.y; state.treasures=[{x:state.player.x+1,y:state.player.y}]; state.visited.add(`${state.stairs.x},${state.stairs.y}`); state.visited.add(`${state.treasures[0].x},${state.treasures[0].y}`)');
+  g.run(`state.player.x=state.stairs.x; state.player.y=state.stairs.y; state.treasures=[{x:state.player.x+1,y:state.player.y}]; state.visited.add(\`\${state.stairs.x},\${state.stairs.y}\`); state.visited.add(\`\${state.treasures[0].x},\${state.treasures[0].y}\`);
+    window.drawnSprites=[]; const originalDrawSprite=drawSprite;
+    drawSprite=function(...args) { window.drawnSprites.push(args); originalDrawSprite(...args); }`);
   g.calls.length = 0; g.run('draw()');
-  assert.equal(g.calls.some(c => c[0] === 'fillText' && c[1] === '▼'), true);
+  assert.equal(g.run("window.drawnSprites.some(([name,x,y])=>name==='stairsDown' && x===state.stairs.x*TILE+TILE/2 && y===state.stairs.y*TILE+TILE/2)"), true);
   assert.equal(g.calls.some(c => c[0] === 'strokeRect'), true);
 });
 
@@ -847,8 +849,8 @@ test('surviving player hits and eligible enemy attacks trigger one rotating mons
   assert.equal(g.run('state.monsterSpeech.monsterId'),500);
   assert.equal(g.run('state.monsterSpeech.text===MONSTER_QUOTES[0]'),true);
   assert.equal(g.run('state.monsterQuoteIndex'),1,'retaliation does not cause a second quote');
-  assert.equal(g.run('state.monsterSpeech.expiresAt-state.activeTime'),2.5);
-  g.run('advanceActiveTime(4);enemyAttack(state.monsters[0])');
+  assert.equal(g.run('state.monsterSpeech.expiresAt-state.activeTime'),5);
+  g.run('advanceActiveTime(5);enemyAttack(state.monsters[0])');
   assert.equal(g.run('state.monsterSpeech.text===MONSTER_QUOTES[1]'),true);
   const other=game();speechEncounter(other);
   other.run('state.monsters[0].nextAttackAt=1;enemyAttack(state.monsters[0])');
@@ -857,14 +859,14 @@ test('surviving player hits and eligible enemy attacks trigger one rotating mons
   assert.equal(other.run('state.monsterSpeech.monsterId'),500);
 });
 
-test('speech expires after 2.5 active seconds and a global four-second cooldown prevents crowd spam',()=>{
+test('speech stays for five active seconds without replacement and a global cooldown prevents crowd spam',()=>{
   const g=game();speechEncounter(g);
   g.run('state.monsters.push({...state.monsters[0],id:501,x:state.player.x-1});monsterTalk(state.monsters[0]);monsterTalk(state.monsters[1])');
   assert.equal(g.run('state.monsterSpeech.monsterId'),500);
-  g.run('advanceActiveTime(2.49)');assert.notEqual(g.run('monsterSpeechLayout()'),null);
+  g.run('advanceActiveTime(4.99)');assert.notEqual(g.run('monsterSpeechLayout()'),null);
+  g.run('monsterTalk(state.monsters[1])');assert.equal(g.run('state.monsterSpeech.monsterId'),500);
   g.run('advanceActiveTime(0.01)');assert.equal(g.run('state.monsterSpeech'),null);
-  g.run('monsterTalk(state.monsters[1])');assert.equal(g.run('state.monsterSpeech'),null);
-  g.run('advanceActiveTime(1.5);monsterTalk(state.monsters[1])');
+  g.run('monsterTalk(state.monsters[1])');
   assert.equal(g.run('state.monsterSpeech.monsterId'),501);
   assert.equal(g.run('state.monsterQuoteIndex'),2);
 });
@@ -877,7 +879,7 @@ test('quote timers freeze during pauses and hidden tabs, independently of NPC di
   assert.deepEqual(g.json('[state.monsterSpeech,state.monsterSpeechReadyAt,state.activeTime,state.bubble]'),before);
   g.run('cancelRetreat();document.hidden=true;advanceActiveTime(60);monsterTalk(state.monsters[0]);enemyTick()');
   assert.deepEqual(g.json('[state.monsterSpeech,state.monsterSpeechReadyAt,state.activeTime,state.bubble]'),before);
-  g.run('document.hidden=false;advanceActiveTime(2.5)');
+  g.run('document.hidden=false;advanceActiveTime(5)');
   assert.equal(g.run('state.monsterSpeech'),null);
   assert.deepEqual(g.json('state.bubble'),{text:'NPC hello',ttl:90});
 });
@@ -886,10 +888,10 @@ test('lethal hits and player death clear speech without enabling an immediate cr
   const g=game();speechEncounter(g);
   g.run('monsterTalk(state.monsters[0]);damageMonster(state.monsters[0],10000)');
   assert.equal(g.run('state.monsterSpeech'),null);
-  assert.equal(g.run('state.monsterSpeechReadyAt'),4);
+  assert.equal(g.run('state.monsterSpeechReadyAt'),5);
   g.run('state.monsters=[{...MONSTER_TYPES[4],id:501,x:7,y:5,hp:1}];attackMonster(state.monsters[0])');
   assert.equal(g.run('state.monsterSpeech'),null,'a one-shot kill never leaves a ghost bubble');
-  g.run('state.monsters=[{...MONSTER_TYPES[4],id:502,x:7,y:5,hp:100}];advanceActiveTime(4);monsterTalk(state.monsters[0]);hurtPlayer(10000,"fatal")');
+  g.run('state.monsters=[{...MONSTER_TYPES[4],id:502,x:7,y:5,hp:100}];advanceActiveTime(5);monsterTalk(state.monsters[0]);hurtPlayer(10000,"fatal")');
   assert.equal(g.run('state.gameOver'),true);assert.equal(g.run('state.monsterSpeech'),null);
 });
 
@@ -930,7 +932,7 @@ test('quotes do not consume combat randomness or change damage outcomes',()=>{
   assert.equal(g.run('window.randomCalls'),1,'only the existing dodge check draws randomness');
   assert.equal(g.run('state.monsters[0].hp'),488);
   assert.equal(g.run('state.player.hp'),59);
-  g.run('advanceActiveTime(4);window.randomCalls=0;monsterTalk(state.monsters[0])');
+  g.run('advanceActiveTime(5);window.randomCalls=0;monsterTalk(state.monsters[0])');
   assert.equal(g.run('window.randomCalls'),0);
 });
 
@@ -945,4 +947,52 @@ test('speech draws after world/player layers without replacing NPC bubbles or le
   assert.equal(g.calls.filter(c=>c[0]==='save').length,g.calls.filter(c=>c[0]==='restore').length);
   g.run('state.monsters[0].x=71');g.calls.length=0;g.run('drawMonsterSpeech()');
   assert.equal(g.calls.some(c=>c[0]==='fillText'&&c[1]===text),false);
+});
+
+test('accepted combat quotes enter the journal once with the speaker name, including cooldown and pause guards',()=>{
+  const g=game();speechEncounter(g);
+  g.run('monsterTalk(state.monsters[0]);monsterTalk(state.monsters[0]);render();draw()');
+  assert.equal(g.run('state.messages.filter(m=>m===`Orc: “${MONSTER_QUOTES[0]}”`).length'),1);
+  assert.equal(g.elements.log.textContent.includes('Orc: “'),true);
+  g.run('advanceActiveTime(4.99);monsterTalk(state.monsters[0]);retreat();advanceActiveTime(20);monsterTalk(state.monsters[0])');
+  assert.equal(g.run('state.messages.filter(m=>m.startsWith("Orc: ")).length'),1);
+  g.run('cancelRetreat();advanceActiveTime(0.01);monsterTalk(state.monsters[0])');
+  assert.equal(g.run('state.messages.filter(m=>m.startsWith("Orc: ")).length'),2);
+  g.run('damageMonster(state.monsters[0],9999)');
+  assert.equal(g.run('state.messages.some(m=>m===`Orc: “${MONSTER_QUOTES[0]}”`)'),true,'speech history survives actor death');
+});
+
+test('large boss artwork fits its clear arena on generation and revisits, with health bars and speech above its bounds',()=>{
+  const g=game();
+  for(const depth of [5,10]) {
+    g.run(`enterFloor(${depth},false)`);
+    const initial=g.json('monsterVisual(state.boss)');
+    assert.equal(initial.width>=96,true);
+    if(depth===10) assert.equal(initial.height>=64,true);
+    assert.equal(g.run('state.boss.x===state.rooms.find(r=>r.isArena).cx && state.boss.y===state.rooms.find(r=>r.isArena).cy'),true);
+    assert.equal(g.run('state.monsters.filter(m=>!m.isBoss).every(m=>!bossSpawnBuffer(m.x,m.y))'),true);
+    assert.equal(g.run('protectedFloorTiles().filter(t=>t!==state.boss).every(t=>!bossSpawnBuffer(t.x,t.y))'),true);
+    assert.equal(g.run(`{const v=monsterVisual(state.boss), r=state.rooms.find(r=>r.isArena);
+      v.left>=r.x*TILE && v.right<=(r.x+r.w)*TILE && v.top>=r.y*TILE && v.bottom<=(r.y+r.h)*TILE;}`),true);
+    g.run('state.player.x=state.boss.x;state.player.y=state.boss.y+1;updateCamera();clearMonsterSpeech();monsterTalk(state.boss)');
+    assert.equal(g.run('monsterSpeechLayout().y+monsterSpeechLayout().height < monsterVisual(state.boss).top-7'),true);
+    g.calls.length=0;g.run('draw()');
+    assert.equal(g.calls.some(c=>c[0]==='fillRect'&&c[2]===initial.top-7&&c[3]===initial.width-12&&c[4]===4),true);
+    g.run('enterFloor(1,false)');g.run(`enterFloor(${depth},false)`);
+    assert.deepEqual(g.json('monsterVisual(state.boss)'),initial);
+  }
+});
+
+test('boss floors retain large connected halls and trap-free arenas over varied generations',()=>{
+  const g=game();
+  for(let i=0;i<20;i++) {
+    const depth=i%2?5:10;
+    g.run(`newGame();enterFloor(${depth},false)`);
+    assert.equal(g.run(`{const r=state.rooms.find(r=>r.isArena);r.w>=18 && r.h>=14 &&
+      state.map.slice(r.y,r.y+r.h).every(row=>row.slice(r.x,r.x+r.w).every(t=>t===0));}`),true);
+    assert.equal(g.run('state.hazards.every(h=>!bossArenaContains(h.x,h.y))'),true);
+    assert.equal(g.run('floorDistances(state.map,state.upstairs).size===state.map.flat().filter(t=>t===0).length'),true);
+  }
+  g.run(`window.corridorMap=Array.from({length:H},()=>Array(W).fill(1));carveCorridor(window.corridorMap,{cx:5,cy:5},{cx:15,cy:5},3)`);
+  assert.equal(g.run('window.corridorMap.slice(4,7).every(row=>row.slice(4,17).every(t=>t===0))'),true);
 });

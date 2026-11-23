@@ -5,10 +5,10 @@ Plain HTML5 canvas game. No build step, no dependencies, no modules — everythi
 ## File map
 - `index.html` — launch-only SVG logo/version and start screen; top stats, a left-side scrolling adventure log, and an equipment sidebar on the right; canvas `#game` (1152x768), game-over and health/retreat overlays, HUD, equipment/merchant display, controls, and sound toggle. Loads `style.css`, then plain scripts `js/sprites.js` and `js/game.js`.
 - `style.css` — dark palette, canvas, HUD, dialog/button styles, and help layout.
-- `js/sprites.js` — `SPRITES` and `SPRITE_PALETTES` (11 each), plus `drawSprite` (references global `ctx` at call time).
+- `js/sprites.js` — `SPRITES` and `SPRITE_PALETTES` (14 each, including distinct stone stairs with up/down arrows), plus `drawSprite` (references global `ctx` at call time).
 - `js/game.js` — generation, floor persistence, combat, NPCs/items, potion inventory, health/retreat dialogs, healing, synthesized audio, drawing, and input. Initializes with `newGame(); render(); setInterval(enemyTick, 220);`.
 - `tests/game.test.cjs` — dependency-free Node VM behavioral tests, with stubbed DOM/canvas/audio. The separate legacy smoke script stays outside the repository.
-- `docs/plans/2026-11-23-monster-combat-quotes-design.md` — latest approved design; adjacent plan lists implementation steps. Earlier ending, persistence, and balance designs remain in the same directory.
+- `docs/plans/2026-11-23-boss-visuals-speech-design.md` — latest approved design and completed implementation checklist. Earlier ending, persistence, and balance designs remain in the same directory.
 
 ## Conventions
 - No ES modules, no imports/exports, no bundler. `sprites.js` loads before `game.js`; both are plain scripts sharing global scope.
@@ -17,9 +17,10 @@ Plain HTML5 canvas game. No build step, no dependencies, no modules — everythi
 - Use `equipItem(slot, item)` for equipment changes, including sales. It adjusts ring maximum/current HP without stacking; direct equipment writes bypass those effects. Ring adds `maxHp: 20`; Shield is an armor-slot item with `def: 5`; sword retains attack/strength modifiers. `renderEquipment()` populates icon cards, modifiers, and effective hero stats.
 - Route player damage through `hurtPlayer()` so death and threshold pauses stop attacks immediately. Pauses freeze simulation; `render()` updates the HUD, canvas, and dialog focus.
 - World dimensions are `W=72`, `H=48`; viewport dimensions are `VIEW_W=36`, `VIEW_H=24`. Keep all stored positions in world coordinates. `draw()` wraps its viewport loops/entity layers in a camera translation; use `inCamera()` for entity culling and keep warning badges above the player. Map values: 0 walkable, 1 wall, 2 blocking obstacle.
+- Boss floors reserve an `isArena` room before other generation: Mimic 18×14, dragon 22×18, with three-tile halls. Keep arenas free of obstacles/hazards, center spawn buffers free of loot/ordinary monsters, and stairs away from the boss center. `rooms` persists these bounds. `monsterVisual()` supplies shared foot-anchored art bounds for sprites/bars/bubbles: Mimic 96×66, dragonBoss 120×96; targeting/collision remains single-tile. The ending reuses dragonBoss artwork with its existing animation.
 - `state.ending` is a global campaign finale, not a floor-save field. `gameOver(true)` starts the guarded final sequence; `gameOver(false)` keeps the death overlay. Ending callbacks must be bound to their object identity and canceled by `newGame()`/skip. During the ending, `gameOver/won` mark campaign completion and freeze normal simulation; a separate requestAnimationFrame clock drives screen-coordinate `drawEnding()`.
 - Keep functions top-level and flat. `log()` writes to `#log`; `render()` redraws canvas + HUD; `draw()` is canvas-only.
-- Do not commit without being asked. Repo has no commits yet; all files are untracked.
+- Do not stage or commit without being asked. Preserve existing user changes and staging.
 
 ## Verify
 - Syntax: `node --check js/game.js && node --check js/sprites.js`
@@ -36,7 +37,8 @@ Plain HTML5 canvas game. No build step, no dependencies, no modules — everythi
 - Potions are stored; H drinks. Below 20% HP pauses; below 10% offers confirmed retreat with full HP. At depth 1 retreat returns to its entrance. Confirmed retreat sets a 60-second active-time cooldown; cancellation and floor travel do not reset it.
 - Autohealing: 2% maximum HP (rounded, minimum 1) per two seconds after six seconds without combat and no monster within three tiles. Pause/hidden-tab time does not count.
 - `enemyAttack()` enforces one shared per-monster 0.8-second cooldown for retaliation and timed attacks, including dodges. Advance `activeTime` only during active simulation.
-- Monster combat speech uses transient `state.monsterSpeech`, `monsterSpeechReadyAt`, and `monsterQuoteIndex`, independent of NPC `state.bubble`. Surviving player hits and eligible enemy attempts call `monsterTalk()`. Rotate the brief attributed pool without consuming combat RNG; one bubble per four active seconds, lasting 2.5. Resolve the living actor ID each draw, respect fog/camera bounds, and draw below hazard warnings. Clear on actor death, travel/recreation, restart, player death, and ending; keep speech out of floor saves/templates.
+- Monster combat speech uses transient `state.monsterSpeech`, `monsterSpeechReadyAt`, and `monsterQuoteIndex`, independent of NPC `state.bubble`. Surviving player hits and eligible enemy attempts call `monsterTalk()`. Rotate the brief attributed pool without consuming combat RNG; one bubble per five active seconds, lasting five. Resolve the living actor ID each draw, respect fog/camera bounds, and draw below hazard warnings. Clear on actor death, travel/recreation, restart, player death, and ending; keep speech out of floor saves/templates.
+- `monsterTalk()` appends the speaker and quote to `log()` only when speech is accepted, never on render or a blocked/cooldown attack.
 - Audio has separate music/effects gain buses and sliders plus master mute. Preserve preferences/context across R, and keep synthesis local.
 - Campaign: floors 1–9 require a collected key to descend; depth-5 Mimic death is an additional gate, depth-10 dragon death unlocks princess rescue, and Space at that princess completes the campaign by starting the plot-twist ending. No princess at depth 5 and no descent past depth 10. Boss kills award XP/gold and save permanent floor defeats without ending the run. `objectiveText()` feeds the objective HUD.
 

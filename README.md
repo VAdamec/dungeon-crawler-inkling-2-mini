@@ -1,6 +1,6 @@
 # Dungeon Crawler
 
-A plain HTML5 canvas dungeon game, version 0.5.0. Open `index.html` directly in a browser (`file://`); there is no install, build step, server, or network dependency.
+A plain HTML5 canvas dungeon game, version 0.6.0. Open `index.html` directly in a browser (`file://`); there is no install, build step, server, or network dependency.
 
 The fantasy logo and version appear on the launch screen only. Click **Enter the dungeon** or press a key to begin; the game waits until you start. During play, stats sit at the top and a scrolling adventure log sits to the left of the map, and equipment with icons and bonuses sits to its right. On narrow screens the log moves below the map. R starts a fresh run without showing the launch screen again; reloading the page shows it.
 
@@ -63,7 +63,11 @@ The princess appears only at depth 10, and there is no depth 11. Defeated bosses
 
 Combat remains real time. Each enemy shares a 0.8-second cooldown between retaliation and timed attacks, including dodges; different enemies can attack independently. Late-floor HP and attack scaling are gentler than before, while XP and gold progression are retained. Use gear, stored potions, retreat, and safe rest to prepare for the final encounter.
 
-Living monsters trade short Monty Python quotes in speech bubbles when hit or attacking. One monster can speak every four active seconds; its bubble lasts 2.5 active seconds, follows it as the camera scrolls, and stays inside the viewport. Pauses and hidden tabs freeze speech timers. Dead, unseen, and offscreen monsters show no bubble; travel, respawn, restart, player death, and the ending clear it. NPC dialogue remains separate.
+Living monsters trade short Monty Python quotes in speech bubbles when hit or attacking. One monster can speak every five active seconds; its bubble lasts five active seconds, follows it as the camera scrolls, and stays inside the viewport. Pauses and hidden tabs freeze speech timers. Dead, unseen, and offscreen monsters show no bubble; travel, respawn, restart, player death, and the ending clear it. NPC dialogue remains separate.
+
+Each spoken quote also appears once in the left adventure log with the monster's name, so it remains readable after the bubble disappears.
+
+Boss floors have larger chambers and three-tile-wide connecting halls. The Mimic has an 18×14-tile arena; the dragon has a 22×18-tile hall. Their central spawn areas stay clear of loot and ordinary monsters, and the arenas contain no traps or blocking props. The Mimic is three tiles wide; the winged, horned dragon spans nearly four tiles across and three high. Health bars and speech sit above the larger artwork. Their combat target and movement still use one tile.
 
 The brief quotations are from *Monty Python and the Holy Grail*: [official Monty Python media](https://www.montypython.com/media), [Black Knight scene](https://www.youtube.com/watch?v=KlYrn2bXsc4), and [Knights Who Say Ni scene](https://www.youtube.com/watch?v=zIV4poUZAQo). Only text is included; no film audio or media assets are bundled.
 

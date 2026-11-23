@@ -1,21 +1,27 @@
 # Handover — Dungeon Crawler
 
-Last updated: 2026-11-23. Current build: v0.5.0.
+Last updated: 2026-11-23. Current build: v0.6.0.
 
 ## Objective and result
 Implemented the approved Monty Python monster combat speech bubbles on top of the princess/dragon romance ending, larger scrolling floors, persistent hidden-carrier keys, hazards/obstacles, and earlier campaign, recovery, audio, and layout features. No commits made.
+
+Latest approved follow-up: combat quotes last five active seconds with a five-second global interval and enter the left journal once per accepted utterance. `monsterVisual()` shares foot-anchored bounds for boss art, health bars, and bubble placement. Mimic is now a 96×66 toothed chest; dedicated `dragonBoss` art is 120×96 with wings, neck, horns, claws, and tail, also reused in the ending. Single-tile collision/combat remains as approved.
+
+Boss generation reserves an `isArena` room before ordinary rooms: 18×14 for the Mimic and 22×18 for the dragon, connected with three-tile halls. Stairs sit away from center. Arenas have no hazards/obstacles; center buffers keep ordinary monsters and loot away from the boss. `rooms` already persists arena metadata. `recreateMonsters()` keeps ordinary respawns out of those buffers. Generation still passes full connectivity, arrival/key/hazard safety, and campaign tests.
+
+Follow-up correction: a local LLM introduced `stairsUp`/`stairsDown` sprites that exactly duplicated the knight. Replaced those grids/palettes in `js/sprites.js` with stone steps and gold directional arrows. Existing sprite calls, discovery, camera culling, and travel behavior remain intact. Updated the old glyph-based rendering assertion for sprite-based stairs; all 59 tests and syntax checks pass. Browser captures are `/tmp/dungeon-stairs.png` and `/tmp/dungeon-stairs-detail.png`.
 
 ## Read first
 - `agents.md` — architecture and conventions.
 - `README.md` — launch, controls, campaign/recovery rules, and verification commands.
 - `tasks.md` — completed criteria and remaining human playtest follow-up.
-- `docs/plans/2026-11-23-monster-combat-quotes-design.md` and adjacent plan — latest approved design. Earlier ending, scrolling/keys/hazards, campaign/balance, and launch/layout designs remain in this directory.
+- `docs/plans/2026-11-23-boss-visuals-speech-design.md` — latest approved design. Earlier ending, scrolling/keys/hazards, campaign/balance, and launch/layout designs remain in this directory.
 - `docs/plans/2026-11-23-launch-layout-design.md` — user-specified layout and launch behavior.
 - `docs/plans/2026-11-23-campaign-playtest-findings.md` — controlled baseline and before/after diagnostics, with limitations.
 - `js/game.js` and `tests/game.test.cjs` — implementation and dependency-free behavior checks.
 
 ## Runtime and state
-Still plain HTML/CSS plus `js/sprites.js` then `js/game.js`; no runtime dependencies, modules, build, server, external fonts, or downloaded audio assets. All mutable game state stays in `state`; functions stay flat/top-level. `GAME_VERSION` is 0.5.0.
+Still plain HTML/CSS plus `js/sprites.js` then `js/game.js`; no runtime dependencies, modules, build, server, external fonts, or downloaded audio assets. All mutable game state stays in `state`; functions stay flat/top-level. `GAME_VERSION` is 0.6.0.
 
 Floor saves (`state.floors`, `FLOOR_FIELDS`, `saveFloor`) retain map/rooms/stairs/visited Set, remaining loot, merchant stock, rescues, monster templates, permanent boss defeat, floor key state, obstacles, hazards/local time, and once-only descent rewards. They do not snapshot player progression. Ordinary monsters respawn from templates on return; defeated bosses never respawn. Collected items remain collected. Saves last within the run; R/reload resets them.
 
@@ -36,7 +42,7 @@ Floor saves (`state.floors`, `FLOOR_FIELDS`, `saveFloor`) retain map/rooms/stair
 
 ## Monster combat speech
 - The user explicitly requested and approved this feature after the earlier status-only question. `MONSTER_QUOTES` contains four very short attributed film quotations; README links official sources. No audio clips or downloaded media were added.
-- `monsterTalk()` runs after a surviving player hit and on an eligible enemy attack attempt. It rotates quotes without consuming RNG or changing combat damage/attack cooldowns. One bubble globally every four active seconds, visible for 2.5; pauses and hidden tabs freeze those clocks.
+- `monsterTalk()` runs after a surviving player hit and on an eligible enemy attack attempt. It rotates quotes without consuming RNG or changing combat damage/attack cooldowns. One bubble globally every five active seconds, visible for five; pauses and hidden tabs freeze those clocks.
 - Transient `state.monsterSpeech` stores live monster ID/text/expiration; `monsterSpeechReadyAt` and `monsterQuoteIndex` govern timing/rotation. These fields are separate from NPC `state.bubble`, floor saves, and monster templates. Travel/recreation clears speech/readiness while retaining rotation; R resets rotation too. Actor death clears its bubble but retains the global cooldown; player death and ending clear speech.
 - `monsterSpeechLayout()` resolves the living actor, checks fog/camera visibility, and clamps the measured rectangle inside the viewport, placing it below top-edge actors. `drawMonsterSpeech()` draws after world/fog/player layers and below hazard warnings. Speech follows actor/camera movement and hides unseen/offscreen actors.
 
@@ -66,8 +72,10 @@ Floor saves (`state.floors`, `FLOOR_FIELDS`, `saveFloor`) retain map/rooms/stair
 
 ## Verification and limits
 - Syntax: `node --check js/game.js` and `node --check js/sprites.js` pass.
-- `node --test tests/game.test.cjs`: 56 pass. Includes floor persistence and 110 varied generation checks, health/recovery/audio tests, complete campaign state flow, permanent boss defeats and reward guards, cooldown timing/dodges, volume controls/mute persistence, prepared endgame duel, Enter default-action regression, launch lifecycle, ring pickup/purchase/replacement/sale with level-up and travel, actual sword/shield combat modifiers, full-world reachability/protection, real floor-key campaign flows, key anti-duplication/priority, every hazard type and timer/death integration, camera clamping/culling, rock-warning layer order, all ending phases/poses, healed actor HP, skip at every phase, world/input freeze, repeated-reward prevention, hidden timing, stale callback rejection, restart cleanup, and screen-coordinate ending drawing. Eight new speech tests cover both combat triggers, rotation, active timing, crowd cooldown, paused/hidden clocks, NPC independence, no added randomness/damage changes, lethal-hit/death/travel/respawn/restart/ending cleanup, visibility, all viewport edges, and drawing layer/context balance.
+- `node --test tests/game.test.cjs`: 59 pass. Includes floor persistence and 130 varied generation checks, health/recovery/audio tests, complete campaign state flow, permanent boss defeats and reward guards, cooldown timing/dodges, volume controls/mute persistence, prepared endgame duel, Enter default-action regression, launch lifecycle, ring pickup/purchase/replacement/sale with level-up and travel, actual sword/shield combat modifiers, full-world reachability/protection, real floor-key campaign flows, key anti-duplication/priority, every hazard type and timer/death integration, camera clamping/culling, rock-warning layer order, all ending phases/poses, healed actor HP, skip at every phase, world/input freeze, repeated-reward prevention, hidden timing, stale callback rejection, restart cleanup, and screen-coordinate ending drawing. Eight new speech tests cover both combat triggers, rotation, active timing, crowd cooldown, paused/hidden clocks, NPC independence, no added randomness/damage changes, lethal-hit/death/travel/respawn/restart/ending cleanup, visibility, all viewport edges, and drawing layer/context balance.
 - Legacy external startup smoke prints `SMOKE_OK`: `/var/folders/lp/737kz569419gglsqmvs0x0200000gn/T/opencode/smoke.js`. It remains outside the repo and unchanged.
+- Latest follow-up adds three tests (59 total) for named once-only chat, five-second speech/cooldown guards, boss visual bounds/bars/bubbles across revisits, and varied boss-arena clearance/connectivity plus three-wide hall carving. Syntax and external smoke pass; sprite/palette counts are now 14 each.
+- New Chrome check (`/tmp/dungeon-boss-visuals-browser-check.js`) measured quote disappearance after 5.145 real seconds (simulation ticks every 220ms), and verified no duplicate chat, next-quote logging, both boss sizes and bubble/bar placement, clear 22×18 dragon arena, refined ending artwork, skip, and restart. No JavaScript errors. Inspected `/tmp/dungeon-large-dragon.png`, `/tmp/dungeon-large-mimic.png`, and `/tmp/dungeon-refined-ending-dragon.png`; arena overview is `/tmp/dungeon-dragon-arena.png`.
 - Controlled Chrome checks over file:// pass for campaign gates/objectives, final rescue victory, boss persistence, retreat cooldown/frozen pauses, scaled healing, separate real audio gains, mute/preferences, and Enter/button controls without JavaScript errors. Real Web Audio gains require floating-point comparison tolerance.
 - New scrolling/hazard browser checks over file:// followed a 58-step keyboard route beyond the old viewport bounds, verified the camera and 72×48 world/1152×768 canvas, locked stairs and real key collection/return persistence, pixel-identical hidden spikes before trigger, rock warning/dodge, fire damage, and frozen hazard time during health pause. No JavaScript errors; scrolled and hazard screenshots inspected. Campaign browser flow now collects actual keys before descending and passes final rescue/recovery/audio checks.
 - Ending browser check over file:// played the complete animation in 14.05 real seconds, inspected/captured reveal, love, healing, flight, sunset, and THE END frames, and verified frozen dungeon state, Esc skip, button/R restart, and restart during playback. No JavaScript errors. A native canvas/MediaRecorder preview with audio was saved as `/tmp/dungeon-ending.webm` (about 2.3 MB); screenshot stages are `/tmp/dungeon-ending-*.png`. The CLI recording helper lacked ffmpeg, so browser-native recording avoided an installation.
@@ -76,12 +84,12 @@ Floor saves (`state.floors`, `FLOOR_FIELDS`, `saveFloor`) retain map/rooms/stair
 - Prior v0.2 balance baseline and after-tuning diagnostics use the same seed, normal-monster XP, and no gear/incoming damage; they are not a full human campaign. Dragon matchup changes from 16 hits/88 damage per retaliation to 9 hits/25. A separate prepared no-gear duel (full HP, two potions, no dodges, one attack/second, no other attackers) can finish and rescue with real game functions. Human completion rate and subjective audible quality remain unassessed.
 
 ## Files and tools
-Modified in the monster-speech follow-up: `js/game.js`, `tests/game.test.cjs`, `README.md`, `agents.md`, `tasks.md`, `handover.md`; added monster-combat-quotes design+plan in `docs/plans/`. Existing shell/styles/sprites and the legacy external smoke are unchanged by this follow-up. Earlier design/plan documents remain for context.
+Modified in the latest boss/speech/arena follow-up: `js/game.js`, `js/sprites.js`, `tests/game.test.cjs`, `README.md`, `agents.md`, `tasks.md`, `handover.md`; added boss-visuals-speech design/checklist in `docs/plans/`. Shell/styles and legacy external smoke are unchanged by this follow-up. Earlier design/plan documents remain for context.
 
 Browser tools/scripts/screenshots use temporary locations, including `/tmp/dungeon-ending-browser-check.js`, `/tmp/dungeon-ending.webm`, `/tmp/dungeon-scrolling-browser-check.js`, `/tmp/dungeon-scrolling.png`, `/tmp/dungeon-hazards.png`, `/tmp/dungeon-campaign-browser-check.js`, `/tmp/dungeon-layout-browser-check.js`, `/tmp/dungeon-launch.png`, and `/tmp/dungeon-layout.png`. The Playwright CLI uses temporary npm cache/session paths; no runtime package was added.
 
 ## Repository and next action
-Workspace: `/Users/vadamec/workspace/ai_tmp/opencode_testing`. Branch `main` has no commits; project files remain untracked. A user/IDE-created `.idea/` directory appeared during work and was left untouched. Do not stage or commit unless asked.
+Workspace: `/Users/vadamec/workspace/ai_tmp/opencode_testing`. Branch `main` now has existing history (latest observed `7f8200d`, `v4`); older handovers describing an untracked repository are stale. The new design file is already staged with additional working changes; staging was left as observed. No commits were made in this follow-up. Do not alter user staging or commit unless asked.
 
 Monty Python monster combat bubbles are implemented and verified following the user's explicit follow-up request and design approval.
 

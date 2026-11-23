@@ -21,10 +21,10 @@ const ITEM_TABLE = [
   { name: 'Shield',   sprite: 'shield',  gold: 55, kind: 'armor', def: 5 },
 ];
 
-const GAME_VERSION = '0.5.0';
+const GAME_VERSION = '0.6.0';
 // Brief quotations from Monty Python and the Holy Grail; official sources in README.
 const MONSTER_QUOTES = ['Ni!', 'None shall pass!', "'Tis but a scratch.", 'Run away!'];
-const MONSTER_SPEECH_DURATION = 2.5, MONSTER_SPEECH_INTERVAL = 4;
+const MONSTER_SPEECH_DURATION = 5, MONSTER_SPEECH_INTERVAL = 5;
 const ENDING_DURATION = 14;
 const GOLD_PER_LEVEL = 3;
 const FINAL_DEPTH = 10, ENEMY_ATTACK_INTERVAL = 0.8, RETREAT_COOLDOWN = 60;
@@ -78,6 +78,13 @@ function genLevel() {
   for (let y = 0; y < H; y++) map.push(new Array(W).fill(1)); // 1 = wall
   const rooms = [{ x: 2, y: 2, w: 8, h: 6, cx: 6, cy: 5 }];
   for (let y = 2; y < 8; y++) for (let x = 2; x < 10; x++) map[y][x] = 0;
+  const isBossLevel = state.depth % 5 === 0;
+  if (isBossLevel) {
+    const w = state.depth === FINAL_DEPTH ? 22 : 18, h = state.depth === FINAL_DEPTH ? 18 : 14;
+    const x = W - w - 3, y = H - h - 3;
+    rooms.push({ x, y, w, h, cx: x + (w >> 1), cy: y + (h >> 1), isArena: true });
+    for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) map[yy][xx] = 0;
+  }
   for (let i = 0; i < 420 && rooms.length < 22; i++) {
     const w = 5 + Math.floor(Math.random() * 6);
     const h = 4 + Math.floor(Math.random() * 4);
@@ -90,36 +97,36 @@ function genLevel() {
   for (let i = 1; i < rooms.length; i++) {
     const previous = rooms.slice(0, i).sort((a, b) =>
       Math.abs(a.cx - rooms[i].cx) + Math.abs(a.cy - rooms[i].cy) - Math.abs(b.cx - rooms[i].cx) - Math.abs(b.cy - rooms[i].cy))[0];
-    carveCorridor(map, rooms[i], previous);
+    carveCorridor(map, rooms[i], previous, isBossLevel ? 3 : 1);
   }
   // Extra connections form loops instead of one chain of rooms.
   for (let i = 2; i < rooms.length; i += 3) {
     const other = rooms[Math.floor(Math.random() * i)];
-    carveCorridor(map, rooms[i], other);
+    carveCorridor(map, rooms[i], other, isBossLevel ? 3 : 1);
   }
   const distances = floorDistances(map, { x: rooms[0].cx, y: rooms[0].cy });
   let farthest = 1;
   for (let i = 2; i < rooms.length; i++) {
     if (distances.get(`${rooms[i].cx},${rooms[i].cy}`) > distances.get(`${rooms[farthest].cx},${rooms[farthest].cy}`)) farthest = i;
   }
-  rooms.push(rooms.splice(farthest, 1)[0]);
+  rooms.push(rooms.splice(isBossLevel ? rooms.findIndex(r => r.isArena) : farthest, 1)[0]);
   state.map = map; state.rooms = rooms;
 
   const p = state.player;
   p.x = rooms[0].cx; p.y = rooms[0].cy;
   const stairsRoom = rooms[rooms.length - 1];
-  state.stairs = { x: stairsRoom.cx, y: stairsRoom.cy };
+  state.stairs = { x: stairsRoom.cx, y: stairsRoom.isArena ? stairsRoom.y + stairsRoom.h - 3 : stairsRoom.cy };
   state.upstairs = { x: rooms[0].cx, y: rooms[0].cy };
 
   state.monsters = [];
   state.bossDefeated = false;
-  const isBossLevel = state.depth % 5 === 0;
   const count = 5 + state.depth * 2;
   for (let i = 0; i < count; i++) {
     const room = rooms[1 + Math.floor(Math.random() * (rooms.length - 1))];
     const tx = room.x + Math.floor(Math.random() * room.w);
     const ty = room.y + Math.floor(Math.random() * room.h);
     if (tx === p.x && ty === p.y) continue;
+    if (room.isArena && Math.max(Math.abs(tx - room.cx), Math.abs(ty - room.cy)) <= 3) continue;
     const t = MONSTER_TYPES[Math.min(MONSTER_TYPES.length - 1, Math.floor(Math.random() * (2 + state.depth)))];
     const scale = 1 + (state.depth - 1) * 0.35;
     state.monsters.push({
@@ -225,14 +232,26 @@ function genLevel() {
   saveFloor();
 }
 
-function carveCorridor(map, from, to) {
+function carveCorridor(map, from, to, width = 1) {
   let x = from.cx, y = from.cy;
   const horizontalFirst = Math.random() < 0.5;
-  while (x !== to.cx || y !== to.cy) {
+  const radius = Math.floor(width / 2);
+  for (;;) {
+    for (let dy = -radius; dy <= radius; dy++) for (let dx = -radius; dx <= radius; dx++) {
+      if (x + dx > 0 && x + dx < W - 1 && y + dy > 0 && y + dy < H - 1) map[y + dy][x + dx] = 0;
+    }
+    if (x === to.cx && y === to.cy) break;
     if ((horizontalFirst && x !== to.cx) || y === to.cy) x += Math.sign(to.cx - x);
     else y += Math.sign(to.cy - y);
-    map[y][x] = 0;
   }
+}
+
+function bossArenaContains(x, y) {
+  return state.rooms.some(r => r.isArena && x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h);
+}
+
+function bossSpawnBuffer(x, y) {
+  return state.rooms.some(r => r.isArena && Math.max(Math.abs(x - r.cx), Math.abs(y - r.cy)) <= 3);
 }
 
 function floorDistances(map, start) {
@@ -260,6 +279,7 @@ function generateObstacles() {
   let floorCount = state.map.reduce((sum, row) => sum + row.filter(t => t === 0).length, 0);
   for (let attempt = 0; attempt < 180 && state.obstacles.length < 10 + Math.floor(state.depth / 2); attempt++) {
     const room = state.rooms[Math.floor(Math.random() * state.rooms.length)];
+    if (room.isArena) continue;
     const x = room.x + 1 + Math.floor(Math.random() * (room.w - 2));
     const y = room.y + 1 + Math.floor(Math.random() * (room.h - 2));
     if (state.map[y][x] !== 0 || reserved.has(`${x},${y}`)) continue;
@@ -275,6 +295,7 @@ function generateHazards() {
   const reserved = new Set(protectedFloorTiles().map(o => `${o.x},${o.y}`));
   const candidates = [];
   for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+    if (bossArenaContains(x, y)) continue;
     if (state.map[y][x] !== 0 || reserved.has(`${x},${y}`)) continue;
     if ([state.upstairs, state.stairs].some(o => Math.max(Math.abs(x - o.x), Math.abs(y - o.y)) <= 3)) continue;
     candidates.push({ x, y });
@@ -458,6 +479,7 @@ function monsterTalk(monster) {
   if (!Number.isInteger(monster.id) || !state.monsters.includes(monster) || !inCamera(monster.x, monster.y) || fogLevel(monster.x, monster.y) >= 3) return;
   if (state.activeTime < state.monsterSpeechReadyAt) return;
   state.monsterSpeech = { monsterId: monster.id, text: MONSTER_QUOTES[state.monsterQuoteIndex], expiresAt: state.activeTime + MONSTER_SPEECH_DURATION };
+  log(`${monster.name}: “${state.monsterSpeech.text}”`);
   state.monsterQuoteIndex = (state.monsterQuoteIndex + 1) % MONSTER_QUOTES.length;
   state.monsterSpeechReadyAt = state.activeTime + MONSTER_SPEECH_INTERVAL;
 }
@@ -476,12 +498,23 @@ function monsterSpeechLayout() {
   const width = ctx.measureText(speech.text).width + 20;
   ctx.restore();
   const height = 28, anchorX = monster.x * TILE + TILE / 2;
+  const visual = monsterVisual(monster);
   const viewportLeft = state.camera.x * TILE, viewportTop = state.camera.y * TILE;
   const x = Math.max(viewportLeft + 6, Math.min(viewportLeft + VIEW_W * TILE - width - 6, anchorX - width / 2));
-  const below = monster.y * TILE - 40 < viewportTop + 4;
-  const y = Math.max(viewportTop + 4, Math.min(viewportTop + VIEW_H * TILE - height - 4, below ? (monster.y + 1) * TILE + 12 : monster.y * TILE - 40));
+  const below = visual.top - 44 < viewportTop + 4;
+  const y = Math.max(viewportTop + 4, Math.min(viewportTop + VIEW_H * TILE - height - 4, below ? visual.bottom + 12 : visual.top - 44));
   return { x, y, width, height, text: speech.text, below, anchorX,
-    tipY: below ? (monster.y + 1) * TILE + 3 : monster.y * TILE - 3 };
+    tipY: Math.max(viewportTop + 3, Math.min(viewportTop + VIEW_H * TILE - 3, below ? visual.bottom + 3 : visual.top - 3)) };
+}
+
+function monsterVisual(monster) {
+  const sprite = monster.isDragon ? 'dragonBoss' : monster.sprite;
+  const scale = monster.isBoss ? 3 : 2;
+  const grid = SPRITES[sprite];
+  const width = Math.max(...grid.map(row => row.length)) * scale, height = grid.length * scale;
+  const x = monster.x * TILE + TILE / 2;
+  const y = monster.isBoss ? (monster.y + 1) * TILE - height / 2 : monster.y * TILE + TILE / 2;
+  return { sprite, scale, x, y, width, height, left: x - width / 2, right: x + width / 2, top: y - height / 2, bottom: y + height / 2 };
 }
 
 function drawMonsterSpeech() {
@@ -535,6 +568,9 @@ function revealAroundPlayer() {
 
 function placeFloorObjects() {
   const used = new Set([state.stairs, state.upstairs].map(o => `${o.x},${o.y}`));
+  for (const room of state.rooms.filter(r => r.isArena)) {
+    for (let y = room.cy - 3; y <= room.cy + 3; y++) for (let x = room.cx - 3; x <= room.cx + 3; x++) used.add(`${x},${y}`);
+  }
   for (const item of [state.merchant, state.prisoner, state.princess, ...state.potions, ...state.treasures].filter(Boolean)) {
     if (used.has(`${item.x},${item.y}`)) {
       let tile = null;
@@ -566,9 +602,10 @@ function recreateMonsters() {
   }
   for (const spawn of state.monsterSpawns) {
     if (spawn.isBoss && state.bossDefeated) continue;
-    const preferred = available.findIndex(t => t.x === spawn.x && t.y === spawn.y);
-    const tile = available.splice(preferred >= 0 ? preferred : 0, 1)[0];
-    if (!tile) break;
+    const preferred = available.findIndex(t => (spawn.isBoss || !bossSpawnBuffer(t.x, t.y)) && t.x === spawn.x && t.y === spawn.y);
+    const index = preferred >= 0 ? preferred : available.findIndex(t => spawn.isBoss ? bossSpawnBuffer(t.x, t.y) : !bossSpawnBuffer(t.x, t.y));
+    if (index < 0) continue;
+    const tile = available.splice(index, 1)[0];
     state.monsters.push({ ...spawn, ...tile, hp: spawn.maxHp, nextAttackAt: state.activeTime });
   }
   state.boss = state.monsters.find(m => m.isBoss) || null;
@@ -1027,10 +1064,8 @@ function draw() {
   drawFloorDetails();
   for (const [stairs, glyph] of [[state.depth < FINAL_DEPTH ? state.stairs : null, '▼'], [state.depth > 1 ? state.upstairs : null, '▲']]) {
     if (!stairs || !inCamera(stairs.x, stairs.y) || !state.visited.has(`${stairs.x},${stairs.y}`)) continue;
-    ctx.fillStyle = glyph === '▼' && !state.floorKey.collected ? '#d98455' : '#d8b45a';
-    ctx.font = '20px monospace';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(glyph, stairs.x * TILE + TILE / 2, stairs.y * TILE + TILE / 2);
+    const spriteName = glyph === '▼' ? 'stairsDown' : 'stairsUp';
+    drawSprite(spriteName, stairs.x * TILE + TILE / 2, stairs.y * TILE + TILE / 2, 2);
   }
   for (const t of state.treasures) {
     if (!inCamera(t.x, t.y) || !state.visited.has(`${t.x},${t.y}`)) continue;
@@ -1062,10 +1097,11 @@ function draw() {
   for (const m of state.monsters) {
     if (m.hp <= 0 || !inCamera(m.x, m.y)) continue;
     if (fogLevel(m.x, m.y) >= 3) continue;
-    const px = m.x * TILE + TILE / 2, py = m.y * TILE + TILE / 2;
-    drawSprite(m.sprite, px, py, 2);
-    ctx.fillStyle = '#333'; ctx.fillRect(px - 12, py - 17, 24, 4);
-    ctx.fillStyle = '#ff3d3d'; ctx.fillRect(px - 12, py - 17, 24 * (m.hp / m.maxHp), 4);
+    const visual = monsterVisual(m);
+    drawSprite(visual.sprite, visual.x, visual.y, visual.scale);
+    const barWidth = m.isBoss ? visual.width - 12 : 24;
+    ctx.fillStyle = '#333'; ctx.fillRect(visual.x - barWidth / 2, visual.top - 7, barWidth, 4);
+    ctx.fillStyle = '#ff3d3d'; ctx.fillRect(visual.x - barWidth / 2, visual.top - 7, barWidth * (m.hp / m.maxHp), 4);
   }
   for (let y = state.camera.y; y < state.camera.y + VIEW_H; y++) {
     for (let x = state.camera.x; x < state.camera.x + VIEW_W; x++) {
@@ -1246,7 +1282,7 @@ function drawEndingDragon(x, y, time, health, flying) {
   ctx.beginPath(); ctx.moveTo(x - 28, y - 10); ctx.lineTo(x - 110, y - 65 - flap); ctx.lineTo(x - 96, y + 8); ctx.lineTo(x - 45, y + 26); ctx.closePath(); ctx.fill(); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(x + 28, y - 10); ctx.lineTo(x + 110, y - 65 - flap); ctx.lineTo(x + 96, y + 8); ctx.lineTo(x + 45, y + 26); ctx.closePath(); ctx.fill(); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(x + 30, y + 24); ctx.quadraticCurveTo(x + 95, y + 65, x + 130, y + 15); ctx.stroke();
-  drawSprite('dragon', x, y + (flying ? Math.sin(time * 10) * 4 : 0), 7);
+  drawSprite('dragonBoss', x, y + (flying ? Math.sin(time * 10) * 4 : 0), 3);
   ctx.restore();
 }
 
