@@ -72,6 +72,14 @@
     <p>Press <b>R</b> to restart</p>
   </div>
 </div>
+<div id="rightSidebar">
+  <section id="minimapPanel" aria-labelledby="minimapTitle">
+    <h2 id="minimapTitle">Floor chart <span id="minimapDepth"></span></h2>
+    <div class="minimap-content">
+      <canvas id="minimap" width="216" height="144" role="img" aria-label="Explored floor chart. Green marks your position; the outlined area is the main map view."></canvas>
+      <p class="minimap-legend"><span class="map-you">◆ You</span><span class="map-up">▲ Up</span><span class="map-down">▼ Down</span><span class="map-view">□ View</span></p>
+    </div>
+  </section>
 <aside id="equip" aria-labelledby="equipTitle">
   <h2 id="equipTitle">Equipment</h2>
   <div id="equipContent">
@@ -97,6 +105,7 @@
     </dl></div>
   </div>
 </aside>
+</div>
 </div>
 <div id="endingControls" hidden><button id="skipEnding" type="button">Skip to sunset (Esc)</button><button id="restartEnding" type="button">New adventure (R)</button></div>
 <div id="merchantStock"></div>

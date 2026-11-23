@@ -1,6 +1,6 @@
 # Dungeon Crawler
 
-A plain HTML5 canvas dungeon game, version 0.6.0. Open `index.html` directly in a browser (`file://`); there is no install, build step, server, or network dependency.
+A plain HTML5 canvas dungeon game, version 0.7.0. Open `index.html` directly in a browser (`file://`); there is no install, build step, server, or network dependency.
 
 The fantasy logo and version appear on the launch screen only. Click **Enter the dungeon** or press a key to begin; the game waits until you start. During play, stats sit at the top and a scrolling adventure log sits to the left of the map, and equipment with icons and bonuses sits to its right. On narrow screens the log moves below the map. R starts a fresh run without showing the launch screen again; reloading the page shows it.
 
@@ -42,6 +42,8 @@ Sound starts after your first keyboard/button interaction if browser audio is av
 ## Larger floors, keys, and hazards
 
 Each floor is **72×48 tiles**, larger than the **36×24-tile viewport**. The camera follows you and stops at the world edges; HUD, log, and equipment stay in place. Rooms connect through branching corridors and loops. Pillars and rubble block movement, and generation checks that all remaining floor tiles and important objects stay reachable. The HUD shows your world position.
+
+The **Floor chart** above the equipment on the right shows explored terrain for the current floor. Green marks you, blue/gold mark discovered up/down stairs, and the pale outline shows the main camera area. Unexplored terrain, monsters, items, keys, and traps are hidden. Exploration returns when you revisit a floor; R/reload clears it. The chart stacks below the map/log on narrow screens.
 
 On floors 1–9, one random ordinary monster secretly carries that floor’s key. There is no carrier icon. Defeat it to drop a golden key, then stand on the drop and press Space. This permanently unlocks that floor’s down stairs. The key is collected before using stairs or interacting with an NPC on the same tile. Drops, collection, and unlocks survive revisits; returning monsters do not duplicate them. The Key HUD shows Missing, Dropped, or Unlocked. Depth 10 has no further descent and needs no floor key; dragon defeat still unlocks the princess rescue.
 

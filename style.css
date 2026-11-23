@@ -75,3 +75,14 @@ canvas:focus-visible { outline: 1px solid #a18c5b; outline-offset: 2px; }
 @media (max-width: 700px) { #equip { height: 530px; } #equipContent { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-content: start; } .gear-slot { margin-bottom: 0; } }
 
 #endingControls { display: flex; gap: 12px; justify-content: center; font-size: 12px; }
+
+#rightSidebar { display: flex; flex-direction: column; gap: 10px; min-width: 0; min-height: 0; }
+#rightSidebar #equip { flex: 1; }
+#minimapPanel { flex: none; min-width: 0; overflow: hidden; border: 1px solid #353b46; border-radius: 6px; background: #11151d; }
+#minimapTitle { display: flex; justify-content: space-between; padding: 12px; background: #191c24; border-bottom: 1px solid #343333; color: #d7ba7b; font-size: 12px; font-weight: normal; letter-spacing: 1px; text-transform: uppercase; }
+#minimapDepth { color: #94a1b7; letter-spacing: 0; }
+.minimap-content { padding: 10px; }
+#minimap { width: 100%; height: auto; aspect-ratio: 3 / 2; border: 1px solid #39414d; border-radius: 3px; box-shadow: none; background: #070b10; }
+.minimap-legend { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px; margin-top: 8px; font-size: 9px; }
+.map-you { color: #86f2c3; } .map-up { color: #8ecaff; } .map-down { color: #f4cf78; } .map-view { color: #9aaac1; }
+@media (max-width: 700px) { #rightSidebar { display: block; } #minimapPanel { max-width: 210px; margin-bottom: 10px; } }

@@ -8,15 +8,20 @@ function game(seed = 42, start = true) {
   const listeners = {};
   const elements = {};
   const calls = [];
+  const minimapCalls = [];
   const noop = () => {};
   const ctx = new Proxy({}, {
     get: (_, name) => name === 'measureText' ? text => ({ width: text.length * 7 }) : ['createLinearGradient','createRadialGradient'].includes(name) ? () => ({addColorStop:noop}) : (...args) => calls.push([name, ...args]),
     set: () => true,
   });
+  const minimapCtx = new Proxy({}, {
+    get: (_, name) => (...args) => minimapCalls.push([name, ...args]),
+    set: (_, name, value) => { minimapCalls.push(['set', name, value]); return true; },
+  });
   function element(id) {
     return elements[id] ||= { style: {}, hidden: false, disabled: false,
       textContent: '', ariaPressed: '', addEventListener: (name, fn) => { listeners[`${id}:${name}`] = fn; },
-      getContext: () => ctx, focus: noop };
+      getContext: () => id === 'minimap' ? minimapCtx : ctx, focus: noop };
   }
   const sandbox = vm.createContext({
     document: { getElementById: element, addEventListener: (name, fn) => { listeners[name] = fn; } },
@@ -30,7 +35,7 @@ function game(seed = 42, start = true) {
     json: code => JSON.parse(vm.runInContext(`JSON.stringify(${code})`, sandbox)),
     key: (key, extra = {}) => listeners.keydown({ key, preventDefault: noop, ...extra }),
     click: id => listeners[`${id}:click`](),
-    visibility: () => listeners.visibilitychange(), elements, calls,
+    visibility: () => listeners.visibilitychange(), elements, calls, minimapCalls,
   };
 }
 
@@ -995,4 +1000,37 @@ test('boss floors retain large connected halls and trap-free arenas over varied 
   }
   g.run(`window.corridorMap=Array.from({length:H},()=>Array(W).fill(1));carveCorridor(window.corridorMap,{cx:5,cy:5},{cx:15,cy:5},3)`);
   assert.equal(g.run('window.corridorMap.slice(4,7).every(row=>row.slice(4,17).every(t=>t===0))'),true);
+});
+
+test('minimap draws only explored terrain, discovered stairs, player and viewport without exposing hidden actors or traps',()=>{
+  const g=game();
+  g.run(`state.visited=new Set(['2,2','3,2','4,2']);state.map[2][2]=0;state.map[2][3]=1;state.map[2][4]=2;
+    state.player.x=2;state.player.y=2;state.stairs={x:30,y:20};updateCamera()`);
+  g.minimapCalls.length=0;g.run('renderMinimap()');
+  const first=JSON.stringify(g.minimapCalls);
+  assert.equal(g.minimapCalls.filter(c=>c[0]==='fillRect').length,6,'background, three known tiles, player border and player');
+  assert.equal(g.minimapCalls.some(c=>c[0]==='strokeRect'&&c[1]===0.5&&c[2]===0.5&&c[3]===107&&c[4]===71),true);
+  assert.equal(g.minimapCalls.some(c=>c[0]==='set'&&c[2]==='#f4cf78'),false,'undiscovered stair is hidden');
+  g.run(`state.map[20][20]=0;state.monsters=[{id:1,x:3,y:2,hp:10}];state.floorKey.carrierId=1;
+    state.floorKey.drop={x:3,y:2};state.hazards=[{x:3,y:2,type:'spikes',revealed:false}];state.treasures=[{x:3,y:2}]`);
+  g.minimapCalls.length=0;g.run('renderMinimap()');
+  assert.equal(JSON.stringify(g.minimapCalls),first,'secret content cannot change the chart');
+  g.run("state.visited.add('30,20')");g.minimapCalls.length=0;g.run('renderMinimap()');
+  assert.equal(g.minimapCalls.some(c=>c[0]==='set'&&c[2]==='#f4cf78'),true);
+  assert.equal(g.minimapCalls.some(c=>c[0]==='fillRect'&&c[1]===90&&c[2]===60&&c[3]===3&&c[4]===3),true);
+});
+
+test('minimap follows floor-local exploration, scrolling and restart without mutating gameplay state',()=>{
+  const g=game();
+  g.run("state.visited.add('40,30');state.player.x=40;state.player.y=30;updateCamera()");
+  const before=g.run('JSON.stringify(state)');
+  g.minimapCalls.length=0;g.run('renderMinimap();renderMinimap()');
+  assert.equal(g.run('JSON.stringify(state)'),before);
+  assert.equal(g.minimapCalls.some(c=>c[0]==='strokeRect'&&c[1]===66.5&&c[2]===54.5),true);
+  down(g);assert.equal(g.elements.minimapDepth.textContent,'D2');
+  assert.equal(g.run("state.visited.has('40,30')"),false);
+  up(g);assert.equal(g.elements.minimapDepth.textContent,'D1');
+  assert.equal(g.run("state.visited.has('40,30')"),true);
+  g.key('r');assert.equal(g.elements.minimapDepth.textContent,'D1');
+  assert.equal(g.run("state.visited.has('40,30')"),false);
 });

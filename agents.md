@@ -3,12 +3,12 @@
 Plain HTML5 canvas game. No build step, no dependencies, no modules — everything must keep working over `file://`.
 
 ## File map
-- `index.html` — launch-only SVG logo/version and start screen; top stats, a left-side scrolling adventure log, and an equipment sidebar on the right; canvas `#game` (1152x768), game-over and health/retreat overlays, HUD, equipment/merchant display, controls, and sound toggle. Loads `style.css`, then plain scripts `js/sprites.js` and `js/game.js`.
+- `index.html` — launch-only SVG logo/version and start screen; top stats, a left-side scrolling adventure log, and a right sidebar with minimap above equipment; canvas `#game` (1152x768), `#minimap` (216x144), game-over and health/retreat overlays, HUD, equipment/merchant display, controls, and sound toggle. Loads `style.css`, then plain scripts `js/sprites.js` and `js/game.js`.
 - `style.css` — dark palette, canvas, HUD, dialog/button styles, and help layout.
 - `js/sprites.js` — `SPRITES` and `SPRITE_PALETTES` (14 each, including distinct stone stairs with up/down arrows), plus `drawSprite` (references global `ctx` at call time).
 - `js/game.js` — generation, floor persistence, combat, NPCs/items, potion inventory, health/retreat dialogs, healing, synthesized audio, drawing, and input. Initializes with `newGame(); render(); setInterval(enemyTick, 220);`.
 - `tests/game.test.cjs` — dependency-free Node VM behavioral tests, with stubbed DOM/canvas/audio. The separate legacy smoke script stays outside the repository.
-- `docs/plans/2026-11-23-boss-visuals-speech-design.md` — latest approved design and completed implementation checklist. Earlier ending, persistence, and balance designs remain in the same directory.
+- `docs/plans/2026-11-23-minimap-design.md` — latest approved design and completed implementation checklist. Earlier ending, persistence, and balance designs remain in the same directory.
 
 ## Conventions
 - No ES modules, no imports/exports, no bundler. `sprites.js` loads before `game.js`; both are plain scripts sharing global scope.
@@ -17,6 +17,7 @@ Plain HTML5 canvas game. No build step, no dependencies, no modules — everythi
 - Use `equipItem(slot, item)` for equipment changes, including sales. It adjusts ring maximum/current HP without stacking; direct equipment writes bypass those effects. Ring adds `maxHp: 20`; Shield is an armor-slot item with `def: 5`; sword retains attack/strength modifiers. `renderEquipment()` populates icon cards, modifiers, and effective hero stats.
 - Route player damage through `hurtPlayer()` so death and threshold pauses stop attacks immediately. Pauses freeze simulation; `render()` updates the HUD, canvas, and dialog focus.
 - World dimensions are `W=72`, `H=48`; viewport dimensions are `VIEW_W=36`, `VIEW_H=24`. Keep all stored positions in world coordinates. `draw()` wraps its viewport loops/entity layers in a camera translation; use `inCamera()` for entity culling and keep warning badges above the player. Map values: 0 walkable, 1 wall, 2 blocking obstacle.
+- `renderMinimap()` uses its own canvas context, three pixels per world tile, from existing map/visited/player/stairs/camera state. Draw only visited terrain and discovered stairs, plus the camera outline/player; never reveal monsters, loot, keys, or traps. Keep it read-only and call it from `render()`. `#rightSidebar` stacks the fixed chart above independently scrolling equipment; mobile stacks the sidebar below map/log.
 - Boss floors reserve an `isArena` room before other generation: Mimic 18×14, dragon 22×18, with three-tile halls. Keep arenas free of obstacles/hazards, center spawn buffers free of loot/ordinary monsters, and stairs away from the boss center. `rooms` persists these bounds. `monsterVisual()` supplies shared foot-anchored art bounds for sprites/bars/bubbles: Mimic 96×66, dragonBoss 120×96; targeting/collision remains single-tile. The ending reuses dragonBoss artwork with its existing animation.
 - `state.ending` is a global campaign finale, not a floor-save field. `gameOver(true)` starts the guarded final sequence; `gameOver(false)` keeps the death overlay. Ending callbacks must be bound to their object identity and canceled by `newGame()`/skip. During the ending, `gameOver/won` mark campaign completion and freeze normal simulation; a separate requestAnimationFrame clock drives screen-coordinate `drawEnding()`.
 - Keep functions top-level and flat. `log()` writes to `#log`; `render()` redraws canvas + HUD; `draw()` is canvas-only.

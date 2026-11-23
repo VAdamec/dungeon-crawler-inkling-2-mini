@@ -21,7 +21,7 @@ const ITEM_TABLE = [
   { name: 'Shield',   sprite: 'shield',  gold: 55, kind: 'armor', def: 5 },
 ];
 
-const GAME_VERSION = '0.6.0';
+const GAME_VERSION = '0.7.0';
 // Brief quotations from Monty Python and the Holy Grail; official sources in README.
 const MONSTER_QUOTES = ['Ni!', 'None shall pass!', "'Tis but a scratch.", 'Run away!'];
 const MONSTER_SPEECH_DURATION = 5, MONSTER_SPEECH_INTERVAL = 5;
@@ -1496,11 +1496,36 @@ function renderEquipment() {
   document.getElementById('heroDexterity').textContent = effectiveDex();
 }
 
+function renderMinimap() {
+  const mapCanvas = document.getElementById('minimap');
+  const mapCtx = mapCanvas.getContext('2d');
+  const scale = 3;
+  mapCtx.fillStyle = '#070b10';
+  mapCtx.fillRect(0, 0, W * scale, H * scale);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    if (!state.visited.has(`${x},${y}`)) continue;
+    mapCtx.fillStyle = state.map[y][x] === 0 ? '#51626b' : state.map[y][x] === 2 ? '#8c7957' : '#242d39';
+    mapCtx.fillRect(x * scale, y * scale, scale, scale);
+  }
+  mapCtx.strokeStyle = '#9aaac1'; mapCtx.lineWidth = 1;
+  mapCtx.strokeRect(state.camera.x * scale + 0.5, state.camera.y * scale + 0.5, VIEW_W * scale - 1, VIEW_H * scale - 1);
+  for (const [stairs, color] of [[state.depth > 1 ? state.upstairs : null, '#8ecaff'], [state.depth < FINAL_DEPTH ? state.stairs : null, '#f4cf78']]) {
+    if (!stairs || !state.visited.has(`${stairs.x},${stairs.y}`)) continue;
+    mapCtx.fillStyle = color;
+    mapCtx.fillRect(stairs.x * scale, stairs.y * scale, scale, scale);
+  }
+  const px = state.player.x * scale, py = state.player.y * scale;
+  mapCtx.fillStyle = '#07151a'; mapCtx.fillRect(px - 1, py - 1, scale + 2, scale + 2);
+  mapCtx.fillStyle = '#86f2c3'; mapCtx.fillRect(px, py, scale, scale);
+  document.getElementById('minimapDepth').textContent = `D${state.depth}`;
+}
+
 function render() {
   checkHealth();
   renderPause();
   const p = state.player;
   draw();
+  renderMinimap();
   document.getElementById('hpText').textContent = `${p.hp}/${p.maxHp}`;
   document.getElementById('hpfill').style.width = (100 * p.hp / p.maxHp) + '%';
   document.getElementById('lvl').textContent = p.lvl;
