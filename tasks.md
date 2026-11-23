@@ -1,11 +1,11 @@
 # Tasks — Dungeon Crawler
 
-Last reviewed: 2026-11-23. Build v0.12.0 adds smooth movement, walking/wing/flame animation, and the ? Help & settings dialog to 2× world zoom (18×12 view) and the approved static graphics refresh to boss-defeat flourishes, the explored-area minimap, monster combat quotes, larger bosses/arenas, persistence/recovery/audio, campaign/balance, scrolling/keys/hazards, and plot-twist ending. See `handover.md` for details and `README.md` for controls.
+Last reviewed: 2026-11-23. Build v0.16.2 adds smooth movement, walking/wing/flame animation, the ? Help & settings dialog, 2× world zoom (18×12 view), the approved static graphics refresh, boss-defeat flourishes, the explored-area minimap with a compact Hero stats/Spells panel above a larger log, monster combat quotes, larger bosses/arenas, ranged/magic combat with out-of-combat mana regeneration and Magic Barrier, tiny defeated-boss companions with 1 damage and ironic remarks, five biomes on 96×64 floors, the 100-floor boss campaign with surprise bosses and a max hero level of 100, dedicated boss art and intro/defeat animations, the Skeleton King throne room, the ~ developer console with hero-stat-freezing, monster-killing god mode, and the plot-twist ending. See `handover.md` for details and `README.md` for controls.
 
 ## Existing gameplay
 - [x] Keep a thin HTML shell, CSS, and two plain scripts with no runtime dependencies or build step; launch over `file://`.
 - [x] Equipment bonuses, trading, rescues, gold rewards, HUD, speech bubbles, turn counter, and centralized death handling.
-- [x] Ten-floor campaign: floor keys plus Mimic unlock lower stairs; dragon defeat unlocks the final princess interaction; it starts the animated plot twist.
+- [x] Hundred-floor campaign: floor keys plus data-driven boss gates unlock lower stairs; dragon defeat unlocks the final princess interaction; it starts the animated plot twist.
 
 ## Persistent floors — complete
 - [x] Preserve layout, rooms, stairs, exploration, remaining treasures/potions, merchant stock, and rescue state across floor changes.
@@ -33,7 +33,7 @@ Last reviewed: 2026-11-23. Build v0.12.0 adds smooth movement, walking/wing/flam
 
 ## Campaign and balance — complete
 - [x] Gate depth-5 descent on Mimic defeat; make depth-10 dragon defeat unlock rescue rather than immediately win.
-- [x] Spawn the princess only at depth 10, require dragon defeat before the final princess interaction, and prevent depth 11.
+- [x] Spawn the princess only at depth 100, require dragon defeat before the final princess interaction, and prevent depth 101.
 - [x] Persist defeated bosses across revisits and prevent repeated boss rewards; preserve ordinary monster respawns.
 - [x] Show the current campaign objective and retreat availability in the HUD.
 - [x] Reduce normal HP growth to 20%/depth and attack growth to 15%/depth; use gentler final-dragon growth while retaining XP/gold scaling.
@@ -104,6 +104,19 @@ Last reviewed: 2026-11-23. Build v0.12.0 adds smooth movement, walking/wing/flam
 - [x] Generate larger boss arenas (18×14/22×18), three-tile halls, separated stairs, and clear spawn buffers; retain floor connectivity/persistence/campaign gates.
 - [x] Correct local-LLM staircase sprites that duplicated the knight: use stone steps with distinct gold up/down arrows. Keep existing stair discovery/camera/travel rules; update the rendering check for sprite-based stairs.
 - [ ] Human difficulty/feel, boss-defeat animation pacing, and subjective music/effect playtest across an entire run. Controlled tests and prepared encounters pass, but do not estimate a human completion rate; volume can now be adjusted independently.
+
+## Expansion — design: docs/plans/2026-11-23-expansion-design.md
+- [x] Add Wasp (ranged), Mage (magic attack) and Healer (magic heal) ordinary monsters with shared enemy cooldown, line of sight, dodge and sound; let them fire from outside melee range during active ticks.
+- [x] Add player archery (Bow treasure, E to shoot nearest visible target in range with line of sight) and magic (F Fireball, G Heal, MP pool with active-time regeneration, HUD bar, help text, merchant/sprite groundwork).
+- [x] Add themed floors 3 (Orc's Kitchen/Cook) and 7 (Skeleton Pub/Bartender) with reserved arenas, unique boss names, props, ranged beer throwing, and per-floor boss-defeat persistence; keep normal key descent rules.
+- [x] Draw dedicated Wasp/Mage/Healer sprites, wing/cast frames and animated projectile visuals (stinger, bolt, beer, arrow, fireball, heal) driven by the transient motion clock.
+- [x] Add spellbook learning/merchant stock, Frostbolt and Greater Heal, per-spell cooldowns, spell HUD/help text, depth-gated ranged/magic enemies and enemy accuracy/damage/heal balancing.
+- [x] Grow worlds to 96x64 with ~32 rooms, more monsters, five biome variants with saved props and tiled palettes, and a merchant on every even non-boss floor with depth-scaled stock/prices; re-verify reachability, culling and minimap.
+- [x] Extend the campaign to 100 floors with data-driven gates, a boss every tenth floor (Hydra, Wild Boar, Medusa, Dark Wizard and others), the dragon/ending at depth 100, and per-boss scaled rewards. Verified with 92 tests, syntax checks, and the external smoke script.
+- [x] Build unique encounter and death animations for every boss with dedicated large sprites/frame poses and identity-bound, skippable, fully cleaned-up rAF scenes. Verified with 96 tests, syntax checks, and the external smoke script.
+- [x] Build the depth-50 Skeleton King throne room with unique art, long-range attacks, adds, intro/death scenes and non-repeatable rewards.
+- [x] Add a `~` developer console with `loadLevel <1-100>` (fresh boss-floor loading) and `godMode 0|1` (immortality) for scenario testing.
+- [ ] Verify all phases with syntax, behavior tests, external smoke, browser file:// play and updated docs; local Node needs a temporary `DYLD_LIBRARY_PATH` symlink for `libsimdutf.37.dylib`.
 
 ## Constraints
 - All runtime files are in this project directory. No runtime installation or server is needed.

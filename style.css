@@ -9,13 +9,17 @@ button:disabled { opacity: .45; cursor: default; }
 #hud .stat b { color: #e1bf70; }
 #hpbar { width: 130px; height: 10px; background: #2a1518; border-radius: 5px; overflow: hidden; border: 1px solid #000; }
 #hpfill { height: 100%; background: linear-gradient(90deg,#e0393e,#ff6a5a); transition: width .2s; }
+#mpbar { width: 130px; height: 10px; background: #141a2c; border-radius: 5px; overflow: hidden; border: 1px solid #000; }
+#mpfill { height: 100%; background: linear-gradient(90deg,#5f6ede,#9ab4ff); transition: width .2s; }
 #xpbar { width: 100px; height: 6px; background: #12202a; border-radius: 3px; overflow: hidden; border: 1px solid #000; }
 #xpfill { height: 100%; background: linear-gradient(90deg,#3ea6ff,#7fe0ff); transition: width .2s; }
 #objective { color: #d4bd8d; font-size: 13px; text-align: center; padding: 3px 12px; }
 #playArea { display: grid; grid-template-columns: 210px minmax(0, 1fr) 210px; gap: 14px; align-items: stretch; }
-#journal { min-width: 0; display: flex; flex-direction: column; border: 1px solid #353b46; border-radius: 6px; background: #11151d; overflow: hidden; }
-#journal h2 { font-size: 13px; font-weight: normal; letter-spacing: 1px; text-transform: uppercase; color: #d7ba7b; padding: 14px 16px; border-bottom: 1px solid #343333; background: #191c24; }
-#log { flex: 1; height: 0; min-height: 120px; overflow-y: auto; white-space: pre-wrap; overflow-wrap: anywhere; color: #a7b9cb; font-size: 12px; line-height: 1.65; padding: 14px 16px; scrollbar-color: #4d5260 #11151d; }
+#leftSidebar { min-width: 0; min-height: 0; display: grid; grid-template-rows: minmax(150px, 0.8fr) minmax(0, 1.2fr); gap: 10px; }
+#heroPanel, #journal { min-width: 0; min-height: 0; display: flex; flex-direction: column; border: 1px solid #353b46; border-radius: 6px; background: #11151d; overflow: hidden; }
+#heroPanel h2, #journal h2 { height: 34px; flex: none; display: flex; align-items: center; padding: 0 16px; border-bottom: 1px solid #343333; background: #191c24; color: #d7ba7b; font-size: 13px; font-weight: normal; letter-spacing: 1px; text-transform: uppercase; }
+#heroPanelContent { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 14px; align-content: start; overflow-y: auto; padding: 8px 12px; scrollbar-color: #4d5260 #11151d; }
+#log { flex: 1; min-height: 0; overflow-y: auto; white-space: pre-wrap; overflow-wrap: anywhere; color: #a7b9cb; font-size: 12px; line-height: 1.65; padding: 14px 16px; scrollbar-color: #4d5260 #11151d; }
 #wrap { position: relative; min-width: 0; align-self: start; }
 canvas { display: block; width: 100%; height: auto; background: #000; border: 3px solid #3a2f1d; border-radius: 6px; box-shadow: 0 0 30px #0008; image-rendering: pixelated; }
 canvas:focus-visible { outline: 1px solid #a18c5b; outline-offset: 2px; }
@@ -42,9 +46,12 @@ canvas:focus-visible { outline: 1px solid #a18c5b; outline-offset: 2px; }
 .gear-summary h3, .hero-stats h3 { font-size: 10px; color: #d7ba7b; text-transform: uppercase; letter-spacing: 1px; margin: 2px 0 10px; font-weight: normal; }
 .gear-summary > div, .hero-stats dl > div { display: flex; justify-content: space-between; gap: 8px; margin-top: 7px; }
 .gear-summary b { color: #a7c6b7; }
-.hero-stats { padding: 12px 2px 4px; color: #a7b9cb; }
+.hero-stats { padding: 4px 0; color: #a7b9cb; }
+.hero-stats h3 { margin: 0 0 6px; }
+.hero-stats dl > div { margin-top: 4px; }
 .hero-stats dd { color: #e4d5b4; }
 
+#spellList { font-size: 11px; color: #a8d2cd; line-height: 1.55; }
 #merchantStock { font-size: 12px; color: #b0c4de; text-align: center; min-height: 18px; }
 #help { font-size: 12px; color: #94a1b7; text-align: center; line-height: 1.8; }
 #audioControls { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 20px; font-size: 12px; color: #aab8ce; margin: 3px 0 12px; }
@@ -64,13 +71,8 @@ canvas:focus-visible { outline: 1px solid #a18c5b; outline-offset: 2px; }
 #startGame span { font-size: 10px; margin-left: 14px; }
 .launch-hint { color: #7e8a91; font-size: 11px; margin-top: 15px; }
 .launch-version { color: #9e895f; font-size: 11px; letter-spacing: 2px; margin-top: 30px; }
-@media (max-width: 1050px) { #playArea { grid-template-columns: 160px minmax(0, 1fr) 180px; gap: 10px; } #hud { gap: 12px; font-size: 12px; } #hpbar { width: 100px; } #xpbar { width: 70px; } }
-@media (max-width: 700px) { #gameLayout { width: calc(100% - 16px); margin-top: 8px; } #playArea { grid-template-columns: minmax(0, 1fr); } #wrap { grid-row: 1; } #journal { height: 190px; } #journal h2 { padding: 9px 12px; } #help { font-size: 10px; } .pause-actions { gap: 8px; font-size: 11px; } #pauseText { font-size: 12px; } .launch-eyebrow { letter-spacing: 2px; } #launchTitle { letter-spacing: 3px; } #launchTitle span:last-child { letter-spacing: 5px; } }
-/* Keep journal content from increasing the map row's intrinsic height. */
-#journal { position: relative; min-height: 0; }
-#journal h2 { height: 44px; display: flex; align-items: center; }
-#log { position: absolute; inset: 44px 0 0; height: auto; min-height: 0; }
-@media (max-width: 700px) { #journal h2 { height: 36px; } #log { top: 36px; } }
+@media (max-width: 1050px) { #playArea { grid-template-columns: 160px minmax(0, 1fr) 180px; gap: 10px; } #hud { gap: 12px; font-size: 12px; } #hpbar, #mpbar { width: 100px; } #xpbar { width: 70px; } }
+@media (max-width: 700px) { #gameLayout { width: calc(100% - 16px); margin-top: 8px; } #playArea { grid-template-columns: minmax(0, 1fr); } #wrap { grid-row: 1; } #leftSidebar { grid-template-rows: 150px 190px; } #heroPanel h2, #journal h2 { height: 30px; padding: 0 12px; font-size: 12px; } #help { font-size: 10px; } .pause-actions { gap: 8px; font-size: 11px; } #pauseText { font-size: 12px; } .launch-eyebrow { letter-spacing: 2px; } #launchTitle { letter-spacing: 3px; } #launchTitle span:last-child { letter-spacing: 5px; } }
 
 @media (min-width: 1051px) and (max-width: 1300px) { #playArea { grid-template-columns: 180px minmax(0, 1fr) 190px; gap: 12px; } }
 @media (max-width: 700px) { #equip { height: 530px; } #equipContent { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-content: start; } .gear-slot { margin-bottom: 0; } }
@@ -88,7 +90,16 @@ canvas:focus-visible { outline: 1px solid #a18c5b; outline-offset: 2px; }
 .map-you { color: #86f2c3; } .map-up { color: #8ecaff; } .map-down { color: #f4cf78; } .map-view { color: #9aaac1; }
 @media (max-width: 700px) { #rightSidebar { display: block; } #minimapPanel { max-width: 210px; margin-bottom: 10px; } }
 
+.stat.cheat { color: #ffcc66; font-weight: bold; letter-spacing: 1px; }
 #helpToggle { flex: none; min-width: 32px; min-height: 32px; padding: 3px 9px; font-size: 18px; line-height: 1; }
+#devConsole { position: fixed; left: 16px; bottom: 16px; z-index: 30; width: min(560px, calc(100vw - 32px)); border: 1px solid #a88a52; border-radius: 8px; background: #0b1018f2; box-shadow: 0 12px 50px #000c; font: 12px/1.5 monospace; color: #c8d3df; overflow: hidden; }
+#devConsole[hidden] { display: none; }
+.console-header { display: flex; justify-content: space-between; gap: 12px; padding: 8px 12px; background: #1c2632; border-bottom: 1px solid #3b4550; color: #e1c082; letter-spacing: 1px; }
+.console-header span { color: #8e9fae; }
+#consoleOutput { height: 110px; margin: 0; padding: 10px 12px; overflow-y: auto; white-space: pre-wrap; overflow-wrap: anywhere; color: #a7d9bd; }
+.console-prompt { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-top: 1px solid #3b4550; }
+.console-prompt input { flex: 1; min-width: 0; border: 1px solid #3b4550; border-radius: 4px; padding: 6px 8px; background: #111821; color: #f0e2c0; font: inherit; }
+.console-prompt button { font-size: 11px; }
 #helpOverlay { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 20px; background: #050810cf; }
 .help-dialog { width: min(720px, 100%); max-height: calc(100dvh - 40px); display: flex; flex-direction: column; overflow: hidden; border: 1px solid #a88a52; border-radius: 8px; background: #131b25; box-shadow: 0 18px 80px #000b; }
 .help-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex: none; padding: 22px 24px; background: #1c2632; border-bottom: 1px solid #3b4550; }

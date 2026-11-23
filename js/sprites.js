@@ -103,6 +103,108 @@ const SPRITES={
     "................................",
     "................................"
   ],
+  "wasp": [
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    ".............YY..YY.............",
+    ".............YY..YY.............",
+    "..............k..k..............",
+    "..............k..k..............",
+    "....llllllllkkkkkkkkllllllll....",
+    "....llllllllkYkYYkYkllllllll....",
+    "......llllllkYYYYYYkllllll......",
+    "......llllllkkkkkkkkllllll......",
+    "............kyyyyyyk............",
+    "............kkkkkkkk............",
+    "............kkkkkkkk............",
+    "............kyyyyyyk............",
+    "............kyyyyyyk............",
+    "............kkkkkkkk............",
+    "............kkkkkkkk............",
+    "............kkkkkkkk............",
+    "..............kkkk..............",
+    "..............kkkk..............",
+    "...............kk...............",
+    "...............kk...............",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................"
+  ],
+  "mage": [
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "..........kkkkkkkkkkkk..ww......",
+    "..........kkkkkkkkkkkk..ww......",
+    "........tttttttttttttttllll.....",
+    "........tttttttttttttttllll.....",
+    "......TTTTTTTTTTTTTTTTTllll.....",
+    "......TTTTTTTTTTTTTTTTTllll.....",
+    "..........pppppppppppp..bb......",
+    "..........pkkppppkkppp..bb......",
+    "..........pppppppppppp..bb......",
+    "..........pppppppppppp..bb......",
+    "........ttttttttttttttttbb......",
+    "........ttTTTTTTTTTTTTttbb......",
+    "........ttTTTTTTTTTTTTttbb......",
+    "........ttTTTTTTTTTTTTttbb......",
+    "......ttttTTTTTTTTTTTTttbb......",
+    "......ttttTTTTTTTTTTTTttbb......",
+    "........ttTTTTTTTTTTTTttbb......",
+    "........ttTTTTTTTTTTTTttbb......",
+    "........ttkkkkkkkkkkkkttbb......",
+    "........ttkkkkkkkkkkkkttbb......",
+    "........kkkkkkkkkkkkkkkk........",
+    "........kkkkkkkkkkkkkkkk........",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................"
+  ],
+  "healer": [
+    "................................",
+    "................................",
+    "................................",
+    "........................ww......",
+    "..........kkkkkkkkkkkk..ww......",
+    "..........kkkkkkkkkkkkwwwwww....",
+    "........GGGGGGGGGGGGGGwwwwww....",
+    "........GGGGGGGGGGGGGGGGww......",
+    "........GGwwwwwwwwwwwwGGww......",
+    "........GGwwwwwwwwwwwwGG........",
+    "........GGwppppppppppwGGbb......",
+    "........GGwpkkppppkkpwGGbb......",
+    "........GGwppppppppppwGGbb......",
+    "........GGwppppppppppwGGbb......",
+    "........ggggggggggggggggbb......",
+    "........ggGGGGGGGGGGGGggbb......",
+    "........ggGGGGwwwwGGGGggbb......",
+    "........ggGGGGwwwwGGGGggbb......",
+    "........ggGGwwwwwwwwGGggbb......",
+    "........ggGGwwwwwwwwGGggbb......",
+    "........ggGGGGwwwwGGGGggbb......",
+    "........ggGGGGwwwwGGGGggbb......",
+    "........ggGGGGGGGGGGGGggbb......",
+    "........ggggggggggggggggbb......",
+    "........kkkkkkkkkkkkkkkk........",
+    "........kkkkkkkkkkkkkkkk........",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................"
+  ],
   "goblin": [
     "................................",
     "................................",
@@ -352,6 +454,282 @@ const SPRITES={
     "....kkkkkkkkkkkkkkkkkkkkkk....pppppp....kkkkkkkkkkkkkkkkkkkk....",
     "....kkkkkkkkkkkkkkkk..........................kkkkkkkkkkkkkk....",
     "....kkkkkkkkkkkkkkkk..........................kkkkkkkkkkkkkk...."
+  ],
+  "hydra": [
+    "................................................................",
+    "................................................................",
+    "..................d.............d.............d.................",
+    "...............ddddddd.......ddddddd.......ddddddd..............",
+    "..............ddddgdddd.....ddddgdddd.....ddddgdddd.............",
+    ".............ddgggggggdd...ddgggggggdd...ddgggggggdd............",
+    "............ddgggggggggdd.ddgggggggggdd.ddgggggggggdd...........",
+    "............ddggegggeggdd.ddggegggeggdd.ddggegggeggdd...........",
+    "...........lddgeeegeeegddlddgeeegeeegddlddgeeegeeegddl..........",
+    "...........dlgggegggegggldlgggegggegggldlgggegggegggld..........",
+    "............ldgggggggggdl.ldgggggggggdl.ldgggggggggdl...........",
+    "............ldgggggggggdl.ldgggggggggdl.ldgggggggggdl...........",
+    "............dlgggggggggld.dlgggggggggld.dlgggggggggld...........",
+    ".............dlgggggggld...dlgggggggld...dlgggggggld............",
+    "..............ldddgdddl.....ldddgdddl.....ldddgdddl.............",
+    "...............ddddddd.......ddddddd.......ddddddd..............",
+    "..................d.............d.............d.................",
+    "..................g.............g.............g.................",
+    "..................g.............g.............g.................",
+    "..................g.............g.............g.................",
+    "..................g.............g.............g.................",
+    "..................g.............g.............g.................",
+    "..................ddddddddddddddddddddddddddddd.................",
+    "..................ddddddddddddddddddddddddddddd.................",
+    "..................ddbbbbbbbbbbbbbbbbbbbbbbbbbdd.................",
+    "..................ddbbbbbbbbbbbbbbbbbbbbbbbbbdd.................",
+    "..................ddbbbbbbbbbbbbbbbbbbbbbbbbbdd.................",
+    "..................ddbbbbbbbbbbbbbbbbbbbbbbbbbdd.................",
+    "..................ddbbllbbllbbllbbllbbllbbllbdd.................",
+    "..................ddbbllbbllbbllbbllbbllbbllbdd.................",
+    "..................ddbbbbbbbbbbbbbbbbbbbbbbbbbdd.................",
+    "..................ddbbbbbbbbbbbbbbbbbbbbbbbbbdd.................",
+    "..................ddbbbbbbbbbbbbbbbbbbbbbbbbbdd.................",
+    "..................ddbbbbbbbbbbbbbbbbbbbbbbbbbdd.................",
+    "..................ddbbbbbbbbbbbbbbbbbbbbbbbbbdd.................",
+    "..................ddbbbbbbbbbbbbbbbbbbbbbbbbbdd.................",
+    "..................ddbbbbbbbbbbbbbbbbbbbbbbbbbdd.................",
+    "..................ddddddddddddddddddddddddddddd.................",
+    "..................ddddddddddddddddddddddddddddd.................",
+    ".........................d.............d........................",
+    "........................d...............d.......................",
+    ".......................d.................d......................",
+    "......................d...................d.....................",
+    "................................................................",
+  ],
+  "boar": [
+    "................................................................",
+    "................................................................",
+    "................................................................",
+    "................................................................",
+    "....................d...........d...........d...................",
+    ".................ddddddd...ddddddddddd...ddddddd................",
+    "................ddddbdddddddddddbdddddddddddbdddd...............",
+    "...............dddbbbbbddddbbbbbbbbbbbddddbbbbbddd..............",
+    "...............ddbbbbbbbddbbbbbbbbbbbbbddbbbbbbbdd..............",
+    "...............ddbbbbbbbddbbbbbbbbbbbbbddbbbbbbbdd..............",
+    "..............ddbbbbbbbbbddbbbbbbbbbbbddbbbbbbbbbdd.............",
+    "...............ddbbbbbbbddbbbbbbbbbbbbbddbbbbbbbdd..............",
+    "...............ddbbbbbbbddbbbbbbbbbbbbbddbbbbbbbdd..............",
+    "...............dddbbbbbdddbbbbbbbbbbbbbdddbbbbbddd..............",
+    "................ddddbddddbbbbbbbbbbbbbbbddddbdddd...............",
+    "................ddddddddbbbbbbbbbbbbbbbbbdddddddd...............",
+    "................ddbbdbbbbbbbbbbbbbbbbbbbbbbbdbbdd...............",
+    "...............ddbbbbbdbbbbbbbbbbbbbbbbbbbbbbbbbdd..............",
+    ".............t.ddbbdddddddbbbbbbbbbbbbbbbbbbbbbbdd.t............",
+    "..............tddbddddeddddbbbbbbbbbbbbbbbbbbbbbddt.............",
+    ".............t.tdbddeeeeeddllllllllllllllllllbbbdt.t............",
+    "..............tdtbddeeeeeddllllllllllllllllllbbbtdt.............",
+    "..............dtbtdeeeeeeeddlllllllllllllllllbbtbtd.............",
+    "...............dtbtdeeeeeddllllllllllllllllllbtbtd..............",
+    "...............ddtdteeeeeddlllllllllllllllllltbtdd..............",
+    "...............ddbtdddeddddllllllllllllllllllbtbdd..............",
+    "...............ddbbtddddddllllllllllllllllllltbbdd..............",
+    "...............ddbbblldllllllllllllllllllllllbbbdd..............",
+    "................ddbblllllllllllllllllllllllllbbdd...............",
+    "................ddbblllllllllllllllllllllllllbbdd...............",
+    "................ddbbllllllnnnnnnnnnnnnnllllllbbdd...............",
+    ".................dbbbbbbbbnnnnnnnnnnnnnbbbbbbbbd................",
+    "..................bbbbbbbbnneeennneeennbbbbbbbb.................",
+    "..................dddbbbbbnneeennneeennbbbbbddd.................",
+    "...................dddbbbbnnnnnnnnnnnnnbbbbddd..................",
+    "....................dddbbbbbbbbbbbbbbbbbbbddd...................",
+    ".....................ddddbbbbbbbbbbbbbbbdddd....................",
+    ".......................ddddbbbbbbbbbbbdddd......................",
+    "........................ddddddddbdddddddd.......................",
+    "...........................ddddddddddd..........................",
+    "................................d...............................",
+    "................................................................",
+    "................................................................",
+    "................................................................",
+  ],
+  "medusa": [
+    "..........................hhh.........hhh.......................",
+    "..........................hh.........h.h........................",
+    "................h.........h.........h...........................",
+    "...............hhh........h........h............................",
+    "..............hhhhh......h......d.h...............h.............",
+    "...............hhh.......h.ddddddhdddd...........hhh............",
+    "................h.......dhddddddhdddddddd.......hhhhh...........",
+    ".................h.....dhddsssssssssssdddd.hhhhh.hhh............",
+    ".................h...dddhssssssssssssssshhhd......h.............",
+    ".................h..dddsssssssssssssssssssddd...................",
+    ".................h.dddsssssssssssssssssssssddd..................",
+    ".................hdddsssssssssssssssssssssssddd.................",
+    "..................hdsssssssssssssssssssssssssdd.................",
+    ".........h.......dhsssssssssssssssssssssssssssdd................",
+    "........hhh.....ddhssssssssssssssssssssssssssshhd...............",
+    ".......hhhhh....ddsssssssssssssssssssssssssssssdhhh....h........",
+    "........hhh.....ddsssssssssssssssssssssssssssssdd..hhhhhh.......",
+    ".........h.h...ddsssssssssssssssssssssssssssssssdd...hhhhh......",
+    "............h..ddsssssssssesssssssssssesssssssssdd....hhh.......",
+    ".............h.ddsssssssseeessssssssseeessssssssdd.....h........",
+    "..............hddssssssseeeeessssssseeeeesssssssdd..............",
+    "...............hdsssssssseeessssssssseeessssssssdd..............",
+    "..............ddhsssssssssesssssssssssessssssssshdd.............",
+    "...............ddsssssssssssssssssssssssssssssssdh..............",
+    "...............ddsssssssssssssssssssssssssssssssddh.............",
+    ".........h.....ddsssssssssssssssssssssssssssssssdd.h............",
+    "........hhh....ddsssssssssssssssssssssssssssssssdd..h...........",
+    ".......hhhhh...ddsssssssssssssssssssssssssssssssdd...h.h........",
+    "........hhhhhh..ddssssssssssdddddddddssssssssssdd.....hhh.......",
+    ".........h....hhhdssssssssssdtttttttdssssssssssdd....hhhhh......",
+    "................dhhssssssssssssssssssssssssssshdd.....hhh.......",
+    ".................ddssssssssssssssssssssssssssshd.......h........",
+    "..................ddsssssssssssssssssssssssssdh.................",
+    "..................dddsssssssssssssssssssssssdddh................",
+    "...................dddsssssssssssssssssssssddd.h................",
+    "....................dddsssssssssssssssssssddd..h................",
+    "..............h......dhhhssssssssssssssshddd...h................",
+    ".............hhh.hhhhh.ddddsssssssssssddhd.....h................",
+    "............hhhhh.rrrrrrrrrrrrrrrrrrrrrrrrrrrrr.h...............",
+    ".............hhh..rrrrrrrrrrrrrrrrrrrrrrrrrrrrrhhh..............",
+    "..............h...rrrrrrrrrrrrrrrrrrrrrrrrrrrrrhhhh.............",
+    "..................rrrrrrrrrrrrrrrrrrrrrrrrrrrrrhhh..............",
+    "..................rrrrrrrrrrrrrrrrrrrrrrrrrrrrr.h...............",
+    ".........................h.h.........hh.........................",
+  ],
+  "darkWizard": [
+    "................................................................",
+    "................................................................",
+    "................................................................",
+    "................................................................",
+    "................................................................",
+    "................................................................",
+    "........................hhhhhhhhhhhhhhhhh.........g.............",
+    ".........................hhhhhhhhhhhhhhh........ggggg...........",
+    "..........................hhhhhhhhhhhhh........ggggggg..........",
+    "...........................hhhhhhhhhhh.........ggggggg..........",
+    "............................hhhhhhhhh.........ggggggggg.........",
+    ".............................hhhhhhh...........ggggggg..........",
+    "................hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhggggggg..........",
+    "............ddddddddddddddddddddddddddddddddddddggggg...........",
+    "............ddddddddddddddddddddddddddddddddddddddgdd...........",
+    "............ddddddddddddddddddddddddddddddddddddddsdd...........",
+    "......................ddddddddddddddddddddd.......s.............",
+    "......................ddddddddddddddddddddd.......s.............",
+    "......................ddsssssssssssssssssdd.......s.............",
+    "......................ddsssssssssssssssssdd.......s.............",
+    "......................ddsssssssssssssssssdd.......s.............",
+    "......................ddssssesssssssessssdd.......s.............",
+    "......................ddssseeessssseeesssdd.......s.............",
+    "......................ddsseeeeessseeeeessdd.......s.............",
+    "......................ddssseeessssseeesssdd.......s.............",
+    "......................ddssssesssssssessssdd.......s.............",
+    "......................ddsssssssssssssssssdd.......s.............",
+    "......................ddsssssssssssssssssdd.......s.............",
+    "......................ddsssssssssssssssssdd.......s.............",
+    "......................ddddddddddddddddddddd.......s.............",
+    "......................ddddrrrrrrrrrrrrrdddd.......s.............",
+    "..........................rrrrrrrrrrrrr...........s.............",
+    "..........................rrrrrrrrrrrrr...........s.............",
+    "..........................rrrrrrrrrrrrr...........s.............",
+    "..........................rrrrrrrrrrrrr...........s.............",
+    "..........................rrrrrrrrrrrrr...........s.............",
+    "..........................rrrrrrrrrrrrr...........s.............",
+    "..........................rrrrrrrrrrrrr...........s.............",
+    "....................ddrrrrrrrrrrrrrrrrrrrrrdd.....s.............",
+    "....................ddrrrrrrrrrrrrrrrrrrrrrdd.....s.............",
+    "....................ddrrrrrrrrrrrrrrrrrrrrrdd.....s.............",
+    "....................ddrrrrrrrrrrrrrrrrrrrrrdd...................",
+    "....................ddddddddddddddddddddddddd...................",
+    "................................................................",
+  ],
+  "skeletonKing": [
+    "................................................................",
+    "................................................................",
+    "................................................................",
+    "................................................................",
+    "................................................................",
+    ".........................ccc...ccc...ccc........................",
+    ".........................ccc...ccc...ccc........................",
+    ".........................ccc...ccc...ccc........................",
+    "........................dcccdddcccdddcccd.......................",
+    "........................dcccdddcccdddcccd.......................",
+    "........................ddcccccccccccccdd.......................",
+    "........................ddcccccccccccccdd.......................",
+    "........................ddddddddddddddddd.......................",
+    "........................ddddddddddddddddd.......................",
+    "........................ddddddddddddddddd.......................",
+    "........................ddddddddddddddddd.......................",
+    "........................ddbbbbbbbbbbbbbdd.......................",
+    "........................ddbbbbbbbbbbbbbdd.......................",
+    "........................ddbddbddbddbddbdd.......................",
+    "........................ddbddbddbddbddbdd.......................",
+    "........................ddbbebbbbbbbebbdd.......................",
+    "........................ddbeeebbbbbeeebdd.......................",
+    "........................ddeeeeedbdeeeeedd.......................",
+    "........................ddbeeeddbddeeebdd.......................",
+    "........................ddbbebbbbbbbebbdd.......................",
+    "........................ddbbbbbbbbbbbbbdd.......................",
+    "........................ddbddbddbddbddbdd.......................",
+    "........................ddbddbddbddbddbdd.......................",
+    "........................ddddddddddddddddd.......................",
+    "........................ddddbbbdddbbbdddd.......................",
+    "........................ddddddddddddddddd.......................",
+    "........................ddbddbddbddbddbdd.......................",
+    "........................ddbbbbbbbbbbbbbdd.......................",
+    "........................ddddddddddddddddd.......................",
+    "........................ddddddddddddddddd.......................",
+    "................................................................",
+    "..................ddrrrrrrrrrrrrrrrrrrrrrrrrrdd.................",
+    "..................ddrrrrrrrrrrrrrrrrrrrrrrrrrdd.................",
+    "..................ddrrrrrrrrrrrrrrrrrrrrrrrrrdd.................",
+    "..................ddrrrrrrrrrrrrrrrrrrrrrrrrrdd.................",
+    "..................ddrrrrrrrrrrrrrrrrrrrrrrrrrdd.................",
+    "..................ddrrrrrrrrrrrrrrrrrrrrrrrrrdd.................",
+    "..................ddddddddddddddddddddddddddddd.................",
+    "................................................................",
+  ],
+  "throne": [
+    "................................................................",
+    "................................................................",
+    "............ccccc...............................ccccc...........",
+    "............ccccc...............................ccccc...........",
+    "........ddddcccccdddddddddddddddddddddddddddddddcccccdddd.......",
+    "........ddddcccccdddddddddddddddddddddddddddddddcccccdddd.......",
+    "........ddddcccccccccccccccccccccccccccccccccccccccccdddd.......",
+    "........ddddcccccccccccccccccccccccccccccccccccccccccdddd.......",
+    "........ddddddddddddddddddddddddddddddddddddddddddddddddd.......",
+    "................................................................",
+    "..............ddddddddddddddddddddddddddddddddddddd.............",
+    "..............ddddddddddddddddddddddddddddddddddddd.............",
+    "..............dddrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrddd.............",
+    "..............dddrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrddd.............",
+    "..............dddrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrddd.............",
+    "..............dddrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrddd.............",
+    "..............dddrrrrrkkkkkkkkkkkkkkkkkkkkkrrrrrddd.............",
+    "..............dddrrrrrkkkkkkkkkkkkkkkkkkkkkrrrrrddd.............",
+    "..............dddrrrrrkkbbbbbbbbbbbbbbbbbkkrrrrrddd.............",
+    "..............dddrrrrrkkbbbbbbbbbbbbbbbbbkkrrrrrddd.............",
+    "..............dddrrrrrkkbbbbbbbbbbbbbbbbbkkrrrrrddd.............",
+    "..............dddrrrrrkkbbbbbbbbbbbbbbbbbkkrrrrrddd.............",
+    "..............dddrrrrrkkbbbbbbbbbbbbbbbbbkkrrrrrddd.............",
+    "..............dddrrrrrkkbbbbbbbbbbbbbbbbbkkrrrrrddd.............",
+    "..............dddrrrrrkkbbbbbbbbbbbbbbbbbkkrrrrrddd.............",
+    "..............dddrrrrrkkbbbbbbbbbbbbbbbbbkkrrrrrddd.............",
+    "..............dddrrrrrkkbbbbbbbbbbbbbbbbbkkrrrrrddd.............",
+    "..............dddrrrrrkkbbbbbbbbbbbbbbbbbkkrrrrrddd.............",
+    "..............dddrrrrrkkbbbbbbbbbbbbbbbbbkkrrrrrddd.............",
+    "..............dddrrrrrkkkkkkkkkkkkkkkkkkkkkrrrrrddd.............",
+    "..............dddrrrrrkkkkkkkkkkkkkkkkkkkkkrrrrrddd.............",
+    "..............dddrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrddd.............",
+    "..............dddrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrddd.............",
+    "..............dddrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrddd.............",
+    "..........ddddddddddddddddddddddddddddddddddddddddddddd.........",
+    "..........ddddddddddddddddddddddddddddddddddddddddddddd.........",
+    "..........dddcccccccccccccccccccccccccccccccccccccccddd.........",
+    "..........dddcccccccccccccccccccccccccccccccccccccccddd.........",
+    "..........dddcccccccccccccccccccccccccccccccccccccccddd.........",
+    "..........ddddddddddddddddddddddddddddddddddddddddddddd.........",
+    "..........ddddddddddddddddddddddddddddddddddddddddddddd.........",
+    "................................................................",
+    "................................................................",
+    "................................................................",
   ],
   "dragonBoss": [
     "................................................................................",
@@ -1130,6 +1508,254 @@ const SPRITES={
     "..........................hhkkhhkkkk........hhkkhhkkhhkk........................",
     "................................................................................",
     "................................................................................"
+  ],
+  "cookingPot": [
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "............kkkkkkkkkkkkkkk.....",
+    "...........ksssssssssssssssk....",
+    "..........ksssssssssssssssssk...",
+    "..........ksssssssssssssssssk...",
+    "..........ksssssssssssssssssk...",
+    "..........ksssssssssssssssssk...",
+    "..........ksssssssssssssssssk...",
+    "..........ksssssssssssssssssk...",
+    "..........ksssssssssssssssssk...",
+    "..........ksssssssssssssssssk...",
+    "..........ksssssssssssssssssk...",
+    "..........ksssssssssssssssssk...",
+    "..........ksssssssssssssssssk...",
+    "...........ksssssssssssssssk....",
+    "............kkkkkkkkkkkkkkk.....",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................"
+  ],
+  "bow": [
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    ".................bk.....w.......",
+    "................bk......w.......",
+    "...............bk.......w.......",
+    "..............bk........w.......",
+    ".............bk.........w.......",
+    "............bk..........w.......",
+    "............bk..........w.......",
+    "...........bk...........w.......",
+    "...........bk...........w.......",
+    "..........bk............w.......",
+    "..........bk............w.......",
+    "..........bk............w.......",
+    "..........kk............k.......",
+    "..........bk............w.......",
+    "..........bk............w.......",
+    "..........bk............w.......",
+    "...........bk...........w.......",
+    "...........bk...........w.......",
+    "............bk..........w.......",
+    "............bk..........w.......",
+    ".............bk.........w.......",
+    "..............bk........w.......",
+    "...............bk.......w.......",
+    "................bk......w.......",
+    "................................",
+    "................................",
+    "................................",
+    "................................"
+  ],
+  "spellbook": [
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    ".....kkkkkkkkkkkkkkkkkkkkkk.....",
+    ".....kkkkkkkkkkkkkkkkkkkkkk.....",
+    ".....kkwwwwwwwwbbwwwwwwwwkk.....",
+    ".....kkwyyyyyywbbwyyyyyywkk.....",
+    ".....kkwyyyyyywbbwyyyyyywkk.....",
+    ".....kkwwwwwwwwbbwwwwwwwwkk.....",
+    ".....kkwwwwwwwwbbwwwwwwwwkk.....",
+    ".....kkwwwwwwwwbbwwwwwwwwkk.....",
+    ".....kkwwwllwwwbbwwwllwwwkk.....",
+    ".....kkwwwllwwwbbwwwllwwwkk.....",
+    ".....kkwwwwwwwwblwwwwwwwwkk.....",
+    ".....kkwwwwwwwwblwwwwwwwwkk.....",
+    ".....kkwwwwwwwlllllwwwwwwkk.....",
+    ".....kkwwwwwwwlllllwwwwwwkk.....",
+    ".....kkwwwwwwwwblwwwwwwwwkk.....",
+    ".....kkwwwllwwwblwwwllwwwkk.....",
+    ".....kkwwwllwwwbbwwwllwwwkk.....",
+    ".....kkwwwwwwwwbbwwwwwwwwkk.....",
+    ".....kkwwwwwwwwbbwwwwwwwwkk.....",
+    ".....kkwwwwwwwwbbwwwwwwwwkk.....",
+    ".....kkkkkkkkkkkkkkkkkkkkkk.....",
+    ".....kkkkkkkkkkkkkkkkkkkkkk.....",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................"
+  ],
+  "tombstone": [
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "........kkkkkkkkkkkkkkkk........",
+    "........kkkkkkkkkkkkkkkk........",
+    "........kksssssssssssskk........",
+    "........kksssssssssssskk........",
+    "........kksssswwwwsssskk........",
+    "........kksssswwwwsssskk........",
+    "........kksssswwwwsssskk........",
+    "........kksssswwwwsssskk........",
+    "........kksssswwwwsssskk........",
+    "........kkswwwwwwwwwwskk........",
+    "........kkswwwwwwwwwwskk........",
+    "........kkswwwwwwwwwwskk........",
+    "........kkswwwwwwwwwwskk........",
+    "........kksssswwwwsssskk........",
+    "........kksssssssssssskk........",
+    "........kksssssssssssskk........",
+    "........kksssssssssssskk........",
+    "........kksssssssssssskk........",
+    "........kksssssssssssskk........",
+    "........kkkkkkkkkkkkkkkk........",
+    "........kkkkkkkkkkkkkkkk........",
+    "........kkkkkkkkkkkkkkkk........",
+    "................................",
+    "................................",
+    "................................"
+  ],
+  "crystal": [
+    "................................",
+    "................................",
+    "................................",
+    "...............kk...............",
+    "...............kk...............",
+    "..............ssss..............",
+    "..............ssss..............",
+    "............kksllskk............",
+    "............kksllskk............",
+    ".........kk.kksllskk............",
+    ".........kk.kksllskk............",
+    ".........kk.kksllskk............",
+    ".........kk.llllllll............",
+    ".........kk.llllllll.kk.........",
+    ".........kk.kksllskk.kk.........",
+    ".........kk.kksllskk.kk.........",
+    ".........kk.kksllskk.kk.........",
+    ".........kk.kksllskk.kk.........",
+    ".........kk.kksllskk.kk.........",
+    "............kksllskk.kk.........",
+    "............kksllskk.kk.........",
+    "............kksllskk.kk.........",
+    "............kksllskk.kk.........",
+    "............kksllskk.kk.........",
+    "............kksllskk.kk.........",
+    "..............ssss..............",
+    "..............ssss..............",
+    "...............kk...............",
+    "...............kk...............",
+    "................................",
+    "................................",
+    "................................"
+  ],
+  "banner": [
+    "................................",
+    "................................",
+    "........kkkkkkkkkkkkkkkk........",
+    "........kkkkkkkkkkkkkkkk........",
+    "........kkkkkkkkkkkkkkkk........",
+    "..........kkrrryyrrrkk..........",
+    "..........kkrrryyrrrkk..........",
+    "..........kkrrryyrrrkk..........",
+    "..........kkrrryyrrrkk..........",
+    "..........kkrrryyrrrkk..........",
+    "..........kkryyyyyyrkk..........",
+    "..........kkryyyyyyrkk..........",
+    "..........kkrrryyrrrkk..........",
+    "..........kkrrryyrrrkk..........",
+    "..........kkrrryyrrrkk..........",
+    "..........kkrrryyrrrkk..........",
+    "..........kkrrryyrrrkk..........",
+    "..........kkrrryyrrrkk..........",
+    "..........kkrrryyrrrkk..........",
+    "..........kkrrryyrrrkk..........",
+    "..........kkryyyyyyrkk..........",
+    "..........kkryyyyyyrkk..........",
+    "..........kkrrryyrrrkk..........",
+    "..........kkrrryyrrrkk..........",
+    "..........kkrrryyrrrkk..........",
+    "..........kkrrryyrrrkk..........",
+    "..........kkrrryyrrrkk..........",
+    "..........kkkkkkkkkkkk..........",
+    "..........kkkkkkkkkkkk..........",
+    "................................",
+    "................................",
+    "................................"
+  ],
+  "barCounter": [
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................",
+    "................................"
   ]
 };
 const SPRITE_PALETTES={
@@ -1341,6 +1967,51 @@ const SPRITE_PALETTES={
     "y": "#f4c66d",
     "p": "#b76778",
     "H": "#dfc18b"
+  },
+  "hydra": {
+    "d": "#173326",
+    "g": "#3f7a52",
+    "l": "#78b46a",
+    "b": "#2d5f43",
+    "e": "#f3d36a",
+  },
+  "boar": {
+    "d": "#2a1c18",
+    "b": "#7a4a32",
+    "l": "#a86f4b",
+    "t": "#eee4c8",
+    "e": "#e0684f",
+    "n": "#3f2b27",
+  },
+  "medusa": {
+    "h": "#25463c",
+    "d": "#18302c",
+    "s": "#77a593",
+    "e": "#f1d66f",
+    "t": "#d8d2bd",
+    "r": "#6c4b83",
+  },
+  "darkWizard": {
+    "h": "#33234f",
+    "d": "#1b1730",
+    "s": "#c6a98b",
+    "e": "#eef4ff",
+    "r": "#624a9c",
+    "g": "#9be8e0",
+  },
+  "skeletonKing": {
+    "c": "#e2b84f",
+    "d": "#252530",
+    "b": "#ddd8c4",
+    "e": "#7de3e0",
+    "r": "#843b4f",
+  },
+  "throne": {
+    "d": "#1d1b28",
+    "c": "#d7b45e",
+    "r": "#843b4f",
+    "k": "#3a2d3d",
+    "b": "#b9a27c",
   },
   "dragonBoss": {
     "k": "#142125",
@@ -1781,7 +2452,17 @@ const SPRITE_PALETTES={
     "s": "#8e774d",
     "h": "#ebd5a3",
     "y": "#f5d06a"
-  }
+  },
+  "wasp": { "k": "#131b26", "y": "#d7ac5e", "Y": "#f3d891", "l": "#a8d2cd" },
+  "mage": { "k": "#131b26", "t": "#635778", "T": "#9683a4", "l": "#a8d2cd", "w": "#e8e3cf", "b": "#74513a", "p": "#d7a579" },
+  "healer": { "k": "#131b26", "g": "#637e51", "G": "#9aac71", "w": "#e8e3cf", "p": "#d7a579", "b": "#74513a" },
+  "cookingPot": { "k": "#131b26", "s": "#687f92" },
+  "barCounter": { "k": "#131b26", "s": "#687f92" },
+  "tombstone": { "k": "#131b26", "s": "#687f92", "w": "#c3ccd2" },
+  "crystal": { "k": "#131b26", "s": "#5f8f9b", "l": "#a8d2cd" },
+  "banner": { "k": "#131b26", "r": "#8e3b45", "y": "#d7b45e" },
+  "bow": { "k": "#131b26", "b": "#74513a", "w": "#e8e3cf" },
+  "spellbook": { "k": "#131b26", "w": "#e8e3cf", "b": "#74513a", "y": "#d7ac5e", "l": "#a8d2cd" }
 };
 
 // Disposable raster caches are shared across restarts, never saved with a floor.
@@ -1804,10 +2485,10 @@ function spriteDimensions(name) {
 
 function spriteFrameGrid(name, frame) {
   const source = SPRITES[name];
-  if (!frame || !['knight', 'goblin', 'skeleton', 'orc', 'bat', 'dragonBoss', 'torch', 'flameOn'].includes(name)) return source;
+  if (!frame || !['knight', 'goblin', 'skeleton', 'orc', 'bat', 'wasp', 'mage', 'healer', 'dragonBoss', 'torch', 'flameOn', 'hydra', 'boar', 'medusa', 'darkWizard', 'skeletonKing'].includes(name)) return source;
   const width = source[0].length, height = source.length;
   const grid = Array.from({ length: height }, () => Array(width).fill('.'));
-  const wings = name === 'bat' || name === 'dragonBoss';
+  const wings = name === 'bat' || name === 'wasp' || name === 'dragonBoss';
   const fire = name === 'torch' || name === 'flameOn';
   const phase = [0, -0.28, 0.85, 0.42][frame % 4];
   // Move wing columns / alternating feet first, then retain the body above them.
@@ -1823,12 +2504,30 @@ function spriteFrameGrid(name, frame) {
           dy = frame === 1 ? -1 : frame === 2 ? 1 : 0;
         }
       } else if (wings) {
-        moving = name === 'bat' ? (x < 12 || x > 20) && y >= 6
+        moving = name === 'wasp' ? ch === 'l' : name === 'bat' ? (x < 12 || x > 20) && y >= 6
           : ((x < 28 && y < 43) || (x > 65 && y < 22 && ch !== 'h'));
         if (moving) {
-          const hinge = name === 'bat' ? (x < 16 ? 12 : 20) : (x < 40 ? 32 : 56);
-          dy = Math.round(Math.abs(x - hinge) * phase * (name === 'bat' ? 0.7 : 0.5));
+          const hinge = name === 'wasp' ? (x < 16 ? 12 : 20) : name === 'bat' ? (x < 16 ? 12 : 20) : (x < 40 ? 32 : 56);
+          dy = Math.round(Math.abs(x - hinge) * phase * (name === 'wasp' ? 0.6 : name === 'bat' ? 0.7 : 0.5));
         }
+      } else if (name === 'mage' || name === 'healer') {
+        moving = x >= 22 && y >= 3 && y < 12 && (ch === 'l' || ch === 'w');
+        if (moving) dy = frame === 1 ? -1 : frame === 2 ? 1 : 0;
+      } else if (name === 'hydra') {
+        moving = y < 18 && ['g', 'l', 'e', 'd'].includes(ch);
+        if (moving) dx = Math.round(Math.sin(x * 0.5 + frame * 1.6) * 2);
+      } else if (name === 'medusa') {
+        moving = ch === 'h' && y < 20;
+        if (moving) dx = Math.round(Math.sin(y * 0.7 + frame * 1.4) * 2);
+      } else if (name === 'darkWizard') {
+        moving = ch === 'g' || (ch === 's' && x > 48);
+        if (moving) dy = frame === 1 ? -2 : frame === 2 ? 2 : 0;
+      } else if (name === 'skeletonKing') {
+        moving = ch === 'c';
+        if (moving) dy = frame === 1 ? 1 : frame === 2 ? -1 : 0;
+      } else if (name === 'boar') {
+        moving = frame % 2 && y >= 36;
+        if (moving) dy = frame === 1 ? 1 : -1;
       } else if (frame % 2) {
         const stride = frame === 1 ? 1 : -1;
         if (y >= 25 && x >= 9 && x <= 24) {
@@ -1894,9 +2593,13 @@ function actorAnimationPose(name, actor) {
   if (!actor || typeof window.requestAnimationFrame !== 'function') return pose;
   const moving = actorIsMoving(actor), key = actorMotionKey(actor), time = state.motion.time;
   pose.facing = state.motion.facing[key] || 1;
-  if (name === 'bat' || name === 'dragonBoss') {
+  if (name === 'bat' || name === 'wasp' || name === 'dragonBoss') {
     pose.frame = Math.floor(time * 8 + (actor.id || 0) % 4) % 4;
-    if (name === 'bat') pose.rise = Math.sin(time * 8) * 0.8;
+    if (name === 'bat' || name === 'wasp') pose.rise = Math.sin(time * 8) * 0.8;
+  } else if (name === 'mage' || name === 'healer' || ['hydra', 'medusa', 'darkWizard', 'skeletonKing'].includes(name)) {
+    pose.frame = Math.floor(time * 6 + (actor.id || 0) % 4) % 4;
+  } else if (moving && name === 'boar') {
+    pose.sx = 1.08; pose.sy = 0.94; pose.rise = -Math.abs(Math.sin(time * Math.PI * 8)) * 3;
   } else if (moving && name === 'slime') {
     const progress = motionProgress(state.motion.moves[key]), hop = Math.sin(progress * Math.PI);
     pose.sx = 1.12 - hop * 0.18; pose.sy = 0.85 + hop * 0.25; pose.rise = -hop * 4;
@@ -1925,17 +2628,18 @@ function drawDungeonTile(x, y) {
   const wall = state.map[y][x] === 1;
   const front = wall && y + 1 < H && state.map[y + 1][x] !== 1;
   const variant = (x * 37 + y * 71) % 11;
-  const key = `${wall ? 'wall' : 'floor'}:${front}:${variant}`;
+  const biome = state.biome || 'crypt';
+  const key = `${biome}:${wall ? 'wall' : 'floor'}:${front}:${variant}`;
   const cache = graphicsCache().tiles;
   if (!cache[key]) {
     const surface = graphicsSurface(TILE, TILE);
-    if (surface) { paintDungeonTile(surface.getContext('2d'), wall, variant, front); cache[key] = surface; }
+    if (surface) { paintDungeonTile(surface.getContext('2d'), wall, variant, front, biome); cache[key] = surface; }
   }
   if (cache[key]) {
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(cache[key], x * TILE, y * TILE);
   } else {
-    ctx.save(); ctx.translate(x * TILE, y * TILE); paintDungeonTile(ctx, wall, variant, front); ctx.restore();
+    ctx.save(); ctx.translate(x * TILE, y * TILE); paintDungeonTile(ctx, wall, variant, front, biome); ctx.restore();
   }
   if (!wall) {
     ctx.fillStyle = 'rgba(13, 21, 40, 0.25)';
@@ -1976,29 +2680,52 @@ function environmentAnimationFrame(x, y) {
   return typeof window.requestAnimationFrame === 'function' ? Math.floor(state.motion.time * 9 + (x * 3 + y) % 4) % 4 : 0;
 }
 
-function paintDungeonTile(c, wall, variant, front = false) {
+const TILE_PALETTES = {
+  crypt: { baseWall: '#1c2633', baseFloor: '#29323d', wallTop: '#364351', wallEdge: '#4b5865', wallLine: '#222e3c',
+    wallBrick: '#424e5a', frontDark: '#151e2b', frontEdge: '#4d5864', frontLight: '#69707a', frontBrick: '#333e4c',
+    frontLine: '#202b39', floor: ['#414c57', '#46515b', '#3d4954', '#44505b'], floorLight: '#5a6670',
+    floorDark: '#333e49', crack: '#35414b', speck: '#616a6e', accent: '#424f46' },
+  cavern: { baseWall: '#101d22', baseFloor: '#17272a', wallTop: '#243b3e', wallEdge: '#3a5c5c', wallLine: '#132428',
+    wallBrick: '#31504f', frontDark: '#0a161a', frontEdge: '#33504e', frontLight: '#5d8180', frontBrick: '#1c3335',
+    frontLine: '#0d1e21', floor: ['#29413f', '#2f4a46', '#243b3a', '#2c4543'], floorLight: '#4c6f68',
+    floorDark: '#1b2e2d', crack: '#1f3a37', speck: '#6f9b8f', accent: '#3c6b62' },
+  kitchen: { baseWall: '#2b211a', baseFloor: '#382b21', wallTop: '#4b3a2b', wallEdge: '#6a5239', wallLine: '#2e2118',
+    wallBrick: '#5a4532', frontDark: '#1e1712', frontEdge: '#634b35', frontLight: '#907151', frontBrick: '#3d2d22',
+    frontLine: '#241a13', floor: ['#594633', '#604c37', '#503e2e', '#5a4835'], floorLight: '#816649',
+    floorDark: '#3e2f23', crack: '#493628', speck: '#a7885f', accent: '#6f5a37' },
+  tavern: { baseWall: '#251b1b', baseFloor: '#332624', wallTop: '#43302b', wallEdge: '#60463a', wallLine: '#281c19',
+    wallBrick: '#523b32', frontDark: '#191110', frontEdge: '#574034', frontLight: '#84634c', frontBrick: '#36251f',
+    frontLine: '#1e1412', floor: ['#503b2f', '#594334', '#473530', '#524031'], floorLight: '#7a5c44',
+    floorDark: '#38291f', crack: '#422f26', speck: '#9c7c59', accent: '#6d4b39' },
+  throne: { baseWall: '#1e1b2c', baseFloor: '#29253a', wallTop: '#37304c', wallEdge: '#534768', wallLine: '#231e34',
+    wallBrick: '#453b5c', frontDark: '#141122', frontEdge: '#4b3f62', frontLight: '#7b6a91', frontBrick: '#2e2843',
+    frontLine: '#1a162b', floor: ['#3b3450', '#413955', '#352f49', '#3d3653'], floorLight: '#6d5d85',
+    floorDark: '#2a2440', crack: '#30294a', speck: '#a48b5e', accent: '#7a6239' },
+};
+
+function paintDungeonTile(c, wall, variant, front = false, biome = 'crypt') {
   const n = variant;
-  c.fillStyle = wall ? '#1c2633' : '#29323d'; c.fillRect(0, 0, 32, 32);
+  const p = TILE_PALETTES[biome] || TILE_PALETTES.crypt;
+  c.fillStyle = wall ? p.baseWall : p.baseFloor; c.fillRect(0, 0, 32, 32);
   if (wall) {
-    c.fillStyle = '#364351'; c.fillRect(1, 1, 30, 30);
-    c.fillStyle = '#4b5865'; c.fillRect(1, 1, 30, 2); c.fillRect(1, 3, 2, 25);
-    c.fillStyle = '#222e3c'; c.fillRect(1, 15, 30, 2); c.fillRect(n % 2 ? 11 : 21, 1, 2, 14); c.fillRect(n % 2 ? 23 : 9, 17, 2, 14);
-    c.fillStyle = '#424e5a'; c.fillRect(4, 5, 8, 2); c.fillRect(14, 22, 10, 1);
+    c.fillStyle = p.wallTop; c.fillRect(1, 1, 30, 30);
+    c.fillStyle = p.wallEdge; c.fillRect(1, 1, 30, 2); c.fillRect(1, 3, 2, 25);
+    c.fillStyle = p.wallLine; c.fillRect(1, 15, 30, 2); c.fillRect(n % 2 ? 11 : 21, 1, 2, 14); c.fillRect(n % 2 ? 23 : 9, 17, 2, 14);
+    c.fillStyle = p.wallBrick; c.fillRect(4, 5, 8, 2); c.fillRect(14, 22, 10, 1);
     if (front) {
-      c.fillStyle = '#151e2b'; c.fillRect(0, 8, 32, 24);
-      c.fillStyle = '#4d5864'; c.fillRect(0, 5, 32, 4);
-      c.fillStyle = '#69707a'; c.fillRect(1, 4, 30, 1);
-      c.fillStyle = '#333e4c'; c.fillRect(2, 10, 28, 9); c.fillRect(2, 21, 28, 9);
-      c.fillStyle = '#202b39'; c.fillRect(n % 2 ? 10 : 21, 10, 2, 9); c.fillRect(n % 2 ? 23 : 8, 21, 2, 9);
+      c.fillStyle = p.frontDark; c.fillRect(0, 8, 32, 24);
+      c.fillStyle = p.frontEdge; c.fillRect(0, 5, 32, 4);
+      c.fillStyle = p.frontLight; c.fillRect(1, 4, 30, 1);
+      c.fillStyle = p.frontBrick; c.fillRect(2, 10, 28, 9); c.fillRect(2, 21, 28, 9);
+      c.fillStyle = p.frontLine; c.fillRect(n % 2 ? 10 : 21, 10, 2, 9); c.fillRect(n % 2 ? 23 : 8, 21, 2, 9);
     }
   } else {
-    const colors = ['#414c57', '#46515b', '#3d4954', '#44505b'];
-    c.fillStyle = colors[n % 4]; c.fillRect(1, 1, 30, 30);
-    c.fillStyle = '#5a6670'; c.fillRect(2, 1, 27, 1); c.fillRect(1, 2, 1, 26);
-    c.fillStyle = '#333e49'; c.fillRect(2, 29, 28, 2); c.fillRect(29, 2, 2, 27);
-    c.fillStyle = '#35414b';
+    c.fillStyle = p.floor[n % 4]; c.fillRect(1, 1, 30, 30);
+    c.fillStyle = p.floorLight; c.fillRect(2, 1, 27, 1); c.fillRect(1, 2, 1, 26);
+    c.fillStyle = p.floorDark; c.fillRect(2, 29, 28, 2); c.fillRect(29, 2, 2, 27);
+    c.fillStyle = p.crack;
     if (n % 3 === 0) { c.fillRect(4, 14, 10, 1); c.fillRect(13, 14, 1, 7); c.fillRect(14, 20, 6, 1); }
-    if (n % 4 === 1) { c.fillStyle = '#616a6e'; c.fillRect(6, 7, 3, 1); c.fillRect(23, 23, 2, 1); }
-    if (n === 3) { c.fillStyle = '#424f46'; c.fillRect(2, 23, 5, 4); c.fillRect(5, 25, 5, 3); }
+    if (n % 4 === 1) { c.fillStyle = p.speck; c.fillRect(6, 7, 3, 1); c.fillRect(23, 23, 2, 1); }
+    if (n === 3) { c.fillStyle = p.accent; c.fillRect(2, 23, 5, 4); c.fillRect(5, 25, 5, 3); }
   }
 }

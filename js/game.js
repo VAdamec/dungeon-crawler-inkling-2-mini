@@ -1,4 +1,4 @@
-const TILE = 32, W = 72, H = 48, MAP_ZOOM = 2, VIEW_W = 18, VIEW_H = 12;
+const TILE = 32, W = 96, H = 64, MAP_ZOOM = 2, VIEW_W = 18, VIEW_H = 12;
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 ctx.imageSmoothingEnabled = false;
@@ -10,35 +10,225 @@ const MONSTER_TYPES = [
   { name: 'Goblin',   sprite: 'goblin',   hp: 22, atk: 9,  def: 2, xp: 22 },
   { name: 'Skeleton', sprite: 'skeleton', hp: 28, atk: 12, def: 4, xp: 32 },
   { name: 'Orc',      sprite: 'orc',      hp: 40, atk: 16, def: 5, xp: 50 },
+  { name: 'Wasp',     sprite: 'wasp',     hp: 18, atk: 8,  def: 1, xp: 20, minDepth: 2, range: 3, ranged: true, projectile: 'stinger' },
+  { name: 'Mage',     sprite: 'mage',     hp: 25, atk: 10, def: 2, xp: 28, minDepth: 4, magic: true, magicType: 'attack', magicRange: 4 },
+  { name: 'Healer',   sprite: 'healer',   hp: 30, atk: 6,  def: 3, xp: 35, minDepth: 5, magic: true, magicType: 'heal', magicRange: 3 },
 ];
 
 const ITEM_TABLE = [
   { name: 'Potion',   sprite: 'potion',  gold: 15, kind: 'heal', heal: 0.35 },
   { name: 'Sword',    sprite: 'sword',   gold: 40, kind: 'weapon', atk: 6, str: 2 },
+  { name: 'Bow',      sprite: 'bow',     gold: 50, kind: 'weapon', atk: 8, str: 1, range: 3 },
   { name: 'Armor',    sprite: 'armor',   gold: 45, kind: 'armor', def: 4, str: 1 },
   { name: 'Helmet',   sprite: 'helmet',  gold: 30, kind: 'armor', def: 2, dex: 2 },
   { name: 'Ring',     sprite: 'ring',    gold: 80, kind: 'ring', maxHp: 20, atk: 3, def: 2, str: 1, dex: 2 },
   { name: 'Elixir',   sprite: 'elixir',  gold: 60, kind: 'elixir', str: 2, dex: 2 },
   { name: 'Shield',   sprite: 'shield',  gold: 55, kind: 'armor', def: 5 },
+  { name: 'Frostbolt Tome', sprite: 'spellbook', gold: 70, kind: 'spellbook', spell: 'frostbolt', minDepth: 2 },
+  { name: 'Greater Heal Tome', sprite: 'spellbook', gold: 85, kind: 'spellbook', spell: 'greaterHeal', minDepth: 4 },
+  { name: 'Magic Barrier Tome', sprite: 'spellbook', gold: 95, kind: 'spellbook', spell: 'magicBarrier', minDepth: 5 },
 ];
 
-const GAME_VERSION = '0.12.0';
+const SPELLS = {
+  fireball: { name: 'Fireball', cost: 8, cooldown: 1.5, key: 'F' },
+  heal: { name: 'Heal', cost: 12, cooldown: 2, key: 'G' },
+  frostbolt: { name: 'Frostbolt', cost: 10, cooldown: 3, key: 'V' },
+  greaterHeal: { name: 'Greater Heal', cost: 18, cooldown: 6, key: 'B' },
+  magicBarrier: { name: 'Magic Barrier', cost: 14, cooldown: 4, key: 'Z' },
+};
+const COMPANION_LINES = {
+  boss: ['I was much taller before our little arrangement.', 'Congratulations. I now years for a smaller office.', 'Technically, I still haunt this floor. Rent free.'],
+  trap: ['You walked into that with such confidence.', 'The floor warned you. I admired your commitment.', 'I died to one of those once. You are doing fine.'],
+  retreat: ['A strategic retreat. A very noble word for jogging away.', 'Cowardice with excellent timing.', 'I approve. Mostly because I am not carrying you.'],
+  merchant: ['Bought everything? The pouch is now a memorial.', 'That merchant smiled like you were the Quest.', 'You now own six things you cannot use. Character growth.'],
+  rescue: ['Another prisoner rescued. My old union is impressed.', 'You cut the ropes. I will take the credit in small font.', 'Heroic. Expensive. Occasionally useful.'],
+};
+
+const THEMED_FLOORS = { 3: { name: 'Cook', sprite: 'orc', kind: 'kitchen', prop: 'cookingPot' },
+  7: { name: 'Bartender', sprite: 'skeleton', kind: 'pub', prop: 'barCounter' } };
+const BIOMES = {
+  crypt: { prop: 'tombstone', hazards: ['spikes', 'flame', 'rocks'], monsters: ['Skeleton', 'Mage'] },
+  cavern: { prop: 'crystal', hazards: ['rocks', 'flame', 'spikes'], monsters: ['Bat', 'Orc'] },
+  kitchen: { prop: 'cookingPot', hazards: ['flame', 'spikes', 'rocks'], monsters: ['Orc', 'Wasp'] },
+  tavern: { prop: 'barCounter', hazards: ['flame', 'rocks', 'spikes'], monsters: ['Goblin', 'Healer'] },
+  throne: { prop: 'banner', hazards: ['flame', 'spikes', 'rocks'], monsters: ['Skeleton', 'Mage', 'Healer'] },
+};
+const BOSSES = {
+  5: { name: 'Mimic', sprite: 'mimic', hp: 80, atk: 18, def: 4, xp: 120, gold: 80 },
+  10: { name: 'Hydra', sprite: 'hydra', hp: 110, atk: 20, def: 5, xp: 150, gold: 100 },
+  20: { name: 'Wild Boar', sprite: 'boar', hp: 130, atk: 22, def: 6, xp: 170, gold: 115 },
+  30: { name: 'Medusa', sprite: 'medusa', hp: 115, atk: 21, def: 5, xp: 175, gold: 120, magic: true, magicType: 'attack', magicRange: 4 },
+  40: { name: 'Dark Wizard', sprite: 'darkWizard', hp: 120, atk: 23, def: 5, xp: 185, gold: 130, magic: true, magicType: 'attack', magicRange: 5 },
+  50: { name: 'Skeleton King', sprite: 'skeletonKing', hp: 150, atk: 24, def: 7, xp: 210, gold: 150, reward: { xp: 1.2, gold: 1.2 }, throne: true, ranged: true, range: 6, projectile: 'bone', summons: true },
+  60: { name: 'Hydra', sprite: 'hydra', hp: 115, atk: 21, def: 6, xp: 195, gold: 140 },
+  70: { name: 'Wild Boar', sprite: 'boar', hp: 140, atk: 23, def: 7, xp: 210, gold: 150 },
+  80: { name: 'Medusa', sprite: 'medusa', hp: 125, atk: 22, def: 6, xp: 220, gold: 160, magic: true, magicType: 'attack', magicRange: 4 },
+  90: { name: 'Dark Wizard', sprite: 'darkWizard', hp: 130, atk: 25, def: 6, xp: 230, gold: 170, magic: true, magicType: 'attack', magicRange: 5 },
+  100: { name: 'Dragon', sprite: 'dragon', hp: 160, atk: 26, def: 6, xp: 250, gold: 200, dragon: true },
+};
+const GAME_VERSION = '0.16.2';
 // Brief quotations from Monty Python and the Holy Grail; official sources in README.
 const MONSTER_QUOTES = ['Ni!', 'None shall pass!', "'Tis but a scratch.", 'Run away!'];
 const MONSTER_SPEECH_DURATION = 5, MONSTER_SPEECH_INTERVAL = 5;
 const ENDING_DURATION = 14;
-const MIMIC_DEFEAT_DURATION = 1.6, DRAGON_DEFEAT_DURATION = 2.6;
+const MIMIC_DEFEAT_DURATION = 1.6, DRAGON_DEFEAT_DURATION = 2.6, BOSS_INTRO_DURATION = 1.6;
+const BOSS_ANIMATIONS = {
+  mimic: { accent: '#d7a94b', intro: 1.5, defeat: 1.6, phases: [[0.4, 'snap'], [0.9, 'coins']], motif: 'jaws' },
+  hydra: { accent: '#6fbf73', intro: 1.6, defeat: 2, phases: [[0.5, 'heads'], [1.1, 'regrow'], [1.6, 'collapse']], motif: 'heads' },
+  boar: { accent: '#d98b5f', intro: 1.5, defeat: 1.8, phases: [[0.4, 'charge'], [1, 'tumble'], [1.4, 'dust']], motif: 'tusks' },
+  medusa: { accent: '#a5d6c4', intro: 1.7, defeat: 2, phases: [[0.45, 'gaze'], [1, 'petrify'], [1.5, 'shatter']], motif: 'snakes' },
+  wizard: { accent: '#a99bff', intro: 1.7, defeat: 2, phases: [[0.45, 'cast'], [1, 'burst'], [1.5, 'banish']], motif: 'runes' },
+  skeletonKing: { accent: '#e4d9b8', intro: 1.6, defeat: 2, phases: [[0.45, 'summon'], [1, 'crown'], [1.5, 'fall']], motif: 'crown' },
+  cook: { accent: '#f0b46b', intro: 1.5, defeat: 1.8, phases: [[0.4, 'sizzle'], [0.9, 'scraps'], [1.4, 'collapse']], motif: 'pans' },
+  bartender: { accent: '#f2d08a', intro: 1.5, defeat: 1.8, phases: [[0.4, 'pour'], [0.9, 'mugs'], [1.4, 'collapse']], motif: 'mugs' },
+  dragon: { accent: '#ff8a54', intro: 1.8, defeat: DRAGON_DEFEAT_DURATION, phases: [[0.9, 'roar'], [1.8, 'fall']], motif: 'wings' },
+};
 const GOLD_PER_LEVEL = 3;
-const FINAL_DEPTH = 10, ENEMY_ATTACK_INTERVAL = 0.8, RETREAT_COOLDOWN = 60;
+function spawnPool(depth, biome) {
+  const pool = MONSTER_TYPES.filter(t => depth >= (t.minDepth || 1));
+  const favored = BIOMES[biome] && BIOMES[biome].monsters;
+  return favored ? pool.flatMap(t => favored.includes(t.name) ? [t, t] : [t]) : pool;
+}
+
+function biomeForDepth(depth) {
+  if (depth === FINAL_DEPTH) return 'throne';
+  const themed = THEMED_FLOORS[depth];
+  if (themed) return themed.kind === 'pub' ? 'tavern' : 'kitchen';
+  return ['crypt', 'cavern', 'kitchen', 'tavern'][(depth - 1) % 4];
+}
+
+function bossForDepth(depth) {
+  const base = BOSSES[depth];
+  if (!base) return null;
+  const tier = Math.ceil(depth / 10);
+  const hpScale = 1 + (depth - 1) * 0.12;
+  const atkScale = 1 + (depth - 1) * 0.16;
+  const rewardScale = 1 + (depth - 1) * 0.25;
+  return {
+    name: base.name, sprite: base.sprite, minDepth: depth,
+    hp: Math.round(base.hp * hpScale), atk: Math.round(base.atk * atkScale),
+    def: base.def + (tier - 1) * 2,
+    xp: Math.round(base.xp * rewardScale * (base.reward && base.reward.xp || 1)),
+    gold: Math.round(base.gold * rewardScale * (base.reward && base.reward.gold || 1)),
+    magic: !!base.magic, magicType: base.magicType, magicRange: base.magicRange,
+    ranged: !!base.ranged, range: base.range, projectile: base.projectile,
+    throne: !!base.throne, summons: !!base.summons, dragon: !!base.dragon,
+  };
+}
+
+function bossGateAt(depth) {
+  return depth === 5 || !!BOSSES[depth];
+}
+
+function bossDepthList() {
+  return Object.keys(BOSSES).map(Number).sort((a, b) => a - b);
+}
+
+function bossKind(m) {
+  if (!m) return 'mimic';
+  if (m.isDragon || m.dragon) return 'dragon';
+  if (m.isThemed) return m.themedType === 'pub' ? 'bartender' : 'cook';
+  const name = String(m.name || '').toLowerCase();
+  if (name.includes('mimic')) return 'mimic';
+  if (name.includes('hydra')) return 'hydra';
+  if (name.includes('boar')) return 'boar';
+  if (name.includes('medusa')) return 'medusa';
+  if (name.includes('wizard')) return 'wizard';
+  if (name.includes('skeleton king')) return 'skeletonKing';
+  return 'mimic';
+}
+
+function bossAnimation(m) {
+  return BOSS_ANIMATIONS[bossKind(m)] || BOSS_ANIMATIONS.mimic;
+}
+
+function lootPool(depth) {
+  return ITEM_TABLE.filter(it => depth >= (it.minDepth || 1));
+}
+
+function learnSpell(spellName) {
+  const spell = SPELLS[spellName];
+  if (!spell) return false;
+  if (state.player.spells[spellName]) return false;
+  state.player.spells[spellName] = true;
+  state.spellReadyAt[spellName] = state.activeTime;
+  log(`You learned ${spell.name}! Press ${spell.key} to cast it.`);
+  return true;
+}
+
+function snapshotPlayerStats() {
+  return Object.fromEntries(GOD_STAT_FIELDS.map(field => [field, state.player[field]]));
+}
+
+function freezePlayerStats() {
+  if (!state.godMode || !state.godModeStats) return;
+  for (const field of GOD_STAT_FIELDS) state.player[field] = state.godModeStats[field];
+}
+
+function adoptBossCompanion(m) {
+  state.companion = { name: m.name, sprite: m.isDragon ? 'dragonBoss' : m.sprite || bossKind(m) };
+  state.companionSpeech = null;
+  state.companionSpeechReadyAt = state.activeTime;
+  state.companionAttackAt = state.activeTime + 3;
+  log(`${m.name} agrees to join you as a tiny, reluctant companion.`);
+}
+
+function companionTalk(kind) {
+  if (!state.companion || state.gameOver || state.activeTime < state.companionSpeechReadyAt) return;
+  const pool = COMPANION_LINES[kind];
+  if (!pool || !pool.length) return;
+  const text = pool[state.companionQuoteIndex % pool.length];
+  state.companionQuoteIndex++;
+  state.companionSpeech = { text, expiresAt: state.activeTime + 5 };
+  state.companionSpeechReadyAt = state.activeTime + 7;
+  log(`${state.companion.name}: “${text}”`);
+}
+
+function companionTick() {
+  const companion = state.companion;
+  if (!companion || state.gameOver) return;
+  if (state.companionSpeech && state.activeTime >= state.companionSpeech.expiresAt) state.companionSpeech = null;
+  if (state.activeTime < state.companionAttackAt) return;
+  state.companionAttackAt = state.activeTime + 3;
+  const target = visibleTargets(3)[0];
+  if (!target) return;
+  spawnProjectile('bolt', state.player, target, 0.25);
+  damageMonster(target, 1);
+}
+
+function companionRenderPosition() {
+  const position = actorRenderPosition(state.player);
+  return { x: position.x * TILE + TILE * 0.78, y: position.y * TILE + TILE * 0.68 };
+}
+
+function drawCompanion() {
+  if (!state.companion || state.gameOver) return;
+  const position = companionRenderPosition();
+  drawSprite(state.companion.sprite, position.x, position.y, 0.55);
+  if (!state.companionSpeech) return;
+  const text = state.companionSpeech.text;
+  ctx.font = '10px monospace';
+  const width = ctx.measureText(text).width + 10;
+  const x = position.x - width / 2, y = position.y - 26;
+  ctx.fillStyle = '#f4e7c8';
+  ctx.beginPath(); ctx.roundRect(x, y, width, 15, 4); ctx.fill();
+  ctx.fillStyle = '#2b241d';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(text, position.x, y + 8);
+}
+
+const FINAL_DEPTH = 100, MAX_LEVEL = 100, ENEMY_ATTACK_INTERVAL = 0.8, RETREAT_COOLDOWN = 60;
 const HEAL_FRACTION = 0.02;
-const FLOOR_FIELDS = ['map', 'rooms', 'potions', 'stairs', 'upstairs', 'treasures',
-  'merchant', 'prisoner', 'princess', 'visited', 'monsterSpawns', 'bossDefeated', 'floorKey', 'obstacles', 'hazards', 'hazardTime'];
+const GOD_STAT_FIELDS = ['hp', 'maxHp', 'mp', 'maxMp', 'str', 'dex', 'def', 'lvl', 'xp', 'xpNext'];
+const FLOOR_FIELDS = ['map', 'rooms', 'potions', 'stairs', 'upstairs', 'treasures', 'merchant', 'prisoner',
+  'princess', 'visited', 'monsterSpawns', 'bossDefeated', 'floorKey', 'obstacles', 'hazards', 'hazardTime', 'biome', 'props'];
 
 let state;
 
 function newGame() {
   stopMotionAnimation();
   stopEndingAnimation();
+  stopBossIntroAnimation();
   stopBossDefeatAnimation();
   const started = state ? state.started : false;
   const art = state ? state.art : null;
@@ -46,15 +236,18 @@ function newGame() {
   document.getElementById('overlay').style.display = 'none';
   state = {
     depth: 1, kills: 0, turn: 0, started, messages: [], helpOpen: false, helpFocus: null,
-    player: { x: 0, y: 0, hp: 60, maxHp: 60, str: 12, dex: 10, def: 3, lvl: 1, xp: 0, xpNext: 40 },
+    consoleOpen: false, consoleLines: [], consoleHistory: [], consoleHistoryIndex: 0, godMode: false, godModeStats: null,
+    player: { x: 0, y: 0, hp: 60, maxHp: 60, mp: 20, maxMp: 20, str: 12, dex: 10, def: 3, lvl: 1, xp: 0, xpNext: 40, spells: { fireball: true, heal: true } },
+    spellReadyAt: { fireball: 0, heal: 0, frostbolt: 0, greaterHeal: 0, magicBarrier: 0 },
     inventory: [],
     gold: 0, equipment: { weapon: null, armor: null, ring: null },
-    map: null, rooms: [], monsters: [], potions: [], stairs: null,
+    map: null, rooms: [], monsters: [], potions: [], stairs: null, biome: 'crypt', props: [],
     treasures: [], merchant: null, boss: null, prisoner: null, princess: null,
     monsterSpeech: null, monsterSpeechReadyAt: 0, monsterQuoteIndex: 0,
-    gameOver: false, won: false, ending: null, bossDefeat: null, bubble: null, visited: new Set(), floors: {},
+    companion: null, companionSpeech: null, companionSpeechReadyAt: 0, companionQuoteIndex: 0, companionAttackAt: 0,
+    gameOver: false, won: false, ending: null, bossIntro: null, bossIntroSeen: false, bossDefeat: null, bubble: null, visited: new Set(), floors: {},
     upstairs: null, monsterSpawns: [], pause: null, warnedLow: false, warnedCritical: false,
-    combatElapsed: 0, healElapsed: 0, activeTime: 0, retreatReadyAt: 0, bossDefeated: false,
+    combatElapsed: 0, healElapsed: 0, activeTime: 0, manaRegenAt: 0, retreatReadyAt: 0, bossDefeated: false, bossSummonAt: 0,
     camera: { x: 0, y: 0 }, floorKey: null, obstacles: [], hazards: [], hazardTime: 0,
     lastTick: Date.now(), audio, art, motion: freshMotionState(),
   };
@@ -83,18 +276,21 @@ function startGame() {
 }
 
 function genLevel() {
+  state.biome = biomeForDepth(state.depth);
   const map = [];
   for (let y = 0; y < H; y++) map.push(new Array(W).fill(1)); // 1 = wall
   const rooms = [{ x: 2, y: 2, w: 8, h: 6, cx: 6, cy: 5 }];
   for (let y = 2; y < 8; y++) for (let x = 2; x < 10; x++) map[y][x] = 0;
-  const isBossLevel = state.depth % 5 === 0;
+  const bossData = bossForDepth(state.depth);
+  const isBossLevel = !!bossData || !!THEMED_FLOORS[state.depth];
   if (isBossLevel) {
-    const w = state.depth === FINAL_DEPTH ? 22 : 18, h = state.depth === FINAL_DEPTH ? 18 : 14;
+    const w = state.depth === FINAL_DEPTH ? 22 : state.depth === 50 ? 24 : 18;
+    const h = state.depth === FINAL_DEPTH ? 18 : state.depth === 50 ? 18 : 14;
     const x = W - w - 3, y = H - h - 3;
-    rooms.push({ x, y, w, h, cx: x + (w >> 1), cy: y + (h >> 1), isArena: true });
+    rooms.push({ x, y, w, h, cx: x + (w >> 1), cy: y + (h >> 1), isArena: true, isThroneRoom: state.depth === 50 });
     for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) map[yy][xx] = 0;
   }
-  for (let i = 0; i < 420 && rooms.length < 22; i++) {
+  for (let i = 0; i < 900 && rooms.length < 32; i++) {
     const w = 5 + Math.floor(Math.random() * 6);
     const h = 4 + Math.floor(Math.random() * 4);
     const x = 1 + Math.floor(Math.random() * (W - w - 2));
@@ -129,20 +325,24 @@ function genLevel() {
 
   state.monsters = [];
   state.bossDefeated = false;
-  const count = 5 + state.depth * 2;
+  const count = Math.min(40, 6 + state.depth * 3);
+  const usedSpawns = new Set([`${p.x},${p.y}`]);
   for (let i = 0; i < count; i++) {
     const room = rooms[1 + Math.floor(Math.random() * (rooms.length - 1))];
     const tx = room.x + Math.floor(Math.random() * room.w);
     const ty = room.y + Math.floor(Math.random() * room.h);
-    if (tx === p.x && ty === p.y) continue;
+    if (tx === p.x && ty === p.y || usedSpawns.has(`${tx},${ty}`)) continue;
     if (room.isArena && Math.max(Math.abs(tx - room.cx), Math.abs(ty - room.cy)) <= 3) continue;
-    const t = MONSTER_TYPES[Math.min(MONSTER_TYPES.length - 1, Math.floor(Math.random() * (2 + state.depth)))];
+    usedSpawns.add(`${tx},${ty}`);
+    const pool = spawnPool(state.depth, state.biome);
+    const t = pool[Math.min(pool.length - 1, Math.floor(Math.random() * (2 + state.depth)))];
     const scale = 1 + (state.depth - 1) * 0.35;
+    const attackScale = t.ranged || t.magic ? 0.1 : 0.15;
     state.monsters.push({
       ...t,
       x: tx, y: ty,
       maxHp: Math.round(t.hp * (1 + (state.depth - 1) * 0.2)), hp: Math.round(t.hp * (1 + (state.depth - 1) * 0.2)),
-      atk: Math.round(t.atk * (1 + (state.depth - 1) * 0.15)), def: t.def + Math.floor((state.depth - 1) / 2),
+      atk: Math.round(t.atk * (1 + (state.depth - 1) * attackScale)), def: t.def + Math.floor((state.depth - 1) / 2),
       xp: Math.round(t.xp * scale),
       gold: Math.max(2, Math.round(5 * scale)),
       id: i,
@@ -150,7 +350,7 @@ function genLevel() {
   }
 
   state.potions = [];
-  const potions = 2 + Math.floor(Math.random() * 2);
+  const potions = 3 + Math.floor(state.depth / 3) + Math.floor(Math.random() * 2);
   for (let i = 0; i < potions; i++) {
     const room = rooms[Math.floor(Math.random() * rooms.length)];
     const px = room.x + Math.floor(Math.random() * room.w);
@@ -160,53 +360,48 @@ function genLevel() {
   }
 
   state.treasures = [];
-  const treasureCount = 2 + Math.floor(Math.random() * 2);
+  const treasureCount = 3 + Math.floor(state.depth / 4) + Math.floor(Math.random() * 2);
   for (let i = 0; i < treasureCount; i++) {
     const room = rooms[1 + Math.floor(Math.random() * (rooms.length - 1))];
     const px = room.x + Math.floor(Math.random() * room.w);
     const py = room.y + Math.floor(Math.random() * room.h);
     if (px === p.x && py === p.y) continue;
-    const it = ITEM_TABLE[Math.floor(Math.random() * ITEM_TABLE.length)];
+    const pool = lootPool(state.depth);
+    const it = pool[Math.floor(Math.random() * pool.length)];
     state.treasures.push({ x: px, y: py, ...it, id: i });
   }
 
-  const isDragonLevel = state.depth % 10 === 0;
+  const themed = THEMED_FLOORS[state.depth];
   state.merchant = null;
   state.boss = null;
   state.prisoner = null;
   state.princess = null;
-  if (isBossLevel && !isDragonLevel) {
+
+  if (themed && !bossData) {
     const room = rooms[rooms.length - 1];
     const scale = 1 + (state.depth - 1) * 0.35;
     state.boss = {
-      name: 'Mimic', sprite: 'mimic',
+      name: themed.name, sprite: themed.sprite,
       x: room.cx, y: room.cy,
-      maxHp: Math.round(80 * (1 + (state.depth - 1) * 0.2)), hp: Math.round(80 * (1 + (state.depth - 1) * 0.2)),
-      atk: Math.round(18 * (1 + (state.depth - 1) * 0.15)), def: 4 + Math.floor(state.depth / 5),
-      xp: Math.round(120 * scale), gold: Math.round(80 * scale),
-      id: 999, isBoss: true,
+      maxHp: Math.round(100 * (1 + (state.depth - 1) * 0.2)), hp: Math.round(100 * (1 + (state.depth - 1) * 0.2)),
+      atk: Math.round(20 * (1 + (state.depth - 1) * 0.15)), def: 6 + Math.floor(state.depth / 5),
+      xp: Math.round(150 * scale), gold: Math.round(100 * scale),
+      id: 999, isBoss: true, isThemed: true, themedType: themed.kind,
+      ranged: themed.kind === 'pub', range: themed.kind === 'pub' ? 4 : 0, projectile: 'beer',
     };
     state.monsters.push(state.boss);
-    state.merchant = null;
-  } else if (isDragonLevel) {
+  } else if (bossData) {
     const room = rooms[rooms.length - 1];
-    const scale = 1 + (state.depth - 1) * 0.35;
-    state.boss = {
-      name: 'Dragon', sprite: 'dragon',
-      x: room.cx, y: room.cy,
-      maxHp: Math.round(160 * (1 + (state.depth - 1) * 0.15)), hp: Math.round(160 * (1 + (state.depth - 1) * 0.15)),
-      atk: Math.round(26 * (1 + (state.depth - 1) * 0.08)), def: 6 + Math.floor(state.depth / 5),
-      xp: Math.round(250 * scale), gold: Math.round(200 * scale),
-      id: 999, isBoss: true, isDragon: true,
-    };
+    state.boss = { ...bossData, x: room.cx, y: room.cy, maxHp: bossData.hp, hp: bossData.hp,
+      id: 999, isBoss: true, isDragon: bossData.dragon, isThroneBoss: !!bossData.throne };
     state.monsters.push(state.boss);
-    state.princess = { x: room.x + (room.w >> 1), y: room.y + (room.h - 1), rescued: false, isPrincess: true };
-    if (state.princess.y === state.boss.y) state.princess.y = room.y;
-    if (state.princess.x === state.boss.x && state.princess.y === state.boss.y) state.princess.x = room.x;
-    state.merchant = null;
+    if (bossData.dragon) {
+      state.princess = { x: room.x + (room.w >> 1), y: room.y + (room.h - 1), rescued: false, isPrincess: true };
+      if (state.princess.y === state.boss.y) state.princess.y = room.y;
+      if (state.princess.x === state.boss.x && state.princess.y === state.boss.y) state.princess.x = room.x;
+    }
   } else {
-    // merchant on levels 2..4 (not boss/dragon)
-    if (state.depth >= 2 && state.depth <= 4) {
+    if (state.depth >= 2 && state.depth % 2 === 0) {
       const merchantRoom = rooms[1 + Math.floor(Math.random() * (rooms.length - 1))];
       state.merchant = { x: merchantRoom.cx, y: merchantRoom.cy, isMerchant: true, stock: merchantStock() };
     }
@@ -225,6 +420,9 @@ function genLevel() {
   }
 
   placeFloorObjects();
+  state.props = [];
+  generateThroneRoom();
+  generateProps();
   state.obstacles = [];
   state.hazards = [];
   state.hazardTime = 0;
@@ -280,13 +478,56 @@ function floorDistances(map, start) {
 
 function protectedFloorTiles() {
   return [state.stairs, state.upstairs, state.merchant, state.prisoner, state.princess,
-    ...state.potions, ...state.treasures, ...state.monsters].filter(Boolean);
+    ...state.potions, ...state.treasures, ...state.props, ...state.monsters].filter(Boolean);
+}
+
+function generateProps() {
+  const reserved = new Set(protectedFloorTiles().map(o => `${o.x},${o.y}`));
+  const sprite = BIOMES[state.biome].prop;
+  for (let i = 0; i < state.rooms.length; i++) {
+    const room = state.rooms[i];
+    if (room.isArena) continue;
+    const count = i === 0 ? 1 : 1 + Math.floor(Math.random() * 2);
+    for (let j = 0; j < count; j++) {
+      const x = room.x + 1 + Math.floor(Math.random() * (room.w - 2));
+      const y = room.y + 1 + Math.floor(Math.random() * (room.h - 2));
+      const key = `${x},${y}`;
+      if (state.map[y][x] !== 0 || reserved.has(key)) continue;
+      state.props.push({ x, y, sprite });
+      reserved.add(key);
+    }
+  }
+}
+
+function generateThroneRoom() {
+  if (state.depth !== 50) return;
+  const room = state.rooms.find(r => r.isThroneRoom);
+  if (!room) return;
+  const reserved = new Set(protectedFloorTiles().map(o => `${o.x},${o.y}`));
+  const decor = [{ x: room.cx, y: room.y + 2, sprite: 'throne' }];
+  for (const x of [room.x + 2, room.x + room.w - 3]) {
+    for (const y of [room.y + 3, room.y + 8, room.y + room.h - 4]) decor.push({ x, y, sprite: 'torch' });
+  }
+  for (const y of [room.y + 4, room.cy + 4]) {
+    decor.push({ x: room.x + 4, y, sprite: 'banner' });
+    decor.push({ x: room.x + room.w - 5, y, sprite: 'banner' });
+  }
+  for (const [dx, dy] of [[-6, -2], [6, 2], [-6, 3], [6, -3]]) {
+    decor.push({ x: room.cx + dx, y: room.cy + dy, sprite: 'tombstone' });
+  }
+  for (const prop of decor) {
+    const key = `${prop.x},${prop.y}`;
+    if (state.map[prop.y] && state.map[prop.y][prop.x] === 0 && !reserved.has(key)) {
+      state.props.push(prop);
+      reserved.add(key);
+    }
+  }
 }
 
 function generateObstacles() {
   const reserved = new Set(protectedFloorTiles().map(o => `${o.x},${o.y}`));
   let floorCount = state.map.reduce((sum, row) => sum + row.filter(t => t === 0).length, 0);
-  for (let attempt = 0; attempt < 180 && state.obstacles.length < 10 + Math.floor(state.depth / 2); attempt++) {
+  for (let attempt = 0; attempt < 320 && state.obstacles.length < 14 + Math.floor(state.depth / 2); attempt++) {
     const room = state.rooms[Math.floor(Math.random() * state.rooms.length)];
     if (room.isArena) continue;
     const x = room.x + 1 + Math.floor(Math.random() * (room.w - 2));
@@ -309,10 +550,10 @@ function generateHazards() {
     if ([state.upstairs, state.stairs].some(o => Math.max(Math.abs(x - o.x), Math.abs(y - o.y)) <= 3)) continue;
     candidates.push({ x, y });
   }
-  const count = 15 + Math.floor(state.depth / 2);
+  const count = 24 + state.depth;
   for (let i = 0; i < count && candidates.length; i++) {
     const tile = candidates.splice(Math.floor(Math.random() * candidates.length), 1)[0];
-    const type = ['flame', 'rocks', 'spikes'][i % 3];
+    const type = BIOMES[state.biome].hazards[i % 3];
     state.hazards.push({ ...tile, type, revealed: type !== 'spikes', triggered: false,
       stage: 'idle', offset: Math.random() * 6, nextDamageAt: 0, impactAt: null });
   }
@@ -328,7 +569,7 @@ function inCamera(x, y) {
 }
 
 function freshMotionState() {
-  return { time: 0, moves: {}, facing: {}, camera: null, frameId: null, lastTimestamp: null, lastPaint: null };
+  return { time: 0, moves: {}, facing: {}, camera: null, projectiles: [], frameId: null, lastTimestamp: null, lastPaint: null };
 }
 
 function stopMotionAnimation() {
@@ -395,7 +636,7 @@ function moveActorTo(actor, x, y) {
 }
 
 function motionPlayable() {
-  return state.started && !state.gameOver && !state.helpOpen && !state.pause && !document.hidden && !bossDefeatActive();
+  return state.started && !state.gameOver && !state.helpOpen && !state.consoleOpen && !state.pause && !document.hidden && !bossCinematicActive();
 }
 
 function actorIsMoving(actor) {
@@ -403,9 +644,17 @@ function actorIsMoving(actor) {
   return !!(move && move.x === actor.x && move.y === actor.y && motionProgress(move) < 1 && typeof window.requestAnimationFrame === 'function');
 }
 
+function projectileVisible(projectile) {
+  const fromTile = { x: Math.floor(projectile.fromX / TILE), y: Math.floor(projectile.fromY / TILE) };
+  const toTile = { x: Math.floor(projectile.toX / TILE), y: Math.floor(projectile.toY / TILE) };
+  return inRenderCamera(fromTile.x, fromTile.y) || inRenderCamera(toTile.x, toTile.y);
+}
+
 function motionNeeded() {
+  if (state.motion.projectiles.some(projectileVisible)) return true;
   if (actorIsMoving(state.player) || state.monsters.some(m => m.hp > 0 &&
-    inRenderCamera(m.x, m.y) && fogLevel(m.x, m.y) < 3 && (actorIsMoving(m) || m.sprite === 'bat' || m.isDragon))) return true;
+    inRenderCamera(m.x, m.y) && fogLevel(m.x, m.y) < 3 &&
+    (actorIsMoving(m) || ['bat', 'wasp', 'mage', 'healer'].includes(m.sprite) || m.isDragon))) return true;
   const view = renderViewport();
   for (let y = view.y0; y < view.y1; y++) for (let x = view.x0; x < view.x1; x++) {
     if (state.visited.has(`${x},${y}`) && wallTorchAt(x, y)) return true;
@@ -426,6 +675,8 @@ function advanceMotion(elapsed) {
   for (const [key, move] of Object.entries(state.motion.moves)) {
     if (motionProgress(move) >= 1) delete state.motion.moves[key];
   }
+  for (const projectile of state.motion.projectiles) projectile.elapsed += Math.max(0, elapsed);
+  state.motion.projectiles = state.motion.projectiles.filter(projectile => projectile.elapsed < projectile.duration);
   if (!state.motion.moves.player) state.motion.camera = null;
 }
 
@@ -455,19 +706,22 @@ function applyPlayerHazards() {
   if (hazard.type === 'spikes' && !hazard.triggered) {
     hazard.triggered = true; hazard.revealed = true;
     hurtPlayer(6 + state.depth, 'Hidden spikes pierce your boots!');
+    companionTalk('trap');
   } else if (hazard.type === 'rocks' && !hazard.triggered) {
     hazard.triggered = true; hazard.stage = 'warning';
     hazard.impactAt = state.hazardTime + 1.2;
     log('Dust and falling stones! Move off the cracked tile!');
+    companionTalk('trap');
     playSound('hit');
   } else if (hazard.type === 'flame' && flameActive(hazard) && state.hazardTime >= hazard.nextDamageAt) {
     hazard.nextDamageAt = state.hazardTime + 1;
     hurtPlayer(4 + state.depth, 'The flames burn you!');
+    companionTalk('trap');
   }
 }
 
 function hazardTick() {
-  if (!state.started || state.gameOver || state.helpOpen || state.pause || document.hidden) return;
+  if (!state.started || state.gameOver || state.helpOpen || state.consoleOpen || state.pause || document.hidden) return;
   for (const hazard of state.hazards) {
     if (hazard.type !== 'rocks' || hazard.stage !== 'warning' || state.hazardTime < hazard.impactAt) continue;
     hazard.stage = 'spent';
@@ -507,6 +761,7 @@ function equipItem(slot, item) {
   const healthChange = equipmentBonus('maxHp') - oldHealthBonus;
   state.player.maxHp += healthChange;
   state.player.hp = Math.min(state.player.maxHp, state.player.hp + Math.max(0, healthChange));
+  freezePlayerStats();
 }
 
 function effectiveStr() {
@@ -540,6 +795,10 @@ function fogLevel(x, y) {
   return 3;
 }
 
+function heroDamage(m, dmg) {
+  return state.godMode ? Math.max(1, m.hp) : dmg;
+}
+
 function damageMonster(m, dmg) {
   if (state.gameOver || m.hp <= 0) return;
   m.hp -= dmg;
@@ -552,26 +811,44 @@ function damageMonster(m, dmg) {
       state.floorKey.drop = { x: m.x, y: m.y };
     }
     const p = state.player;
-    p.xp += m.xp;
-    let msg = `${m.name} ${m.isDragon ? 'defeated' : 'slain'}! +${m.xp} XP`;
+    const xpGain = p.lvl >= MAX_LEVEL ? 0 : m.xp;
+    p.xp += xpGain;
+    let msg = `${m.name} ${m.isDragon ? 'defeated' : m.isThemed ? 'defeated' : 'slain'}! +${xpGain} XP`;
     if (m.gold) { state.gold += m.gold; msg += ` +${m.gold} gold`; }
     log(msg);
     if (m.isBoss) {
       state.bossDefeated = true;
+      adoptBossCompanion(m);
+      companionTalk('boss');
       saveFloor();
       startBossDefeat(m);
     }
     delete state.motion.moves[actorMotionKey(m)];
-    while (p.xp >= p.xpNext) {
+    while (p.lvl < MAX_LEVEL && p.xp >= p.xpNext) {
       p.xp -= p.xpNext;
       p.lvl++;
       p.xpNext = Math.round(p.xpNext * 1.5);
-      p.maxHp += 10; p.str += 3; p.dex += 1; p.def += 1; p.hp = Math.min(p.maxHp, p.hp + 20);
+      p.maxHp += 10; p.maxMp += 4; p.mp = Math.min(p.maxMp, p.mp + 4);
+      p.str += 3; p.dex += 1; p.def += 1; p.hp = Math.min(p.maxHp, p.hp + 20);
       log(`Level up! You are now level ${p.lvl}!`);
+      if (p.lvl >= MAX_LEVEL) {
+        p.xp = 0; p.xpNext = 1;
+        log('Maximum level reached!');
+      }
     }
-    if (m.isBoss) log(`${msg}. ${m.isDragon ? 'Rescue the princess to win!' : state.floorKey.collected ? 'The stairs are unlocked!' : 'Find this floor’s key to open the stairs.'}`);
+    if (p.lvl >= MAX_LEVEL) { p.xp = 0; p.xpNext = 1; }
+    if (m.isBoss) {
+      const themed = m.isThemed && THEMED_FLOORS[state.depth];
+      const hint = themed ? `${m.name} is defeated! The ${themed.kind} is safe now.`
+        : m.isThroneBoss ? 'The throne falls silent. Its guards crumble, and the stairs are unlocked.'
+          : m.isDragon ? `Rescue the princess at depth ${FINAL_DEPTH} to win!`
+          : bossGateAt(state.depth) ? `${m.name} is defeated! The stairs are unlocked.`
+            : state.floorKey && state.floorKey.collected ? 'The stairs are unlocked!' : 'Find this floor’s key to open the stairs.';
+      log(`${msg}. ${hint}`);
+    }
     if (keyDropped) log('A golden floor key drops! Stand on it and press Space.');
   }
+  freezePlayerStats();
 }
 
 function attackMonster(m) {
@@ -579,8 +856,136 @@ function attackMonster(m) {
   markCombat();
   playSound('slash');
   const dmg = Math.max(1, effectiveAtk() - m.def);
-  damageMonster(m, dmg);
+  damageMonster(m, heroDamage(m, dmg));
   if (m.hp > 0) { monsterTalk(m); enemyAttack(m); }
+}
+
+function rangedWeapon() {
+  const weapon = state.equipment.weapon;
+  return weapon && weapon.range ? weapon : null;
+}
+
+function hasLineOfSight(x0, y0, x1, y1) {
+  const steps = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0));
+  for (let i = 1; i < steps; i++) {
+    const x = Math.round(x0 + (x1 - x0) * i / steps);
+    const y = Math.round(y0 + (y1 - y0) * i / steps);
+    if (state.map[y] && state.map[y][x] !== 0) return false;
+  }
+  return true;
+}
+
+function visibleTargets(range) {
+  const p = state.player;
+  return state.monsters.filter(m => m.hp > 0 && inCamera(m.x, m.y) && fogLevel(m.x, m.y) < 3 &&
+    Math.max(Math.abs(m.x - p.x), Math.abs(m.y - p.y)) <= range && hasLineOfSight(p.x, p.y, m.x, m.y));
+}
+
+function spawnProjectile(kind, source, target, duration = 0.35) {
+  const from = actorRenderPosition(source), to = actorRenderPosition(target);
+  const projectiles = state.motion.projectiles;
+  if (projectiles.length >= 24) projectiles.shift();
+  projectiles.push({ kind,
+    fromX: (from.x + 0.5) * TILE, fromY: (from.y + 0.5) * TILE,
+    toX: (to.x + 0.5) * TILE, toY: (to.y + 0.5) * TILE,
+    elapsed: 0, duration });
+}
+
+function shootBow() {
+  if (!state.started || state.gameOver || state.helpOpen || state.pause || bossCinematicActive()) return;
+  const weapon = rangedWeapon();
+  if (!weapon) { log('You need a bow to shoot.'); render(); return; }
+  const targets = visibleTargets(weapon.range).sort((a, b) =>
+    Math.max(Math.abs(a.x - state.player.x), Math.abs(a.y - state.player.y)) -
+    Math.max(Math.abs(b.x - state.player.x), Math.abs(b.y - state.player.y)));
+  const target = targets[0];
+  if (!target) { log('No monster in bow range.'); render(); return; }
+  markCombat();
+  playSound('shoot');
+  state.turn++;
+  spawnProjectile('arrow', state.player, target);
+  damageMonster(target, heroDamage(target, Math.max(1, effectiveAtk() - target.def)));
+  if (target.hp > 0) { monsterTalk(target); enemyAttack(target); }
+  log(`You shoot ${target.name} with your ${weapon.name}.`);
+  render();
+}
+
+function castSpell(spellName) {
+  if (!state.started || state.gameOver || state.helpOpen || state.pause || bossCinematicActive()) return;
+  const spell = SPELLS[spellName];
+  if (!spell) return;
+  const p = state.player;
+  if (!p.spells[spellName]) {
+    log(`You have not learned ${spell.name}.`); render(); return;
+  }
+  const readyAt = state.spellReadyAt[spellName] || 0;
+  if (state.activeTime < readyAt) {
+    log(`${spell.name} recharges for ${(readyAt - state.activeTime).toFixed(1)}s.`); render(); return;
+  }
+  if (!state.godMode && p.mp < spell.cost) { log(`Not enough mana for ${spell.name} (${p.mp}/${p.maxMp}).`); render(); return; }
+  if (!state.godMode) p.mp -= spell.cost;
+  state.spellReadyAt[spellName] = state.activeTime + spell.cooldown;
+  markCombat();
+  playSound('magic');
+  state.turn++;
+  if (spellName === 'fireball') {
+    const targets = visibleTargets(3);
+    for (const m of targets) {
+      spawnProjectile('fireball', p, m, 0.45);
+      damageMonster(m, heroDamage(m, Math.max(1, Math.round(effectiveAtk() * 0.8) - Math.floor(m.def / 2))));
+      if (m.hp > 0) enemyAttack(m);
+    }
+    log(targets.length ? `You cast Fireball at ${targets.length} monster${targets.length === 1 ? '' : 's'}.`
+      : 'Fireball scorches empty air.');
+  } else if (spellName === 'frostbolt') {
+    const target = visibleTargets(4)[0];
+    if (target) {
+      spawnProjectile('frost', p, target, 0.35);
+      damageMonster(target, heroDamage(target, Math.max(1, Math.round(effectiveAtk() * 1.6) - Math.floor(target.def / 2))));
+      if (target.hp > 0) enemyAttack(target);
+      log(`You cast Frostbolt at ${target.name}.`);
+    } else log('Frostbolt dissolves into empty air.');
+  } else if (spellName === 'magicBarrier') {
+    const target = visibleTargets(3)[0];
+    if (!target) log('Magic Barrier flares and fades.');
+    else {
+      spawnProjectile('bolt', p, target, 0.3);
+      const horizontal = Math.abs(target.x - p.x) >= Math.abs(target.y - p.y);
+      const sx = horizontal ? Math.sign(target.x - p.x) : 0;
+      const sy = horizontal ? 0 : Math.sign(target.y - p.y);
+      let x = target.x, y = target.y, pushed = 0, impact = false;
+      for (let i = 0; i < 3; i++) {
+        const nx = x + sx, ny = y + sy;
+        if (!state.map[ny] || state.map[ny][nx] !== 0 || monsterAt(nx, ny) || (nx === p.x && ny === p.y)) { impact = true; break; }
+        x = nx; y = ny; pushed++;
+      }
+      if (pushed) moveActorTo(target, x, y);
+      const damage = Math.max(2, Math.round(effectiveAtk() * 1.4) - Math.floor(target.def / 2));
+      if (impact || !pushed) {
+        damageMonster(target, heroDamage(target, damage));
+        log(`Magic Barrier slams ${target.name} into the wall for ${damage} damage!`);
+      } else log(`Magic Barrier shoves ${target.name} ${pushed} tiles away.`);
+      if (target.hp > 0) enemyAttack(target);
+    }
+  } else {
+    spawnProjectile('heal', p, p, 0.6);
+    const fraction = spellName === 'greaterHeal' ? 0.55 : 0.3;
+    const amount = Math.max(1, Math.round(p.maxHp * fraction));
+    p.hp = Math.min(p.maxHp, p.hp + amount);
+    log(`You cast ${spell.name} and recover ${amount} HP.`);
+  }
+  freezePlayerStats();
+  render();
+}
+
+function regenMana() {
+  if (state.godMode) return;
+  const p = state.player;
+  if (state.combatElapsed < 4) return;
+  if (state.monsters.some(m => m.hp > 0 && Math.max(Math.abs(m.x - p.x), Math.abs(m.y - p.y)) <= 3)) return;
+  if (state.activeTime < (state.manaRegenAt || 0)) return;
+  state.manaRegenAt = state.activeTime + 2;
+  if (p.mp < p.maxMp) p.mp = Math.min(p.maxMp, p.mp + 1);
 }
 
 function enemyAttack(m) {
@@ -588,6 +993,43 @@ function enemyAttack(m) {
   m.nextAttackAt = state.activeTime + ENEMY_ATTACK_INTERVAL;
   monsterTalk(m);
   markCombat();
+  const distance = Math.max(Math.abs(m.x - state.player.x), Math.abs(m.y - state.player.y));
+  const inLine = hasLineOfSight(m.x, m.y, state.player.x, state.player.y);
+  if (m.ranged && distance <= m.range && inLine) {
+    const projectile = m.projectile === 'bone' ? 'bone' : m.projectile === 'beer' ? 'beer' : 'stinger';
+    spawnProjectile(projectile, m, state.player);
+    if (Math.random() < dodgeChance()) { log(`You dodge ${m.name}'s ${m.projectile}!`); return; }
+    if (Math.random() < Math.min(0.8, 0.55 + state.depth * 0.02)) {
+      playSound('shoot');
+      const damage = Math.max(1, m.atk);
+      hurtPlayer(damage, `${m.name} shoots you with a ${m.projectile} for ${damage}!`);
+    } else log(`${m.name}'s ${m.projectile} misses!`);
+    return;
+  }
+  if (m.magic && distance <= m.magicRange && inLine) {
+    if (m.magicType === 'attack') {
+      spawnProjectile('bolt', m, state.player);
+      if (Math.random() < dodgeChance()) { log(`You dodge ${m.name}'s spell!`); return; }
+      if (Math.random() < Math.min(0.75, 0.45 + state.depth * 0.025)) {
+        playSound('magic');
+        const damage = Math.max(1, m.atk);
+        hurtPlayer(damage, `${m.name} casts a spell and hits you for ${damage}!`);
+      } else log(`${m.name}'s spell fizzles!`);
+    } else if (m.magicType === 'heal') {
+      const patient = [m, ...state.monsters.filter(other => other !== m && other.hp > 0 && other.hp < other.maxHp
+        && Math.max(Math.abs(other.x - m.x), Math.abs(other.y - m.y)) <= m.magicRange
+        && hasLineOfSight(m.x, m.y, other.x, other.y))]
+        .filter(other => other.hp < other.maxHp)
+        .sort((a, b) => a.hp / a.maxHp - b.hp / b.maxHp)[0];
+      if (patient) {
+        spawnProjectile('heal', m, patient, 0.6);
+        const healAmount = Math.max(1, Math.round(patient.maxHp * 0.15));
+        patient.hp = Math.min(patient.maxHp, patient.hp + healAmount);
+        log(`${m.name} casts a healing spell on ${patient === m ? 'themselves' : patient.name} for ${healAmount} HP!`);
+      }
+    }
+    return;
+  }
   if (Math.random() < dodgeChance()) {
     log(`You dodge the ${m.name}'s strike!`);
     return;
@@ -663,15 +1105,43 @@ function drawMonsterSpeech() {
 
 function gameOver(won) {
   if (won) { startEnding(); return; }
+  clearBossIntro();
   clearBossDefeat();
   clearMonsterSpeech();
   clearMovementAnimation();
+  state.companionSpeech = null;
   state.gameOver = true; state.won = won; state.pause = null;
   const ov = document.getElementById('overlay');
   document.getElementById('ovTitle').textContent = 'GAME OVER';
   document.getElementById('ovTitle').style.color = '#ff3d3d';
   document.getElementById('ovText').textContent = `Slain at depth ${state.depth}. ${state.kills} kills.`;
   ov.style.display = 'flex';
+}
+
+function bossIntroActive() {
+  return !!(state && state.bossIntro && !state.bossIntro.completed);
+}
+
+function bossCinematicActive() {
+  return bossIntroActive() || bossDefeatActive();
+}
+
+function stopBossIntroAnimation() {
+  const anim = state && state.bossIntro;
+  if (!anim) return;
+  if (anim.frameId !== null && typeof window.cancelAnimationFrame === 'function') window.cancelAnimationFrame(anim.frameId);
+  anim.frameId = null;
+}
+
+function clearBossIntro() {
+  stopBossIntroAnimation();
+  if (state) state.bossIntro = null;
+}
+
+function bossIntroPhase(t) {
+  if (t < 0.45) return 'reveal';
+  if (t < 1.15) return 'roar';
+  return 'hold';
 }
 
 function bossDefeatActive() {
@@ -695,15 +1165,140 @@ function clearBossDefeat() {
 }
 
 function bossDefeatPhase(anim) {
-  const t = anim.elapsed;
+  const t = anim.elapsed, phases = BOSS_ANIMATIONS[anim.kind] || BOSS_ANIMATIONS.mimic;
   if (anim.kind === 'dragon') {
     if (t < 0.9) return 'roar';
     if (t < 1.8) return 'fall';
     return 'legacy';
   }
-  if (t < 0.4) return 'snap';
-  if (t < 0.9) return 'coins';
-  return 'collapse';
+  if (anim.kind === 'mimic') {
+    if (t < 0.4) return 'snap';
+    if (t < 0.9) return 'coins';
+    return 'collapse';
+  }
+  let phase = phases.phases[0][1];
+  for (const [at, name] of phases.phases) if (t >= at) phase = name;
+  return phase;
+}
+
+function playBossIntroSound(kind) {
+  if (kind === 'dragon') {
+    tone(58, 0.7, 'sawtooth', 0.3, 0, 'effects');
+    tone(116.54, 0.5, 'square', 0.2, 0.2, 'effects');
+  } else if (kind === 'hydra') {
+    [110, 138.59, 164.81].forEach((note, i) => tone(note, 0.35, 'sawtooth', 0.18, i * 0.11, 'effects'));
+  } else if (kind === 'boar') {
+    tone(92, 0.4, 'square', 0.28, 0, 'effects');
+    tone(72, 0.5, 'triangle', 0.2, 0.18, 'effects');
+  } else if (kind === 'medusa') {
+    tone(440, 0.5, 'sine', 0.18, 0, 'effects');
+    tone(659.25, 0.4, 'triangle', 0.14, 0.18, 'effects');
+  } else if (kind === 'wizard') {
+    [261.63, 329.63, 392, 523.25].forEach((note, i) => tone(note, 0.28, 'sine', 0.14, i * 0.08, 'effects'));
+  } else if (kind === 'skeletonKing') {
+    tone(73.42, 0.6, 'square', 0.24, 0, 'effects');
+    tone(146.83, 0.5, 'triangle', 0.18, 0.22, 'effects');
+  } else if (kind === 'bartender') {
+    tone(392, 0.18, 'sine', 0.16, 0, 'effects');
+    tone(523.25, 0.22, 'sine', 0.14, 0.14, 'effects');
+  } else if (kind === 'cook') {
+    tone(220, 0.2, 'square', 0.2, 0, 'effects');
+    tone(330, 0.22, 'triangle', 0.16, 0.16, 'effects');
+  } else {
+    tone(120, 0.22, 'square', 0.24, 0, 'effects');
+    tone(180, 0.18, 'triangle', 0.18, 0.16, 'effects');
+  }
+}
+
+function checkBossIntro() {
+  const m = state && state.boss;
+  if (!m || m.hp <= 0 || state.bossIntroSeen || !state.started || state.gameOver || state.helpOpen || state.pause || bossCinematicActive()) return;
+  const p = state.player;
+  if (Math.max(Math.abs(m.x - p.x), Math.abs(m.y - p.y)) > 4 || !hasLineOfSight(p.x, p.y, m.x, m.y)) return;
+  startBossIntro(m);
+}
+
+function startBossIntro(m) {
+  if (!m || !m.isBoss || m.hp <= 0 || !state.started || state.gameOver || state.helpOpen || state.pause || bossCinematicActive()) return;
+  const kind = bossKind(m), meta = BOSS_ANIMATIONS[kind], visual = monsterVisual(m);
+  state.bossIntroSeen = true;
+  clearMovementAnimation();
+  clearMonsterSpeech();
+  state.bossIntro = {
+    kind, label: m.name, accent: meta.accent, elapsed: 0, phase: 'reveal', completed: false,
+    duration: meta.intro, hpRatio: Math.max(0, m.hp / m.maxHp), frameId: null,
+    lastTimestamp: null, events: new Set(),
+    visual: { sprite: visual.sprite, scale: visual.scale, width: visual.width, height: visual.height },
+  };
+  playBossIntroSound(kind);
+  draw();
+  requestBossIntroFrame(state.bossIntro);
+}
+
+function requestBossIntroFrame(anim) {
+  if (state.bossIntro !== anim || anim.completed || typeof window.requestAnimationFrame !== 'function') return;
+  anim.frameId = window.requestAnimationFrame(timestamp => bossIntroFrame(timestamp, anim));
+}
+
+function bossIntroFrame(timestamp, anim) {
+  if (state.bossIntro !== anim || anim.completed) return;
+  anim.frameId = null;
+  if (document.hidden || state.helpOpen || state.consoleOpen) {
+    anim.lastTimestamp = null;
+    requestBossIntroFrame(anim);
+    return;
+  }
+  const elapsed = anim.lastTimestamp === null ? 0 : Math.min(0.1, Math.max(0, (timestamp - anim.lastTimestamp) / 1000));
+  anim.lastTimestamp = timestamp;
+  advanceBossIntro(elapsed);
+  draw();
+  requestBossIntroFrame(anim);
+}
+
+function advanceBossIntro(elapsed) {
+  const anim = state && state.bossIntro;
+  if (!anim || anim.completed || document.hidden || state.helpOpen || state.consoleOpen) return;
+  anim.elapsed = Math.min(anim.duration, anim.elapsed + Math.max(0, elapsed));
+  anim.phase = bossIntroPhase(anim.elapsed);
+  for (const [at, event] of [[0.45, 'reveal'], [1.15, 'roar']]) {
+    if (anim.elapsed < at || anim.events.has(event)) continue;
+    anim.events.add(event);
+    playBossIntroSound(anim.kind);
+  }
+  if (anim.elapsed >= anim.duration) {
+    anim.completed = true;
+    clearBossIntro();
+    draw();
+  }
+}
+
+function skipBossIntro() {
+  if (!bossIntroActive() || document.hidden || state.helpOpen) return;
+  clearBossIntro();
+  draw();
+  canvas.focus?.();
+}
+
+function bossIntroScene() {
+  const anim = state && state.bossIntro;
+  if (!anim) return null;
+  const t = anim.elapsed, progress = defeatClamp(t / anim.duration);
+  const reveal = defeatClamp(t / 0.45), roar = defeatClamp((t - 0.45) / 0.7);
+  const fade = defeatClamp((t - anim.duration + 0.3) / 0.3);
+  return {
+    kind: anim.kind, label: anim.label, phase: anim.phase, accent: anim.accent,
+    sprite: anim.visual.sprite, scale: anim.visual.scale,
+    t, progress, hpRatio: anim.hpRatio,
+    alpha: reveal * (1 - fade), bannerAlpha: reveal * (1 - fade),
+    shake: Math.sin(t * 70) * 4 * (1 - roar) + Math.sin(t * 22) * 2 * roar,
+    zoom: 1 + roar * 0.16,
+    particles: Array.from({ length: 10 }, (_, i) => {
+      const angle = i / 10 * Math.PI * 2 + anim.kind.length * 0.13;
+      const radius = 40 + i * 9 + roar * 26;
+      return { x: 576 + Math.cos(angle) * radius, y: 318 + Math.sin(angle) * radius * 0.65,
+        alpha: (1 - fade) * (0.35 + 0.65 * roar), size: 3 + i % 3 };
+    }),
+  };
 }
 
 function playBossDefeatSound(kind) {
@@ -721,16 +1316,19 @@ function playBossDefeatSound(kind) {
 function startBossDefeat(m) {
   if (!m || !m.isBoss || state.gameOver || state.ending || state.bossDefeat) return;
   const isDragon = !!m.isDragon;
+  const kind = bossKind(m), meta = BOSS_ANIMATIONS[kind];
   const visual = monsterVisual(m);
+  clearBossIntro();
   clearMovementAnimation();
-  const kind = isDragon ? 'dragon' : 'mimic';
   state.bossDefeat = {
-    kind, elapsed: 0, phase: isDragon ? 'roar' : 'snap', completed: false,
-    duration: isDragon ? DRAGON_DEFEAT_DURATION : MIMIC_DEFEAT_DURATION,
+    kind, label: m.name, elapsed: 0, phase: isDragon ? 'roar' : meta.phases[0][1], completed: false,
+    duration: meta.defeat,
     frameId: null, lastTimestamp: null, events: new Set(),
     visual: { sprite: visual.sprite, scale: visual.scale, x: visual.x, y: visual.y,
       width: visual.width, height: visual.height, left: visual.left, right: visual.right,
       top: visual.top, bottom: visual.bottom, tileX: m.x, tileY: m.y },
+    guards: m.isThroneBoss ? state.monsters.filter(g => g.isGuard && g.hp > 0)
+      .map(g => ({ dx: (g.x - m.x) * TILE, dy: (g.y - m.y) * TILE })) : [],
   };
   clearMonsterSpeech();
   playBossDefeatSound(kind);
@@ -746,7 +1344,7 @@ function requestBossDefeatFrame(anim) {
 function bossDefeatFrame(timestamp, anim) {
   if (state.bossDefeat !== anim || anim.completed) return;
   anim.frameId = null;
-  if (document.hidden || state.helpOpen) {
+  if (document.hidden || state.helpOpen || state.consoleOpen) {
     anim.lastTimestamp = null;
     requestBossDefeatFrame(anim);
     return;
@@ -760,17 +1358,20 @@ function bossDefeatFrame(timestamp, anim) {
 
 function advanceBossDefeat(elapsed) {
   const anim = state && state.bossDefeat;
-  if (!anim || anim.completed || document.hidden || state.helpOpen) return;
+  if (!anim || anim.completed || document.hidden || state.helpOpen || state.consoleOpen) return;
   anim.elapsed = Math.min(anim.duration, anim.elapsed + Math.max(0, elapsed));
   anim.phase = bossDefeatPhase(anim);
-  const milestones = anim.kind === 'dragon' ? [[0.9, 'roar'], [1.8, 'fall']] : [[0.4, 'snap'], [0.9, 'coins']];
+  const milestones = anim.kind === 'dragon' ? [[0.9, 'roar'], [1.8, 'fall']]
+    : anim.kind === 'mimic' ? [[0.4, 'snap'], [0.9, 'coins']]
+      : BOSS_ANIMATIONS[anim.kind].phases;
   for (const [at, event] of milestones) {
     if (anim.elapsed < at || anim.events.has(event)) continue;
     anim.events.add(event);
     if (anim.kind === 'dragon' && event === 'roar') tone(72, 0.7, 'sawtooth', 0.34, 0, 'effects');
     else if (anim.kind === 'dragon') tone(98, 0.5, 'square', 0.22, 0, 'effects');
-    else if (event === 'snap') tone(160, 0.08, 'square', 0.34, 0, 'effects');
-    else tone(880, 0.1, 'triangle', 0.22, 0, 'effects');
+    else if (anim.kind === 'mimic' && event === 'snap') tone(160, 0.08, 'square', 0.34, 0, 'effects');
+    else if (anim.kind === 'mimic') tone(880, 0.1, 'triangle', 0.22, 0, 'effects');
+    else tone(event === 'crown' || event === 'shatter' || event === 'banish' ? 660 : 196, 0.18, 'triangle', 0.2, 0, 'effects');
   }
   if (anim.elapsed >= anim.duration) {
     anim.completed = true;
@@ -806,6 +1407,29 @@ function bossDefeatScene() {
       squash: fall * 0.55, rise: fall * 16, alpha: 1 - fade, coins,
       bannerAlpha: reveal * (1 - defeatClamp((t - 1.3) / 0.3)), bannerRise: reveal * 10 };
   }
+  if (anim.kind !== 'dragon') {
+    const meta = BOSS_ANIMATIONS[anim.kind] || BOSS_ANIMATIONS.mimic;
+    const reveal = defeatClamp((t - 0.2) / 0.3);
+    const fade = defeatClamp((t - anim.duration + 0.4) / 0.4);
+    const drop = defeatClamp((t - 0.5) / 1.2);
+    const particles = Array.from({ length: 12 }, (_, i) => {
+      const angle = i / 12 * Math.PI * 2 + anim.kind.length * 0.17;
+      const travel = Math.max(0, t - 0.35 - (i % 3) * 0.05);
+      const radius = 12 + travel * (38 + i % 4 * 8);
+      return { x: Math.cos(angle) * radius, y: Math.sin(angle) * radius * 0.6 - travel * 22 + travel * travel * 28,
+        alpha: 1 - defeatClamp(travel / 1.1), size: 3 + i % 4, spin: travel * (i % 2 ? 4 : -4) };
+    });
+    const crownShards = meta.motif === 'crown' ? Array.from({ length: 8 }, (_, i) => {
+      const angle = i / 8 * Math.PI * 2;
+      const travel = Math.max(0, t - 0.45);
+      return { x: Math.cos(angle) * (8 + travel * 46), y: -72 + Math.sin(angle) * 18 - travel * 16 + travel * travel * 22,
+        alpha: 1 - defeatClamp(travel / 1.2), size: 4 + i % 3, spin: travel * (i % 2 ? 5 : -5) };
+    }) : [];
+    return { kind: anim.kind, phase: anim.phase, t, progress, accent: meta.accent, motif: meta.motif,
+      shake: Math.sin(t * 78) * 4 * (1 - drop), squash: drop * 0.45, rise: drop * 12,
+      alpha: 1 - fade, particles, crownShards, guards: anim.guards || [],
+      bannerAlpha: reveal * (1 - defeatClamp((t - anim.duration + 0.3) / 0.3)), bannerRise: reveal * 10 };
+  }
   const fall = defeatClamp((t - 0.8) / 1);
   const flare = 1 - defeatClamp(t / 0.9);
   const fade = defeatClamp((t - 2) / 0.6);
@@ -821,7 +1445,7 @@ function bossDefeatScene() {
 }
 
 function movePlayer(dx, dy) {
-  if (state.gameOver || state.helpOpen || state.pause) return;
+  if (state.gameOver || state.helpOpen || state.pause || bossCinematicActive()) return;
   const p = state.player;
   const nx = p.x + dx, ny = p.y + dy;
   if (nx < 0 || ny < 0 || nx >= W || ny >= H) return;
@@ -833,6 +1457,7 @@ function movePlayer(dx, dy) {
   state.turn++;
   revealAroundPlayer();
   applyPlayerHazards();
+  checkBossIntro();
   render();
 }
 
@@ -880,7 +1505,7 @@ function recreateMonsters() {
     available.push({ x, y });
   }
   for (const spawn of state.monsterSpawns) {
-    if (spawn.isBoss && state.bossDefeated) continue;
+    if ((spawn.isBoss || spawn.isGuard) && state.bossDefeated) continue;
     const preferred = available.findIndex(t => (spawn.isBoss || !bossSpawnBuffer(t.x, t.y)) && t.x === spawn.x && t.y === spawn.y);
     const index = preferred >= 0 ? preferred : available.findIndex(t => spawn.isBoss ? bossSpawnBuffer(t.x, t.y) : !bossSpawnBuffer(t.x, t.y));
     if (index < 0) continue;
@@ -890,12 +1515,15 @@ function recreateMonsters() {
   state.boss = state.monsters.find(m => m.isBoss) || null;
 }
 
-function enterFloor(depth, fromBelow) {
+function enterFloor(depth, fromBelow, fresh = false) {
   if (depth < 1 || depth > FINAL_DEPTH) return;
+  clearBossIntro();
   clearBossDefeat();
+  state.bossIntroSeen = false;
+  state.bossSummonAt = state.activeTime + 4;
   saveFloor();
   state.depth = depth;
-  const floor = state.floors[depth];
+  const floor = fresh ? null : state.floors[depth];
   if (floor) {
     for (const field of FLOOR_FIELDS) state[field] = floor[field];
   } else {
@@ -915,7 +1543,9 @@ function descendStairs() {
   const p = state.player;
   if (p.x !== state.stairs.x || p.y !== state.stairs.y) return;
   if (state.depth === FINAL_DEPTH) { log('The dungeon ends here. Defeat the dragon, then rescue the princess.'); render(); return; }
-  if (state.depth === 5 && !state.bossDefeated) { log('The Mimic guards the stairs. Defeat it first!'); render(); return; }
+  if (bossGateAt(state.depth) && state.boss && !state.bossDefeated) {
+    log(`${state.boss.name} guards the stairs. Defeat it first!`); render(); return;
+  }
   if (!state.floorKey.collected) { log('The stairs are locked. A monster carries this floor’s key.'); render(); return; }
   saveFloor();
   const floor = state.floors[state.depth];
@@ -946,9 +1576,10 @@ function ascendStairs() {
 
 function merchantStock() {
   const stock = [];
-  const count = 3;
+  const count = Math.min(6, 3 + Math.floor(state.depth / 4));
   for (let i = 0; i < count; i++) {
-    const it = ITEM_TABLE[Math.floor(Math.random() * ITEM_TABLE.length)];
+    const pool = lootPool(state.depth).filter(it => it.kind !== 'spellbook' || !state.player.spells[it.spell]);
+    const it = pool[Math.floor(Math.random() * pool.length)];
     stock.push({ ...it, id: 100 + i });
   }
   return stock;
@@ -962,7 +1593,12 @@ function buyFromMerchant() {
   const m = merchantAt(p.x, p.y);
   if (!m || !m.stock || m.stock.length === 0) { log('Nothing for sale here.'); render(); return; }
   const it = m.stock[0];
-  const cost = Math.round(it.gold * 1.5);
+  if (it.kind === 'spellbook' && state.player.spells[it.spell]) {
+    log(`You already know ${SPELLS[it.spell].name}.`);
+    m.stock.shift(); render(); return;
+  }
+  const priceScale = 1.5 + Math.max(0, state.depth - 1) * 0.03;
+  const cost = Math.round(it.gold * priceScale);
   if (state.gold < cost) { log(`Not enough gold (${cost} needed).`); render(); return; }
   state.gold -= cost;
   m.stock.shift();
@@ -978,9 +1614,13 @@ function buyFromMerchant() {
   } else if (it.kind === 'elixir') {
     state.gold += it.gold;
     log(`Bought ${it.name}! +${it.gold} gold`);
+  } else if (it.kind === 'spellbook') {
+    learnSpell(it.spell);
+    log(`Bought ${it.name}!`);
   } else {
     log(`Bought ${it.name}!`);
   }
+  if (!m.stock.length) companionTalk('merchant');
   render();
 }
 function sellToMerchant() {
@@ -1019,6 +1659,7 @@ function rescuePrisoner() {
   const prisonerGold = 20 + state.depth * 5;
   state.gold += prisonerGold;
   log(`You rescue the prisoner! +30% HP, +${prisonerGold} gold.`);
+  companionTalk('rescue');
   state.bubble = { text: 'Thank you!', ttl: 90 };
   render();
 }
@@ -1039,6 +1680,7 @@ function rescuePrincess() {
   const princessGold = 40 + state.depth * 10;
   state.gold += princessGold;
   log(`You reach the princess. Your journey earns +${princessGold} gold.`);
+  companionTalk('rescue');
   state.bubble = null;
   saveFloor();
   gameOver(true);
@@ -1052,7 +1694,8 @@ function pickup() {
   if (key && key.drop && key.drop.x === p.x && key.drop.y === p.y) {
     key.collected = true; key.drop = null;
     saveFloor(); playSound('pickup');
-    log(state.depth === 5 && !state.bossDefeated ? 'Key collected! Defeat the Mimic to unlock the stairs.' : 'Key collected! This floor’s stairs are permanently unlocked.');
+    const gate = bossGateAt(state.depth) && state.boss && !state.bossDefeated;
+    log(gate ? `Key collected! Defeat ${state.boss.name} to unlock the stairs.` : 'Key collected! This floor’s stairs are permanently unlocked.');
     render(); return;
   }
   if (state.stairs && p.x === state.stairs.x && p.y === state.stairs.y) { descendStairs(); return; }
@@ -1085,6 +1728,9 @@ function pickup() {
   } else if (t.kind === 'elixir') {
     state.gold += t.gold;
     log(`${t.name}! +${t.gold} gold`);
+  } else if (t.kind === 'spellbook') {
+    learnSpell(t.spell);
+    log(`${t.name}!`);
   } else {
     state.gold += t.gold;
     log(`${t.name}! +${t.gold} gold`);
@@ -1100,6 +1746,7 @@ function storePotion(item) {
 function drinkPotion() {
   if (state.gameOver || state.helpOpen || (state.pause && state.pause.kind !== 'health')) return;
   const p = state.player;
+  if (state.godMode) { log('God mode holds your health steady; the potion stays stored.'); render(); return; }
   if (!state.inventory.length) { log('No potions stored.'); return; }
   if (p.hp >= p.maxHp) { log('Already at full health.'); return; }
   const potion = state.inventory.shift();
@@ -1113,10 +1760,16 @@ function drinkPotion() {
 function markCombat() {
   state.combatElapsed = 0;
   state.healElapsed = 0;
+  state.manaRegenAt = state.activeTime + 4;
 }
 
 function hurtPlayer(damage, message) {
   if (state.gameOver || state.helpOpen || state.pause) return;
+  if (state.godMode) {
+    markCombat();
+    log(`${message} (god mode blocks the damage)`);
+    return;
+  }
   markCombat();
   state.player.hp -= damage;
   log(message);
@@ -1126,7 +1779,8 @@ function hurtPlayer(damage, message) {
 }
 
 function checkHealth() {
-  if (state.gameOver || state.helpOpen) return;
+  freezePlayerStats();
+  if (state.gameOver || state.helpOpen || state.godMode) return;
   const ratio = state.player.hp / state.player.maxHp;
   if (ratio >= 0.2) state.warnedLow = false;
   if (ratio >= 0.1) state.warnedCritical = false;
@@ -1152,7 +1806,7 @@ function retreatRemaining() {
 }
 
 function advanceActiveTime(elapsed) {
-  if (!state.started || state.gameOver || state.helpOpen || state.pause || document.hidden) return;
+  if (!state.started || state.gameOver || state.helpOpen || state.consoleOpen || state.pause || document.hidden || bossCinematicActive()) return;
   state.activeTime += Math.max(0, elapsed);
   state.hazardTime += Math.max(0, elapsed);
   updateMonsterSpeech();
@@ -1176,6 +1830,7 @@ function confirmRetreat() {
   if (state.gameOver || state.helpOpen || !state.pause || state.pause.kind !== 'retreat' || retreatRemaining() > 0) return;
   state.retreatReadyAt = state.activeTime + RETREAT_COOLDOWN;
   state.pause = null;
+  companionTalk('retreat');
   if (state.depth > 1) enterFloor(state.depth - 1, true);
   else {
     state.player.x = state.upstairs.x; state.player.y = state.upstairs.y;
@@ -1193,6 +1848,8 @@ function confirmRetreat() {
 
 function recoveryTick(elapsed) {
   if (!state.started || state.gameOver || state.helpOpen || state.pause) return;
+  freezePlayerStats();
+  if (state.godMode) { state.combatElapsed += elapsed; return; }
   const before = state.combatElapsed;
   state.combatElapsed += elapsed;
   const p = state.player;
@@ -1232,21 +1889,70 @@ function renderPause() {
   }
 }
 
+function summonThroneGuards() {
+  const boss = state && state.boss;
+  if (!boss || !boss.isThroneBoss || boss.hp <= 0 || state.bossDefeated || state.activeTime < state.bossSummonAt) return;
+  state.bossSummonAt = state.activeTime + 6;
+  const room = state.rooms.find(r => r.isThroneRoom);
+  if (!room) return;
+  const alive = state.monsters.filter(m => m.isGuard && m.hp > 0).length;
+  const needed = Math.min(3 - alive, 2);
+  if (needed <= 0) return;
+  const template = MONSTER_TYPES.find(t => t.name === 'Skeleton') || MONSTER_TYPES[3];
+  const candidates = [];
+  for (const dx of [-6, 6]) for (const dy of [-4, -2, 2, 4]) {
+    const x = room.cx + dx, y = room.cy + dy;
+    if (state.map[y] && state.map[y][x] === 0 && !state.props.some(p => p.x === x && p.y === y)) candidates.push({ x, y });
+  }
+  let id = Math.max(0, ...state.monsters.map(m => m.id)) + 1;
+  let summoned = 0;
+  for (const tile of candidates) {
+    if (summoned >= needed) break;
+    if (tile.x === state.player.x && tile.y === state.player.y || state.monsters.some(m => m.hp > 0 && m.x === tile.x && m.y === tile.y)) continue;
+    const scale = 1 + (state.depth - 1) * 0.2, attackScale = 1 + (state.depth - 1) * 0.15;
+    state.monsters.push({ ...template, ...tile,
+      maxHp: Math.round(template.hp * scale), hp: Math.round(template.hp * scale),
+      atk: Math.round(template.atk * attackScale), def: template.def + Math.floor((state.depth - 1) / 2),
+      xp: Math.round(template.xp * (1 + (state.depth - 1) * 0.35)), gold: Math.round(5 * (1 + (state.depth - 1) * 0.35)),
+      id: id++, isGuard: true, nextAttackAt: state.activeTime });
+    summoned++;
+  }
+  if (summoned) {
+    log(`The Skeleton King summons ${summoned} skeletal guard${summoned === 1 ? '' : 's'}!`);
+    tone(82.41, 0.5, 'square', 0.24, 0, 'effects');
+  }
+}
+
 function enemyTick() {
   const now = Date.now();
   const elapsed = Math.min(0.5, Math.max(0, (now - state.lastTick) / 1000));
   state.lastTick = now;
-  if (!state.started || state.gameOver || state.helpOpen || state.pause || document.hidden || bossDefeatActive()) return;
+  freezePlayerStats();
+  if (!state.started || state.gameOver || state.helpOpen || state.consoleOpen || state.pause || document.hidden || bossCinematicActive()) return;
   checkHealth();
   if (state.pause) { render(); return; }
   advanceActiveTime(elapsed);
   musicTick();
   hazardTick();
   if (state.gameOver || state.helpOpen || state.pause) { render(); return; }
+  checkBossIntro();
+  if (bossIntroActive()) { render(); return; }
+  summonThroneGuards();
   const p = state.player;
+  regenMana();
+  companionTick();
   if (state.bubble && state.bubble.ttl > 0) state.bubble.ttl--;
   for (const m of state.monsters) {
     if (m.hp <= 0) continue;
+    const attackRange = m.ranged ? m.range : m.magic ? m.magicRange : 0;
+    if (attackRange) {
+      const distance = Math.max(Math.abs(p.x - m.x), Math.abs(p.y - m.y));
+      if (distance <= attackRange && hasLineOfSight(m.x, m.y, p.x, p.y)) {
+        enemyAttack(m);
+        if (state.gameOver || state.helpOpen || state.pause) { render(); return; }
+        continue;
+      }
+    }
     if (Math.random() < 0.6) {
       const dx = Math.sign(p.x - m.x), dy = Math.sign(p.y - m.y);
       const options = [];
@@ -1272,6 +1978,18 @@ function enemyTick() {
 }
 
 function drawFloorDetails() {
+  const themed = THEMED_FLOORS[state.depth];
+  if (themed) {
+    const arena = state.rooms.find(r => r.isArena);
+    if (arena) for (const [ox, oy] of [[-4, -3], [4, 3]]) {
+      const x = arena.cx + ox, y = arena.cy + oy;
+      if (inRenderCamera(x, y) && state.visited.has(`${x},${y}`)) drawSprite(themed.prop, x * TILE + TILE / 2, y * TILE + TILE / 2, 2);
+    }
+  }
+  for (const prop of state.props) {
+    if (!inRenderCamera(prop.x, prop.y) || !state.visited.has(`${prop.x},${prop.y}`)) continue;
+    drawSprite(prop.sprite, prop.x * TILE + TILE / 2, prop.y * TILE + TILE / 2, 2);
+  }
   for (const obstacle of state.obstacles) {
     if (!inRenderCamera(obstacle.x, obstacle.y) || !state.visited.has(`${obstacle.x},${obstacle.y}`)) continue;
     drawSprite(obstacle.type, obstacle.x * TILE + TILE / 2, obstacle.y * TILE + TILE / 2, 2);
@@ -1328,8 +2046,9 @@ function drawMimicDefeat(scene) {
   ctx.globalAlpha = scene.bannerAlpha;
   ctx.font = 'bold 18px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   const y = visual.top - 28 - scene.bannerRise;
-  ctx.strokeStyle = '#14110e'; ctx.lineWidth = 4; ctx.strokeText('MIMIC DEFEATED', visual.x, y);
-  ctx.fillStyle = '#ffdf8a'; ctx.fillText('MIMIC DEFEATED', visual.x, y);
+  const label = `${(state.bossDefeat.label || 'Mimic').toUpperCase()} DEFEATED`;
+  ctx.strokeStyle = '#14110e'; ctx.lineWidth = 4; ctx.strokeText(label, visual.x, y);
+  ctx.fillStyle = '#ffdf8a'; ctx.fillText(label, visual.x, y);
   ctx.restore();
 }
 
@@ -1374,9 +2093,195 @@ function drawDragonDefeat(scene) {
   ctx.restore();
 }
 
+function drawBossDefeat(scene) {
+  const anim = state.bossDefeat;
+  const visual = anim.visual;
+  if (!inRenderCamera(visual.tileX, visual.tileY)) return;
+  ctx.save();
+  ctx.globalAlpha = scene.alpha;
+  ctx.translate(visual.x + scene.shake, visual.y + scene.rise);
+  ctx.scale(1 + scene.squash * 0.22, 1 - scene.squash);
+  drawSprite(visual.sprite, 0, 0, visual.scale);
+  ctx.restore();
+  ctx.save();
+  ctx.globalAlpha = scene.alpha;
+  ctx.translate(visual.x, visual.y);
+  ctx.strokeStyle = scene.accent; ctx.fillStyle = scene.accent; ctx.lineWidth = 3;
+  if (scene.motif === 'heads') {
+    for (let i = 0; i < 3; i++) {
+      const swing = Math.sin(scene.t * 6 + i * 2) * 10;
+      ctx.beginPath(); ctx.arc((i - 1) * 26 + swing, -54 - i * 8, 9, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.moveTo((i - 1) * 26 + swing, -45 - i * 8); ctx.lineTo((i - 1) * 30 + swing, -22); ctx.stroke();
+    }
+  } else if (scene.motif === 'tusks') {
+    for (const side of [-1, 1]) {
+      ctx.beginPath(); ctx.moveTo(side * 18, -8); ctx.quadraticCurveTo(side * 40, -22, side * 34, -48); ctx.stroke();
+    }
+    for (let i = 0; i < 5; i++) ctx.fillRect(-60 + i * 26 + scene.t * 14 % 26, 32 + (i % 2) * 7, 12, 5);
+  } else if (scene.motif === 'snakes') {
+    for (let i = 0; i < 6; i++) {
+      const a = i / 6 * Math.PI * 2 + scene.t;
+      ctx.beginPath(); ctx.moveTo(Math.cos(a) * 12, -48 + Math.sin(a) * 6);
+      ctx.quadraticCurveTo(Math.cos(a + 1) * 34, -70, Math.cos(a + 2) * 42, -52); ctx.stroke();
+    }
+  } else if (scene.motif === 'runes') {
+    ctx.font = 'bold 15px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    for (let i = 0; i < 6; i++) {
+      const a = i / 6 * Math.PI * 2 + scene.t;
+      ctx.strokeRect(Math.cos(a) * 46 - 7, -36 + Math.sin(a) * 30 - 8, 14, 16);
+      ctx.fillText('✦', Math.cos(a) * 46, -36 + Math.sin(a) * 30);
+    }
+  } else if (scene.motif === 'crown') {
+    ctx.beginPath(); ctx.moveTo(-24, -62); ctx.lineTo(-18, -84); ctx.lineTo(-6, -70); ctx.lineTo(0, -90);
+    ctx.lineTo(6, -70); ctx.lineTo(18, -84); ctx.lineTo(24, -62); ctx.closePath(); ctx.stroke();
+    for (let i = 0; i < 5; i++) ctx.fillRect((i - 2) * 19, 36 + (i % 2) * 9, 10, 6);
+  } else if (scene.motif === 'pans') {
+    for (let i = 0; i < 4; i++) {
+      const a = i / 4 * Math.PI * 2 + scene.t * 2;
+      ctx.beginPath(); ctx.arc(Math.cos(a) * 42, -28 + Math.sin(a) * 24, 9, 0, Math.PI * 2); ctx.stroke();
+      ctx.fillRect(Math.cos(a + 0.6) * 56, -28 + Math.sin(a + 0.6) * 34, 7, 7);
+    }
+  } else if (scene.motif === 'mugs') {
+    for (let i = 0; i < 5; i++) {
+      const x = (i - 2) * 22 + Math.sin(scene.t * 5 + i) * 6;
+      ctx.strokeRect(x - 6, -50 - i * 5, 12, 17);
+      ctx.fillRect(x - 5, -55 - i * 5, 10, 5);
+    }
+  }
+  if (scene.motif === 'crown') {
+    for (const shard of scene.crownShards || []) {
+      ctx.globalAlpha = scene.alpha * shard.alpha;
+      ctx.save(); ctx.translate(shard.x, shard.y); ctx.rotate(shard.spin);
+      ctx.fillRect(-shard.size / 2, -shard.size / 2, shard.size, shard.size);
+      ctx.restore();
+    }
+    const fall = defeatClamp((scene.t - 0.7) / 1.2);
+    for (const guard of scene.guards || []) {
+      ctx.globalAlpha = scene.alpha;
+      ctx.save(); ctx.translate(guard.dx, guard.dy + fall * 10); ctx.rotate(fall * (guard.dx > 0 ? 1.1 : -1.1));
+      ctx.fillStyle = '#d8d3c1'; ctx.fillRect(-5, -18, 10, 14); ctx.fillRect(-8, -4, 16, 4);
+      ctx.fillStyle = '#131b26'; ctx.fillRect(-3, -14, 2, 3); ctx.fillRect(1, -14, 2, 3);
+      ctx.restore();
+    }
+  }
+  for (const particle of scene.particles) {
+    ctx.globalAlpha = scene.alpha * particle.alpha;
+    ctx.save(); ctx.translate(particle.x, particle.y); ctx.rotate(particle.spin);
+    ctx.fillRect(-particle.size / 2, -particle.size / 2, particle.size, particle.size);
+    ctx.restore();
+  }
+  ctx.restore();
+  ctx.save();
+  ctx.globalAlpha = scene.bannerAlpha;
+  ctx.font = 'bold 18px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  const y = visual.top - 28 - scene.bannerRise;
+  const label = `${(anim.label || 'Boss').toUpperCase()} DEFEATED`;
+  ctx.strokeStyle = '#14110e'; ctx.lineWidth = 4; ctx.strokeText(label, visual.x, y);
+  ctx.fillStyle = '#ffdf8a'; ctx.fillText(label, visual.x, y);
+  ctx.restore();
+}
+
+function drawBossIntro(scene) {
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalAlpha = scene.alpha;
+  ctx.fillStyle = 'rgba(6, 8, 16, 0.66)'; ctx.fillRect(0, 0, 1152, 768);
+  const glow = ctx.createRadialGradient(576, 318, 20, 576, 318, 260);
+  glow.addColorStop(0, `${scene.accent}88`); glow.addColorStop(1, `${scene.accent}00`);
+  ctx.fillStyle = glow; ctx.fillRect(316, 58, 520, 520);
+  for (const particle of scene.particles) {
+    ctx.globalAlpha = scene.alpha * particle.alpha;
+    ctx.fillStyle = scene.accent;
+    ctx.fillRect(particle.x, particle.y, particle.size, particle.size);
+  }
+  ctx.globalAlpha = scene.alpha;
+  ctx.save();
+  ctx.translate(576 + scene.shake, 336);
+  ctx.scale(scene.zoom, scene.zoom);
+  const meta = BOSS_ANIMATIONS[scene.kind] || BOSS_ANIMATIONS.mimic;
+  if (meta.motif === 'heads') {
+    for (let i = -1; i <= 1; i++) {
+      ctx.save(); ctx.translate(i * 42, -58 - Math.abs(i) * 12); ctx.rotate(i * 0.28);
+      drawSprite(scene.sprite, 0, 0, scene.scale); ctx.restore();
+    }
+  } else {
+    drawSprite(scene.sprite, 0, 0, scene.scale);
+  }
+  ctx.restore();
+  ctx.globalAlpha = scene.bannerAlpha;
+  ctx.fillStyle = '#0a0c13'; ctx.fillRect(176, 600, 800, 112);
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = scene.accent; ctx.font = 'bold 38px Georgia, serif';
+  ctx.fillText(scene.label.toUpperCase(), 576, 634);
+  ctx.fillStyle = '#333'; ctx.fillRect(276, 664, 600, 16);
+  ctx.fillStyle = '#ff5563'; ctx.fillRect(276, 664, 600 * scene.hpRatio, 16);
+  ctx.restore();
+}
+
+function projectilePoint(projectile) {
+  const t = Math.max(0, Math.min(1, projectile.elapsed / projectile.duration));
+  return { x: projectile.fromX + (projectile.toX - projectile.fromX) * t,
+    y: projectile.fromY + (projectile.toY - projectile.fromY) * t - Math.sin(t * Math.PI) * 12, t };
+}
+
+function drawProjectiles() {
+  for (const projectile of state.motion.projectiles) {
+    if (!projectileVisible(projectile)) continue;
+    const point = projectilePoint(projectile);
+    const angle = Math.atan2(projectile.toY - projectile.fromY, projectile.toX - projectile.fromX);
+    ctx.save();
+    ctx.translate(point.x, point.y);
+    if (projectile.kind === 'stinger') {
+      ctx.rotate(angle + Math.PI / 2);
+      ctx.fillStyle = '#f3d891';
+      ctx.beginPath(); ctx.moveTo(0, -7); ctx.lineTo(4, 5); ctx.lineTo(-4, 5); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#131b26'; ctx.fillRect(-1, 1, 2, 4);
+    } else if (projectile.kind === 'arrow') {
+      ctx.rotate(angle);
+      ctx.strokeStyle = '#74513a'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(-9, 0); ctx.lineTo(7, 0); ctx.stroke();
+      ctx.fillStyle = '#e8e3cf';
+      ctx.beginPath(); ctx.moveTo(10, 0); ctx.lineTo(5, -3); ctx.lineTo(5, 3); ctx.closePath(); ctx.fill();
+    } else if (projectile.kind === 'beer') {
+      ctx.fillStyle = '#a3764b'; ctx.fillRect(-5, -6, 10, 12);
+      ctx.fillStyle = '#f3e9cd'; ctx.fillRect(-5, -7, 10, 3);
+      ctx.strokeStyle = '#f3e9cd'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(7, 0, 4, -1.2, 1.2); ctx.stroke();
+    } else if (projectile.kind === 'fireball') {
+      ctx.fillStyle = `rgba(255, 140, 50, ${1 - point.t * 0.3})`;
+      ctx.beginPath(); ctx.arc(0, 0, 6, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ffe4ac'; ctx.beginPath(); ctx.arc(0, 0, 3, 0, Math.PI * 2); ctx.fill();
+    } else if (projectile.kind === 'bone') {
+      ctx.rotate(angle);
+      ctx.fillStyle = '#e8e3cf';
+      ctx.fillRect(-9, -2, 14, 4);
+      ctx.beginPath(); ctx.arc(-9, -3, 3, 0, Math.PI * 2); ctx.arc(-9, 3, 3, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(6, -3, 3, 0, Math.PI * 2); ctx.arc(6, 3, 3, 0, Math.PI * 2); ctx.fill();
+    } else if (projectile.kind === 'frost') {
+      ctx.rotate(angle);
+      ctx.fillStyle = '#a8d2cd';
+      ctx.beginPath(); ctx.moveTo(10, 0); ctx.lineTo(0, -5); ctx.lineTo(-8, 0); ctx.lineTo(0, 5); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#e8e3cf'; ctx.fillRect(-3, -1, 8, 2);
+    } else if (projectile.kind === 'heal') {
+      const rise = point.t * 18;
+      ctx.fillStyle = '#a8d2cd';
+      for (let i = 0; i < 4; i++) {
+        const a = i * Math.PI / 2 + point.t * 3;
+        ctx.fillRect(Math.cos(a) * 8 - 1, Math.sin(a) * 8 - rise, 3, 3);
+      }
+      ctx.fillStyle = '#e8e3cf'; ctx.fillRect(-2, -2 - rise, 4, 4);
+    } else {
+      ctx.fillStyle = '#9ab4ff'; ctx.beginPath(); ctx.arc(0, 0, 5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#e8e3cf'; ctx.beginPath(); ctx.arc(0, 0, 2, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.restore();
+  }
+}
+
 function draw() {
   if (state.ending) { drawEnding(); return; }
   const defeat = state.bossDefeat ? bossDefeatScene() : null;
+  const intro = state.bossIntro ? bossIntroScene() : null;
   const p = state.player;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   updateCamera();
@@ -1462,11 +2367,15 @@ function draw() {
   ctx.save(); ctx.translate(px, py);
   drawActorSprite('knight', 0, 0, 2, p);
   ctx.restore();
+  drawCompanion();
+  drawProjectiles();
   drawMonsterSpeech();
   drawHazardWarnings();
   if (defeat && defeat.kind === 'mimic') drawMimicDefeat(defeat);
+  else if (defeat && defeat.kind !== 'dragon') drawBossDefeat(defeat);
   ctx.restore();
   if (defeat && defeat.kind === 'dragon') drawDragonDefeat(defeat);
+  if (intro) drawBossIntro(intro);
   requestMotionFrame();
 }
 
@@ -1493,6 +2402,7 @@ function startEnding() {
   const dragon = state.boss || state.monsterSpawns.find(m => m.isDragon);
   state.ending = { elapsed: 0, phase: 'reveal', completed: false, frameId: null,
     lastTimestamp: null, events: new Set(), dragon: { ...dragon, hp: 0 } };
+  clearBossIntro();
   clearBossDefeat();
   clearMonsterSpeech();
   clearMovementAnimation();
@@ -1518,7 +2428,7 @@ function stopEndingAnimation() {
 function endingFrame(timestamp, ending) {
   if (state.ending !== ending || ending.completed) return;
   ending.frameId = null;
-  if (document.hidden || state.helpOpen) {
+  if (document.hidden || state.helpOpen || state.consoleOpen) {
     ending.lastTimestamp = null;
     requestEndingFrame(ending);
     return;
@@ -1532,7 +2442,7 @@ function endingFrame(timestamp, ending) {
 
 function advanceEnding(elapsed, silent = false) {
   const ending = state.ending;
-  if (!ending || ending.completed || document.hidden || state.helpOpen) return;
+  if (!ending || ending.completed || document.hidden || state.helpOpen || state.consoleOpen) return;
   ending.elapsed = Math.min(ENDING_DURATION, ending.elapsed + Math.max(0, elapsed));
   ending.phase = endingPhase(ending.elapsed);
   const milestones = [
@@ -1749,6 +2659,7 @@ function playSound(name) {
   const notes = {
     slash: [180, 90], hit: [90, 65], heal: [330, 440, 660],
     death: [220, 165, 110, 55], pickup: [440, 660], stairs: [220, 330, 440],
+    shoot: [520, 300], magic: [294, 392, 587],
   }[name] || [];
   notes.forEach((note, i) => tone(note, 0.12, name === 'slash' ? 'sawtooth' : 'square', 0.3, i * 0.09));
 }
@@ -1784,9 +2695,13 @@ function setAudioVolume(channel, percent) {
 function objectiveText() {
   if (state.ending) return endingCaption();
   let campaign;
-  if (!state.floors[5] || !state.floors[5].bossDefeated) campaign = 'Defeat the Mimic at depth 5 to unlock the lower dungeon.';
-  else if (!state.floors[FINAL_DEPTH] || !state.floors[FINAL_DEPTH].bossDefeated) campaign = 'Defeat the dragon at depth 10.';
-  else campaign = 'Rescue the princess at depth 10 — stand on her tile and press Space.';
+  if (state.boss && bossGateAt(state.depth) && !state.bossDefeated) {
+    campaign = `Defeat ${state.boss.name} here to unlock the stairs.`;
+  } else {
+    const finalCleared = state.floors[FINAL_DEPTH] && state.floors[FINAL_DEPTH].bossDefeated;
+    campaign = finalCleared ? `Rescue the princess at depth ${FINAL_DEPTH} — stand on her tile and press Space.`
+      : `Descend toward depth ${FINAL_DEPTH}.`;
+  }
   if (state.floorKey && !state.floorKey.collected) return `${state.floorKey.drop ? 'Collect the dropped floor key (Space).' : 'Find the hidden key carrier.'} ${campaign}`;
   return campaign;
 }
@@ -1814,6 +2729,10 @@ function renderEquipment() {
   document.getElementById('heroAttack').textContent = effectiveAtk();
   document.getElementById('heroDefense').textContent = effectiveDef();
   document.getElementById('heroDexterity').textContent = effectiveDex();
+  document.getElementById('spellList').textContent = Object.keys(SPELLS)
+    .filter(name => state.player.spells[name])
+    .map(name => `${SPELLS[name].key} ${SPELLS[name].name}`)
+    .join(' · ');
 }
 
 function renderMinimap() {
@@ -1845,8 +2764,110 @@ function renderMinimap() {
 function resetHelpClock() {
   state.lastTick = Date.now();
   if (state.ending) state.ending.lastTimestamp = null;
+  if (state.bossIntro) state.bossIntro.lastTimestamp = null;
   if (state.bossDefeat) state.bossDefeat.lastTimestamp = null;
   state.motion.lastTimestamp = null;
+}
+
+function consoleMessage(text) {
+  state.consoleLines.push(String(text));
+  if (state.consoleLines.length > 8) state.consoleLines.shift();
+  document.getElementById('consoleOutput').textContent = state.consoleLines.join('\n');
+}
+
+function openConsole() {
+  if (state.consoleOpen || state.helpOpen) return;
+  state.consoleOpen = true;
+  state.consoleLines = [];
+  state.consoleHistoryIndex = state.consoleHistory.length;
+  document.getElementById('devConsole').hidden = false;
+  const input = document.getElementById('consoleInput');
+  input.value = '';
+  consoleMessage('Commands: loadLevel <1-100> · godMode 0|1 · help · clear');
+  stopMotionAnimation();
+  input.focus?.();
+}
+
+function closeConsole() {
+  if (!state.consoleOpen) return;
+  state.consoleOpen = false;
+  document.getElementById('devConsole').hidden = true;
+  state.lastTick = Date.now();
+  if (state.ending) state.ending.lastTimestamp = null;
+  if (state.bossIntro) state.bossIntro.lastTimestamp = null;
+  if (state.bossDefeat) state.bossDefeat.lastTimestamp = null;
+  stopMotionAnimation(); requestMotionFrame();
+  (state.started ? canvas : document.getElementById('startGame')).focus?.();
+}
+
+function toggleConsole() {
+  if (state.consoleOpen) closeConsole(); else openConsole();
+}
+
+function loadLevel(raw) {
+  const depth = Number(raw);
+  if (!Number.isInteger(depth) || depth < 1 || depth > FINAL_DEPTH) {
+    consoleMessage(`Usage: loadLevel <1-${FINAL_DEPTH}>`);
+    return;
+  }
+  if (!state.started) startGame();
+  clearBossIntro();
+  clearBossDefeat();
+  clearMonsterSpeech();
+  stopEndingAnimation();
+  clearMovementAnimation();
+  state.ending = null;
+  state.gameOver = false;
+  state.won = false;
+  state.pause = null;
+  state.bossIntroSeen = false;
+  state.player.hp = state.player.maxHp;
+  state.player.mp = state.player.maxMp;
+  state.combatElapsed = 0;
+  state.healElapsed = 0;
+  state.manaRegenAt = state.activeTime;
+  state.lastTick = Date.now();
+  enterFloor(depth, false, true);
+  log(`Cheat: loaded depth ${depth}.`);
+  consoleMessage(`Loaded depth ${depth} (${state.biome})${state.boss ? ` — ${state.boss.name}` : ''}.`);
+  render();
+}
+
+function setGodMode(raw) {
+  const value = String(raw ?? '').toLowerCase();
+  const enabled = value === '1' || value === 'on' || value === 'true' ? true
+    : value === '0' || value === 'off' || value === 'false' ? false
+      : value === '' ? !state.godMode : null;
+  if (enabled === null) { consoleMessage('Usage: godMode 0|1'); return; }
+  if (enabled && !state.godMode) state.godModeStats = snapshotPlayerStats();
+  if (!enabled) state.godModeStats = null;
+  state.godMode = enabled;
+  freezePlayerStats();
+  consoleMessage(`God mode ${state.godMode ? 'enabled' : 'disabled'}; hero stats are frozen.`);
+  render();
+}
+
+function submitConsole() {
+  const input = document.getElementById('consoleInput');
+  const text = input.value.trim();
+  input.value = '';
+  if (!text) return;
+  if (!state.consoleHistory.length || state.consoleHistory[state.consoleHistory.length - 1] !== text) state.consoleHistory.push(text);
+  state.consoleHistoryIndex = state.consoleHistory.length;
+  consoleMessage(`> ${text}`);
+  const [name, ...args] = text.split(/\s+/);
+  const command = name.toLowerCase();
+  if (command === 'loadlevel') loadLevel(args[0]);
+  else if (command === 'godmode') setGodMode(args[0]);
+  else if (command === 'clear') { state.consoleLines = []; document.getElementById('consoleOutput').textContent = ''; }
+  else if (command === 'help') consoleMessage('loadLevel <1-100> · godMode 0|1 · help · clear');
+  else consoleMessage(`Unknown command: ${name}`);
+}
+
+function consoleHistoryStep(delta) {
+  if (!state.consoleHistory.length) return;
+  state.consoleHistoryIndex = Math.max(0, Math.min(state.consoleHistory.length, state.consoleHistoryIndex + delta));
+  document.getElementById('consoleInput').value = state.consoleHistory[state.consoleHistoryIndex] || '';
 }
 
 function openHelp() {
@@ -1882,6 +2903,7 @@ function toggleHelp() {
 }
 
 function render() {
+  freezePlayerStats();
   checkHealth();
   renderPause();
   const p = state.player;
@@ -1889,6 +2911,8 @@ function render() {
   renderMinimap();
   document.getElementById('hpText').textContent = `${p.hp}/${p.maxHp}`;
   document.getElementById('hpfill').style.width = (100 * p.hp / p.maxHp) + '%';
+  document.getElementById('mpText').textContent = `${p.mp}/${p.maxMp}`;
+  document.getElementById('mpfill').style.width = (100 * p.mp / p.maxMp) + '%';
   document.getElementById('lvl').textContent = p.lvl;
   document.getElementById('xpfill').style.width = (100 * p.xp / p.xpNext) + '%';
   document.getElementById('depth').textContent = state.depth;
@@ -1899,6 +2923,9 @@ function render() {
   document.getElementById('keyStatus').textContent = !state.floorKey ? '—' : state.floorKey.collected ? 'Unlocked' : state.floorKey.drop ? 'Dropped' : 'Missing';
   document.getElementById('posText').textContent = `${p.x + 1},${p.y + 1}`;
   document.getElementById('retreatStatus').textContent = retreatRemaining() > 0 ? `${Math.ceil(retreatRemaining())}s` : 'Ready';
+  document.getElementById('companionStat').hidden = !state.companion;
+  document.getElementById('companionName').textContent = state.companion ? state.companion.name : '';
+  document.getElementById('godModeStat').hidden = !state.godMode;
   const objective = objectiveText();
   if (document.getElementById('objective').textContent !== objective) document.getElementById('objective').textContent = objective;
   for (const channel of ['music', 'effects']) {
@@ -1919,6 +2946,25 @@ function render() {
 
 document.addEventListener('keydown', e => {
   const k = e.key.toLowerCase();
+  const consoleInput = document.getElementById('consoleInput');
+  if (state.consoleOpen) {
+    if (k === '`' || k === '~' || k === 'escape') { e.preventDefault(); closeConsole(); return; }
+    if (e.target === consoleInput) {
+      if (k === 'enter') { e.preventDefault(); submitConsole(); }
+      else if (k === 'arrowup') { e.preventDefault(); consoleHistoryStep(-1); }
+      else if (k === 'arrowdown') { e.preventDefault(); consoleHistoryStep(1); }
+      else if (k === 'tab') { e.preventDefault(); document.getElementById('consoleClose').focus?.(); }
+      return;
+    }
+    e.preventDefault();
+    if (k === 'enter' || k === 'tab') consoleInput.focus?.();
+    return;
+  }
+  if (k === '`' || k === '~') {
+    e.preventDefault();
+    if (!e.repeat) toggleConsole();
+    return;
+  }
   if (k === '?') {
     e.preventDefault();
     if (!e.repeat) toggleHelp();
@@ -1951,8 +2997,10 @@ document.addEventListener('keydown', e => {
   startAudio();
   if (k === 'm') { toggleAudio(); return; }
   if (k === 'r') { restartFromEnding(); return; }
-  if (bossDefeatActive()) {
-    if (k === 'escape' && !e.repeat) skipBossDefeat();
+  if (bossCinematicActive()) {
+    if (k === 'escape' && !e.repeat) {
+      if (bossIntroActive()) skipBossIntro(); else skipBossDefeat();
+    }
     return;
   }
   if (state.ending) {
@@ -1982,11 +3030,18 @@ document.addEventListener('keydown', e => {
   else if (k === 'x') sellToMerchant();
   else if (k === 'q' || k === 'backspace') ascendStairs();
   else if (k === 'enter') retreat();
+  else if (k === 'e') shootBow();
+  else if (k === 'f') castSpell('fireball');
+  else if (k === 'g') castSpell('heal');
+  else if (k === 'v') castSpell('frostbolt');
+  else if (k === 'b') castSpell('greaterHeal');
+  else if (k === 'z') castSpell('magicBarrier');
 });
 
 document.addEventListener('visibilitychange', () => {
   state.lastTick = Date.now();
   if (state.ending) state.ending.lastTimestamp = null;
+  if (state.bossIntro) state.bossIntro.lastTimestamp = null;
   if (state.bossDefeat) state.bossDefeat.lastTimestamp = null;
   stopMotionAnimation(); requestMotionFrame();
 });
@@ -1994,7 +3049,7 @@ document.addEventListener('visibilitychange', () => {
 for (const [id, action] of [
   ['skipEnding', skipEnding], ['restartEnding', restartFromEnding], ['startGame', startGame], ['drinkPotion', drinkPotion], ['continueGame', continueGame], ['retreatChoice', retreat],
   ['confirmRetreat', confirmRetreat], ['cancelRetreat', cancelRetreat], ['audioToggle', toggleAudio],
-  ['helpToggle', toggleHelp], ['closeHelp', closeHelp],
+  ['helpToggle', toggleHelp], ['closeHelp', closeHelp], ['consoleClose', closeConsole],
 ]) document.getElementById(id).addEventListener('click', () => { startAudio(); action(); });
 
 for (const channel of ['music', 'effects']) {

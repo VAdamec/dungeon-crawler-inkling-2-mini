@@ -13,9 +13,9 @@ Local LLM playground, tooks ~30h to get to v0.11.0 with "better" graphics
 - gemma
 
 
-A plain HTML5 canvas dungeon game, version 0.12.0. Open `index.html` directly in a browser (`file://`); there is no install, build step, server, or network dependency.
+A plain HTML5 canvas dungeon game, version 0.16.2. Open `index.html` directly in a browser (`file://`); there is no install, build step, server, or network dependency.
 
-The fantasy logo and version appear on the launch screen only. Click **Enter the dungeon** or press a key to begin; the game waits until you start. During play, stats sit at the top and a scrolling adventure log sits to the left of the map, and equipment with icons and bonuses sits to its right. On narrow screens the log moves below the map. R starts a fresh run without showing the launch screen again; reloading the page shows it.
+The fantasy logo and version appear on the launch screen only. Click **Enter the dungeon** or press a key to begin; the game waits until you start. During play, stats sit at the top; Hero stats and Spells sit above a half-height adventure log on the left of the map, and the floor chart with equipment sits to the right. On narrow screens the left and right panels stack below the map. R starts a fresh run without showing the launch screen again; reloading the page shows it.
 
 ## Screenshots
 
@@ -56,6 +56,7 @@ Movement now eases between tiles with walking poses. Bats and the dragon flap th
 | Space | Collect a key/item, buy the first merchant item, rescue an NPC, or use the staircase under you |
 | Q / Backspace | Ascend while standing on ▲ |
 | H | Drink a stored potion |
+| F / G / V / B / Z | Cast Fireball, Heal, Frostbolt, Greater Heal, or Magic Barrier if learned (each costs MP) |
 | X | Sell all equipped gear while standing on the merchant |
 | Enter | Request retreat during normal play |
 | C / Escape | Continue from a health pause |
@@ -65,6 +66,9 @@ Movement now eases between tiles with walking poses. Bats and the dragon flap th
 | Y | Confirm a retreat; N / Escape cancels |
 | M | Toggle music and effects |
 | R | Restart the run |
+| ~ / ` | Open or close the developer console (pauses play) |
+
+The developer console accepts `loadLevel <1-100>` to generate a fresh target floor (including boss floors) and `godMode 0|1` to freeze the hero's HP, MP, level, XP, and combat stats while leaving monsters fully active and one-shot killable by player attacks. `help` and `clear` are also available; `godMode` is shown in the HUD while active.
 
 Dialog buttons also work with mouse or Tab and Enter/Space.
 
@@ -100,13 +104,13 @@ Hazards stay off arrivals/stairs and their surrounding three tiles, as well as i
 
 ## Campaign and combat
 
-The objective below the HUD tracks a ten-floor campaign:
+The objective below the HUD tracks a 100-floor campaign. Bosses guard depths 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, and 100; the HUD names only the boss on your current floor, keeping later encounters a surprise. Find each floor’s hidden key carrier to descend, defeat the resident boss where one guards the stairs, then reach depth 100. The final dragon’s death unlocks the princess; stand on her and press Space to watch the animated ending. Boss rewards and defeat flags cannot be collected twice, while ordinary monsters still respawn. Merchants appear on every even non-boss floor and prisoners on even floors.
 
-1. Find each floor’s key to descend. At depth 5, also defeat the Mimic to unlock the lower dungeon.
-2. Reach depth 10 and defeat the dragon. Its death unlocks the princess rescue; the game continues.
-3. Stand on the princess and press Space to complete the campaign and watch the animated ending. Esc skips it; R restarts.
+Hero level stops at 100; further kills do not add XP or raise the cap.
 
-The princess appears only at depth 10, and there is no depth 11. Defeated bosses stay defeated when you return, and their kill rewards cannot be collected twice. Ordinary monsters still respawn. Merchants appear at depths 2–4 and prisoners on even non-boss floors.
+MP slowly returns after four seconds without combat if no monster is within three tiles. The Magic Barrier tome adds a spell that pushes a visible foe three tiles away; if a wall or another monster blocks the path, it slams into the obstruction for extra damage instead.
+
+Defeated bosses become tiny companions. A companion follows the hero, deals 1 damage to nearby visible enemies every few seconds, and offers dry commentary on traps, retreats, shopping sprees, and rescued prisoners. The HUD names the active companion, and its remarks are also written to the adventure log.
 
 Combat remains real time. Each enemy shares a 0.8-second cooldown between retaliation and timed attacks, including dodges; different enemies can attack independently. Late-floor HP and attack scaling are gentler than before, while XP and gold progression are retained. Use gear, stored potions, retreat, and safe rest to prepare for the final encounter.
 

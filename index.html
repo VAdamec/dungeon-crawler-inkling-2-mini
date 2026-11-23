@@ -26,7 +26,7 @@
       <path d="M70 231h180" stroke="#9d783d" stroke-width="2"/>
     </svg>
     <h1 id="launchTitle"><span>Dungeon</span><span>Crawler</span></h1>
-    <p class="launch-tagline">Ten floors. One dragon. A princess to save.</p>
+    <p class="launch-tagline">A hundred floors. A legion of bosses. One princess to save.</p>
     <button id="startGame" type="button">Enter the dungeon <span aria-hidden="true">◆</span></button>
     <p class="launch-hint">Press any key to begin</p>
     <p id="launchVersion" class="launch-version"></p>
@@ -36,6 +36,8 @@
 <div id="hud">
   <div class="stat">HP <b id="hpText"></b></div>
   <div id="hpbar"><div id="hpfill"></div></div>
+  <div class="stat">MP <b id="mpText"></b></div>
+  <div id="mpbar"><div id="mpfill"></div></div>
   <div class="stat">Lv <b id="lvl"></b></div>
   <div id="xpbar"><div id="xpfill"></div></div>
   <div class="stat">Depth <b id="depth"></b></div>
@@ -46,13 +48,30 @@
   <div class="stat">Key <b id="keyStatus"></b></div>
   <div class="stat">Pos <b id="posText"></b></div>
   <div class="stat">Retreat <b id="retreatStatus"></b></div>
+  <div class="stat" id="companionStat" hidden>Companion <b id="companionName"></b></div>
+  <div class="stat cheat" id="godModeStat" hidden>GOD</div>
   <button id="helpToggle" type="button" aria-label="Help and settings (?)" aria-controls="helpOverlay" aria-expanded="false" title="Help and settings (?)">?</button>
 </div>
 <div id="objective" aria-live="polite"></div>
 <div id="playArea">
-  <aside id="journal" aria-labelledby="journalTitle">
-    <h2 id="journalTitle">Adventure log</h2>
-    <div id="log" role="log" aria-live="polite"></div>
+  <aside id="leftSidebar" aria-label="Hero details and adventure log">
+    <section id="heroPanel" aria-labelledby="heroPanelTitle">
+      <h2 id="heroPanelTitle">Hero</h2>
+      <div id="heroPanelContent">
+        <div class="hero-stats"><h3>Hero stats</h3><dl>
+          <div><dt>Max HP</dt><dd id="heroMaxHp"></dd></div>
+          <div><dt>Strength</dt><dd id="heroStrength"></dd></div>
+          <div><dt>Attack</dt><dd id="heroAttack"></dd></div>
+          <div><dt>Defense</dt><dd id="heroDefense"></dd></div>
+          <div><dt>Dexterity</dt><dd id="heroDexterity"></dd></div>
+        </dl></div>
+        <div class="hero-stats"><h3>Spells</h3><div id="spellList"></div></div>
+      </div>
+    </section>
+    <section id="journal" aria-labelledby="journalTitle">
+      <h2 id="journalTitle">Adventure log</h2>
+      <div id="log" role="log" aria-live="polite"></div>
+    </section>
   </aside>
 <div id="wrap">
   <canvas id="game" width="1152" height="768" tabindex="0" aria-label="Dungeon map. Use arrow keys or WASD to move."></canvas>
@@ -78,7 +97,7 @@
   <section id="minimapPanel" aria-labelledby="minimapTitle">
     <h2 id="minimapTitle">Floor chart <span id="minimapDepth"></span></h2>
     <div class="minimap-content">
-      <canvas id="minimap" width="216" height="144" role="img" aria-label="Explored floor chart. Green marks your position; the outlined area is the main map view."></canvas>
+      <canvas id="minimap" width="288" height="192" role="img" aria-label="Explored floor chart. Green marks your position; the outlined area is the main map view."></canvas>
       <p class="minimap-legend"><span class="map-you">◆ You</span><span class="map-up">▲ Up</span><span class="map-down">▼ Down</span><span class="map-view">□ View</span></p>
     </div>
   </section>
@@ -98,13 +117,6 @@
       <p id="ringBonuses" class="gear-bonuses"></p>
     </section>
     <div class="gear-summary"><h3>Gear bonuses</h3><div><span>Max HP</span><b id="gearHpBonus"></b></div><div><span>Strength</span><b id="gearStrBonus"></b></div></div>
-    <div class="hero-stats"><h3>Hero stats</h3><dl>
-      <div><dt>Max HP</dt><dd id="heroMaxHp"></dd></div>
-      <div><dt>Strength</dt><dd id="heroStrength"></dd></div>
-      <div><dt>Attack</dt><dd id="heroAttack"></dd></div>
-      <div><dt>Defense</dt><dd id="heroDefense"></dd></div>
-      <div><dt>Dexterity</dt><dd id="heroDexterity"></dd></div>
-    </dl></div>
     <div id="merchantStock" hidden></div>
   </div>
 </aside>
@@ -120,6 +132,8 @@
       <h3>Controls</h3>
 <div id="help">Arrows/WASD: move · Space: collect / buy / use stairs · H: drink potion · X: sell all gear<br>
 Q/Backspace: ascend at ▲ · Enter: retreat · C/Esc: continue from health pause · R: restart<br>
+E: bow · F: Fireball (8 MP) · G: Heal (12 MP) · V: Frostbolt · B: Greater Heal · Z: Magic Barrier (knocks a foe back, or slams it into a wall). Learn spells from tomes; each has its own cooldown. MP slowly returns when no fight is near.<br>
+      Defeated bosses join as tiny companions. They chip in for 1 damage and make dry remarks about traps, retreats, shopping sprees, and rescues.<br>
 Find a monster’s key to unlock ▼. Space collects keys. Avoid fire, falling rocks, and hidden spikes.<br>
 Potions are stored. Low HP pauses time; critical HP offers retreat. Retreat has a 60s active cooldown. Rest away from enemies to heal.</div>
 <div id="audioControls">
@@ -128,9 +142,14 @@ Potions are stored. Low HP pauses time; critical HP offers retreat. Retreat has 
   <label for="effectsVolume">Effects <input id="effectsVolume" type="range" min="0" max="100" value="80"> <output id="effectsVolumeText" for="effectsVolume">80%</output></label>
 </div>
 
-      <p class="help-shortcuts">? opens or closes this window · M mutes sound · Esc skips a boss flourish or the ending.</p>
+      <p class="help-shortcuts">? opens or closes this window · M mutes sound · Esc skips a boss flourish or the ending · ~ opens the dev console (loadLevel, godMode).</p>
     </div>
   </section>
+</div>
+<div id="devConsole" role="dialog" aria-label="Developer console" hidden>
+  <div class="console-header"><b>DEV CONSOLE</b><span>~ / Esc to close</span></div>
+  <pre id="consoleOutput" aria-live="polite"></pre>
+  <div class="console-prompt"><span>&gt;</span><input id="consoleInput" type="text" autocomplete="off" spellcheck="false" aria-label="Console command"><button id="consoleClose" type="button">Close</button></div>
 </div>
 <script src="js/sprites.js"></script>
 <script src="js/game.js"></script>

@@ -20,7 +20,7 @@ function game(seed = 42, start = true) {
   });
   function element(id) {
     return elements[id] ||= { style: {}, hidden: false, disabled: false,
-      textContent: '', ariaPressed: '', addEventListener: (name, fn) => { listeners[`${id}:${name}`] = fn; },
+      textContent: '', value: '', ariaPressed: '', addEventListener: (name, fn) => { listeners[`${id}:${name}`] = fn; },
       getContext: () => id === 'minimap' ? minimapCtx : ctx, focus: noop };
   }
   const sandbox = vm.createContext({
@@ -273,7 +273,7 @@ test('ten-floor campaign gates the Mimic, requires dragon defeat then princess r
   g.run('damageMonster(state.boss, state.boss.hp); render()');
   assert.equal(g.run('state.gameOver'), false, 'Mimic is not the final encounter');
   assert.equal(g.run('state.floors[5].bossDefeated'), true);
-  assert.match(g.elements.objective.textContent, /dragon/);
+  assert.doesNotMatch(g.elements.objective.textContent, /Hydra|Next boss/);
   const once = g.json('[state.gold,state.kills,state.player.xp,state.player.lvl]');
   g.run('damageMonster(state.boss, 9999)');
   assert.deepEqual(g.json('[state.gold,state.kills,state.player.xp,state.player.lvl]'), once, 'dead boss rewards cannot be claimed again');
@@ -282,15 +282,18 @@ test('ten-floor campaign gates the Mimic, requires dragon defeat then princess r
   assert.equal(g.run('state.boss'), null);
   assert.equal(g.run('state.monsters.some(m => m.isBoss)'), false);
   assert.equal(g.run('state.monsters.length'), g.run('state.monsterSpawns.length - 1'), 'ordinary monsters still respawn');
-  for (let depth = 5; depth < 10; depth++) down(g);
+  for (let depth = 5; depth < 100; depth++) {
+    g.run('if(state.boss && bossGateAt(state.depth) && !state.bossDefeated) damageMonster(state.boss,state.boss.hp)');
+    down(g);
+  }
   assert.equal(g.run('state.boss.isDragon'), true);
   const locked = g.json('[state.gold,state.player.hp]');
   g.run('state.player.x=state.princess.x; state.player.y=state.princess.y; pickup()');
   assert.equal(g.run('state.princess.rescued'), false);
   assert.equal(g.run('state.gameOver'), false);
   assert.deepEqual(g.json('[state.gold,state.player.hp]'), locked, 'locked rescue grants no reward');
-  down(g); assert.equal(g.run('state.depth'), 10, 'no depth 11');
-  g.run('enterFloor(11,false)'); assert.equal(g.run('state.depth'), 10);
+  down(g); assert.equal(g.run('state.depth'), 100, 'no depth 101');
+  g.run('enterFloor(101,false)'); assert.equal(g.run('state.depth'), 100);
   g.run('damageMonster(state.boss,state.boss.hp); render()');
   assert.equal(g.run('state.gameOver'), false, 'dragon kill alone is not victory');
   assert.match(g.elements.objective.textContent, /Rescue the princess/);
@@ -306,7 +309,7 @@ test('ten-floor campaign gates the Mimic, requires dragon defeat then princess r
   assert.equal(g.run('state.depth'), 1);
   assert.deepEqual(g.json('Object.keys(state.floors)'), ['1']);
   assert.equal(g.run('state.bossDefeated'), false);
-  assert.match(g.elements.objective.textContent, /Mimic/);
+  assert.doesNotMatch(g.elements.objective.textContent, /Mimic|Next boss/);
 });
 
 test('boss XP still levels the player and death persists before a floor transition', () => {
@@ -315,6 +318,23 @@ test('boss XP still levels the player and death persists before a floor transiti
   assert.equal(g.run('state.player.lvl > 1'), true);
   assert.equal(g.run('state.floors[5].bossDefeated'), true);
   assert.equal(g.run('state.won'), false);
+});
+
+test('hero level stops at 100 and max-level kills do not grow XP', () => {
+  const g = game();
+  g.run(`state.monsters = [{ id: 91, name: 'Slime', sprite: 'slime', hp: 1, maxHp: 1,
+    atk: 1, def: 0, xp: 999999, x: state.player.x + 1, y: state.player.y }];
+    state.player.lvl = 99; state.player.xp = state.player.xpNext;
+    damageMonster(state.monsters[0], 999)`);
+  assert.equal(g.run('state.player.lvl'), 100);
+  assert.equal(g.run('state.player.xp'), 0);
+  assert.equal(g.run('state.player.xpNext'), 1);
+  g.run(`state.monsters = [{ id: 92, name: 'Slime', sprite: 'slime', hp: 1, maxHp: 1,
+    atk: 1, def: 0, xp: 999999, x: state.player.x + 1, y: state.player.y }];
+    damageMonster(state.monsters[0], 999); render()`);
+  assert.equal(g.run('state.player.lvl'), 100);
+  assert.equal(g.run('state.player.xp'), 0);
+  assert.equal(g.elements.xpfill.style.width, '0%');
 });
 
 test('retaliation and timed enemy attacks share a per-monster cooldown including dodges', () => {
@@ -372,14 +392,28 @@ test('healing scales with max HP, retains safety checks, and caps the final heal
   assert.equal(g.run('state.player.hp'), 100);
 });
 
-test('late-floor scaling removes the dragon damage spike without reducing XP and gold scaling', () => {
+test('late-floor scaling keeps the final boss above ordinary monsters without reducing reward scaling', () => {
   const g = game();
-  g.run('enterFloor(10,false)');
-  assert.equal(g.run('state.boss.maxHp'), 376);
-  assert.equal(g.run('state.boss.atk'), 45);
-  assert.equal(g.run('state.boss.xp'), 1038);
-  assert.equal(g.run('state.boss.gold'), 830);
-  assert.equal(g.run('state.monsters.filter(m=>!m.isBoss).every(m=>m.atk<=38 && m.maxHp<=112)'), true);
+  g.run('enterFloor(100,false)');
+  assert.equal(g.run('state.boss.maxHp'), 2061);
+  assert.equal(g.run('state.boss.atk'), 438);
+  assert.equal(g.run('state.boss.xp'), 6438);
+  assert.equal(g.run('state.boss.gold'), 5150);
+  assert.equal(g.run('state.monsters.filter(m=>!m.isBoss).every(m=>m.atk<=254 && m.maxHp<=832 && m.atk<state.boss.atk && m.maxHp<state.boss.maxHp)'), true);
+});
+
+test('boss roster gates every milestone floor with distinct names and scaled rewards', () => {
+  const g = game();
+  assert.deepEqual(g.json('bossDepthList()'), [5,10,20,30,40,50,60,70,80,90,100]);
+  for (const [depth, name] of [[5,'Mimic'],[10,'Hydra'],[20,'Wild Boar'],[30,'Medusa'],[40,'Dark Wizard'],[50,'Skeleton King'],[100,'Dragon']]) {
+    g.run(`newGame();enterFloor(${depth},false)`);
+    assert.equal(g.run('state.boss.name'), name);
+    assert.equal(g.run('bossGateAt(state.depth)'), true);
+    g.run('state.player.x=state.stairs.x;state.player.y=state.stairs.y;pickup()');
+    assert.equal(g.run('state.depth'), depth, `${name} must be defeated before descending`);
+  }
+  assert.equal(g.run('bossForDepth(10).xp > bossForDepth(5).xp'), true);
+  assert.equal(g.run('bossForDepth(100).gold > bossForDepth(90).gold'), true);
 });
 
 test('independent volume settings clamp, update their own buses, preserve mute, and survive restart', () => {
@@ -411,15 +445,15 @@ test('independent volume settings clamp, update their own buses, preserve mute, 
 
 test('prepared no-gear endgame duel can finish using stored potions and the real combat/rescue functions', () => {
   const g = game();
-  for (let depth = 1; depth <= 10; depth++) {
+  for (let depth = 1; depth <= 100; depth++) {
     if (depth > 1) down(g);
     g.run('for(const m of state.monsters.filter(m=>!m.isBoss)) damageMonster(m,m.hp)');
-    if (depth === 5) g.run('damageMonster(state.boss,state.boss.hp)');
+    g.run('if(state.boss && bossGateAt(state.depth) && !state.bossDefeated) damageMonster(state.boss,state.boss.hp)');
   }
   // Prepared duel, not a whole-run difficulty estimate: full HP, two potions,
   // no gear/dodges, one player attack per second, and no other attackers.
-  g.run(`state.player.hp=state.player.maxHp;
-    state.inventory=[{heal:0.35},{heal:0.35}];
+  g.run(`state.player.maxHp=3000; state.player.hp=3000; state.player.str=300;
+    state.inventory=[{heal:0.5},{heal:0.5},{heal:0.5},{heal:0.5}];
     state.monsters=[state.boss]; Math.random=()=>0.9;
     for(let round=0;round<30 && state.boss.hp>0 && !state.gameOver;round++) {
       attackMonster(state.boss);
@@ -527,8 +561,8 @@ test('larger generated worlds keep all floor tiles, key carriers, stairs and NPC
   const g = game();
   for (let i = 0; i < 50; i++) {
     g.run(`newGame(); enterFloor(${1 + i % 10},false)`);
-    assert.deepEqual(g.json('[state.map[0].length,state.map.length,VIEW_W,VIEW_H]'), [72,48,18,12]);
-    assert.equal(g.run('state.rooms.length >= 18 && state.rooms.length <= 22'), true);
+    assert.deepEqual(g.json('[state.map[0].length,state.map.length,VIEW_W,VIEW_H]'), [96,64,18,12]);
+    assert.equal(g.run('state.rooms.length >= 28 && state.rooms.length <= 32'), true);
     assert.equal(g.run('floorDistances(state.map,state.upstairs).size === state.map.flat().filter(t=>t===0).length'), true);
     assert.equal(g.run('floorDistances(state.map,state.upstairs).get(`${state.stairs.x},${state.stairs.y}`) > VIEW_W'), true);
     assert.equal(g.run('protectedFloorTiles().every(t=>floorDistances(state.map,state.upstairs).has(`${t.x},${t.y}`))'), true);
@@ -536,9 +570,13 @@ test('larger generated worlds keep all floor tiles, key carriers, stairs and NPC
     assert.equal(g.run('state.hazards.every(h=>state.map[h.y][h.x]===0 && [state.upstairs,state.stairs].every(s=>Math.max(Math.abs(h.x-s.x),Math.abs(h.y-s.y))>3))'), true);
     assert.equal(g.run('state.hazards.every(h=>!protectedFloorTiles().some(t=>t.x===h.x&&t.y===h.y))'), true);
     assert.equal(g.run("new Set(state.hazards.map(h=>h.type)).size"), 3);
-    if (i % 10 < 9) assert.equal(g.run('state.monsters.some(m=>m.id===state.floorKey.carrierId && !m.isBoss)'), true);
-    else assert.equal(g.run('state.floorKey'), null);
+    assert.equal(g.run('state.props.length > 0 && state.props.every(p => state.map[p.y][p.x] === 0)'), true, 'biome props are walkable decorations');
+    assert.equal(g.run('state.depth % 2 === 0 && ![3,5,7,10].includes(state.depth) ? !!state.merchant : state.merchant === null'), true);
+    assert.equal(g.run('state.monsters.some(m=>m.id===state.floorKey.carrierId && !m.isBoss)'), true);
   }
+  g.run('newGame(); enterFloor(100,false)');
+  assert.equal(g.run('state.floorKey'), null);
+  assert.equal(g.run('!!state.boss && state.boss.isDragon'), true);
 });
 
 test('hidden key carrier drops a key, stairs stay locked until Space collects it, and unlock persists', () => {
@@ -592,11 +630,11 @@ test('key pickup takes priority over stairs and NPC interaction on the same tile
 
 test('complete campaign can progress with real key drops and still requires both Mimic defeat and final rescue', () => {
   const g = game();
-  for (let depth = 1; depth < 10; depth++) {
+  for (let depth = 1; depth < 100; depth++) {
     useDownStairs(g); assert.equal(g.run('state.depth'), depth);
     collectFloorKey(g);
-    if (depth === 5) {
-      useDownStairs(g); assert.equal(g.run('state.depth'), 5);
+    if (g.run('!!state.boss && bossGateAt(state.depth) && !state.bossDefeated')) {
+      useDownStairs(g); assert.equal(g.run('state.depth'), depth);
       g.run('damageMonster(state.boss,state.boss.hp)');
     }
     useDownStairs(g); assert.equal(g.run('state.depth'), depth + 1);
@@ -610,7 +648,7 @@ test('complete campaign can progress with real key drops and still requires both
 
 test('spikes are invisible before stepping, deal damage once, and remain revealed after revisiting', () => {
   const g = game();
-  g.run(`state.monsters=[];state.map[5][7]=0;state.hazards=[{type:'spikes',x:7,y:5,revealed:false,triggered:false}];
+  g.run(`state.monsters=[];state.props=[];state.map[5][7]=0;state.hazards=[{type:'spikes',x:7,y:5,revealed:false,triggered:false}];
     state.player.x=6;state.player.y=5;state.visited.add('7,5')`);
   g.calls.length=0; g.run('updateCamera();drawFloorDetails()');
   assert.equal(g.calls.length, 0, 'unrevealed spikes have no visual marker');
@@ -692,7 +730,7 @@ test('blocking obstacles stop both player movement and monster movement without 
 
 test('camera follows full-world movement, clamps at every edge, and draws only a viewport', () => {
   const g = game();
-  for (const [x,y,camX,camY] of [[1,1,0,0],[40,30,31,24],[71,47,54,36],[0,47,0,36],[71,0,54,0]]) {
+  for (const [x,y,camX,camY] of [[1,1,0,0],[40,30,31,24],[95,63,78,52],[0,63,0,52],[95,0,78,0]]) {
     g.run(`state.player.x=${x};state.player.y=${y};updateCamera()`);
     assert.deepEqual(g.json('[state.camera.x,state.camera.y]'), [camX,camY]);
   }
@@ -718,13 +756,13 @@ test('falling-rock warning is drawn above the player instead of hidden under the
 });
 
 function reachEnding(g) {
-  g.run(`enterFloor(10,false); damageMonster(state.boss,state.boss.hp);
+  g.run(`enterFloor(100,false); damageMonster(state.boss,state.boss.hp);
     state.player.x=state.princess.x;state.player.y=state.princess.y;pickup()`);
 }
 
 test('final interaction starts the twist once, including after revisiting the defeated dragon floor', () => {
   const g = game();
-  g.run('enterFloor(10,false);state.player.x=state.princess.x;state.player.y=state.princess.y;pickup()');
+  g.run('enterFloor(100,false);state.player.x=state.princess.x;state.player.y=state.princess.y;pickup()');
   assert.equal(g.run('state.ending'), null);
   g.run('damageMonster(state.boss,state.boss.hp)');
   up(g);down(g);
@@ -907,7 +945,7 @@ test('travel, respawn, restart, and the ending clear transient monster speech',(
   speechEncounter(g);g.run('monsterTalk(state.monsters[0]);recreateMonsters()');
   assert.equal(g.run('state.monsterSpeech'),null);
   g.key('r');assert.equal(g.run('state.monsterQuoteIndex'),0);assert.equal(g.run('state.monsterSpeech'),null);
-  g.run('enterFloor(10,false);damageMonster(state.boss,state.boss.hp)');
+  g.run('enterFloor(100,false);damageMonster(state.boss,state.boss.hp)');
   speechEncounter(g);g.run('monsterTalk(state.monsters[0]);state.player.x=state.princess.x;state.player.y=state.princess.y;pickup()');
   assert.notEqual(g.run('state.ending'),null);assert.equal(g.run('state.monsterSpeech'),null);
   g.run('monsterTalk(state.monsters[0])');assert.equal(g.run('state.monsterSpeech'),null);
@@ -969,11 +1007,11 @@ test('accepted combat quotes enter the journal once with the speaker name, inclu
 
 test('large boss artwork fits its clear arena on generation and revisits, with health bars and speech above its bounds',()=>{
   const g=game();
-  for(const depth of [5,10]) {
+  for(const depth of [5,10,20,30,40,50,60,70,80,90,100]) {
     g.run(`enterFloor(${depth},false)`);
     const initial=g.json('monsterVisual(state.boss)');
     assert.equal(initial.width>=96,true);
-    if(depth===10) assert.equal(initial.height>=64,true);
+    assert.equal(initial.height>=64,true);
     assert.equal(g.run('state.boss.x===state.rooms.find(r=>r.isArena).cx && state.boss.y===state.rooms.find(r=>r.isArena).cy'),true);
     assert.equal(g.run('state.monsters.filter(m=>!m.isBoss).every(m=>!bossSpawnBuffer(m.x,m.y))'),true);
     assert.equal(g.run('protectedFloorTiles().filter(t=>t!==state.boss).every(t=>!bossSpawnBuffer(t.x,t.y))'),true);
@@ -1062,7 +1100,7 @@ test('Mimic defeat plays a short in-world flourish and freezes play until it fin
 
 test('Dragon defeat uses a screen-space cinematic and clears before the romance ending',()=>{
   const g=game();
-  g.run('enterFloor(10,false);damageMonster(state.boss,state.boss.hp)');
+  g.run('enterFloor(100,false);damageMonster(state.boss,state.boss.hp)');
   assert.equal(g.run('state.bossDefeat.kind'),'dragon');
   assert.equal(g.run('state.gameOver'),false,'dragon kill is not the final victory');
   const frozen=g.json('[state.player,state.monsters,state.activeTime,state.hazardTime]');
@@ -1114,6 +1152,95 @@ test('boss defeat frames are clamped, hidden-tab safe, identity-bound, and skipp
   assert.equal(g.run('state.floors[5].bossDefeated'),true);
 });
 
+test('boss animations map every roster and themed boss to a distinct visual kind',()=>{
+  const g=game();
+  assert.deepEqual(g.json('bossDepthList().map(d=>bossKind(bossForDepth(d)))'),
+    ['mimic','hydra','boar','medusa','wizard','skeletonKing','hydra','boar','medusa','wizard','dragon']);
+  assert.equal(g.run("bossKind({isDragon:true,name:'Dragon'})"),'dragon');
+  assert.equal(g.run("bossKind({isThemed:true,themedType:'kitchen',name:'Cook'})"),'cook');
+  assert.equal(g.run("bossKind({isThemed:true,themedType:'pub',name:'Bartender'})"),'bartender');
+  const motifs=g.json("bossDepthList().map(d=>BOSS_ANIMATIONS[bossKind(bossForDepth(d))].motif)");
+  assert.equal(new Set(motifs).size>=6,true);
+  assert.equal(g.run('BOSS_ANIMATIONS.medusa.defeat > BOSS_ANIMATIONS.mimic.defeat'),true);
+  assert.deepEqual(g.json("spriteDimensions('hydra')"),{width:32,height:22});
+  for(const name of ['hydra','boar','medusa','darkWizard','skeletonKing']) {
+    assert.equal(g.run(`spriteFrameGrid('${name}',1).join('') !== SPRITES['${name}'].join('')`),true);
+    assert.equal(g.run(`SPRITES['${name}'].every(row => row.length === 64 && [...row].every(c => c === '.' || SPRITE_PALETTES['${name}'][c]))`),true);
+  }
+});
+
+test('boss intro freezes play, renders a themed name/HP card, and can be skipped',()=>{
+  const g=game();
+  g.run(`enterFloor(10,false);state.player.x=state.boss.x-2;state.player.y=state.boss.y;
+    state.map[state.boss.y][state.boss.x-2]=0;updateCamera();checkBossIntro()`);
+  assert.equal(g.run('bossIntroActive()'),true);
+  assert.equal(g.run('state.bossIntro.kind'),'hydra');
+  assert.equal(g.run('state.bossIntro.phase'),'reveal');
+  const frozen=g.json('[state.player,state.monsters,state.activeTime,state.hazardTime]');
+  g.key('ArrowRight');g.run('enemyTick();advanceActiveTime(10)');
+  assert.deepEqual(g.json('[state.player,state.monsters,state.activeTime,state.hazardTime]'),frozen);
+  g.calls.length=0;g.run('draw()');
+  assert.equal(g.calls.some(c=>c[0]==='setTransform'&&c[1]===1&&c[5]===0&&c[6]===0),true);
+  assert.equal(g.calls.some(c=>c[0]==='fillText'&&c[1]==='HYDRA'),true);
+  assert.equal(g.calls.filter(c=>c[0]==='save').length,g.calls.filter(c=>c[0]==='restore').length);
+  assert.equal(g.run('bossIntroScene().particles.length'),10);
+  g.run('advanceBossIntro(0.6)');assert.equal(g.run('bossIntroScene().phase'),'roar');
+  g.key('Escape');
+  assert.equal(g.run('state.bossIntro'),null);
+  assert.equal(g.run('bossIntroActive()'),false);
+  g.run('checkBossIntro()');assert.equal(g.run('state.bossIntro'),null,'intro plays once per boss encounter');
+});
+
+test('boss intro frames are clamped, hidden-tab safe, identity-bound, and cleared by travel/restart',()=>{
+  const g=game();
+  g.run(`window.introFrames=new Map();window.introCancelled=[];window.introNextFrame=0;
+    window.requestAnimationFrame=fn=>{const id=++window.introNextFrame;window.introFrames.set(id,fn);return id;};
+    window.cancelAnimationFrame=id=>{window.introCancelled.push(id);window.introFrames.delete(id);};
+    enterFloor(30,false);state.player.x=state.boss.x-2;state.player.y=state.boss.y;
+    state.map[state.boss.y][state.boss.x-2]=0;updateCamera();checkBossIntro()`);
+  assert.equal(g.run('window.introFrames.size'),1);
+  g.run('window.oldIntro=state.bossIntro;window.oldIntroCallback=window.introFrames.get(state.bossIntro.frameId)');
+  g.run('bossIntroFrame(1000,state.bossIntro);bossIntroFrame(1100,state.bossIntro)');
+  assert.equal(g.run('state.bossIntro.elapsed'),0.1);
+  g.run('bossIntroFrame(9000,state.bossIntro)');assert.equal(g.run('state.bossIntro.elapsed'),0.2);
+  g.run('document.hidden=true;bossIntroFrame(20000,state.bossIntro);advanceBossIntro(50)');
+  assert.equal(g.run('state.bossIntro.elapsed'),0.2);
+  g.run('document.hidden=false');g.visibility();
+  g.run('bossIntroFrame(30000,state.bossIntro)');assert.equal(g.run('state.bossIntro.elapsed'),0.2);
+  g.run('bossIntroFrame(30050,state.bossIntro)');
+  assert.ok(Math.abs(g.run('state.bossIntro.elapsed')-0.25)<1e-9);
+  g.run('enterFloor(31,false)');assert.equal(g.run('state.bossIntro'),null);
+  g.run('window.oldIntroCallback(50000)');assert.equal(g.run('state.bossIntro'),null);
+  g.run('enterFloor(40,false);state.player.x=state.boss.x-2;state.player.y=state.boss.y;state.map[state.boss.y][state.boss.x-2]=0;checkBossIntro()');
+  const frameId=g.run('state.bossIntro.frameId');
+  g.key('r');
+  assert.equal(g.run('state.bossIntro'),null);
+  assert.equal(g.run(`window.introCancelled.includes(${frameId})`),true);
+});
+
+test('remaining bosses use distinct defeat motifs and cleanup without repeating rewards',()=>{
+  const g=game();
+  const cases=[[10,'HYDRA'],[20,'WILD BOAR'],[30,'MEDUSA'],[40,'DARK WIZARD'],[50,'SKELETON KING'],[3,'COOK'],[7,'BARTENDER']];
+  const motifs=[];
+  for(const [depth,label] of cases) {
+    g.run(`newGame();enterFloor(${depth},false);state.player.x=state.boss.x-1;state.player.y=state.boss.y;updateCamera()`);
+    g.run('damageMonster(state.boss,state.boss.hp)');
+    const scene=g.json('bossDefeatScene()');
+    assert.equal(g.run('bossDefeatActive()'),true);
+    assert.equal(scene.kind,g.run('state.bossDefeat.kind'));
+    assert.equal(scene.particles.length,12);
+    motifs.push(scene.motif);
+    g.calls.length=0;g.run('draw()');
+    assert.equal(g.calls.some(c=>c[0]==='fillText'&&c[1]===`${label} DEFEATED`),true);
+    assert.equal(g.calls.filter(c=>c[0]==='save').length,g.calls.filter(c=>c[0]==='restore').length);
+    const rewards=g.json('[state.gold,state.kills,state.player.xp]');
+    g.key('Escape');
+    assert.equal(g.run('state.bossDefeat'),null);
+    assert.deepEqual(g.json('[state.gold,state.kills,state.player.xp]'),rewards);
+  }
+  assert.equal(new Set(motifs).size,motifs.length);
+});
+
 test('refreshed sprite grids have complete palettes and retain logical boss dimensions',()=>{
   const g=game();
   assert.equal(g.run(`Object.entries(SPRITES).every(([name,grid])=>grid.length>0 && grid.every(row=>row.length===grid[0].length && [...row].every(c=>c==='.'||SPRITE_PALETTES[name][c])))`),true);
@@ -1149,14 +1276,14 @@ test('terrain decoration is deterministic without consuming combat RNG or reveal
 
 test('two-times zoom scales only the world, draws 18 by 12 tiles, and leaves ending framing unscaled',()=>{
   const g=game();
-  g.run(`state.monsters=[];state.hazards=[];state.player.x=71;state.player.y=47;
+  g.run(`state.monsters=[];state.hazards=[];state.props=[];state.player.x=95;state.player.y=63;
     window.drawnTiles=[];const originalTile=drawDungeonTile;
     drawDungeonTile=function(x,y){window.drawnTiles.push([x,y]);originalTile(x,y);}`);
   g.calls.length=0;g.run('draw()');
   assert.equal(g.calls.some(c=>c[0]==='scale'&&c[1]===2&&c[2]===2),true);
   assert.equal(g.calls.findIndex(c=>c[0]==='scale')<g.calls.findIndex(c=>c[0]==='translate'),true);
   assert.equal(g.run('window.drawnTiles.length'),216);
-  assert.equal(g.run('window.drawnTiles.every(([x,y])=>x>=54&&x<72&&y>=36&&y<48)'),true);
+  assert.equal(g.run('window.drawnTiles.every(([x,y])=>x>=78&&x<96&&y>=52&&y<64)'),true);
   assert.equal(g.run('VIEW_W*TILE*MAP_ZOOM===1152 && VIEW_H*TILE*MAP_ZOOM===768'),true);
   reachEnding(g);g.calls.length=0;g.run('draw()');
   assert.equal(g.calls.some(c=>c[0]==='scale'&&c[1]===2&&c[2]===2),false);
@@ -1315,4 +1442,432 @@ test('discovered wall torches and active vents animate without moving their fixt
   g.run('state.hazards=[{type:"flame",x:42,y:30,revealed:true,offset:0,nextDamageAt:0}];state.visited.add("42,30")');
   assert.equal(g.run('motionNeeded()'),true);
   g.run('state.hazardTime=3');assert.equal(g.run('motionNeeded()'),false,'inactive vent does not require animation');
+});
+
+test('ranged and magic monsters attack from a distance but respect line of sight', () => {
+  const g = game();
+  g.run(`Math.random = () => 0.1;
+    state.monsters = [{ id: 1, name: 'Wasp', sprite: 'bat', hp: 18, maxHp: 18, atk: 8, def: 1,
+      xp: 20, x: state.player.x + 3, y: state.player.y, ranged: true, range: 3, projectile: 'stinger', nextAttackAt: 0 }];
+    state.floorKey = null; state.activeTime = 10; state.player.hp = 60;`);
+  g.run('enemyTick()');
+  assert.ok(g.run('state.player.hp') < 60, 'wasp shoots from outside melee range');
+  g.run(`state.player.hp = 60; state.monsters[0].nextAttackAt = 0;
+    state.map[state.player.y][state.player.x + 1] = 1;`);
+  g.run('enemyTick()');
+  assert.equal(g.run('state.player.hp'), 60, 'a wall blocks ranged attacks');
+  g.run(`state.map[state.player.y][state.player.x + 1] = 0;
+    state.monsters[0] = { id: 2, name: 'Mage', sprite: 'skeleton', hp: 25, maxHp: 25, atk: 10, def: 2,
+      xp: 28, x: state.player.x + 2, y: state.player.y, magic: true, magicType: 'attack', magicRange: 4, nextAttackAt: 0 };
+    state.player.hp = 60;`);
+  g.run('enemyTick()');
+  assert.ok(g.run('state.player.hp') < 60, 'mage casts from a distance');
+});
+
+test('archery, fireball and healing use equipment, mana and visible targets', () => {
+  const g = game();
+  g.run(`Math.random = () => 0.9;
+    state.monsters = [
+      { id: 1, name: 'Slime', sprite: 'slime', hp: 14, maxHp: 14, atk: 5, def: 0, xp: 10, x: state.player.x + 2, y: state.player.y },
+      { id: 2, name: 'Bat', sprite: 'bat', hp: 10, maxHp: 10, atk: 7, def: 1, xp: 14, x: state.player.x, y: state.player.y + 2 },
+    ];
+    state.floorKey = null; state.activeTime = 10;`);
+  g.key('e');
+  assert.equal(g.run('state.monsters[0].hp'), 14, 'no bow means no shot');
+  g.run('state.equipment.weapon = { name: "Bow", sprite: "bow", atk: 8, range: 3 }');
+  g.key('e');
+  assert.ok(g.run('state.monsters[0].hp') < 14, 'bow damages a visible target');
+  g.run('state.player.mp = 20');
+  g.key('f');
+  assert.equal(g.run('state.player.mp'), 12);
+  assert.ok(g.run('state.monsters.every(m => m.hp <= 0)'), 'fireball hits all visible monsters');
+  g.run('state.player.hp = 20');
+  g.key('g');
+  assert.equal(g.run('state.player.mp'), 0);
+  assert.ok(g.run('state.player.hp') > 20, 'heal restores health');
+  g.run('state.activeTime = 12');
+  g.key('g');
+  assert.match(g.json('state.messages').at(-1), /Not enough mana/);
+  g.run('render()');
+  assert.equal(g.elements.mpText.textContent, '0/20');
+});
+
+test('themed floors reserve an arena, spawn their themed boss and draw their props', () => {
+  const g = game();
+  g.run('state.depth = 3; genLevel();');
+  assert.equal(g.run('state.boss.name'), 'Cook');
+  assert.equal(g.run('state.rooms.some(r => r.isArena)'), true);
+  assert.equal(g.run('state.boss.ranged || false'), false);
+  g.run('state.depth = 7; genLevel();');
+  assert.equal(g.run('state.boss.name'), 'Bartender');
+  assert.equal(g.run('state.boss.ranged'), true);
+  assert.equal(g.run('THEMED_FLOORS[state.depth].prop'), 'barCounter');
+  assert.equal(g.run('!!SPRITE_PALETTES.barCounter && !!SPRITES.barCounter'), true);
+});
+
+test('ranged and spellcasting monsters have dedicated art with animated frames', () => {
+  const g = game();
+  for (const name of ['wasp', 'mage', 'healer']) {
+    assert.deepEqual(g.json(`spriteDimensions('${name}')`), { width: 16, height: 16 });
+    assert.equal(g.run(`Object.keys(SPRITE_PALETTES.${name}).length > 0`), true);
+    assert.equal(g.run(`spriteFrameGrid('${name}',1).length === SPRITES.${name}.length &&
+      spriteFrameGrid('${name}',1).every((row,i) => row.length === SPRITES.${name}[i].length)`), true);
+    assert.notDeepEqual(g.json(`spriteFrameGrid('${name}',1)`), g.json(`SPRITES.${name}`));
+  }
+  assert.deepEqual(g.json("MONSTER_TYPES.filter(t => ['Wasp','Mage','Healer'].includes(t.name)).map(t => t.sprite)"), ['wasp', 'mage', 'healer']);
+  g.run('window.requestAnimationFrame=()=>1; state.motion.time=1');
+  assert.equal(g.run("actorAnimationPose('wasp',{id:1}).frame"), 1);
+  assert.equal(g.run("actorAnimationPose('mage',{id:1}).frame"), 3);
+  assert.equal(g.run("actorAnimationPose('healer',{id:1}).frame"), 3);
+});
+
+test('projectiles launch at attack time, advance only with active motion, and clear on recreation', () => {
+  const g = game();
+  g.run(`Math.random = () => 0.1; state.floorKey = null; state.activeTime = 10;
+    state.motion.projectiles = []; state.player.hp = 60;
+    state.monsters = [{ id: 1, name: 'Wasp', sprite: 'wasp', hp: 18, maxHp: 18, atk: 8, def: 1,
+      xp: 20, x: state.player.x + 2, y: state.player.y, ranged: true, range: 3, projectile: 'stinger', nextAttackAt: 0 }];`);
+  g.run('enemyAttack(state.monsters[0])');
+  assert.equal(g.run('state.motion.projectiles.length'), 1);
+  assert.equal(g.run('state.motion.projectiles[0].kind'), 'stinger');
+  assert.ok(g.run('state.player.hp') < 60, 'damage resolves when the projectile is launched');
+  assert.equal(g.run('motionNeeded()'), true);
+  g.run('advanceMotion(0.5)');
+  assert.equal(g.run('state.motion.projectiles.length'), 0);
+  g.run('state.helpOpen=true; spawnProjectile("beer",state.player,state.player); advanceMotion(5); state.helpOpen=false');
+  assert.equal(g.run('state.motion.projectiles[0].elapsed'), 0, 'pauses freeze projectile visuals');
+  g.run('state.monsterSpawns=[]; recreateMonsters()');
+  assert.equal(g.run('state.motion.projectiles.length'), 0, 'travel clears projectile visuals');
+});
+
+test('player attacks spawn arrow, fireball and heal projectiles', () => {
+  const g = game();
+  g.run(`Math.random = () => 0.9; state.floorKey = null; state.activeTime = 10;
+    state.equipment.weapon = { name: 'Bow', sprite: 'bow', atk: 8, range: 3 };
+    state.monsters = [{ id: 1, name: 'Slime', sprite: 'slime', hp: 40, maxHp: 40, atk: 5, def: 0,
+      xp: 10, x: state.player.x + 2, y: state.player.y }]; state.player.mp = 20;`);
+  g.key('e');
+  assert.deepEqual(g.json('state.motion.projectiles.map(p => p.kind)'), ['arrow']);
+  g.key('f');
+  assert.ok(g.json('state.motion.projectiles.map(p => p.kind)').includes('fireball'));
+  g.key('g');
+  assert.ok(g.json('state.motion.projectiles.map(p => p.kind)').includes('heal'));
+  g.run('draw()');
+  assert.ok(g.calls.some(call => call[0] === 'arc'), 'projectile shapes are painted');
+});
+
+test('spellbook tomes have valid art and unlock by depth', () => {
+  const g = game();
+  assert.equal(g.run('SPRITES.spellbook.length'), 32);
+  assert.equal(g.run('SPRITES.spellbook.every(row => row.length === 32)'), true);
+  assert.equal(g.run('Object.keys(SPRITE_PALETTES.spellbook).length > 0'), true);
+  assert.equal(g.run('lootPool(1).some(it => it.kind === "spellbook")'), false);
+  assert.equal(g.run('lootPool(2).some(it => it.spell === "frostbolt")'), true);
+  assert.equal(g.run('lootPool(3).some(it => it.spell === "greaterHeal")'), false);
+  assert.equal(g.run('lootPool(4).some(it => it.spell === "greaterHeal")'), true);
+});
+
+test('spellbooks teach spells through treasures and merchants, and knowledge persists', () => {
+  const g = game();
+  g.run(`state.floorKey = null;
+    state.treasures = [{ ...ITEM_TABLE.find(it => it.spell === 'frostbolt'), x: state.player.x, y: state.player.y }];
+    pickup();`);
+  assert.equal(g.run('!!state.player.spells.frostbolt'), true);
+  assert.match(g.json('state.messages').at(-2), /learned Frostbolt/);
+  g.run(`state.gold = 200; state.merchant = { x: state.player.x, y: state.player.y, stock: [
+    { ...ITEM_TABLE.find(it => it.spell === 'greaterHeal'), id: 100 },
+    { ...ITEM_TABLE.find(it => it.spell === 'frostbolt'), id: 101 }
+  ] }; buyFromMerchant();`);
+  assert.equal(g.run('!!state.player.spells.greaterHeal'), true);
+  assert.equal(g.run('state.gold'), 200 - Math.round(85 * 1.5));
+  assert.equal(g.run('state.merchant.stock.length'), 1, 'known spellbooks are skipped');
+  g.run('buyFromMerchant()');
+  assert.equal(g.run('state.gold'), 200 - Math.round(85 * 1.5), 'duplicate knowledge costs no gold');
+  const learned = g.json('state.player.spells');
+  g.run('enterFloor(2, false)');
+  assert.deepEqual(g.json('state.player.spells'), learned, 'spells are player progression, not floor saves');
+  assert.equal(g.run('Object.values(state.floors).some(floor => floor.player)'), false);
+});
+
+test('advanced spells require learning and each spell keeps its own cooldown', () => {
+  const g = game();
+  g.run(`Math.random = () => 0.9; state.floorKey = null; state.activeTime = 5; state.player.mp = 100;
+    state.player.hp = 20;
+    state.monsters = [{ id: 1, name: 'Slime', sprite: 'slime', hp: 200, maxHp: 200, atk: 5, def: 2,
+      xp: 10, x: state.player.x + 1, y: state.player.y, nextAttackAt: 0 }];`);
+  g.key('v');
+  assert.match(g.json('state.messages').at(-1), /have not learned Frostbolt/);
+  g.run('learnSpell("frostbolt")');
+  g.key('v');
+  assert.equal(g.run('state.player.mp'), 90);
+  assert.ok(g.run('state.monsters[0].hp') < 200, 'frostbolt damages its target');
+  assert.equal(g.run('state.motion.projectiles[0].kind'), 'frost');
+  const hp = g.run('state.monsters[0].hp');
+  g.key('v');
+  assert.equal(g.run('state.player.mp'), 90, 'cooldown blocks a second cast');
+  assert.equal(g.run('state.monsters[0].hp'), hp);
+  assert.match(g.json('state.messages').at(-1), /Frostbolt recharges/);
+  g.run('state.activeTime = 8');
+  g.key('v');
+  assert.equal(g.run('state.player.mp'), 80, 'advancing active time clears the cooldown');
+  g.key('f');
+  const afterFireball = g.run('state.player.mp');
+  g.key('f');
+  assert.equal(g.run('state.player.mp'), afterFireball, 'fireball has a separate cooldown');
+  g.run('learnSpell("greaterHeal"); state.activeTime = 20; state.player.mp = 100; state.player.hp = 20');
+  g.key('b');
+  assert.equal(g.run('state.player.mp'), 82);
+  assert.ok(g.run('state.player.hp') > 20, 'greater heal restores health');
+  g.run('render()');
+  assert.match(g.elements.spellList.textContent, /V Frostbolt/);
+  assert.match(g.elements.spellList.textContent, /B Greater Heal/);
+});
+
+test('ranged and spellcasting enemies unlock progressively by depth', () => {
+  const g = game();
+  assert.equal(g.run('spawnPool(1).some(t => t.ranged || t.magic)'), false);
+  assert.equal(g.run('spawnPool(2).some(t => t.name === "Wasp")'), true);
+  assert.equal(g.run('spawnPool(3).some(t => t.magic)'), false);
+  assert.equal(g.run('spawnPool(4).some(t => t.name === "Mage")'), true);
+  assert.equal(g.run('spawnPool(5).some(t => t.name === "Healer")'), true);
+  g.run('state.depth = 1; genLevel()');
+  assert.equal(g.run('state.monsters.some(m => m.ranged || m.magic)'), false, 'early floors cannot spawn ranged enemies');
+});
+
+test('biome variants use coordinate-derived tile palettes and saved props', () => {
+  const g = game();
+  assert.deepEqual(g.json('Object.keys(BIOMES)'), ['crypt', 'cavern', 'kitchen', 'tavern', 'throne']);
+  assert.equal(g.run('biomeForDepth(3)'), 'kitchen');
+  assert.equal(g.run('biomeForDepth(7)'), 'tavern');
+  assert.equal(g.run('biomeForDepth(100)'), 'throne');
+  assert.equal(g.run('state.biome'), 'crypt');
+  const props = g.json('state.props');
+  g.run('enterFloor(2, false)');
+  assert.equal(g.run('state.biome'), 'cavern');
+  assert.ok(g.run('state.props.length > 0'));
+  assert.notDeepEqual(g.json('state.props'), props);
+  assert.equal(g.run('Object.values(state.floors).some(f => f.biome === "crypt")'), true);
+  g.run(`document.createElement = () => ({ width: 0, height: 0,
+    getContext: () => new Proxy({}, { get: () => () => {}, set: () => true }) });
+    graphicsCache().tiles = {}; state.biome = "crypt"; drawDungeonTile(2, 2);
+    state.biome = "throne"; drawDungeonTile(2, 2)`);
+  assert.equal(g.run('Object.keys(graphicsCache().tiles).some(k => k.startsWith("crypt:"))'), true);
+  assert.equal(g.run('Object.keys(graphicsCache().tiles).some(k => k.startsWith("throne:"))'), true);
+  g.run('state.visited.add(`${state.player.x},${state.player.y + 1}`); state.props = [{ x: state.player.x, y: state.player.y + 1, sprite: BIOMES[state.biome].prop }]');
+  g.calls.length = 0; g.run('drawFloorDetails()');
+  assert.ok(g.calls.some(call => call[0] === 'drawImage'), 'biome props are painted');
+});
+
+test('merchant stock and prices scale with depth on every even non-boss floor', () => {
+  const g = game();
+  g.run(`state.depth = 8; state.gold = 500;
+    state.merchant = { x: state.player.x, y: state.player.y, isMerchant: true,
+      stock: [{ ...ITEM_TABLE[1], id: 100 }] }; buyFromMerchant();`);
+  assert.equal(g.run('state.gold'), 500 - Math.round(40 * (1.5 + 7 * 0.03)));
+  assert.equal(g.run('merchantStock().length'), 5);
+  g.run('enterFloor(6, false)');
+  assert.ok(g.run('!!state.merchant'));
+  assert.equal(g.run('state.merchant.stock.length'), 4);
+  assert.equal(g.run('state.prisoner !== null'), true, 'prisoners still share even floors');
+});
+
+test('enemy healers prioritize the most wounded visible ally', () => {
+  const g = game();
+  g.run(`state.activeTime = 5; state.floorKey = null;
+    state.monsters = [
+      { id: 1, name: 'Healer', sprite: 'healer', hp: 30, maxHp: 30, atk: 6, def: 3, magic: true,
+        magicType: 'heal', magicRange: 3, x: state.player.x + 1, y: state.player.y, nextAttackAt: 0 },
+      { id: 2, name: 'Orc', sprite: 'orc', hp: 10, maxHp: 40, atk: 16, def: 5,
+        x: state.player.x + 2, y: state.player.y, nextAttackAt: 0 }
+    ]; enemyAttack(state.monsters[0]);`);
+  assert.ok(g.run('state.monsters[1].hp') > 10, 'wounded ally is healed');
+  assert.equal(g.run('state.monsters[0].hp'), 30, 'healthy healer does not heal themselves');
+  assert.equal(g.run('state.motion.projectiles[0].kind'), 'heal');
+});
+
+test('depth 50 has a saved throne room with bone volleys and summoned guards', () => {
+  const g = game();
+  g.run('newGame(); enterFloor(50, false)');
+  const arena = g.json('state.rooms.find(r => r.isArena)');
+  assert.equal(arena.isThroneRoom, true);
+  assert.equal(g.run('state.boss.isThroneBoss'), true);
+  assert.equal(g.run('state.boss.ranged'), true);
+  assert.equal(g.run('state.boss.projectile'), 'bone');
+  const props = g.json('state.props.filter(p => p.x >= state.rooms.find(r => r.isThroneRoom).x && p.x < state.rooms.find(r => r.isThroneRoom).x + state.rooms.find(r => r.isThroneRoom).w)');
+  assert.ok(props.some(p => p.sprite === 'throne'), 'throne dais is a saved prop');
+  assert.ok(props.some(p => p.sprite === 'torch'), 'torch rows are saved props');
+  assert.ok(props.some(p => p.sprite === 'banner'), 'banners are saved props');
+  g.run(`state.activeTime = 10; state.bossSummonAt = 10;
+    state.player.hp = state.player.maxHp = 9999;
+    state.player.x = state.boss.x - 2; state.player.y = state.boss.y;
+    state.motion.projectiles = []; state.boss.nextAttackAt = 0;
+    enemyAttack(state.boss); summonThroneGuards()`);
+  assert.equal(g.run('state.motion.projectiles[0].kind'), 'bone');
+  assert.ok(g.run('state.monsters.some(m => m.isGuard && m.hp > 0)'), 'Skeleton King summons guards');
+  assert.ok(g.run('state.messages.some(m => m.includes("skeletal guard"))'), 'summons are logged');
+});
+
+test('Skeleton King defeat shatters the crown, collapses guards, and never repeats rewards', () => {
+  const g = game();
+  g.run(`newGame(); enterFloor(50, false);
+    state.activeTime = 10; state.bossSummonAt = 10; summonThroneGuards();
+    state.player.x = state.boss.x - 1; state.player.y = state.boss.y; updateCamera();
+    damageMonster(state.boss, state.boss.hp)`);
+  const scene = g.json('bossDefeatScene()');
+  assert.equal(scene.motif, 'crown');
+  assert.ok(scene.crownShards.length > 0, 'crown shatters into shards');
+  assert.ok(scene.guards.length > 0, 'summoned army falls in the defeat scene');
+  assert.ok(g.run('state.messages.some(m => m.includes("throne falls silent"))'), 'unique defeat log persists in journal');
+  const rewards = g.json('[state.gold, state.kills, state.player.xp]');
+  g.calls.length = 0; g.run('draw()');
+  assert.ok(g.calls.some(c => c[0] === 'fillRect'), 'defeat particles and guards render');
+  assert.equal(g.calls.filter(c => c[0] === 'save').length, g.calls.filter(c => c[0] === 'restore').length);
+  g.key('Escape');
+  down(g);
+  const afterDescent = g.json('[state.gold, state.kills, state.player.xp]');
+  up(g);
+  assert.equal(g.run('state.depth'), 50);
+  assert.equal(g.run('state.bossDefeated'), true);
+  assert.equal(g.run('state.monsters.some(m => m.isGuard)'), false, 'guards do not respawn after the throne falls');
+  assert.deepEqual(g.json('[state.gold, state.kills, state.player.xp]'), afterDescent, 'rewards are not repeated on revisit');
+  assert.equal(g.json('[state.gold, state.kills, state.player.xp]')[0] - rewards[0], 3, 'only the normal descent bonus was added');
+});
+
+test('dev console toggles with tilde and freezes gameplay while open', () => {
+  const g = game();
+  const before = g.json('[state.player.x, state.player.y, state.activeTime]');
+  g.key('`');
+  assert.equal(g.run('state.consoleOpen'), true);
+  assert.equal(g.elements.devConsole.hidden, false);
+  g.key('w'); g.run('enemyTick()');
+  assert.deepEqual(g.json('[state.player.x, state.player.y, state.activeTime]'), before);
+  g.key('~');
+  assert.equal(g.run('state.consoleOpen'), false);
+  assert.equal(g.elements.devConsole.hidden, true);
+});
+
+test('loadLevel jumps to a fresh boss floor and rejects invalid depths', () => {
+  const g = game();
+  g.key('`');
+  const input = g.elements.consoleInput;
+  input.value = 'loadLevel 50'; g.key('Enter', { target: input });
+  assert.equal(g.run('state.depth'), 50);
+  assert.equal(g.run('state.boss.name'), 'Skeleton King');
+  assert.equal(g.run('state.boss.hp'), g.run('state.boss.maxHp'));
+  assert.ok(g.elements.consoleOutput.textContent.includes('Loaded depth 50'));
+  assert.ok(g.run('state.messages.some(m => m.includes("Cheat: loaded depth 50"))'));
+  g.run('damageMonster(state.boss, state.boss.hp)');
+  g.key('Escape');
+  g.key('`');
+  input.value = 'loadLevel 50'; g.key('Enter', { target: input });
+  assert.equal(g.run('state.boss.hp'), g.run('state.boss.maxHp'), 'reloading regenerates the boss for repeat tests');
+  input.value = 'loadLevel 900'; g.key('Enter', { target: input });
+  assert.equal(g.run('state.depth'), 50);
+  assert.ok(g.elements.consoleOutput.textContent.includes('Usage: loadLevel <1-100>'));
+});
+
+test('godMode freezes only hero stats until disabled', () => {
+  const g = game();
+  g.key('`');
+  const input = g.elements.consoleInput;
+  g.run('state.player.mp = 7; state.monsters[0].hp = 3; render()');
+  const frozen = g.json('[state.player.hp, state.player.maxHp, state.player.mp, state.player.maxMp, state.player.str, state.player.dex, state.player.def, state.player.lvl, state.player.xp, state.player.xpNext]');
+  input.value = 'godMode 1'; g.key('Enter', { target: input });
+  assert.equal(g.run('state.godMode'), true);
+  assert.equal(g.elements.godModeStat.hidden, false);
+  g.run(`hurtPlayer(9999, "test hit"); castSpell("fireball");
+    damageMonster(state.monsters[0], 9999); regenMana(); drinkPotion(); render()`);
+  assert.deepEqual(g.json('[state.player.hp, state.player.maxHp, state.player.mp, state.player.maxMp, state.player.str, state.player.dex, state.player.def, state.player.lvl, state.player.xp, state.player.xpNext]'), frozen);
+  assert.equal(g.run('state.monsters[0].hp <= 0'), true, 'monsters can still be killed');
+  const monsterHp = g.run('state.monsters[1].hp');
+  g.run('state.monsters[1].hp -= 4');
+  assert.equal(g.run('state.monsters[1].hp'), monsterHp - 4, 'monster stats are not frozen');
+  g.run('state.monsters[1].hp = 5000; state.monsters[1].maxHp = 5000; attackMonster(state.monsters[1])');
+  assert.equal(g.run('state.monsters[1].hp <= 0'), true, 'hero attacks still kill high-HP monsters');
+  assert.equal(g.run('state.gameOver'), false);
+  input.value = 'godMode 0'; g.key('Enter', { target: input });
+  assert.equal(g.run('state.godMode'), false);
+  g.run('hurtPlayer(5, "test hit")');
+  assert.equal(g.run('state.player.hp'), g.run('state.player.maxHp') - 5);
+});
+
+test('objective hides future bosses and hero details sit above the adventure log', () => {
+  const g = game();
+  g.run('enterFloor(6, false); render()');
+  assert.doesNotMatch(g.elements.objective.textContent, /Next boss|\b(Mimic|Hydra)\b|depth 10\b/i);
+  assert.match(g.elements.objective.textContent, /Descend/);
+  g.run('enterFloor(5, false); render()');
+  assert.match(g.elements.objective.textContent, /Defeat Mimic here/);
+  const html = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
+  const left = html.indexOf('id="leftSidebar"');
+  const hero = html.indexOf('id="heroMaxHp"');
+  const spells = html.indexOf('id="spellList"');
+  const journal = html.indexOf('id="journalTitle"');
+  const equip = html.indexOf('id="equipTitle"');
+  assert.ok(left >= 0 && left < hero && hero < spells && spells < journal && journal < equip);
+});
+
+test('mana regenerates only outside recent combat and away from monsters', () => {
+  const g = game();
+  g.run(`state.player.mp = 5; state.combatElapsed = 0; state.activeTime = 20;
+    state.manaRegenAt = 0; state.monsters = []; regenMana()`);
+  assert.equal(g.run('state.player.mp'), 5, 'recent combat blocks regeneration');
+  g.run('state.combatElapsed = 5; regenMana()');
+  assert.equal(g.run('state.player.mp'), 6);
+  g.run('state.activeTime = 22; markCombat(); regenMana()');
+  assert.equal(g.run('state.player.mp'), 6, 'an attack restarts the mana timer');
+  g.run(`state.combatElapsed = 5; state.activeTime = 30;
+    state.monsters = [{ hp: 1, x: state.player.x + 2, y: state.player.y }]; regenMana()`);
+  assert.equal(g.run('state.player.mp'), 6, 'a nearby monster blocks regeneration');
+});
+
+test('Magic Barrier shoves a foe three tiles or damages it against a wall', () => {
+  const g = game();
+  g.run(`Math.random = () => 0.9;
+    state.player.spells.magicBarrier = true; state.player.mp = 20; state.activeTime = 20;
+    state.spellReadyAt.magicBarrier = 0; state.floorKey = null;
+    state.monsters = [{ id: 1, name: 'Slime', sprite: 'slime', hp: 30, maxHp: 30,
+      atk: 5, def: 0, xp: 10, x: state.player.x + 1, y: state.player.y }];
+    for (let i = 1; i <= 5; i++) state.map[state.player.y][state.player.x + i] = 0`);
+  const startX = g.run('state.player.x');
+  g.key('z');
+  assert.equal(g.run('state.monsters[0].x'), startX + 4, 'the foe moves three tiles away');
+  assert.equal(g.run('state.monsters[0].hp'), 30, 'an open path causes no impact damage');
+  assert.equal(g.run('state.player.mp'), 6);
+
+  const wall = game();
+  wall.run(`Math.random = () => 0.9;
+    state.player.spells.magicBarrier = true; state.player.mp = 20; state.activeTime = 20;
+    state.spellReadyAt.magicBarrier = 0; state.floorKey = null;
+    state.monsters = [{ id: 1, name: 'Slime', sprite: 'slime', hp: 30, maxHp: 30,
+      atk: 5, def: 0, xp: 10, x: state.player.x + 1, y: state.player.y }];
+    state.map[state.player.y][state.player.x + 2] = 1`);
+  const wallX = wall.run('state.monsters[0].x');
+  wall.key('z');
+  assert.equal(wall.run('state.monsters[0].x'), wallX, 'a wall stops the knockback');
+  assert.ok(wall.run('state.monsters[0].hp') < 30, 'the wall impact deals damage');
+});
+
+test('defeated bosses become tiny companions that chip in and comment ironically', () => {
+  const g = game();
+  g.run(`Math.random = () => 0.9; state.depth = 3; state.player.mp = 20;
+    state.activeTime = 20; state.floorKey = null;
+    state.monsters = [{ id: 99, name: 'Cook', sprite: 'orc', hp: 1, maxHp: 1,
+      atk: 1, def: 0, xp: 1, gold: 0, x: state.player.x + 1, y: state.player.y, isBoss: true }]`);
+  g.key('f');
+  assert.deepEqual(g.json('[state.companion.name, state.companion.sprite]'), ['Cook', 'orc']);
+  assert.equal(g.run('state.messages.some(m => /Cook:/.test(m))'), true);
+  g.run('clearBossDefeat(); state.bossDefeat = null;');
+  g.run(`state.companionSpeech = null; state.companionAttackAt = 0; state.activeTime = 30;
+    state.monsters = [{ id: 100, name: 'Slime', sprite: 'slime', hp: 10, maxHp: 10,
+      atk: 1, def: 0, xp: 1, x: state.player.x + 2, y: state.player.y }];
+    companionTick()`);
+  assert.equal(g.run('state.monsters[0].hp'), 9, 'the companion deals only one damage');
+  g.run('state.companionSpeechReadyAt = 0; companionTalk("retreat"); render()');
+  assert.equal(g.run('state.messages.some(m => /Cook:/.test(m))'), true);
+  assert.equal(g.elements.companionStat.hidden, false);
+  assert.equal(g.elements.companionName.textContent, 'Cook');
+  g.run('newGame(); render()');
+  assert.equal(g.run('state.companion'), null);
+  assert.equal(g.elements.companionStat.hidden, true);
 });
