@@ -15,7 +15,7 @@ Local LLM playground, tooks ~30h to get to v0.11.0 with "better" graphics
 
 A plain HTML5 canvas dungeon game, version 0.16.2. Open `index.html` directly in a browser (`file://`); there is no install, build step, server, or network dependency.
 
-The fantasy logo and version appear on the launch screen only. Click **Enter the dungeon** or press a key to begin; the game waits until you start. During play, stats sit at the top; Hero stats and Spells sit above a half-height adventure log on the left of the map, and the floor chart with equipment sits to the right. On narrow screens the left and right panels stack below the map. R starts a fresh run without showing the launch screen again; reloading the page shows it.
+The fantasy logo and version appear on the launch screen only. Click **Enter the dungeon** or press a key to begin; the game waits until you start. During play, stats sit at the top; Hero stats sit in a fixed compact panel above a fixed, internally scrolling adventure log (newest first) on the left of the map, and the floor chart with equipment and Spells under Gear bonuses sits to the right. On narrow screens the left and right panels stack below the map. R starts a fresh run without showing the launch screen again; reloading the page shows it.
 
 ## Screenshots
 

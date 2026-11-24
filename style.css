@@ -15,10 +15,10 @@ button:disabled { opacity: .45; cursor: default; }
 #xpfill { height: 100%; background: linear-gradient(90deg,#3ea6ff,#7fe0ff); transition: width .2s; }
 #objective { color: #d4bd8d; font-size: 13px; text-align: center; padding: 3px 12px; }
 #playArea { display: grid; grid-template-columns: 210px minmax(0, 1fr) 210px; gap: 14px; align-items: stretch; }
-#leftSidebar { min-width: 0; min-height: 0; display: grid; grid-template-rows: minmax(150px, 0.8fr) minmax(0, 1.2fr); gap: 10px; }
+#leftSidebar { min-width: 0; min-height: 0; height: 100%; max-height: 100%; display: grid; grid-template-rows: 180px minmax(0, 1fr); gap: 10px; }
 #heroPanel, #journal { min-width: 0; min-height: 0; display: flex; flex-direction: column; border: 1px solid #353b46; border-radius: 6px; background: #11151d; overflow: hidden; }
 #heroPanel h2, #journal h2 { height: 34px; flex: none; display: flex; align-items: center; padding: 0 16px; border-bottom: 1px solid #343333; background: #191c24; color: #d7ba7b; font-size: 13px; font-weight: normal; letter-spacing: 1px; text-transform: uppercase; }
-#heroPanelContent { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 14px; align-content: start; overflow-y: auto; padding: 8px 12px; scrollbar-color: #4d5260 #11151d; }
+#heroPanelContent { flex: 1; min-height: 0; overflow-y: auto; padding: 6px 12px; font-size: 11px; scrollbar-color: #4d5260 #11151d; }
 #log { flex: 1; min-height: 0; overflow-y: auto; white-space: pre-wrap; overflow-wrap: anywhere; color: #a7b9cb; font-size: 12px; line-height: 1.65; padding: 14px 16px; scrollbar-color: #4d5260 #11151d; }
 #wrap { position: relative; min-width: 0; align-self: start; }
 canvas { display: block; width: 100%; height: auto; background: #000; border: 3px solid #3a2f1d; border-radius: 6px; box-shadow: 0 0 30px #0008; image-rendering: pixelated; }
@@ -48,8 +48,9 @@ canvas:focus-visible { outline: 1px solid #a18c5b; outline-offset: 2px; }
 .gear-summary b { color: #a7c6b7; }
 .hero-stats { padding: 4px 0; color: #a7b9cb; }
 .hero-stats h3 { margin: 0 0 6px; }
-.hero-stats dl > div { margin-top: 4px; }
+.hero-stats dl > div { margin-top: 3px; }
 .hero-stats dd { color: #e4d5b4; }
+#equipContent .hero-stats { margin-top: 12px; padding-top: 12px; border-top: 1px solid #31363f; }
 
 #spellList { font-size: 11px; color: #a8d2cd; line-height: 1.55; }
 #merchantStock { font-size: 12px; color: #b0c4de; text-align: center; min-height: 18px; }

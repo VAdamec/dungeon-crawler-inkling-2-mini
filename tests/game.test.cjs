@@ -1804,7 +1804,17 @@ test('objective hides future bosses and hero details sit above the adventure log
   const spells = html.indexOf('id="spellList"');
   const journal = html.indexOf('id="journalTitle"');
   const equip = html.indexOf('id="equipTitle"');
-  assert.ok(left >= 0 && left < hero && hero < spells && spells < journal && journal < equip);
+  assert.ok(left >= 0 && left < hero && hero < journal && journal < equip && equip < spells);
+  const css = fs.readFileSync(path.join(__dirname, '../style.css'), 'utf8');
+  assert.match(css, /#leftSidebar\s*\{[^}]*grid-template-rows:\s*180px minmax\(0, 1fr\)/);
+});
+
+test('adventure log shows newest messages first while stored history stays chronological', () => {
+  const g = game();
+  g.run('log("old entry"); log("new entry")');
+  assert.deepEqual(g.json('[state.messages.at(-2), state.messages.at(-1)]'), ['old entry', 'new entry']);
+  assert.ok(g.elements.log.textContent.indexOf('new entry') < g.elements.log.textContent.indexOf('old entry'));
+  assert.equal(g.elements.log.scrollTop, 0);
 });
 
 test('mana regenerates only outside recent combat and away from monsters', () => {

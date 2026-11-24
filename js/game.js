@@ -737,8 +737,8 @@ function log(msg) {
   state.messages.push(String(msg));
   if (state.messages.length > 80) state.messages.shift();
   const panel = document.getElementById('log');
-  panel.textContent = state.messages.join('\n\n');
-  panel.scrollTop = panel.scrollHeight;
+  panel.textContent = [...state.messages].reverse().join('\n\n');
+  panel.scrollTop = 0;
 }
 
 function monsterAt(x, y) {
