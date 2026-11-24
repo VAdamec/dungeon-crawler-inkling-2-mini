@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dungeon Crawler — Classic JRPG visual proposal · revision</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b1018;color:#c6d0d8;font:13px/1.55 'Courier New',monospace}
+main{width:1240px;max-width:96vw;margin:28px auto 60px}
+section{background:#121b26;border:1px solid #314153;border-radius:8px;padding:24px;margin-bottom:22px}
+h1{font:30px Georgia,serif;color:#e8c68d;margin:0 0 6px}
+h2{font:22px Georgia,serif;color:#e8c68d;margin:0 0 4px}
+p{margin:0}
+.eyebrow{color:#8fb0aa;text-transform:uppercase;letter-spacing:3px;font-size:10px;margin-bottom:8px}
+.note{color:#8d9faf;font-size:11px;margin-top:6px}
+.warning{display:inline-block;border:1px solid #a3703a;color:#e8b46b;border-radius:20px;padding:6px 12px;font-size:10px;letter-spacing:2px}
+.header{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:18px}
+.shot{margin:16px 0 26px}
+.shot figcaption{font-size:11px;color:#9fb0be;margin:6px 0 0}
+canvas.scene{display:block;width:100%;max-width:1152px;height:auto;image-rendering:pixelated;border:1px solid #3c4f62;background:#0b1019}
+.rule{border-left:3px solid #a9503a;padding-left:12px;color:#b9c7d2;font-size:11px;margin-top:14px}
+footer{border-top:1px solid #314153;padding-top:14px;color:#8fa3b1;font-size:11px;display:flex;justify-content:space-between;gap:20px}
+</style>
+</head>
+<body>
+<main>
+<section><p class="eyebrow">Latest design · primary-agent study 03</p><h2>New town, dungeon and directional character proposal</h2><p class="note">The latest isolated design supersedes this revision-2 gallery for review. It includes substantial building overhangs, continuous terrain, new character painters and matched grayscale/silhouette comparisons. Both the focus and expanded collection are approved and implemented in the working game.</p><p style="margin-top:16px"><a href="design-v3/index.html" style="color:#edc98b;font-size:18px">Open the approved focus study →</a> · <a href="design-v3/collection/index.html" style="color:#edc98b;font-size:18px">Open the expanded collection →</a></p></section>
+  <section>
+    <div class="header">
+      <div>
+        <p class="eyebrow">Dungeon Crawler · 2026-11-24 · JRPG-02 revised focus</p>
+        <h1>Classic JRPG visual proposal — town + dungeon first</h1>
+        <p class="note">Original Knights of Xentar / PC-98-inspired overhead pixel art. Square grid preserved. Every image below is a proposal, not current gameplay.</p>
+      </div>
+      <span class="warning">PROPOSAL — NOT APPROVED</span>
+    </div>
+    <p class="note">Revision after review: the earlier gallery hid several new assets behind harness fallbacks. This pass shows only the two focus scenes until they are convincing. Each scene is the real 18×12 viewport at 2× display scale (1152×768), followed by a grayscale copy so shape changes can be judged without palette.</p>
+    <div class="rule">Fixes in this revision: new front/side/back hero drawn in-scene; shaped inn/store/huts with pitched roofs; organic tree canopies; separate water and bank tiles with no masonry river; continuous grass/road surfaces with no embossed square border; no recolor fallback for displayed props or bosses.</div>
+  </section>
+
+  <section id="scene-town">
+    <p class="eyebrow">Focus sample 1 · color then grayscale</p>
+    <h2>Town hub — facades, roads, riverbanks, bridge, gate</h2>
+    <p class="note">Look for stepped gables and shaded facades on the Inn/Store/huts, rounded canopy trees, a blue river with sandy banks, a planked bridge, and the new hero in front / side / back views.</p>
+  </section>
+
+  <section id="scene-dungeon">
+    <p class="eyebrow">Focus sample 2 · color then grayscale</p>
+    <h2>Dungeon — narrow corridors, wall height, fog edges</h2>
+    <p class="note">Look for connected wall tops with a front face, borderless continuous floor, shaped stairs/chest/potion/key/torch, the new ordinary-monster grids, and the new side-view hero with Marmalade.</p>
+  </section>
+
+  <section>
+    <p class="eyebrow">Deferred until these two samples pass</p>
+    <h2>Remaining asset gallery</h2>
+    <p class="note">Bosses, all unique monsters, full item/equipment/hazard coverage and the throne-room sample are intentionally not presented here. The earlier recolor-based boss/item sheets are withdrawn, not approved.</p>
+  </section>
+
+  <footer>
+    <span id="render-note">Rendering…</span>
+    <span>Concrete artwork requires approval before JRPG-03. No runtime files changed.</span>
+  </footer>
+</main>
+<script src="before-sprites.js"></script>
+<script src="proposal-sprites.js"></script>
+<script src="preview.js"></script>
+</body>
+</html>

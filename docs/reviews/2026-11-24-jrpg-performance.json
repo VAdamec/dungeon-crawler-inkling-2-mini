@@ -1,0 +1,32 @@
+{
+  "before": {
+    "median": 0.6000000238418579,
+    "p95": 2.300000011920929,
+    "units": "milliseconds",
+    "cache": {
+      "sprites": 13,
+      "tiles": 51
+    }
+  },
+  "after": {
+    "median": 0.7999999821186066,
+    "p95": 2.5,
+    "units": "milliseconds",
+    "cache": {
+      "sprites": 15,
+      "tiles": 432
+    }
+  },
+  "pixels": {
+    "hiddenSpikePixelEquality": true,
+    "heroDirections": 4,
+    "batWingFrames": true,
+    "dragonWingFrames": true,
+    "torchFrames": true
+  },
+  "audio": {
+    "context": "running",
+    "music": 0.31,
+    "effects": 0.58
+  }
+}

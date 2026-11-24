@@ -1,0 +1,68 @@
+{
+  "checks": [
+    "launch freeze / user-gesture audio start",
+    "Space recruits Marmalade / gate descent",
+    "J scroll consumption / exact tile one-use portal return",
+    "connected descent/ascent / exact floor layout persistence",
+    "real keyboard interpolation / directional art / Help animation freeze",
+    "health dialog/freeze / confirmed retreat-to-town",
+    "all 9 unique/themed boss intros, defeats, frozen input and Esc skip",
+    "princess trigger / healing and sunset phases / ending Help freeze / Esc / R",
+    "audio preferences preserved / 390px Help width"
+  ],
+  "bossResults": [
+    {
+      "depth": 3,
+      "kind": "cook",
+      "hp": 140
+    },
+    {
+      "depth": 5,
+      "kind": "mimic",
+      "hp": 118
+    },
+    {
+      "depth": 7,
+      "kind": "bartender",
+      "hp": 220
+    },
+    {
+      "depth": 10,
+      "kind": "hydra",
+      "hp": 229
+    },
+    {
+      "depth": 20,
+      "kind": "boar",
+      "hp": 426
+    },
+    {
+      "depth": 30,
+      "kind": "medusa",
+      "hp": 515
+    },
+    {
+      "depth": 40,
+      "kind": "wizard",
+      "hp": 682
+    },
+    {
+      "depth": 50,
+      "kind": "skeletonKing",
+      "hp": 1032
+    },
+    {
+      "depth": 100,
+      "kind": "dragon",
+      "hp": 2061
+    }
+  ],
+  "audio": {
+    "context": "running",
+    "music": 0.31,
+    "effects": 0.58
+  },
+  "mobile": true,
+  "errors": [],
+  "remote": []
+}

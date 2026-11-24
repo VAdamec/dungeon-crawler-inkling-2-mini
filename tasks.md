@@ -1,8 +1,8 @@
 # Tasks — Dungeon Crawler
 
-Last reviewed: 2026-11-24. Working build v0.20.0 includes smooth movement, walking/wing/flame animation, the ? Help & settings dialog, 2× world zoom (18×12 view), the approved static graphics refresh, boss-defeat flourishes, the explored-area minimap with a compact Hero stats panel above a larger log and Spells under Gear bonuses, monster combat quotes, larger bosses/arenas, ranged/magic combat with out-of-combat mana regeneration and Magic Barrier, tiny defeated-boss companions with adjacent-tile following, fog light, 1 damage and ironic remarks, the persistent fully visible town hub with grass/sand roads, huts, Inn, Store, villagers, wandering animals, river, bridge and dungeon gate, retreat-to-town with an exact saved dungeon return point, Town Scrolls with one-use town portals, depth 1 ▲ stairs back to town, five biomes on 96×64 floors, the 100-floor boss campaign with surprise bosses and a max hero level of 100, dedicated boss art and intro/defeat animations, the Skeleton King throne room, the ~ developer console with hero-stat-freezing, monster-killing god mode, and the plot-twist ending. See `handover.md` for details and `README.md` for controls.
+Last reviewed: 2026-11-24. Release v1.0.0 includes smooth movement, walking/wing/flame animation, the ? Help & settings dialog, 2× world zoom (18×12 view), the approved static graphics refresh, boss-defeat flourishes, the explored-area minimap with a compact Hero stats panel above a larger log and Spells under Gear bonuses, monster combat quotes, larger bosses/arenas, ranged/magic combat with out-of-combat mana regeneration and Magic Barrier, tiny defeated-boss companions with adjacent-tile following, fog light, 1 damage and ironic remarks, the persistent fully visible town hub with grass/sand roads, huts, Inn, Store, villagers, wandering animals, river, bridge and dungeon gate, retreat-to-town with an exact saved dungeon return point, Town Scrolls with one-use town portals, depth 1 ▲ stairs back to town, five biomes on 96×64 floors, the 100-floor boss campaign with surprise bosses and a max hero level of 100, dedicated boss art and intro/defeat animations, the Skeleton King throne room, the ~ developer console with hero-stat-freezing, monster-killing god mode, and the plot-twist ending. See `handover.md` for details and `README.md` for controls.
 
-Current audit: **132 behavior tests**, syntax and external smoke pass. Selected offline Chrome checks and screenshots passed; see [status review](docs/reviews/2026-11-24-status-review.md) for evidence and two open gameplay findings. Historical verification counts below refer to their implementation dates.
+Current graphics audit: **138 behavior tests**, syntax and external smoke pass. Selected offline Chrome checks and screenshots passed; see [status review](docs/reviews/2026-11-24-status-review.md) for evidence and two open gameplay findings. The [JRPG implementation review](docs/reviews/2026-11-24-jrpg-implementation.md) records the latest tests, seeded comparison and browser checks. Historical verification counts below refer to their implementation dates.
 
 ## Existing gameplay
 - [x] Keep a thin HTML shell, CSS, and two plain scripts with no runtime dependencies or build step; launch over `file://`.
@@ -131,12 +131,31 @@ Current audit: **132 behavior tests**, syntax and external smoke pass. Selected 
 ## Review follow-ups — 2026-11-24
 
 - [x] Update changelog, README screenshots, illustrated bestiary and magic reference; reconcile current plan/handover status.
-- [ ] Sample the full weighted `spawnPool()` rather than clamping a depth-based index; add low/deep-floor regression cases.
-- [ ] Make Magic Barrier choose the nearest eligible target with deterministic ties; decide whether Frostbolt should share this rule.
+- [x] Sample the entire weighted `spawnPool()` using its length; regression cases drive every weighted slot on floors 1, 2 and 100, preserving biome duplicates and minimum-depth gating.
+- [x] Make both Magic Barrier and Frostbolt choose the nearest eligible enemy by tile distance, breaking equal-distance ties by lowest monster ID without RNG or live-array sorting. Cover ordering, eligibility, range boundaries, mana/cooldowns, push/damage and empty casts.
+- [x] Verify these fixes: 151 behavior tests pass, both scripts pass syntax checks, external smoke reports `SMOKE_OK`, and both spell hotkeys select the nearest enemy in offline Chrome without browser errors or network requests.
 - [ ] Complete a human campaign and audible quality/balance playtest.
 - [ ] Decide whether to schedule the expansion design’s deferred themed extras: recurring themed encounters, Cook throwing-pan attacks and extra themed food/mug/stool content.
 
 See [review findings](docs/reviews/2026-11-24-status-review.md#findings).
+
+## Implemented — classic JRPG graphics (2026-11-24)
+
+Both artwork stages and runtime integration were explicitly approved. The graphics refresh is implemented; [verification and limits](docs/reviews/2026-11-24-jrpg-implementation.md) are recorded. Existing gameplay, clocks, map dimensions and offline launch remain intact. No staging/commits.
+
+[Design and task details](docs/plans/2026-11-24-classic-jrpg-graphics-plan.md) · [Runtime asset inventory](docs/previews/2026-11-24-classic-jrpg/inventory.md)
+
+- [x] JRPG-01: baseline, asset/direction/frame inventory, before captures and same-browser performance comparison.
+- [x] JRPG-02A: structural town/dungeon/character focus preview, approved by the user.
+- [x] JRPG-02B: remaining monsters, bosses, items and biomes, approved by the user with an explicit implementation request.
+- [x] JRPG-03: original dungeon materials, known wall faces and shared visual helpers.
+- [x] JRPG-04: directional humanoids, explicit art bounds and preserved walking/wing/cast/flame clocks.
+- [x] JRPG-05: town architecture/scenery, NPC/animal art, companion visibility and unchanged interaction footprints.
+- [x] JRPG-06: complete monster/boss/item/hazard/FX catalog and refreshed cinematic artwork with existing lifecycle/timing.
+- [x] JRPG-07: 138 tests, syntax, smoke, selected file:// browser scenarios, pixel secrecy and rendering-cost comparison.
+- [x] JRPG-08: runtime screenshots/bestiary, changelog, agent guidance, inventory and handoff.
+
+Unrelated gameplay fixes and full human difficulty/audio playtesting remain separate backlog items.
 
 ## Constraints
 - All runtime files are in this project directory. No runtime installation or server is needed.

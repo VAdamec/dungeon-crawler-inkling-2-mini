@@ -2,9 +2,27 @@
 
 Versions below distinguish the current working build from committed releases. Entries summarize local source, plans and git history; dates are local commit/review dates. Intermediate working-version numbers are not reconstructed as releases.
 
-## Unreleased — working build 0.20.0
+## 1.0.0 — 2026-11-24
 
-Reviewed 2026-11-24; latest committed version is 0.16.3.
+Classic JRPG graphics release, based on 0.20.0 (`5c5a6b0`). Runtime launch branding is now 1.0.0.
+
+### Fixed — 2026-11-24
+
+- Ordinary monster spawning now samples every slot of the depth-filtered, biome-weighted pool. This fixes excluded eligible types on early floors and excessive last-entry spawning at depth. Configured minimum depths, duplicate weights and monster stats are unchanged; the encounter mix can change on both early and late floors.
+- Frostbolt and Magic Barrier now target the nearest living, visible enemy within their existing range and line of sight. Distance uses the larger tile-axis difference; equal distances choose the lowest monster ID, independently of monster-list order. Target selection consumes no RNG and does not reorder the live array.
+- Added regression coverage for generated floors 1/2/100, target order/ties, visibility/LOS/camera eligibility, spell ranges and unchanged mana/cooldown/empty-cast behavior. Existing Barrier push/impact and spell damage rules remain intact.
+- Verified 151 passing behavior tests, both script syntax checks, external smoke and both spell hotkeys in offline Chrome, with no browser errors or network requests.
+
+### Graphics update — 2026-11-24
+
+- Integrated the user-approved classic JRPG artwork across town, all ordinary/themed/campaign monsters, equipment/items, hazards, props and projectile effects. Four-direction humanoids, walking poses, wings, torches and existing cinematic clocks remain local and pause-aware.
+- Fitted buildings to their existing blocked town footprints; added art-aware culling, stable foot anchors and throne-room material/column treatment without changing generated maps, collision or campaign rules.
+- Stored 76 original sprite/FX names as compact pixel grids in the existing two-script runtime; no external assets, dependencies or build step. Launch branding identifies release 1.0.0.
+- Updated runtime screenshots/bestiary and recorded 138 passing behavior tests, smoke, offline-browser checks, matching seeded gameplay fixtures and a warm rendering comparison. See [implementation evidence](docs/reviews/2026-11-24-jrpg-implementation.md).
+
+## 0.20.0 — 2026-11-24
+
+Commit `5c5a6b0`: town, companions and teleport flows, with the then-current documentation and screenshots.
 
 ### Added
 

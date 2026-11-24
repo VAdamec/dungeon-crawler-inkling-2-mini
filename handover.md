@@ -1,10 +1,30 @@
 # Handover — Dungeon Crawler
 
-Last updated: 2026-11-24. Current working build: v0.20.0; latest committed version: v0.16.3 (`895af42`).
+Last updated: 2026-11-24. Current release: v1.0.0; latest committed version: v0.20.0 (`5c5a6b0`).
+
+## Latest follow-up — weighted spawning and nearest spell targets
+
+The user authorized fixing the two reviewed behavior gaps. Ordinary monsters now sample `spawnPool()` by its actual array length, keeping configured depth filters and duplicated biome weights. Both Frostbolt (range 4) and Magic Barrier (range 3) use `nearestVisibleTarget()`: existing alive/fog/camera/LOS eligibility, Chebyshev tile distance, and lowest-ID tie-breaking. No RNG or live-array sorting is added to selection; other attacks/companions retain their current targeting. Spell costs, cooldowns, damage and Barrier push/impact rules are unchanged. Encounter composition changes intentionally, including restoring configured Skeleton/Orc eligibility at depth 1; no balance stats were retuned.
+
+Regression tests exercise all weighted slots on floors 1/2/100 and both spells’ distance/order/tie/eligibility/range/resource behavior. See current tasks and changelog. Historical graphics-only comparisons below predate these intentional gameplay fixes; they are not a claim that the corrected spawning/targeting matches old behavior. Release branding stays 1.0.0; no staging/commit/tag commands were issued.
+
+Verification: all 151 behavior tests pass, including 13 new regressions; both scripts pass syntax checks and the external smoke reports `SMOKE_OK`. Actual Frostbolt/Barrier hotkeys in file:// Chrome target the nearer enemy despite farther-first array order, preserving the array and expected MP costs/damage/push. No browser errors or network requests occurred.
+
+## Latest result — approved JRPG graphics integrated
+
+The user approved both focus and expanded collections and explicitly requested implementation while preserving gameplay, animation and offline support. The runtime graphics refresh is complete in the working tree. No staging or commit was performed; preserve the pre-existing staged plan/prompt additions.
+
+- `js/sprites.js` now contains 76 original sprite/FX names as compact run-length grids with 211 unique decoded poses, four-way humanoid variants, explicit bounds, independent icon/direction caches and new biome/material painters. No preview assets or exporter are loaded at runtime.
+- `js/game.js` has rendering-only anchor/culling/footprint helpers, transient direction bookkeeping, smooth town patrol rendering, material/column overrides in the saved throne arena, and approved art in projectile/boss/ending drawing. Logical map generation, stats, targeting, inventory, campaign rules and audio code are preserved.
+- Existing footprints size town buildings; doorway/gate coordinates do not move. Player-last visibility remains. Five biome materials share the old grid and 18×12 view at 2×. The hero is 32×44, Mimic 96×66 and Dragon 120×108 drawn world pixels; other figures use explicit art bounds with single-tile collision.
+- Verification: 138 tests pass, both syntax checks and external `SMOKE_OK`; 13 focused material/render checks also pass after palette cleanup. Seeded old/new town, ten patrol ticks and eleven floor fixtures match gameplay/world data excluding sprite identifiers. Actual file:// Chrome checks cover movement, dialogs/travel, all boss kinds, ending/skip/restart and mobile, with no errors/remote requests. Hidden spikes remain pixel-identical before reveal, and AudioContext runs after interaction. Warm draw+minimap median/p95: 0.6/2.3 ms before, 0.8/2.5 ms after on this machine.
+- README screenshots and bestiary portraits now show implemented graphics under `docs/screenshots/2026-11-24-jrpg/`. The user designated the graphics release 1.0.0; launch branding and current release documentation are updated. The latest committed base remains 5c5a6b0; no release commit/tag was created.
+
+Read [implementation evidence](docs/reviews/2026-11-24-jrpg-implementation.md), [runtime inventory](docs/previews/2026-11-24-classic-jrpg/inventory.md) and [completed plan](docs/plans/2026-11-24-classic-jrpg-graphics-plan.md). Optional original-art export recipes are archived with the collection, never required to play. The weighted-spawn and spell-targeting issues are resolved in the follow-up above. Full human campaign/audio assessment remains open.
 
 ## Current handoff — read first
 
-This section and the [status review](docs/reviews/2026-11-24-status-review.md) supersede the dated implementation history below. This pass updates documentation and screenshots only; existing runtime edits and staging are preserved. No staging or commits were performed.
+The latest result above supersedes this earlier snapshot. This section and the [status review](docs/reviews/2026-11-24-status-review.md) supersede the dated implementation history below. This pass updates documentation and screenshots only; existing runtime edits and staging are preserved. No staging or commits were performed.
 
 - Current game: 100 floors, level cap 100, 96×64 worlds targeting 32 rooms, 18×12 viewport at 2× zoom, five biomes and saved decorative props. Keys are required on floors 1–99. Boss gates are at 5, 10, 20, 30, 40, 50, 60, 70, 80, 90 and 100. Final dragon defeat then princess interaction at depth 100 starts the ending.
 - Expansion includes ranged/magic enemies, Bow (E), five spells/tomes, active-time MP regeneration, large boss artwork/intros/defeats, the depth-50 throne room and developer console. `bossForDepth()` supplies actual encounter stats; README now lists them.

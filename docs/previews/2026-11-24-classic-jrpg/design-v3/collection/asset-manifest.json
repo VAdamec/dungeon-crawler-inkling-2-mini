@@ -1,0 +1,926 @@
+[
+  {
+    "id": "slime",
+    "name": "Slime",
+    "group": "ordinary",
+    "bounds": {
+      "left": -19,
+      "top": -23,
+      "right": 19,
+      "bottom": 4,
+      "width": 39,
+      "height": 28
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "bat",
+    "name": "Bat",
+    "group": "ordinary",
+    "bounds": {
+      "left": -29,
+      "top": -42,
+      "right": 28,
+      "bottom": 3,
+      "width": 58,
+      "height": 46
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "goblin",
+    "name": "Goblin",
+    "group": "ordinary",
+    "bounds": {
+      "left": -15,
+      "top": -41,
+      "right": 18,
+      "bottom": 3,
+      "width": 34,
+      "height": 45
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "skeleton",
+    "name": "Skeleton",
+    "group": "ordinary",
+    "bounds": {
+      "left": -10,
+      "top": -38,
+      "right": 14,
+      "bottom": 3,
+      "width": 25,
+      "height": 42
+    },
+    "source": "Approved study-03 painter"
+  },
+  {
+    "id": "orc",
+    "name": "Orc",
+    "group": "ordinary",
+    "bounds": {
+      "left": -20,
+      "top": -51,
+      "right": 31,
+      "bottom": 4,
+      "width": 52,
+      "height": 56
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "wasp",
+    "name": "Wasp",
+    "group": "ordinary",
+    "bounds": {
+      "left": -24,
+      "top": -40,
+      "right": 23,
+      "bottom": 4,
+      "width": 48,
+      "height": 45
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "mage",
+    "name": "Mage",
+    "group": "ordinary",
+    "bounds": {
+      "left": -10,
+      "top": -39,
+      "right": 16,
+      "bottom": 3,
+      "width": 27,
+      "height": 43
+    },
+    "source": "Approved study-03 painter"
+  },
+  {
+    "id": "healer",
+    "name": "Healer",
+    "group": "ordinary",
+    "bounds": {
+      "left": -11,
+      "top": -42,
+      "right": 18,
+      "bottom": 3,
+      "width": 30,
+      "height": 46
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "mimic",
+    "name": "Mimic",
+    "group": "boss",
+    "bounds": {
+      "left": -42,
+      "top": -58,
+      "right": 42,
+      "bottom": 8,
+      "width": 85,
+      "height": 67
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "hydra",
+    "name": "Hydra",
+    "group": "boss",
+    "bounds": {
+      "left": -44,
+      "top": -84,
+      "right": 53,
+      "bottom": 9,
+      "width": 98,
+      "height": 94
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "boar",
+    "name": "Wild Boar",
+    "group": "boss",
+    "bounds": {
+      "left": -45,
+      "top": -59,
+      "right": 50,
+      "bottom": 8,
+      "width": 96,
+      "height": 68
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "medusa",
+    "name": "Medusa",
+    "group": "boss",
+    "bounds": {
+      "left": -29,
+      "top": -80,
+      "right": 31,
+      "bottom": 7,
+      "width": 61,
+      "height": 88
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "darkWizard",
+    "name": "Dark Wizard",
+    "group": "boss",
+    "bounds": {
+      "left": -31,
+      "top": -82,
+      "right": 33,
+      "bottom": 6,
+      "width": 65,
+      "height": 89
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "skeletonKing",
+    "name": "Skeleton King",
+    "group": "boss",
+    "bounds": {
+      "left": -33,
+      "top": -96,
+      "right": 39,
+      "bottom": 7,
+      "width": 73,
+      "height": 104
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "dragonBoss",
+    "name": "Dragon",
+    "group": "boss",
+    "bounds": {
+      "left": -60,
+      "top": -99,
+      "right": 59,
+      "bottom": 9,
+      "width": 120,
+      "height": 109
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "cook",
+    "name": "Cook",
+    "group": "boss",
+    "bounds": {
+      "left": -20,
+      "top": -64,
+      "right": 31,
+      "bottom": 4,
+      "width": 52,
+      "height": 69
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "bartender",
+    "name": "Bartender",
+    "group": "boss",
+    "bounds": {
+      "left": -10,
+      "top": -38,
+      "right": 22,
+      "bottom": 3,
+      "width": 33,
+      "height": 42
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "potion",
+    "name": "Potion",
+    "group": "item",
+    "bounds": {
+      "left": -7,
+      "top": -18,
+      "right": 6,
+      "bottom": 2,
+      "width": 14,
+      "height": 21
+    },
+    "source": "Approved study-03 painter"
+  },
+  {
+    "id": "sword",
+    "name": "Sword",
+    "group": "item",
+    "bounds": {
+      "left": -9,
+      "top": -35,
+      "right": 8,
+      "bottom": 2,
+      "width": 18,
+      "height": 38
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "bow",
+    "name": "Bow",
+    "group": "item",
+    "bounds": {
+      "left": -8,
+      "top": -36,
+      "right": 23,
+      "bottom": 1,
+      "width": 32,
+      "height": 38
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "armor",
+    "name": "Armor",
+    "group": "item",
+    "bounds": {
+      "left": -12,
+      "top": -33,
+      "right": 12,
+      "bottom": -4,
+      "width": 25,
+      "height": 30
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "helmet",
+    "name": "Helmet",
+    "group": "item",
+    "bounds": {
+      "left": -13,
+      "top": -32,
+      "right": 13,
+      "bottom": -4,
+      "width": 27,
+      "height": 29
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "shield",
+    "name": "Shield",
+    "group": "item",
+    "bounds": {
+      "left": -12,
+      "top": -34,
+      "right": 11,
+      "bottom": 0,
+      "width": 24,
+      "height": 35
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "ring",
+    "name": "Ring",
+    "group": "item",
+    "bounds": {
+      "left": -11,
+      "top": -31,
+      "right": 11,
+      "bottom": 0,
+      "width": 23,
+      "height": 32
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "elixir",
+    "name": "Elixir",
+    "group": "item",
+    "bounds": {
+      "left": -10,
+      "top": -31,
+      "right": 9,
+      "bottom": -3,
+      "width": 20,
+      "height": 29
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "frostbolt",
+    "name": "Frostbolt tome",
+    "group": "item",
+    "bounds": {
+      "left": -12,
+      "top": -30,
+      "right": 12,
+      "bottom": -1,
+      "width": 25,
+      "height": 30
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "greaterHeal",
+    "name": "Greater Heal tome",
+    "group": "item",
+    "bounds": {
+      "left": -12,
+      "top": -30,
+      "right": 12,
+      "bottom": -1,
+      "width": 25,
+      "height": 30
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "magicBarrier",
+    "name": "Barrier tome",
+    "group": "item",
+    "bounds": {
+      "left": -12,
+      "top": -30,
+      "right": 12,
+      "bottom": -1,
+      "width": 25,
+      "height": 30
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "townScroll",
+    "name": "Town Scroll",
+    "group": "item",
+    "bounds": {
+      "left": -13,
+      "top": -30,
+      "right": 11,
+      "bottom": -1,
+      "width": 25,
+      "height": 30
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "townPortal",
+    "name": "Return portal",
+    "group": "item",
+    "bounds": {
+      "left": -18,
+      "top": -47,
+      "right": 18,
+      "bottom": 0,
+      "width": 37,
+      "height": 48
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "key",
+    "name": "Floor key",
+    "group": "item",
+    "bounds": {
+      "left": -13,
+      "top": -31,
+      "right": 16,
+      "bottom": 0,
+      "width": 30,
+      "height": 32
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "chest",
+    "name": "Chest",
+    "group": "item",
+    "bounds": {
+      "left": -14,
+      "top": -21,
+      "right": 14,
+      "bottom": 4,
+      "width": 29,
+      "height": 26
+    },
+    "source": "Approved study-03 painter"
+  },
+  {
+    "id": "stairsUp",
+    "name": "Stairs up",
+    "group": "item",
+    "bounds": {
+      "left": -16,
+      "top": -32,
+      "right": 15,
+      "bottom": -1,
+      "width": 32,
+      "height": 32
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "stairsDown",
+    "name": "Stairs down",
+    "group": "item",
+    "bounds": {
+      "left": -16,
+      "top": -32,
+      "right": 15,
+      "bottom": 0,
+      "width": 32,
+      "height": 33
+    },
+    "source": "Approved study-03 painter"
+  },
+  {
+    "id": "torch",
+    "name": "Wall torch",
+    "group": "item",
+    "bounds": {
+      "left": -7,
+      "top": -35,
+      "right": 6,
+      "bottom": 0,
+      "width": 14,
+      "height": 36
+    },
+    "source": "Approved study-03 painter"
+  },
+  {
+    "id": "ordinaryFloor",
+    "name": "Ordinary floor",
+    "group": "item",
+    "bounds": {
+      "left": -16,
+      "top": -32,
+      "right": 15,
+      "bottom": -1,
+      "width": 32,
+      "height": 32
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "hiddenSpikes",
+    "name": "Hidden spikes · no marker",
+    "group": "item",
+    "bounds": {
+      "left": -16,
+      "top": -32,
+      "right": 15,
+      "bottom": -1,
+      "width": 32,
+      "height": 32
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "spikes",
+    "name": "Revealed spikes",
+    "group": "item",
+    "bounds": {
+      "left": -16,
+      "top": -32,
+      "right": 15,
+      "bottom": -1,
+      "width": 32,
+      "height": 32
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "flameOff",
+    "name": "Vent · idle",
+    "group": "item",
+    "bounds": {
+      "left": -16,
+      "top": -32,
+      "right": 15,
+      "bottom": -1,
+      "width": 32,
+      "height": 32
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "flameOn",
+    "name": "Vent · active",
+    "group": "item",
+    "bounds": {
+      "left": -16,
+      "top": -32,
+      "right": 15,
+      "bottom": -1,
+      "width": 32,
+      "height": 32
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "rockCrack",
+    "name": "Rock warning",
+    "group": "item",
+    "bounds": {
+      "left": -16,
+      "top": -32,
+      "right": 15,
+      "bottom": -1,
+      "width": 32,
+      "height": 32
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "rockSpent",
+    "name": "Spent rocks",
+    "group": "item",
+    "bounds": {
+      "left": -19,
+      "top": -32,
+      "right": 17,
+      "bottom": 0,
+      "width": 37,
+      "height": 33
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "rubble",
+    "name": "Rubble",
+    "group": "item",
+    "bounds": {
+      "left": -19,
+      "top": -20,
+      "right": 17,
+      "bottom": 0,
+      "width": 37,
+      "height": 21
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "pillar",
+    "name": "Pillar",
+    "group": "item",
+    "bounds": {
+      "left": -13,
+      "top": -51,
+      "right": 16,
+      "bottom": 6,
+      "width": 30,
+      "height": 58
+    },
+    "source": "Approved study-03 painter"
+  },
+  {
+    "id": "tombstone",
+    "name": "Tombstone",
+    "group": "item",
+    "bounds": {
+      "left": -15,
+      "top": -30,
+      "right": 14,
+      "bottom": 0,
+      "width": 30,
+      "height": 31
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "crystal",
+    "name": "Crystal",
+    "group": "item",
+    "bounds": {
+      "left": -20,
+      "top": -43,
+      "right": 19,
+      "bottom": -3,
+      "width": 40,
+      "height": 41
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "cookingPot",
+    "name": "Cooking pot",
+    "group": "item",
+    "bounds": {
+      "left": -17,
+      "top": -41,
+      "right": 17,
+      "bottom": 4,
+      "width": 35,
+      "height": 46
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "barCounter",
+    "name": "Bar counter",
+    "group": "item",
+    "bounds": {
+      "left": -32,
+      "top": -38,
+      "right": 31,
+      "bottom": 0,
+      "width": 64,
+      "height": 39
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "banner",
+    "name": "Royal banner",
+    "group": "item",
+    "bounds": {
+      "left": -18,
+      "top": -54,
+      "right": 17,
+      "bottom": 2,
+      "width": 36,
+      "height": 57
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "throne",
+    "name": "Throne",
+    "group": "item",
+    "bounds": {
+      "left": -31,
+      "top": -78,
+      "right": 30,
+      "bottom": 2,
+      "width": 62,
+      "height": 81
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "merchant",
+    "name": "Merchant",
+    "group": "cast",
+    "bounds": {
+      "left": -9,
+      "top": -41,
+      "right": 17,
+      "bottom": 4,
+      "width": 27,
+      "height": 46
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "prisoner",
+    "name": "Prisoner",
+    "group": "cast",
+    "bounds": {
+      "left": -9,
+      "top": -35,
+      "right": 9,
+      "bottom": 4,
+      "width": 19,
+      "height": 40
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "princess",
+    "name": "Princess",
+    "group": "cast",
+    "bounds": {
+      "left": -12,
+      "top": -48,
+      "right": 12,
+      "bottom": 3,
+      "width": 25,
+      "height": 52
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "villager",
+    "name": "Villager",
+    "group": "cast",
+    "bounds": {
+      "left": -9,
+      "top": -35,
+      "right": 9,
+      "bottom": 4,
+      "width": 19,
+      "height": 40
+    },
+    "source": "Approved study-03 painter"
+  },
+  {
+    "id": "marmalade",
+    "name": "Marmalade",
+    "group": "cast",
+    "bounds": {
+      "left": -10,
+      "top": -20,
+      "right": 15,
+      "bottom": 3,
+      "width": 26,
+      "height": 24
+    },
+    "source": "Approved study-03 painter"
+  },
+  {
+    "id": "dog",
+    "name": "Village dog",
+    "group": "cast",
+    "bounds": {
+      "left": -15,
+      "top": -23,
+      "right": 17,
+      "bottom": 3,
+      "width": 33,
+      "height": 27
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "chicken",
+    "name": "Chicken",
+    "group": "cast",
+    "bounds": {
+      "left": -13,
+      "top": -23,
+      "right": 12,
+      "bottom": 2,
+      "width": 26,
+      "height": 26
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "fx:arrow",
+    "name": "arrow",
+    "group": "effect",
+    "bounds": {
+      "left": -23,
+      "top": -19,
+      "right": 22,
+      "bottom": -11,
+      "width": 46,
+      "height": 9
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "fx:stinger",
+    "name": "stinger",
+    "group": "effect",
+    "bounds": {
+      "left": -18,
+      "top": -18,
+      "right": 18,
+      "bottom": -12,
+      "width": 37,
+      "height": 7
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "fx:bone",
+    "name": "bone",
+    "group": "effect",
+    "bounds": {
+      "left": -17,
+      "top": -27,
+      "right": 17,
+      "bottom": -3,
+      "width": 35,
+      "height": 25
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "fx:beer",
+    "name": "beer",
+    "group": "effect",
+    "bounds": {
+      "left": -7,
+      "top": -28,
+      "right": 11,
+      "bottom": -9,
+      "width": 19,
+      "height": 20
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "fx:fireball",
+    "name": "fireball",
+    "group": "effect",
+    "bounds": {
+      "left": -25,
+      "top": -27,
+      "right": 13,
+      "bottom": -5,
+      "width": 39,
+      "height": 23
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "fx:frostbolt",
+    "name": "frostbolt",
+    "group": "effect",
+    "bounds": {
+      "left": -22,
+      "top": -25,
+      "right": 19,
+      "bottom": -9,
+      "width": 42,
+      "height": 17
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "fx:heal",
+    "name": "heal",
+    "group": "effect",
+    "bounds": {
+      "left": -17,
+      "top": -28,
+      "right": 17,
+      "bottom": -6,
+      "width": 35,
+      "height": 23
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "fx:greaterHeal",
+    "name": "greaterHeal",
+    "group": "effect",
+    "bounds": {
+      "left": -24,
+      "top": -32,
+      "right": 24,
+      "bottom": -2,
+      "width": 49,
+      "height": 31
+    },
+    "source": "Original collection painter or role-specific extension"
+  },
+  {
+    "id": "fx:magicBarrier",
+    "name": "magicBarrier",
+    "group": "effect",
+    "bounds": {
+      "left": -15,
+      "top": -36,
+      "right": 12,
+      "bottom": 0,
+      "width": 28,
+      "height": 37
+    },
+    "source": "Original collection painter or role-specific extension"
+  }
+]

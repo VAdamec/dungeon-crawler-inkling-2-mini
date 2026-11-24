@@ -1,0 +1,56 @@
+{
+  "url": "file:///Users/vadamec/workspace/ai_tmp/opencode_testing/docs/previews/2026-11-24-classic-jrpg/design-v3/index.html",
+  "sceneSize": [
+    1152,
+    768
+  ],
+  "visualChecks": {
+    "trueGrayscale": true,
+    "deterministicExport": true,
+    "sceneSizes": [
+      [
+        1152,
+        768
+      ],
+      [
+        1152,
+        768
+      ]
+    ]
+  },
+  "counts": {
+    "river": 2,
+    "bridge": 2,
+    "tree": 22,
+    "building:INN": 4,
+    "building:SHOP": 2,
+    "villager": 6,
+    "hero:front": 7,
+    "cat": 4,
+    "wall": 12,
+    "pillar": 8,
+    "stairs": 2,
+    "chest": 2,
+    "potion": 2,
+    "torch": 8,
+    "skeleton": 2,
+    "mage": 2,
+    "hero:right": 5,
+    "grass-road": 1,
+    "flagstone": 1,
+    "hero:back": 3,
+    "hero:left": 3
+  },
+  "errors": [],
+  "remote": [],
+  "mobile": {
+    "width": 390,
+    "scroll": 390
+  },
+  "checks": [
+    "scene exports",
+    "comparison toggles",
+    "grayscale toggle",
+    "mobile width"
+  ]
+}

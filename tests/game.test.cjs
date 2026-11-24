@@ -1200,10 +1200,10 @@ test('boss animations map every roster and themed boss to a distinct visual kind
   const motifs=g.json("bossDepthList().map(d=>BOSS_ANIMATIONS[bossKind(bossForDepth(d))].motif)");
   assert.equal(new Set(motifs).size>=6,true);
   assert.equal(g.run('BOSS_ANIMATIONS.medusa.defeat > BOSS_ANIMATIONS.mimic.defeat'),true);
-  assert.deepEqual(g.json("spriteDimensions('hydra')"),{width:32,height:22});
+  assert.deepEqual(g.json("spriteDimensions('hydra')"),{width:36,height:32});
   for(const name of ['hydra','boar','medusa','darkWizard','skeletonKing']) {
     assert.equal(g.run(`spriteFrameGrid('${name}',1).join('') !== SPRITES['${name}'].join('')`),true);
-    assert.equal(g.run(`SPRITES['${name}'].every(row => row.length === 64 && [...row].every(c => c === '.' || SPRITE_PALETTES['${name}'][c]))`),true);
+    assert.equal(g.run(`SPRITES['${name}'].every(row => row.length === SPRITES['${name}'][0].length && [...row].every(c => c === '.' || SPRITE_PALETTES['${name}'][c]))`),true);
   }
 });
 
@@ -1279,12 +1279,12 @@ test('remaining bosses use distinct defeat motifs and cleanup without repeating 
   assert.equal(new Set(motifs).size,motifs.length);
 });
 
-test('refreshed sprite grids have complete palettes and retain logical boss dimensions',()=>{
+test('JRPG sprite grids have complete palettes and explicit approved art dimensions',()=>{
   const g=game();
   assert.equal(g.run(`Object.entries(SPRITES).every(([name,grid])=>grid.length>0 && grid.every(row=>row.length===grid[0].length && [...row].every(c=>c==='.'||SPRITE_PALETTES[name][c])))`),true);
-  assert.deepEqual(g.json('spriteDimensions("knight")'),{width:16,height:16});
+  assert.deepEqual(g.json('spriteDimensions("knight")'),{width:16,height:22});
   assert.deepEqual(g.json('spriteDimensions("mimic")'),{width:32,height:22});
-  assert.deepEqual(g.json('spriteDimensions("dragonBoss")'),{width:40,height:32});
+  assert.deepEqual(g.json('spriteDimensions("dragonBoss")'),{width:40,height:36});
 });
 
 test('static sprite and terrain raster caches reuse surfaces and survive restart without becoming floor state',()=>{
@@ -1470,7 +1470,7 @@ test('discovered wall torches and active vents animate without moving their fixt
   assert.equal(g.run('wallTorchAt(42,24)'),true);assert.equal(g.run('motionNeeded()'),true);
   for(const name of ['torch','flameOn']) {
     assert.notDeepEqual(g.json(`spriteFrameGrid('${name}',0)`),g.json(`spriteFrameGrid('${name}',1)`));
-    assert.deepEqual(g.json(`spriteFrameGrid('${name}',0).slice(25)`),g.json(`spriteFrameGrid('${name}',1).slice(25)`),'fixture stays still');
+    assert.deepEqual(g.json(`spriteFrameGrid('${name}',0).slice(Math.ceil(SPRITES['${name}'].length*.75))`),g.json(`spriteFrameGrid('${name}',1).slice(Math.ceil(SPRITES['${name}'].length*.75))`),'fixture stays still');
   }
   const first=g.run('environmentAnimationFrame(42,24)');g.run('advanceMotion(0.12)');
   assert.notEqual(g.run('environmentAnimationFrame(42,24)'),first);
@@ -1547,7 +1547,7 @@ test('themed floors reserve an arena, spawn their themed boss and draw their pro
 test('ranged and spellcasting monsters have dedicated art with animated frames', () => {
   const g = game();
   for (const name of ['wasp', 'mage', 'healer']) {
-    assert.deepEqual(g.json(`spriteDimensions('${name}')`), { width: 16, height: 16 });
+    assert.deepEqual(g.json(`spriteDimensions('${name}')`), name==='wasp' ? {width:26,height:24} : {width:20,height:22});
     assert.equal(g.run(`Object.keys(SPRITE_PALETTES.${name}).length > 0`), true);
     assert.equal(g.run(`spriteFrameGrid('${name}',1).length === SPRITES.${name}.length &&
       spriteFrameGrid('${name}',1).every((row,i) => row.length === SPRITES.${name}[i].length)`), true);
@@ -1591,8 +1591,8 @@ test('player attacks spawn arrow, fireball and heal projectiles', () => {
   assert.ok(g.json('state.motion.projectiles.map(p => p.kind)').includes('fireball'));
   g.key('g');
   assert.ok(g.json('state.motion.projectiles.map(p => p.kind)').includes('heal'));
-  g.run('draw()');
-  assert.ok(g.calls.some(call => call[0] === 'arc'), 'projectile shapes are painted');
+  g.run(`window.effects=[];const originalEffectSprite=drawSprite;drawSprite=(...a)=>{window.effects.push(a[0]);originalEffectSprite(...a)};drawProjectiles();drawSprite=originalEffectSprite`);
+  assert.equal(g.run('["arrowFX","fireballFX","healFX"].every(name=>window.effects.includes(name))'),true,'approved projectile motifs are painted');
 });
 
 test('spellbook tomes have valid art and unlock by depth', () => {
@@ -2334,3 +2334,180 @@ test('death, ending, and restart reset the waiting cat and active companion', ()
   assert.equal(g.run('state.companion'), null);
   assert.equal(g.run('!!entranceCatActor().hidden'), false);
 });
+
+test('JRPG directional frames have complete palettes, fixed bounds and distinct four-way hero art',()=>{
+  const g=game();
+  assert.equal(g.run(`Object.entries(JRPG_VARIANTS).every(([name,dirs])=>Object.values(dirs).every(frames=>frames.length===4&&frames.every(id=>JRPG_GRIDS[id].length===SPRITES[name].length&&JRPG_GRIDS[id].every(row=>row.length===SPRITES[name][0].length&&[...row].every(ch=>ch==='.'||SPRITE_PALETTES[name][ch])))))`),true);
+  const views=g.json("['front','back','left','right'].map(dir=>spriteFrameGrid('knight',0,dir).join(''))");
+  assert.equal(new Set(views).size,4);
+  assert.equal(g.run("['frostboltTome','greaterHealTome','barrierTome','cook','bartender','arrowFX','fireballFX','healFX'].every(name=>SPRITES[name].some(row=>/[^.]/.test(row)))"),true);
+});
+
+test('directional movement and raster caches remain visual-only with a fixed tile foot anchor',()=>{
+  const g=game();enableMotion(g);
+  const progression=g.json('[state.player.hp,state.player.mp,state.player.xp,state.turn,state.gold]');
+  g.run(`window.surfaceCount=0;document.createElement=()=>({width:0,height:0,getContext:()=>ctx});
+    moveActorTo(state.player,41,30);advanceMotion(1);drawActorSprite('knight',100,100,2,state.player)`);
+  assert.equal(g.run('state.motion.directions.player'),'right');
+  assert.equal(g.run('!!state.art.sprites["knight:right:0"]'),true);
+  g.run(`moveActorTo(state.player,41,29);advanceMotion(1);drawActorSprite('knight',100,100,2,state.player)`);
+  assert.equal(g.run('state.motion.directions.player'),'back');
+  assert.equal(g.run('!!state.art.sprites["knight:back:0"]'),true);
+  assert.notEqual(g.run('state.art.sprites["knight:back:0"]'),g.run('state.art.sprites["knight:right:0"]'));
+  for(const [x,y,dir]of [[40,29,'left'],[40,30,'front']]){
+    g.run(`moveActorTo(state.player,${x},${y});advanceMotion(1)`);
+    assert.equal(g.run('state.motion.directions.player'),dir);
+  }
+  for(const name of ['knight','orc','mage','dragonBoss'])assert.equal(g.run(`worldSpriteCenterY('${name}',30,2)+spriteDimensions('${name}').height`),31*32);
+  assert.deepEqual(g.json('[state.player.hp,state.player.mp,state.player.xp,state.turn,state.gold]'),progression);
+  assert.equal(g.run('FLOOR_FIELDS.includes("motion")||FLOOR_FIELDS.includes("directions")'),false);
+});
+
+test('town architecture derives existing blocked footprints without changing map or interaction tiles',()=>{
+  const g=game(43,true,'town'),map=g.json('state.map'),props=g.json('state.props'),landmarks=g.json('state.town.landmarks');
+  assert.deepEqual(g.json('townBuildingBounds(state.props.find(p=>p.sprite==="inn"))'),{x0:26,x1:31,y0:20,y1:24});
+  assert.deepEqual(g.json('townBuildingBounds(state.props.find(p=>p.sprite==="store"))'),{x0:43,x1:47,y0:20,y1:24});
+  g.run('Math.random=()=>{throw Error("Rendering consumed gameplay RNG")};draw();draw()');
+  assert.deepEqual(g.json('state.map'),map);assert.deepEqual(g.json('state.props'),props);assert.deepEqual(g.json('state.town.landmarks'),landmarks);
+  assert.equal(g.run('state.map[state.inn.y][state.inn.x]'),0);
+  assert.equal(g.run('state.map[state.townGate.y][state.townGate.x]'),0);
+  assert.equal(g.run('FLOOR_FIELDS.includes("townBuildings")'),false);
+});
+
+test('throne rendering uses marble/carpet inside the saved arena without changing the floor biome or contents',()=>{
+  const g=game();g.run('enterFloor(50,false)');
+  const before=g.json('[state.biome,state.map,state.props,state.monsterSpawns]');
+  assert.equal(g.run('artBiomeAt(state.rooms.find(r=>r.isThroneRoom).cx,state.rooms.find(r=>r.isThroneRoom).cy)'),'throne');
+  assert.equal(g.run('throneCarpetAt(state.rooms.find(r=>r.isThroneRoom).cx,state.rooms.find(r=>r.isThroneRoom).cy)'),2);
+  assert.equal(g.run('artBiomeAt(0,0)'),g.run('state.biome'));
+  g.run('draw();saveFloor()');
+  assert.deepEqual(g.json('[state.biome,state.map,state.props,state.monsterSpawns]'),before);
+  assert.equal(g.run('state.floors[50].biome'),before[0]);
+});
+
+test('art culling includes visible overhangs while undiscovered props and spikes stay hidden',()=>{
+  const g=game();g.run(`state.player.x=40;state.player.y=30;updateCamera();state.props=[];state.hazards=[];
+    window.seenArt=[];const originalSprite=drawSprite;drawSprite=(...args)=>{window.seenArt.push(args[0]);originalSprite(...args);};
+    state.props=[{x:state.player.x+1,y:state.player.y,sprite:'crystal'}];state.visited.delete((state.player.x+1)+','+state.player.y);draw()`);
+  assert.equal(g.run('window.seenArt.includes("crystal")'),false);
+  g.run('state.visited.add((state.player.x+1)+","+state.player.y);window.seenArt=[];draw()');
+  assert.equal(g.run('window.seenArt.includes("crystal")'),true);
+  assert.equal(g.run('inCamera(state.camera.x+VIEW_W,30)'),false);
+  assert.equal(g.run('inArtCamera("dragonBoss",state.camera.x+VIEW_W,30,3)'),true);
+  g.run('drawSprite=originalSprite');
+});
+
+test('themed boss companions draw the matching outfit without rewriting progression or combat sprites',()=>{
+  const g=game(),readyAt=g.run('state.companionAttackAt');g.run(`window.companionSprites=[];const originalActorPainter=drawActorSprite;drawActorSprite=(...a)=>{window.companionSprites.push(a[0]);originalActorPainter(...a);};
+    state.companion={kind:'boss',name:'Cook',sprite:'orc',x:state.player.x,y:state.player.y};drawCompanion();
+    state.companion={kind:'boss',name:'Bartender',sprite:'skeleton',x:state.player.x,y:state.player.y};drawCompanion();`);
+  assert.deepEqual(g.json('window.companionSprites'),['cook','bartender']);
+  assert.equal(g.run('state.companion.sprite'),'skeleton');
+  assert.equal(g.run('state.companionAttackAt'),readyAt);
+});
+
+for (const depth of [1, 2, 100]) {
+  test(`floor ${depth} samples every weighted spawn-pool slot without depth-based clamping`, () => {
+    const g = game(713);
+    const pool = g.json(`spawnPool(${depth},biomeForDepth(${depth})).map(t=>t.name)`);
+    g.run(`window.spawnSample=0;window.nextSpawnRoll=false;window.selectionCount=0;
+      const originalSpawnPool=spawnPool, seededRandom=Math.random;
+      spawnPool=(depth,biome)=>{const pool=originalSpawnPool(depth,biome);window.nextSpawnRoll=true;return pool;};
+      Math.random=()=>{if(window.nextSpawnRoll){window.nextSpawnRoll=false;window.selectionCount++;return window.spawnSample;}return seededRandom();};`);
+    const observed = [];
+    for (let slot = 0; slot < pool.length; slot++) {
+      // Control only the actual type-selection draw; map/placement draws retain seeded randomness.
+      g.run(`window.spawnSample=${(slot + 0.5) / pool.length};window.selectionCount=0;enterFloor(${depth},false,true)`);
+      const ordinary = g.json('state.monsters.filter(m=>!m.isBoss).map(m=>m.name)');
+      assert.ok(ordinary.length > 0, 'the generated floor has ordinary monsters');
+      assert.equal(g.run('window.selectionCount'), ordinary.length);
+      assert.ok(ordinary.every(name => name === pool[slot]), `weighted slot ${slot} must produce ${pool[slot]}`);
+      observed.push(ordinary[0]);
+    }
+    assert.deepEqual(observed, pool, 'duplicated biome-favored slots retain their weight');
+    assert.equal(pool.filter(name => name === (depth === 2 ? 'Bat' : 'Skeleton')).length, 2);
+    assert.ok(observed.includes(depth === 1 ? 'Orc' : depth === 2 ? 'Wasp' : 'Healer'), 'late pool entries remain selectable');
+    assert.equal(g.run(`state.monsters.filter(m=>!m.isBoss).every(m=>${depth}>=(m.minDepth||1))`), true);
+  });
+}
+
+function nearestSpellFixture(g, spell, monsters) {
+  g.run(`state.area='dungeon';state.player.x=40;state.player.y=30;state.player.hp=state.player.maxHp;
+    state.player.mp=50;state.player.maxMp=50;state.player.spells.${spell}=true;
+    state.spellReadyAt.${spell}=0;state.activeTime=20;state.pause=null;state.companion=null;
+    state.floorKey=null;state.hazards=[];state.obstacles=[];clearBossIntro();clearBossDefeat();clearMovementAnimation();
+    for(let y=24;y<=38;y++)for(let x=34;x<=48;x++){state.map[y][x]=0;state.visited.add(x+','+y);}
+    state.monsters=${JSON.stringify(monsters)}.map(m=>({...MONSTER_TYPES[0],hp:200,maxHp:200,atk:0,def:0,xp:0,...m}));
+    updateCamera();Math.random=()=>0.9;`);
+}
+
+for (const spell of ['frostbolt', 'magicBarrier']) {
+  test(`${spell} targets the nearer enemy even when a farther enemy comes first`, () => {
+    const g = game();
+    nearestSpellFixture(g, spell, [{id:9,x:43,y:30},{id:2,x:40,y:31}]);
+    g.run(`castSpell('${spell}')`);
+    assert.deepEqual(g.json('state.monsters.map(m=>m.id)'), [9,2], 'targeting must not reorder the live array');
+    assert.equal(g.run('state.monsters[0].hp'), 200);
+    assert.deepEqual(g.json('state.motion.projectiles.map(p=>[p.toX,p.toY])'), [[40.5*32,31.5*32]]);
+    if (spell === 'frostbolt') {
+      assert.ok(g.run('state.monsters[1].hp') < 200);
+      assert.deepEqual(g.json('[state.monsters[1].x,state.monsters[1].y]'), [40,31]);
+    } else {
+      assert.deepEqual(g.json('[state.monsters[1].x,state.monsters[1].y]'), [40,34]);
+      assert.equal(g.run('state.monsters[1].hp'), 200, 'a clear three-tile push causes no impact damage');
+    }
+    assert.equal(g.run('state.player.mp'), 50-g.run(`SPELLS.${spell}.cost`));
+    assert.equal(g.run(`state.spellReadyAt.${spell}`), 20+g.run(`SPELLS.${spell}.cooldown`));
+  });
+
+  test(`${spell} breaks equal tile-distance ties by monster ID without RNG or array mutation`, () => {
+    const g = game();
+    nearestSpellFixture(g, spell, [{id:9,x:42,y:30},{id:2,x:42,y:32}]);
+    g.run(`window.beforeTargetRandom=Math.random;Math.random=()=>{throw Error('Target selection consumed RNG')};
+      window.firstChoice=nearestVisibleTarget(4).id;state.monsters.reverse();
+      window.secondChoice=nearestVisibleTarget(4).id;Math.random=window.beforeTargetRandom;`);
+    assert.deepEqual(g.json('[window.firstChoice,window.secondChoice]'), [2,2], 'diagonal and axial distance 2 are tied');
+    assert.deepEqual(g.json('state.monsters.map(m=>m.id)'), [2,9]);
+    g.run(`castSpell('${spell}')`);
+    assert.deepEqual(g.json('state.motion.projectiles.map(p=>[p.toX,p.toY])'), [[42.5*32,32.5*32]]);
+    assert.deepEqual(g.json('state.monsters.map(m=>m.id)'), [2,9]);
+  });
+
+  test(`${spell} ignores dead, unseen, blocked, off-camera and out-of-range enemies`, () => {
+    const g = game();
+    nearestSpellFixture(g, spell, [
+      {id:1,x:40,y:31,hp:0}, {id:2,x:42,y:30}, {id:3,x:40,y:29},
+      {id:4,x:39,y:29}, {id:5,x:40,y:35}, {id:6,x:40,y:33},
+    ]);
+    g.run(`state.map[30][41]=1;state.camera={x:40,y:28};
+      const naturalFog=fogLevel;fogLevel=(x,y)=>x===40&&y===29?3:naturalFog(x,y);`);
+    assert.deepEqual(g.json('visibleTargets(4).map(m=>m.id)'), [6]);
+    g.run(`castSpell('${spell}')`);
+    assert.deepEqual(g.json('state.motion.projectiles.map(p=>[p.toX,p.toY])'), [[40.5*32,33.5*32]]);
+    assert.deepEqual(g.json('state.monsters.slice(0,5).map(m=>[m.id,m.x,m.y,m.hp])'),
+      [[1,40,31,0],[2,42,30,200],[3,40,29,200],[4,39,29,200],[5,40,35,200]]);
+  });
+
+  test(`${spell} preserves its own range boundary`, () => {
+    const g = game();
+    nearestSpellFixture(g, spell, [{id:1,x:44,y:30}]);
+    // Isolate spell range from fog; visibility eligibility is tested separately above.
+    g.run('fogLevel=()=>0');
+    g.run(`castSpell('${spell}')`);
+    assert.equal(g.run('state.motion.projectiles.length'), spell==='frostbolt'?1:0);
+    if(spell==='frostbolt')assert.ok(g.run('state.monsters[0].hp')<200);
+    else assert.deepEqual(g.json('[state.monsters[0].x,state.monsters[0].y,state.monsters[0].hp]'),[44,30,200]);
+  });
+
+  test(`${spell} with no eligible target preserves existing mana, cooldown and empty-cast behavior`, () => {
+    const g = game();
+    nearestSpellFixture(g, spell, [{id:1,x:40,y:31,hp:0},{id:2,x:40,y:35}]);
+    const turn = g.run('state.turn');
+    assert.equal(g.run(`nearestVisibleTarget(${spell === 'frostbolt' ? 4 : 3})`), null);
+    g.run(`castSpell('${spell}')`);
+    assert.equal(g.run('state.motion.projectiles.length'), 0);
+    assert.equal(g.run('state.player.mp'), 50-g.run(`SPELLS.${spell}.cost`));
+    assert.equal(g.run(`state.spellReadyAt.${spell}`), 20+g.run(`SPELLS.${spell}.cooldown`));
+    assert.equal(g.run('state.turn'), turn+1);
+  });
+}

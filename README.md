@@ -13,30 +13,32 @@ Local LLM playground, tooks ~30h to get to v0.11.0 with "better" graphics
 - gemma
 
 
-A plain HTML5 canvas dungeon game, **working build 0.20.0** (reviewed 2026-11-24). Open `index.html` directly in a browser (`file://`); there is no install, build step, server, or network dependency.
+A plain HTML5 canvas dungeon game, **version 1.0.0** (reviewed 2026-11-24). Open `index.html` directly in a browser (`file://`); there is no install, build step, server, or network dependency.
 
 The fantasy logo and version appear on the launch screen only. Click **Enter the dungeon** or press a key to begin; the game waits until you start. During play, stats sit at the top; Hero stats sit in a fixed compact panel above a fixed, internally scrolling adventure log (newest first) on the left of the map, and the floor chart with equipment and Spells under Gear bonuses sits to the right. On narrow screens the left and right panels stack below the map. R starts a fresh run without showing the launch screen again; reloading the page shows it.
 
-[Changelog](CHANGELOG.md) · [Current status review and known issues](docs/reviews/2026-11-24-status-review.md)
+[Changelog](CHANGELOG.md) · [Initial status review and known issues](docs/reviews/2026-11-24-status-review.md)
+
+[JRPG graphics implementation and checks](docs/reviews/2026-11-24-jrpg-implementation.md)
 
 ## Screenshots
 
-Current browser captures from the local `file://` build, 2026-11-24. The dungeon encounter below is prepared to show the new enemy types and learned spells; it is not a full campaign playthrough.
+Current browser captures of the implemented JRPG artwork from the local `file://` build, 2026-11-24. The dungeon encounter below is prepared to show the new enemy types and learned spells; it is not a full campaign playthrough.
 
-![Town gate with recruited Marmalade, top HUD, Hero panel, adventure log, minimap and equipment](docs/screenshots/2026-11-24/marmalade.png)
+![Town gate with recruited Marmalade, top HUD, Hero panel, adventure log, minimap and equipment](docs/screenshots/2026-11-24-jrpg/marmalade.png)
 
-![Prepared dungeon encounter showing a Wasp, Mage, Healer, bow equipment and learned spells](docs/screenshots/2026-11-24/dungeon.png)
+![Prepared dungeon encounter showing a Wasp, Mage, Healer, bow equipment and learned spells](docs/screenshots/2026-11-24-jrpg/dungeon.png)
 
 <details>
 <summary>Village, Help & settings, and mobile help</summary>
 
-![Village with Inn, Store and wandering townsfolk](docs/screenshots/2026-11-24/town.png)
+![Village with Inn, Store and wandering townsfolk](docs/screenshots/2026-11-24-jrpg/town.png)
 
 Help opens with **?** or the HUD button and pauses play.
 
-![Current Help and settings dialog](docs/screenshots/2026-11-24/help.png)
+![Current Help and settings dialog](docs/screenshots/2026-11-24-jrpg/help.png)
 
-<img src="docs/screenshots/2026-11-24/mobile-help.png" width="390" alt="Help dialog at a 390-pixel mobile viewport">
+<img src="docs/screenshots/2026-11-24-jrpg/mobile-help.png" width="390" alt="Help dialog at a 390-pixel mobile viewport">
 
 </details>
 
@@ -44,9 +46,9 @@ Help opens with **?** or the HUD button and pauses play.
 
 The dungeon is displayed at **2× zoom**, with 18×12 tiles visible in the same canvas. Characters, tiles, loot, bubbles, warnings, and world health bars are twice as large. The camera follows you and the minimap outline tracks the smaller view. HUD/sidebar sizes and screen-space cinematic framing stay consistent.
 
-The original pixel artwork uses worn slate masonry, recessed wall faces, moss/cracks, warm wall torches, and shaded full-body characters. Stairs, loot, equipment icons, and hazards share the same original pixel-art palette. [View the character, item, and dungeon design sheets](docs/previews/2026-11-23-static-graphics/index.html). The reference asset pack inspired the general direction; its artwork is not bundled.
+The approved classic JRPG refresh uses original detailed overhead pixel art: pitched roofs and timber facades, organic tree canopies, continuous grass/roads, raised masonry, distinct biome materials and full-body characters. The knight and humanoids have directional views; bosses, loot, equipment, stairs, hazards and spell effects share the same palette. [Approved focus design](docs/previews/2026-11-24-classic-jrpg/design-v3/index.html) · [Expanded artwork](docs/previews/2026-11-24-classic-jrpg/design-v3/collection/index.html). References inspired the direction; no third-party artwork is bundled.
 
-Sprites and terrain variations are rasterized into small local canvas caches and reused, with crisp nearest-neighbor rendering. The four runtime files total about 301 KiB, with no external art/font/network loading and a capped animation drawing loop. Existing boss-defeat and ending scenes use the refreshed figures.
+The checked-in sprite grids use compact run-length data and shared pose grids; no preview files or asset build are needed at runtime. Sprites, directional frames, equipment icons and coordinate-derived terrain are cached on local canvases with crisp nearest-neighbor rendering. The four runtime files total about 495 KiB, with no external art/font/network loading and a capped animation drawing loop. Existing boss-defeat and ending scenes use the refreshed figures.
 
 Movement now eases between tiles with walking poses. Bats and the dragon flap their wings, moving slimes hop and squash, and wall torches and active fire vents flicker. Animations freeze during Help, health/retreat pauses, and hidden tabs. Combat, collision, and trap timing still use the original logical tiles and gameplay clocks.
 
@@ -132,7 +134,7 @@ Living monsters trade short Monty Python quotes in speech bubbles when hit or at
 
 Each spoken quote also appears once in the left adventure log with the monster's name, so it remains readable after the bubble disappears.
 
-Boss floors have larger chambers and three-tile-wide connecting halls. The Mimic has an 18×14-tile arena; the dragon has a 22×18-tile hall. Their central spawn areas stay clear of loot and ordinary monsters, and the arenas contain no traps or blocking props. The Mimic is three tiles wide; the winged, horned dragon spans nearly four tiles across and three high. Health bars and speech sit above the larger artwork. Their combat target and movement still use one tile.
+Boss floors have larger chambers and three-tile-wide connecting halls. The Mimic has an 18×14-tile arena; the dragon has a 22×18-tile hall. The depth-50 arena uses marble/carpet and column art without changing its saved biome or floor layout. Their central spawn areas stay clear of loot and ordinary monsters, and the arenas contain no traps or blocking props. The Mimic is three tiles wide; the winged, horned dragon spans nearly four tiles across and more than three high. Other campaign bosses keep at least three-tile visual bounds; their targeting and collision stay single-tile. Health bars and speech sit above the larger artwork. Their combat target and movement still use one tile.
 
 Defeating a boss pauses play briefly for a victory flourish. The Mimic snaps shut, sprays coins, and collapses in place with a **MIMIC DEFEATED** banner. The dragon gets a screen-space cinematic: a darkened hall, lightning, embers, drooping wings, a falling dragon, and **DRAGON SLAIN**. Rewards, defeat flags, and objectives are applied immediately; Esc skips the flourish. The dragon animation clears before the later princess interaction starts the full ending.
 
@@ -140,22 +142,22 @@ The brief quotations are from *Monty Python and the Holy Grail*: [official Monty
 
 ## Illustrated bestiary
 
-Figures below are exported from the current runtime pixel artwork, enlarged for readability. Stats were checked against `MONSTER_TYPES` and `bossForDepth()` in [game.js](js/game.js) for working build 0.20.0.
+Figures below are exported from the current runtime pixel artwork, enlarged for readability. Stats were checked against `MONSTER_TYPES` and `bossForDepth()` in [game.js](js/game.js) for version 1.0.0.
 
 ### Ordinary monsters
 
-These are **base stats**, before depth scaling. “Eligible depth” is the configured minimum, not a guaranteed first appearance. The [status review](docs/reviews/2026-11-24-status-review.md#findings) records a spawn-selection bug affecting which eligible monsters actually appear and their frequency.
+These are **base stats**, before depth scaling. “Eligible depth” is the configured minimum, not a guaranteed appearance on every eligible floor. Generation samples the complete eligible pool, including duplicate entries that favor each biome’s monster types.
 
 | Figure | Monster | Eligible depth | Base HP | ATK | DEF | XP | Ability |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | --- |
-| <img src="docs/screenshots/2026-11-24/monsters/slime.png" width="64" alt="Slime"> | Slime | 1 | 14 | 5 | 0 | 10 | Melee; hopping movement |
-| <img src="docs/screenshots/2026-11-24/monsters/bat.png" width="64" alt="Bat"> | Bat | 1 | 10 | 7 | 1 | 14 | Melee; flying artwork |
-| <img src="docs/screenshots/2026-11-24/monsters/goblin.png" width="64" alt="Goblin"> | Goblin | 1 | 22 | 9 | 2 | 22 | Melee |
-| <img src="docs/screenshots/2026-11-24/monsters/skeleton.png" width="64" alt="Skeleton"> | Skeleton | 1 | 28 | 12 | 4 | 32 | Melee |
-| <img src="docs/screenshots/2026-11-24/monsters/orc.png" width="64" alt="Orc"> | Orc | 1 | 40 | 16 | 5 | 50 | Melee |
-| <img src="docs/screenshots/2026-11-24/monsters/wasp.png" width="64" alt="Wasp"> | Wasp | 2 | 18 | 8 | 1 | 20 | Ranged stinger, 3 tiles |
-| <img src="docs/screenshots/2026-11-24/monsters/mage.png" width="64" alt="Mage"> | Mage | 4 | 25 | 10 | 2 | 28 | Magic attack, 4 tiles |
-| <img src="docs/screenshots/2026-11-24/monsters/healer.png" width="64" alt="Healer"> | Healer | 5 | 30 | 6 | 3 | 35 | Heals self/allies, 3 tiles; melee fallback |
+| <img src="docs/screenshots/2026-11-24-jrpg/monsters/slime.png" width="64" alt="Slime"> | Slime | 1 | 14 | 5 | 0 | 10 | Melee; hopping movement |
+| <img src="docs/screenshots/2026-11-24-jrpg/monsters/bat.png" width="64" alt="Bat"> | Bat | 1 | 10 | 7 | 1 | 14 | Melee; flying artwork |
+| <img src="docs/screenshots/2026-11-24-jrpg/monsters/goblin.png" width="64" alt="Goblin"> | Goblin | 1 | 22 | 9 | 2 | 22 | Melee |
+| <img src="docs/screenshots/2026-11-24-jrpg/monsters/skeleton.png" width="64" alt="Skeleton"> | Skeleton | 1 | 28 | 12 | 4 | 32 | Melee |
+| <img src="docs/screenshots/2026-11-24-jrpg/monsters/orc.png" width="64" alt="Orc"> | Orc | 1 | 40 | 16 | 5 | 50 | Melee |
+| <img src="docs/screenshots/2026-11-24-jrpg/monsters/wasp.png" width="64" alt="Wasp"> | Wasp | 2 | 18 | 8 | 1 | 20 | Ranged stinger, 3 tiles |
+| <img src="docs/screenshots/2026-11-24-jrpg/monsters/mage.png" width="64" alt="Mage"> | Mage | 4 | 25 | 10 | 2 | 28 | Magic attack, 4 tiles |
+| <img src="docs/screenshots/2026-11-24-jrpg/monsters/healer.png" width="64" alt="Healer"> | Healer | 5 | 30 | 6 | 3 | 35 | Heals self/allies, 3 tiles; melee fallback |
 
 For dungeon depth `d`, ordinary monsters scale as follows:
 
@@ -168,41 +170,41 @@ ATK is a stat, not guaranteed damage: melee subtracts the hero's effective defen
 
 ### Companion
 
-<img src="docs/screenshots/2026-11-24/monsters/marmalade.png" width="96" alt="Marmalade">
+<img src="docs/screenshots/2026-11-24-jrpg/monsters/marmalade.png" width="96" alt="Marmalade">
 
 **Marmalade** joins beside the town gate or automatically on the first descent. Every three active seconds it attacks for 1 damage, or 2 against its preferred target, bats. It follows between areas, adds a two-tile light radius, and comments in bubbles and the log. The first defeated boss replaces it; boss companions deal exactly 1 damage every three active seconds. Companions are run progression, not separate floor rewards that can be farmed on return.
 
 <details>
 <summary>Boss artwork, encounter stats and throne room (spoilers)</summary>
 
-![Current boss artwork, enlarged for documentation](docs/screenshots/2026-11-24/bosses.png)
+![Current boss artwork, enlarged for documentation](docs/screenshots/2026-11-24-jrpg/bosses.png)
 
 These are **actual scaled encounter stats at each listed depth**, not base values. Rewards are once per floor; defeated bosses stay defeated on return. Large artwork still has single-tile targeting and collision.
 
 | Figure | Depth | Boss | HP | ATK | DEF | XP | Gold | Ability |
 | --- | ---: | --- | ---: | ---: | ---: | ---: | ---: | --- |
-| <img src="docs/screenshots/2026-11-24/monsters/mimic.png" width="64" alt="Mimic"> | 5 | Mimic | 118 | 30 | 4 | 240 | 160 | Melee |
-| <img src="docs/screenshots/2026-11-24/monsters/hydra.png" width="64" alt="Hydra"> | 10 | Hydra | 229 | 49 | 5 | 488 | 325 | Melee |
-| <img src="docs/screenshots/2026-11-24/monsters/wild-boar.png" width="64" alt="Wild Boar"> | 20 | Wild Boar | 426 | 89 | 8 | 978 | 661 | Melee |
-| <img src="docs/screenshots/2026-11-24/monsters/medusa.png" width="64" alt="Medusa"> | 30 | Medusa | 515 | 118 | 9 | 1444 | 990 | Magic attack, 4 tiles |
-| <img src="docs/screenshots/2026-11-24/monsters/dark-wizard.png" width="64" alt="Dark Wizard"> | 40 | Dark Wizard | 682 | 167 | 11 | 1989 | 1398 | Magic attack, 5 tiles |
-| <img src="docs/screenshots/2026-11-24/monsters/skeleton-king.png" width="64" alt="Skeleton King"> | 50 | Skeleton King | 1032 | 212 | 15 | 3339 | 2385 | Bone projectiles, 6 tiles; summons skeleton guards |
-| <img src="docs/screenshots/2026-11-24/monsters/hydra.png" width="64" alt="Hydra"> | 60 | Hydra | 929 | 219 | 16 | 3071 | 2205 | Melee |
-| <img src="docs/screenshots/2026-11-24/monsters/wild-boar.png" width="64" alt="Wild Boar"> | 70 | Wild Boar | 1299 | 277 | 19 | 3833 | 2738 | Melee |
-| <img src="docs/screenshots/2026-11-24/monsters/medusa.png" width="64" alt="Medusa"> | 80 | Medusa | 1310 | 300 | 20 | 4565 | 3320 | Magic attack, 4 tiles |
-| <img src="docs/screenshots/2026-11-24/monsters/dark-wizard.png" width="64" alt="Dark Wizard"> | 90 | Dark Wizard | 1518 | 381 | 22 | 5348 | 3953 | Magic attack, 5 tiles |
-| <img src="docs/screenshots/2026-11-24/monsters/dragon.png" width="64" alt="Dragon"> | 100 | Dragon | 2061 | 438 | 24 | 6438 | 5150 | Melee |
+| <img src="docs/screenshots/2026-11-24-jrpg/monsters/mimic.png" width="64" alt="Mimic"> | 5 | Mimic | 118 | 30 | 4 | 240 | 160 | Melee |
+| <img src="docs/screenshots/2026-11-24-jrpg/monsters/hydra.png" width="64" alt="Hydra"> | 10 | Hydra | 229 | 49 | 5 | 488 | 325 | Melee |
+| <img src="docs/screenshots/2026-11-24-jrpg/monsters/wild-boar.png" width="64" alt="Wild Boar"> | 20 | Wild Boar | 426 | 89 | 8 | 978 | 661 | Melee |
+| <img src="docs/screenshots/2026-11-24-jrpg/monsters/medusa.png" width="64" alt="Medusa"> | 30 | Medusa | 515 | 118 | 9 | 1444 | 990 | Magic attack, 4 tiles |
+| <img src="docs/screenshots/2026-11-24-jrpg/monsters/dark-wizard.png" width="64" alt="Dark Wizard"> | 40 | Dark Wizard | 682 | 167 | 11 | 1989 | 1398 | Magic attack, 5 tiles |
+| <img src="docs/screenshots/2026-11-24-jrpg/monsters/skeleton-king.png" width="64" alt="Skeleton King"> | 50 | Skeleton King | 1032 | 212 | 15 | 3339 | 2385 | Bone projectiles, 6 tiles; summons skeleton guards |
+| <img src="docs/screenshots/2026-11-24-jrpg/monsters/hydra.png" width="64" alt="Hydra"> | 60 | Hydra | 929 | 219 | 16 | 3071 | 2205 | Melee |
+| <img src="docs/screenshots/2026-11-24-jrpg/monsters/wild-boar.png" width="64" alt="Wild Boar"> | 70 | Wild Boar | 1299 | 277 | 19 | 3833 | 2738 | Melee |
+| <img src="docs/screenshots/2026-11-24-jrpg/monsters/medusa.png" width="64" alt="Medusa"> | 80 | Medusa | 1310 | 300 | 20 | 4565 | 3320 | Magic attack, 4 tiles |
+| <img src="docs/screenshots/2026-11-24-jrpg/monsters/dark-wizard.png" width="64" alt="Dark Wizard"> | 90 | Dark Wizard | 1518 | 381 | 22 | 5348 | 3953 | Magic attack, 5 tiles |
+| <img src="docs/screenshots/2026-11-24-jrpg/monsters/dragon.png" width="64" alt="Dragon"> | 100 | Dragon | 2061 | 438 | 24 | 6438 | 5150 | Melee |
 
-Themed encounters add the **Cook** in the depth-3 Orc's Kitchen and **Bartender** in the depth-7 Skeleton Pub. Their defeat is optional for descent; the floor key is still required. They reuse Orc/Skeleton artwork.
+Themed encounters add the **Cook** in the depth-3 Orc's Kitchen and **Bartender** in the depth-7 Skeleton Pub. Their defeat is optional for descent; the floor key is still required. They use Orc/Skeleton-derived chef and bartender designs; their gameplay remains unchanged.
 
 | Figure | Depth | Encounter | HP | ATK | DEF | XP | Gold | Ability |
 | --- | ---: | --- | ---: | ---: | ---: | ---: | ---: | --- |
-| <img src="docs/screenshots/2026-11-24/monsters/cook.png" width="64" alt="Cook"> | 3 | Cook | 140 | 26 | 6 | 255 | 170 | Melee |
-| <img src="docs/screenshots/2026-11-24/monsters/bartender.png" width="64" alt="Bartender"> | 7 | Bartender | 220 | 38 | 7 | 465 | 310 | Thrown beer, 4 tiles |
+| <img src="docs/screenshots/2026-11-24-jrpg/monsters/cook.png" width="64" alt="Cook"> | 3 | Cook | 140 | 26 | 6 | 255 | 170 | Melee |
+| <img src="docs/screenshots/2026-11-24-jrpg/monsters/bartender.png" width="64" alt="Bartender"> | 7 | Bartender | 220 | 38 | 7 | 465 | 310 | Thrown beer, 4 tiles |
 
-The Skeleton King has a dedicated 24×18 throne arena with a dais, torch rows, banners and guard alcoves. This screenshot uses a developer-loaded floor and prepared camera/exploration to show the room; the hero stats are not an endgame balance example.
+The Skeleton King has a dedicated 24×18 throne arena with a dais, torch rows, banners and guard alcoves. This screenshot uses a fresh generated floor and prepared camera/exploration to show the room; the hero stats are not an endgame balance example.
 
-![Prepared view of the depth-50 Skeleton King throne room](docs/screenshots/2026-11-24/skeleton-king.png)
+![Prepared view of the depth-50 Skeleton King throne room](docs/screenshots/2026-11-24-jrpg/skeleton-king.png)
 
 </details>
 
@@ -214,11 +216,11 @@ Fireball and Heal are known at the start. Learn the other spells by collecting/b
 | --- | --- | ---: | --- | --- | --- | --- |
 | F | Fireball | 8 | 1.5 s | All eligible enemies within 3 tiles | `max(1, round(A × 0.8) − floor(D / 2))` each; no stun | Starting spell |
 | G | Heal | 12 | 2 s | Self | Restore 30% maximum HP, rounded and capped | Starting spell |
-| V | Frostbolt | 10 | 3 s | First eligible enemy within 4 tiles | `max(1, round(A × 1.6) − floor(D / 2))`; no slow effect | Tome, depth 2+ |
+| V | Frostbolt | 10 | 3 s | Nearest eligible enemy within 4 tiles | `max(1, round(A × 1.6) − floor(D / 2))`; no slow effect | Tome, depth 2+ |
 | B | Greater Heal | 18 | 6 s | Self | Restore 55% maximum HP, rounded and capped | Tome, depth 4+ |
-| Z | Magic Barrier | 14 | 4 s | First eligible enemy within 3 tiles | Push up to 3 tiles; blocked push deals `max(2, round(A × 1.4) − floor(D / 2))` | Tome, depth 5+ |
+| Z | Magic Barrier | 14 | 4 s | Nearest eligible enemy within 3 tiles | Push up to 3 tiles; blocked push deals `max(2, round(A × 1.4) − floor(D / 2))` | Tome, depth 5+ |
 
-`A` is effective hero attack (strength including gear, plus equipment attack); `D` is the target's defense. Targeted attacks require line of sight, current visibility and camera eligibility. Range uses the larger of horizontal/vertical tile distance, so diagonals count as one tile. Frostbolt and Barrier currently take the first eligible enemy in the monster list; [nearest-target follow-up](docs/reviews/2026-11-24-status-review.md#findings) is recorded. A fully successful Barrier push deals no damage. Healing always restores at least 1 HP before the maximum-HP cap. Casting into empty air or at full HP still spends MP and starts the cooldown.
+`A` is effective hero attack (strength including gear, plus equipment attack); `D` is the target's defense. Targeted attacks require line of sight, current visibility and camera eligibility. Range uses the larger of horizontal/vertical tile distance, so diagonals count as one tile. Frostbolt and Magic Barrier choose the nearest eligible enemy; equal tile distances choose the lowest monster ID. Target selection does not reorder the monster list or consume random numbers. A fully successful Barrier push deals no damage. Healing always restores at least 1 HP before the maximum-HP cap. Casting into empty air or at full HP still spends MP and starts the cooldown.
 
 Mana regenerates **1 MP every two active seconds**, after four seconds without combat and with no living monster within three tiles. Town freezes passive regeneration; the Inn restores HP and MP fully.
 
@@ -251,7 +253,7 @@ Collecting or buying gear equips it; selling removes its modifiers. Floor change
 
 ## Development and checks
 
-Runtime files: `index.html`, `style.css`, `js/sprites.js`, and `js/game.js`. Both scripts share global scope; preserve their order and `file://` compatibility. See [agent guidance](agents.md), [tasks](tasks.md), [handover](handover.md), [changelog](CHANGELOG.md), and the [2026-11-24 review](docs/reviews/2026-11-24-status-review.md). The review passed 132 behavior tests, syntax and external smoke checks, plus selected Chrome `file://` checks; a full human campaign and subjective audio playtest remain open.
+Runtime files: `index.html`, `style.css`, `js/sprites.js`, and `js/game.js`. Both scripts share global scope; preserve their order and `file://` compatibility. See [agent guidance](agents.md), [tasks](tasks.md), [handover](handover.md), [changelog](CHANGELOG.md), and the [2026-11-24 review](docs/reviews/2026-11-24-status-review.md). The graphics pass passed 138 behavior tests, syntax and external smoke checks, plus Chrome `file://` checks covering movement, travel, dialogs, all boss kinds and the ending. A seeded comparison also preserves town/floor gameplay data. A full human campaign and subjective audio playtest remain open.
 
 Run the dependency-free checks with Node.js:
 

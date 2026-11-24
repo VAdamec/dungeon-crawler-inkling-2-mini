@@ -1,6 +1,6 @@
 # Expansion: ranged/magic combat, 100 floors, themed levels and bosses
 
-Status: all six implementation phases, including the Skeleton King throne room, are implemented in working build 0.20.0. Scope approved 2026-11-23; reviewed 2026-11-24 with 132 passing behavior tests, syntax and external smoke plus selected browser checks. [Current review](../reviews/2026-11-24-status-review.md) records weighted-spawn and Barrier-targeting gaps; full human campaign balance remains open.
+Status: all six implementation phases, including the Skeleton King throne room, are implemented in working build 0.20.0. Scope approved 2026-11-23; reviewed 2026-11-24 with 132 passing behavior tests, syntax and external smoke plus selected browser checks. The [initial review](../reviews/2026-11-24-status-review.md) recorded weighted-spawn and Barrier-targeting gaps, now resolved by the explicitly authorized follow-up (including nearest-target Frostbolt). Full human campaign balance remains open.
 
 At design time a partial implementation already existed (ranged/magic enemies, Bow, Fireball/Heal and themed floors, with 81 tests). The sections below preserve that implementation sequence; completed checklists and the current review determine status.
 

@@ -26,6 +26,10 @@ All five 2026-11-24 plans have implemented status and matching source/tests:
 
 The town plan's old “separate planned work” statement and expansion's obsolete test/environment notes have been reconciled. Earlier test counts in dated implementation notes remain historical. README, tasks, agent guidance and handover now identify the current build; the changelog separates working changes from verified commit versions.
 
+## Resolution update — 2026-11-24
+
+Both source findings below are now fixed following explicit user authorization: generation samples the full weighted pool; Frostbolt and Magic Barrier choose the nearest eligible enemy by Chebyshev tile distance, with lowest-ID ties and no RNG/live-array sorting. Regression cases cover generated floors 1/2/100 and spell ordering, ties, eligibility, ranges and unchanged resource/push behavior. The findings below preserve the original evidence, not current unresolved status. See [tasks](../../tasks.md) and [changelog](../../CHANGELOG.md).
+
 ## Findings
 
 ### Spawn selection does not sample the full weighted pool

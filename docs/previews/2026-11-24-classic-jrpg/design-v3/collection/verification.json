@@ -1,0 +1,553 @@
+{
+  "scenes": [
+    {
+      "id": "crypt",
+      "base": [
+        1152,
+        768
+      ]
+    },
+    {
+      "id": "cavern",
+      "base": [
+        1152,
+        768
+      ]
+    },
+    {
+      "id": "kitchen",
+      "base": [
+        1152,
+        768
+      ]
+    },
+    {
+      "id": "tavern",
+      "base": [
+        1152,
+        768
+      ]
+    },
+    {
+      "id": "throne",
+      "base": [
+        1152,
+        768
+      ]
+    },
+    {
+      "id": "dragon-hall",
+      "base": [
+        1152,
+        768
+      ]
+    }
+  ],
+  "assets": [
+    {
+      "id": "slime",
+      "name": "Slime",
+      "group": "ordinary"
+    },
+    {
+      "id": "bat",
+      "name": "Bat",
+      "group": "ordinary"
+    },
+    {
+      "id": "goblin",
+      "name": "Goblin",
+      "group": "ordinary"
+    },
+    {
+      "id": "skeleton",
+      "name": "Skeleton",
+      "group": "ordinary"
+    },
+    {
+      "id": "orc",
+      "name": "Orc",
+      "group": "ordinary"
+    },
+    {
+      "id": "wasp",
+      "name": "Wasp",
+      "group": "ordinary"
+    },
+    {
+      "id": "mage",
+      "name": "Mage",
+      "group": "ordinary"
+    },
+    {
+      "id": "healer",
+      "name": "Healer",
+      "group": "ordinary"
+    },
+    {
+      "id": "mimic",
+      "name": "Mimic",
+      "group": "boss",
+      "depth": "Depth 5"
+    },
+    {
+      "id": "hydra",
+      "name": "Hydra",
+      "group": "boss",
+      "depth": "Depths 10 / 60"
+    },
+    {
+      "id": "boar",
+      "name": "Wild Boar",
+      "group": "boss",
+      "depth": "Depths 20 / 70"
+    },
+    {
+      "id": "medusa",
+      "name": "Medusa",
+      "group": "boss",
+      "depth": "Depths 30 / 80"
+    },
+    {
+      "id": "darkWizard",
+      "name": "Dark Wizard",
+      "group": "boss",
+      "depth": "Depths 40 / 90"
+    },
+    {
+      "id": "skeletonKing",
+      "name": "Skeleton King",
+      "group": "boss",
+      "depth": "Depth 50"
+    },
+    {
+      "id": "dragonBoss",
+      "name": "Dragon",
+      "group": "boss",
+      "depth": "Depth 100"
+    },
+    {
+      "id": "cook",
+      "name": "Cook",
+      "group": "boss",
+      "depth": "Depth 3 · themed"
+    },
+    {
+      "id": "bartender",
+      "name": "Bartender",
+      "group": "boss",
+      "depth": "Depth 7 · themed"
+    },
+    {
+      "id": "potion",
+      "name": "Potion",
+      "group": "item"
+    },
+    {
+      "id": "sword",
+      "name": "Sword",
+      "group": "item"
+    },
+    {
+      "id": "bow",
+      "name": "Bow",
+      "group": "item"
+    },
+    {
+      "id": "armor",
+      "name": "Armor",
+      "group": "item"
+    },
+    {
+      "id": "helmet",
+      "name": "Helmet",
+      "group": "item"
+    },
+    {
+      "id": "shield",
+      "name": "Shield",
+      "group": "item"
+    },
+    {
+      "id": "ring",
+      "name": "Ring",
+      "group": "item"
+    },
+    {
+      "id": "elixir",
+      "name": "Elixir",
+      "group": "item"
+    },
+    {
+      "id": "frostbolt",
+      "name": "Frostbolt tome",
+      "group": "item"
+    },
+    {
+      "id": "greaterHeal",
+      "name": "Greater Heal tome",
+      "group": "item"
+    },
+    {
+      "id": "magicBarrier",
+      "name": "Barrier tome",
+      "group": "item"
+    },
+    {
+      "id": "townScroll",
+      "name": "Town Scroll",
+      "group": "item"
+    },
+    {
+      "id": "townPortal",
+      "name": "Return portal",
+      "group": "item"
+    },
+    {
+      "id": "key",
+      "name": "Floor key",
+      "group": "item"
+    },
+    {
+      "id": "chest",
+      "name": "Chest",
+      "group": "item"
+    },
+    {
+      "id": "stairsUp",
+      "name": "Stairs up",
+      "group": "item"
+    },
+    {
+      "id": "stairsDown",
+      "name": "Stairs down",
+      "group": "item"
+    },
+    {
+      "id": "torch",
+      "name": "Wall torch",
+      "group": "item"
+    },
+    {
+      "id": "ordinaryFloor",
+      "name": "Ordinary floor",
+      "group": "item"
+    },
+    {
+      "id": "hiddenSpikes",
+      "name": "Hidden spikes · no marker",
+      "group": "item"
+    },
+    {
+      "id": "spikes",
+      "name": "Revealed spikes",
+      "group": "item"
+    },
+    {
+      "id": "flameOff",
+      "name": "Vent · idle",
+      "group": "item"
+    },
+    {
+      "id": "flameOn",
+      "name": "Vent · active",
+      "group": "item"
+    },
+    {
+      "id": "rockCrack",
+      "name": "Rock warning",
+      "group": "item"
+    },
+    {
+      "id": "rockSpent",
+      "name": "Spent rocks",
+      "group": "item"
+    },
+    {
+      "id": "rubble",
+      "name": "Rubble",
+      "group": "item"
+    },
+    {
+      "id": "pillar",
+      "name": "Pillar",
+      "group": "item"
+    },
+    {
+      "id": "tombstone",
+      "name": "Tombstone",
+      "group": "item"
+    },
+    {
+      "id": "crystal",
+      "name": "Crystal",
+      "group": "item"
+    },
+    {
+      "id": "cookingPot",
+      "name": "Cooking pot",
+      "group": "item"
+    },
+    {
+      "id": "barCounter",
+      "name": "Bar counter",
+      "group": "item"
+    },
+    {
+      "id": "banner",
+      "name": "Royal banner",
+      "group": "item"
+    },
+    {
+      "id": "throne",
+      "name": "Throne",
+      "group": "item"
+    },
+    {
+      "id": "merchant",
+      "name": "Merchant",
+      "group": "cast"
+    },
+    {
+      "id": "prisoner",
+      "name": "Prisoner",
+      "group": "cast"
+    },
+    {
+      "id": "princess",
+      "name": "Princess",
+      "group": "cast"
+    },
+    {
+      "id": "villager",
+      "name": "Villager",
+      "group": "cast"
+    },
+    {
+      "id": "marmalade",
+      "name": "Marmalade",
+      "group": "cast"
+    },
+    {
+      "id": "dog",
+      "name": "Village dog",
+      "group": "cast"
+    },
+    {
+      "id": "chicken",
+      "name": "Chicken",
+      "group": "cast"
+    },
+    {
+      "id": "fx:arrow",
+      "name": "arrow",
+      "group": "effect"
+    },
+    {
+      "id": "fx:stinger",
+      "name": "stinger",
+      "group": "effect"
+    },
+    {
+      "id": "fx:bone",
+      "name": "bone",
+      "group": "effect"
+    },
+    {
+      "id": "fx:beer",
+      "name": "beer",
+      "group": "effect"
+    },
+    {
+      "id": "fx:fireball",
+      "name": "fireball",
+      "group": "effect"
+    },
+    {
+      "id": "fx:frostbolt",
+      "name": "frostbolt",
+      "group": "effect"
+    },
+    {
+      "id": "fx:heal",
+      "name": "heal",
+      "group": "effect"
+    },
+    {
+      "id": "fx:greaterHeal",
+      "name": "greaterHeal",
+      "group": "effect"
+    },
+    {
+      "id": "fx:magicBarrier",
+      "name": "magicBarrier",
+      "group": "effect"
+    }
+  ],
+  "checks": {
+    "strictDispatch": true,
+    "hiddenSpikesIdentical": true,
+    "deterministicExport": true,
+    "noLegacyAtlas": true
+  },
+  "calls": {
+    "asset:slime": 1,
+    "slime": 2,
+    "asset:bat": 1,
+    "bat": 3,
+    "asset:goblin": 1,
+    "goblin": 3,
+    "asset:skeleton": 1,
+    "asset:orc": 1,
+    "orc": 6,
+    "asset:wasp": 1,
+    "wasp": 3,
+    "asset:mage": 1,
+    "asset:healer": 1,
+    "healer": 2,
+    "asset:mimic": 2,
+    "mimic": 3,
+    "asset:hydra": 2,
+    "hydra": 3,
+    "asset:boar": 2,
+    "boar": 3,
+    "asset:medusa": 2,
+    "medusa": 3,
+    "asset:darkWizard": 2,
+    "darkWizard": 3,
+    "asset:skeletonKing": 2,
+    "skeletonKing": 4,
+    "asset:dragonBoss": 2,
+    "dragonBoss": 4,
+    "asset:cook": 1,
+    "cook": 3,
+    "asset:bartender": 1,
+    "bartender": 3,
+    "asset:potion": 1,
+    "potion": 8,
+    "asset:sword": 1,
+    "sword": 2,
+    "asset:bow": 1,
+    "bow": 2,
+    "asset:armor": 1,
+    "armor": 2,
+    "asset:helmet": 1,
+    "helmet": 2,
+    "asset:shield": 1,
+    "shield": 2,
+    "asset:ring": 1,
+    "ring": 2,
+    "asset:elixir": 1,
+    "elixir": 2,
+    "asset:frostbolt": 1,
+    "frostbolt": 2,
+    "asset:greaterHeal": 1,
+    "greaterHeal": 2,
+    "asset:magicBarrier": 1,
+    "magicBarrier": 2,
+    "asset:townScroll": 1,
+    "townScroll": 2,
+    "asset:townPortal": 1,
+    "townPortal": 2,
+    "asset:key": 1,
+    "key": 2,
+    "asset:chest": 1,
+    "chest": 3,
+    "asset:stairsUp": 1,
+    "stairsUp": 2,
+    "asset:stairsDown": 1,
+    "stairsDown": 8,
+    "asset:torch": 1,
+    "torch": 2,
+    "asset:ordinaryFloor": 2,
+    "ordinaryFloor": 3,
+    "asset:hiddenSpikes": 2,
+    "hiddenSpikes": 3,
+    "asset:spikes": 1,
+    "spikes": 2,
+    "asset:flameOff": 1,
+    "flameOff": 2,
+    "asset:flameOn": 1,
+    "flameOn": 2,
+    "asset:rockCrack": 1,
+    "rockCrack": 2,
+    "asset:rockSpent": 1,
+    "rockSpent": 2,
+    "asset:rubble": 1,
+    "rubble": 5,
+    "asset:pillar": 1,
+    "pillar": 2,
+    "asset:tombstone": 1,
+    "tombstone": 4,
+    "asset:crystal": 1,
+    "crystal": 5,
+    "asset:cookingPot": 1,
+    "cookingPot": 3,
+    "asset:barCounter": 1,
+    "barCounter": 3,
+    "asset:banner": 1,
+    "banner": 8,
+    "asset:throne": 1,
+    "throne": 3,
+    "asset:merchant": 1,
+    "merchant": 2,
+    "asset:prisoner": 1,
+    "prisoner": 2,
+    "asset:princess": 1,
+    "princess": 2,
+    "asset:villager": 1,
+    "villager": 2,
+    "asset:marmalade": 2,
+    "marmalade": 3,
+    "asset:dog": 1,
+    "dog": 2,
+    "asset:chicken": 1,
+    "chicken": 2,
+    "asset:fx:arrow": 1,
+    "fx:arrow": 2,
+    "asset:fx:stinger": 1,
+    "fx:stinger": 2,
+    "asset:fx:bone": 1,
+    "fx:bone": 2,
+    "asset:fx:beer": 1,
+    "fx:beer": 2,
+    "asset:fx:fireball": 1,
+    "fx:fireball": 2,
+    "asset:fx:frostbolt": 1,
+    "fx:frostbolt": 2,
+    "asset:fx:heal": 1,
+    "fx:heal": 2,
+    "asset:fx:greaterHeal": 1,
+    "fx:greaterHeal": 2,
+    "asset:fx:magicBarrier": 1,
+    "fx:magicBarrier": 2,
+    "scene:crypt": 1,
+    "floor:crypt": 1,
+    "wall:crypt": 6,
+    "scene:cavern": 1,
+    "floor:cavern": 1,
+    "wall:cavern": 6,
+    "scene:kitchen": 1,
+    "floor:kitchen": 1,
+    "wall:kitchen": 6,
+    "scene:tavern": 1,
+    "floor:tavern": 1,
+    "wall:tavern": 6,
+    "scene:throne": 1,
+    "floor:throne": 2,
+    "wall:throne": 12,
+    "scene:throne:dragon": 1
+  },
+  "errors": [],
+  "remote": [],
+  "mobile": {
+    "width": 390,
+    "scroll": 390
+  },
+  "controls": [
+    "biome selector",
+    "pose alternate and restore",
+    "grayscale and restore"
+  ],
+  "assetBoundsNotClipped": true
+}

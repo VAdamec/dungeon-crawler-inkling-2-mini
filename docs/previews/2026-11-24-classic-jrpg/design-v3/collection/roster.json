@@ -1,0 +1,381 @@
+{
+  "monsters": [
+    {
+      "name": "Slime",
+      "sprite": "slime",
+      "hp": 14,
+      "atk": 5,
+      "def": 0,
+      "xp": 10
+    },
+    {
+      "name": "Bat",
+      "sprite": "bat",
+      "hp": 10,
+      "atk": 7,
+      "def": 1,
+      "xp": 14
+    },
+    {
+      "name": "Goblin",
+      "sprite": "goblin",
+      "hp": 22,
+      "atk": 9,
+      "def": 2,
+      "xp": 22
+    },
+    {
+      "name": "Skeleton",
+      "sprite": "skeleton",
+      "hp": 28,
+      "atk": 12,
+      "def": 4,
+      "xp": 32
+    },
+    {
+      "name": "Orc",
+      "sprite": "orc",
+      "hp": 40,
+      "atk": 16,
+      "def": 5,
+      "xp": 50
+    },
+    {
+      "name": "Wasp",
+      "sprite": "wasp",
+      "hp": 18,
+      "atk": 8,
+      "def": 1,
+      "xp": 20,
+      "minDepth": 2,
+      "range": 3,
+      "ranged": true,
+      "projectile": "stinger"
+    },
+    {
+      "name": "Mage",
+      "sprite": "mage",
+      "hp": 25,
+      "atk": 10,
+      "def": 2,
+      "xp": 28,
+      "minDepth": 4,
+      "magic": true,
+      "magicType": "attack",
+      "magicRange": 4
+    },
+    {
+      "name": "Healer",
+      "sprite": "healer",
+      "hp": 30,
+      "atk": 6,
+      "def": 3,
+      "xp": 35,
+      "minDepth": 5,
+      "magic": true,
+      "magicType": "heal",
+      "magicRange": 3
+    }
+  ],
+  "items": [
+    {
+      "name": "Potion",
+      "sprite": "potion",
+      "gold": 15,
+      "kind": "heal",
+      "heal": 0.35
+    },
+    {
+      "name": "Sword",
+      "sprite": "sword",
+      "gold": 40,
+      "kind": "weapon",
+      "atk": 6,
+      "str": 2
+    },
+    {
+      "name": "Bow",
+      "sprite": "bow",
+      "gold": 50,
+      "kind": "weapon",
+      "atk": 8,
+      "str": 1,
+      "range": 3
+    },
+    {
+      "name": "Armor",
+      "sprite": "armor",
+      "gold": 45,
+      "kind": "armor",
+      "def": 4,
+      "str": 1
+    },
+    {
+      "name": "Helmet",
+      "sprite": "helmet",
+      "gold": 30,
+      "kind": "armor",
+      "def": 2,
+      "dex": 2
+    },
+    {
+      "name": "Ring",
+      "sprite": "ring",
+      "gold": 80,
+      "kind": "ring",
+      "maxHp": 20,
+      "atk": 3,
+      "def": 2,
+      "str": 1,
+      "dex": 2
+    },
+    {
+      "name": "Elixir",
+      "sprite": "elixir",
+      "gold": 60,
+      "kind": "elixir",
+      "str": 2,
+      "dex": 2
+    },
+    {
+      "name": "Shield",
+      "sprite": "shield",
+      "gold": 55,
+      "kind": "armor",
+      "def": 5
+    },
+    {
+      "name": "Frostbolt Tome",
+      "sprite": "spellbook",
+      "gold": 70,
+      "kind": "spellbook",
+      "spell": "frostbolt",
+      "minDepth": 2
+    },
+    {
+      "name": "Greater Heal Tome",
+      "sprite": "spellbook",
+      "gold": 85,
+      "kind": "spellbook",
+      "spell": "greaterHeal",
+      "minDepth": 4
+    },
+    {
+      "name": "Magic Barrier Tome",
+      "sprite": "spellbook",
+      "gold": 95,
+      "kind": "spellbook",
+      "spell": "magicBarrier",
+      "minDepth": 5
+    },
+    {
+      "name": "Town Scroll",
+      "sprite": "townScroll",
+      "gold": 55,
+      "kind": "scroll",
+      "scroll": "town",
+      "minDepth": 1,
+      "lootWeight": 1
+    }
+  ],
+  "bosses": {
+    "5": {
+      "name": "Mimic",
+      "sprite": "mimic",
+      "hp": 80,
+      "atk": 18,
+      "def": 4,
+      "xp": 120,
+      "gold": 80
+    },
+    "10": {
+      "name": "Hydra",
+      "sprite": "hydra",
+      "hp": 110,
+      "atk": 20,
+      "def": 5,
+      "xp": 150,
+      "gold": 100
+    },
+    "20": {
+      "name": "Wild Boar",
+      "sprite": "boar",
+      "hp": 130,
+      "atk": 22,
+      "def": 6,
+      "xp": 170,
+      "gold": 115
+    },
+    "30": {
+      "name": "Medusa",
+      "sprite": "medusa",
+      "hp": 115,
+      "atk": 21,
+      "def": 5,
+      "xp": 175,
+      "gold": 120,
+      "magic": true,
+      "magicType": "attack",
+      "magicRange": 4
+    },
+    "40": {
+      "name": "Dark Wizard",
+      "sprite": "darkWizard",
+      "hp": 120,
+      "atk": 23,
+      "def": 5,
+      "xp": 185,
+      "gold": 130,
+      "magic": true,
+      "magicType": "attack",
+      "magicRange": 5
+    },
+    "50": {
+      "name": "Skeleton King",
+      "sprite": "skeletonKing",
+      "hp": 150,
+      "atk": 24,
+      "def": 7,
+      "xp": 210,
+      "gold": 150,
+      "reward": {
+        "xp": 1.2,
+        "gold": 1.2
+      },
+      "throne": true,
+      "ranged": true,
+      "range": 6,
+      "projectile": "bone",
+      "summons": true
+    },
+    "60": {
+      "name": "Hydra",
+      "sprite": "hydra",
+      "hp": 115,
+      "atk": 21,
+      "def": 6,
+      "xp": 195,
+      "gold": 140
+    },
+    "70": {
+      "name": "Wild Boar",
+      "sprite": "boar",
+      "hp": 140,
+      "atk": 23,
+      "def": 7,
+      "xp": 210,
+      "gold": 150
+    },
+    "80": {
+      "name": "Medusa",
+      "sprite": "medusa",
+      "hp": 125,
+      "atk": 22,
+      "def": 6,
+      "xp": 220,
+      "gold": 160,
+      "magic": true,
+      "magicType": "attack",
+      "magicRange": 4
+    },
+    "90": {
+      "name": "Dark Wizard",
+      "sprite": "darkWizard",
+      "hp": 130,
+      "atk": 25,
+      "def": 6,
+      "xp": 230,
+      "gold": 170,
+      "magic": true,
+      "magicType": "attack",
+      "magicRange": 5
+    },
+    "100": {
+      "name": "Dragon",
+      "sprite": "dragon",
+      "hp": 160,
+      "atk": 26,
+      "def": 6,
+      "xp": 250,
+      "gold": 200,
+      "dragon": true
+    }
+  },
+  "biomes": {
+    "crypt": {
+      "prop": "tombstone",
+      "hazards": [
+        "spikes",
+        "flame",
+        "rocks"
+      ],
+      "monsters": [
+        "Skeleton",
+        "Mage"
+      ]
+    },
+    "cavern": {
+      "prop": "crystal",
+      "hazards": [
+        "rocks",
+        "flame",
+        "spikes"
+      ],
+      "monsters": [
+        "Bat",
+        "Orc"
+      ]
+    },
+    "kitchen": {
+      "prop": "cookingPot",
+      "hazards": [
+        "flame",
+        "spikes",
+        "rocks"
+      ],
+      "monsters": [
+        "Orc",
+        "Wasp"
+      ]
+    },
+    "tavern": {
+      "prop": "barCounter",
+      "hazards": [
+        "flame",
+        "rocks",
+        "spikes"
+      ],
+      "monsters": [
+        "Goblin",
+        "Healer"
+      ]
+    },
+    "throne": {
+      "prop": "banner",
+      "hazards": [
+        "flame",
+        "spikes",
+        "rocks"
+      ],
+      "monsters": [
+        "Skeleton",
+        "Mage",
+        "Healer"
+      ]
+    }
+  },
+  "themed": {
+    "3": {
+      "name": "Cook",
+      "sprite": "orc",
+      "kind": "kitchen",
+      "prop": "cookingPot"
+    },
+    "7": {
+      "name": "Bartender",
+      "sprite": "skeleton",
+      "kind": "pub",
+      "prop": "barCounter"
+    }
+  }
+}

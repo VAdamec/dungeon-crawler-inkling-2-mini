@@ -24,9 +24,9 @@ const ITEM_TABLE = [
   { name: 'Ring',     sprite: 'ring',    gold: 80, kind: 'ring', maxHp: 20, atk: 3, def: 2, str: 1, dex: 2 },
   { name: 'Elixir',   sprite: 'elixir',  gold: 60, kind: 'elixir', str: 2, dex: 2 },
   { name: 'Shield',   sprite: 'shield',  gold: 55, kind: 'armor', def: 5 },
-  { name: 'Frostbolt Tome', sprite: 'spellbook', gold: 70, kind: 'spellbook', spell: 'frostbolt', minDepth: 2 },
-  { name: 'Greater Heal Tome', sprite: 'spellbook', gold: 85, kind: 'spellbook', spell: 'greaterHeal', minDepth: 4 },
-  { name: 'Magic Barrier Tome', sprite: 'spellbook', gold: 95, kind: 'spellbook', spell: 'magicBarrier', minDepth: 5 },
+  { name: 'Frostbolt Tome', sprite: 'frostboltTome', gold: 70, kind: 'spellbook', spell: 'frostbolt', minDepth: 2 },
+  { name: 'Greater Heal Tome', sprite: 'greaterHealTome', gold: 85, kind: 'spellbook', spell: 'greaterHeal', minDepth: 4 },
+  { name: 'Magic Barrier Tome', sprite: 'barrierTome', gold: 95, kind: 'spellbook', spell: 'magicBarrier', minDepth: 5 },
   { name: 'Town Scroll', sprite: 'townScroll', gold: 55, kind: 'scroll', scroll: 'town', minDepth: 1, lootWeight: 1 },
 ];
 
@@ -86,7 +86,7 @@ const BOSSES = {
   90: { name: 'Dark Wizard', sprite: 'darkWizard', hp: 130, atk: 25, def: 6, xp: 230, gold: 170, magic: true, magicType: 'attack', magicRange: 5 },
   100: { name: 'Dragon', sprite: 'dragon', hp: 160, atk: 26, def: 6, xp: 250, gold: 200, dragon: true },
 };
-const GAME_VERSION = '0.20.0';
+const GAME_VERSION = '1.0.0';
 // Brief quotations from Monty Python and the Holy Grail; official sources in README.
 const MONSTER_QUOTES = ['Ni!', 'None shall pass!', "'Tis but a scratch.", 'Run away!'];
 const MONSTER_SPEECH_DURATION = 5, MONSTER_SPEECH_INTERVAL = 5;
@@ -283,11 +283,12 @@ function companionTick() {
 function drawCompanion() {
   const companion = state.companion;
   if (!companion || state.gameOver || !Number.isInteger(companion.x) || !Number.isInteger(companion.y)) return;
-  if (!inRenderCamera(companion.x, companion.y) || fogLevel(companion.x, companion.y) >= 3) return;
-  const position = actorRenderPosition(companion);
-  const cx = position.x * TILE + TILE / 2, cy = position.y * TILE + TILE / 2;
   const scale = companion.scale || 0.55;
-  drawActorSprite(companion.sprite, cx, cy, scale, companion);
+  const sprite = companion.kind==='boss' && companion.name==='Cook' ? 'cook' : companion.kind==='boss' && companion.name==='Bartender' ? 'bartender' : companion.sprite;
+  if (!inArtCamera(sprite,companion.x,companion.y,scale) || fogLevel(companion.x,companion.y)>=3) return;
+  const position = actorRenderPosition(companion);
+  const cx = position.x * TILE + TILE / 2, cy = worldSpriteCenterY(sprite,position.y,scale);
+  drawActorSprite(sprite, cx, cy, scale, companion);
   if (!state.companionSpeech) return;
   const text = state.companionSpeech.text;
   ctx.font = '10px monospace';
@@ -420,7 +421,7 @@ function genLevel() {
     if (room.isArena && Math.max(Math.abs(tx - room.cx), Math.abs(ty - room.cy)) <= 3) continue;
     usedSpawns.add(`${tx},${ty}`);
     const pool = spawnPool(state.depth, state.biome);
-    const t = pool[Math.min(pool.length - 1, Math.floor(Math.random() * (2 + state.depth)))];
+    const t = pool[Math.floor(Math.random() * pool.length)];
     const scale = 1 + (state.depth - 1) * 0.35;
     const attackScale = t.ranged || t.magic ? 0.1 : 0.15;
     state.monsters.push({
@@ -770,7 +771,7 @@ function townTick() {
     const tile = actor.path[actor.pathIndex];
     if (!state.map[tile.y] || state.map[tile.y][tile.x] !== 0) continue;
     if (tile.x === state.player.x && tile.y === state.player.y) continue;
-    actor.x = tile.x; actor.y = tile.y; changed = true;
+    moveActorTo(actor,tile.x,tile.y); changed = true;
   }
   return changed;
 }
@@ -858,9 +859,10 @@ function drawTownNpcs() {
   if (!state.town) return;
   const actors = [...state.town.npcs, ...(state.town.animals || [])].sort((a, b) => a.y - b.y);
   for (const actor of actors) {
-    if (actor.hidden || !inRenderCamera(actor.x, actor.y)) continue;
+    if (actor.hidden || !inArtCamera(actor.sprite,actor.x,actor.y,actor.scale||1.5)) continue;
     const scale = actor.scale || (actor.sprite === 'villager' ? 1.5 : 0.75);
-    drawActorSprite(actor.sprite, actor.x * TILE + TILE / 2, actor.y * TILE + TILE / 2, scale, actor);
+    const position=actorRenderPosition(actor);
+    drawActorSprite(actor.sprite, position.x * TILE + TILE / 2, worldSpriteCenterY(actor.sprite,position.y,scale), scale, actor);
   }
 }
 
@@ -1009,7 +1011,7 @@ function inCamera(x, y) {
 }
 
 function freshMotionState() {
-  return { time: 0, moves: {}, facing: {}, camera: null, projectiles: [], frameId: null, lastTimestamp: null, lastPaint: null };
+  return { time: 0, moves: {}, facing: {}, directions: {}, camera: null, projectiles: [], frameId: null, lastTimestamp: null, lastPaint: null };
 }
 
 function stopMotionAnimation() {
@@ -1027,7 +1029,7 @@ function clearMovementAnimation() {
 function actorMotionKey(actor) {
   if (actor === state.player) return 'player';
   if (actor === state.companion) return 'companion';
-  return `monster:${actor.id}`;
+  return actor.name && !Number.isInteger(actor.id) ? `town:${actor.name}` : `monster:${actor.id}`;
 }
 
 function motionProgress(move) {
@@ -1062,8 +1064,7 @@ function inRenderCamera(x, y) {
 function moveActorTo(actor, x, y) {
   updateCamera();
   const key = actorMotionKey(actor);
-  const dx = x - actor.x;
-  if (dx) state.motion.facing[key] = Math.sign(dx);
+  faceActor(actor, x-actor.x, y-actor.y);
   if (actor !== state.player && (!inRenderCamera(actor.x, actor.y) || fogLevel(actor.x, actor.y) >= 3)) {
     actor.x = x; actor.y = y; delete state.motion.moves[key]; return;
   }
@@ -1095,12 +1096,13 @@ function projectileVisible(projectile) {
 function motionNeeded() {
   if (state.motion.projectiles.some(projectileVisible)) return true;
   if (actorIsMoving(state.player)) return true;
+  if(state.area==='town' && state.town && [...state.town.npcs,...state.town.animals].some(a=>!a.hidden&&actorIsMoving(a)&&inArtCamera(a.sprite,a.x,a.y,a.scale||1.5)))return true;
   const companion = state.companion;
   if (companion && Number.isInteger(companion.x) && Number.isInteger(companion.y) && inRenderCamera(companion.x, companion.y) && fogLevel(companion.x, companion.y) < 3 &&
     (actorIsMoving(companion) || ['bat', 'wasp', 'dragonBoss'].includes(companion.sprite))) return true;
   if (state.monsters.some(m => m.hp > 0 &&
     inRenderCamera(m.x, m.y) && fogLevel(m.x, m.y) < 3 &&
-    (actorIsMoving(m) || ['bat', 'wasp', 'mage', 'healer'].includes(m.sprite) || m.isDragon))) return true;
+    (actorIsMoving(m) || ['bat', 'wasp', 'mage', 'healer', 'hydra', 'medusa', 'darkWizard', 'skeletonKing'].includes(m.sprite) || m.isDragon))) return true;
   const view = renderViewport();
   for (let y = view.y0; y < view.y1; y++) for (let x = view.x0; x < view.x1; x++) {
     if (state.visited.has(`${x},${y}`) && wallTorchAt(x, y)) return true;
@@ -1342,6 +1344,18 @@ function visibleTargets(range, source = state.player) {
     Math.max(Math.abs(m.x - source.x), Math.abs(m.y - source.y)) <= range && hasLineOfSight(source.x, source.y, m.x, m.y));
 }
 
+function nearestVisibleTarget(range, source = state.player) {
+  let nearest = null, nearestDistance = Infinity;
+  for (const monster of visibleTargets(range, source)) {
+    const distance = Math.max(Math.abs(monster.x - source.x), Math.abs(monster.y - source.y));
+    if (distance < nearestDistance || (distance === nearestDistance && monster.id < nearest.id)) {
+      nearest = monster;
+      nearestDistance = distance;
+    }
+  }
+  return nearest;
+}
+
 function spawnProjectile(kind, source, target, duration = 0.35) {
   const from = actorRenderPosition(source), to = actorRenderPosition(target);
   const projectiles = state.motion.projectiles;
@@ -1401,7 +1415,7 @@ function castSpell(spellName) {
     log(targets.length ? `You cast Fireball at ${targets.length} monster${targets.length === 1 ? '' : 's'}.`
       : 'Fireball scorches empty air.');
   } else if (spellName === 'frostbolt') {
-    const target = visibleTargets(4)[0];
+    const target = nearestVisibleTarget(4);
     if (target) {
       spawnProjectile('frost', p, target, 0.35);
       damageMonster(target, heroDamage(target, Math.max(1, Math.round(effectiveAtk() * 1.6) - Math.floor(target.def / 2))));
@@ -1409,7 +1423,7 @@ function castSpell(spellName) {
       log(`You cast Frostbolt at ${target.name}.`);
     } else log('Frostbolt dissolves into empty air.');
   } else if (spellName === 'magicBarrier') {
-    const target = visibleTargets(3)[0];
+    const target = nearestVisibleTarget(3);
     if (!target) log('Magic Barrier flares and fades.');
     else {
       spawnProjectile('bolt', p, target, 0.3);
@@ -1542,13 +1556,13 @@ function monsterSpeechLayout() {
 }
 
 function monsterVisual(monster) {
-  const sprite = monster.isDragon ? 'dragonBoss' : monster.sprite;
+  const sprite = monster.isDragon ? 'dragonBoss' : monster.isThemed ? (monster.themedType==='kitchen'?'cook':'bartender') : monster.sprite;
   const scale = monster.isBoss ? 3 : 2;
   const size = spriteDimensions(sprite);
   const width = size.width * scale, height = size.height * scale;
   const position = actorRenderPosition(monster);
   const x = position.x * TILE + TILE / 2;
-  const y = monster.isBoss ? (position.y + 1) * TILE - height / 2 : position.y * TILE + TILE / 2;
+  const y = (position.y + 1) * TILE - height / 2;
   return { sprite, scale, x, y, width, height, left: x - width / 2, right: x + width / 2, top: y - height / 2, bottom: y + height / 2 };
 }
 
@@ -2487,33 +2501,97 @@ function enemyTick() {
   render();
 }
 
+function worldSpriteCenterY(name, tileY, scale = 2) {
+  return (tileY + 1) * TILE - spriteDimensions(name).height * scale / 2;
+}
+function inArtCamera(name, x, y, scale = 2) {
+  const camera = renderCamera(), size = spriteDimensions(name), foot=(y+1)*TILE, cx=(x+.5)*TILE;
+  return cx+size.width*scale/2>=camera.x*TILE && cx-size.width*scale/2<=(camera.x+VIEW_W)*TILE &&
+    foot>=camera.y*TILE && foot-size.height*scale<=(camera.y+VIEW_H)*TILE;
+}
+function drawWorldSprite(name, x, y, scale = 2, frame = 0) {
+  drawSprite(name, x*TILE+TILE/2, worldSpriteCenterY(name,y,scale), scale, frame);
+}
+function faceActor(actor, dx, dy) {
+  const key=actorMotionKey(actor);
+  if(dx)state.motion.facing[key]=Math.sign(dx);
+  if(dx || dy)state.motion.directions[key]=Math.abs(dx)>=Math.abs(dy) ? (dx<0?'left':'right') : (dy<0?'back':'front');
+}
+function townBuildingBounds(prop) {
+  const art=graphicsCache();
+  if(!art.townBuildings || art.townBuildings.map!==state.map) art.townBuildings={map:state.map,bounds:{}};
+  const key=`${prop.x},${prop.y}`;
+  if(art.townBuildings.bounds[key])return art.townBuildings.bounds[key];
+  const excluded=new Set(state.props.filter(p=>p.sprite==='water'||p.sprite==='tree').map(p=>`${p.x},${p.y}`));
+  const queue=[{x:prop.x,y:prop.y}],seen=new Set();let x0=prop.x,x1=prop.x,y0=prop.y,y1=prop.y;
+  for(let i=0;i<queue.length && seen.size<100;i++){
+    const p=queue[i],k=`${p.x},${p.y}`;
+    if(seen.has(k)||excluded.has(k)||!state.map[p.y]||state.map[p.y][p.x]!==1)continue;
+    seen.add(k);x0=Math.min(x0,p.x);x1=Math.max(x1,p.x);y0=Math.min(y0,p.y);y1=Math.max(y1,p.y);
+    for(const [dx,dy]of [[1,0],[-1,0],[0,1],[0,-1]])queue.push({x:p.x+dx,y:p.y+dy});
+  }
+  const result={x0,x1,y0,y1};art.townBuildings.bounds[key]=result;return result;
+}
+function townSceneryTiles() {
+  const art=graphicsCache();
+  if(art.townTerrain && art.townTerrain.map===state.map)return art.townTerrain.tiles;
+  const tiles=new Set();
+  for(const prop of state.props){
+    if(prop.sprite==='water'||prop.sprite==='tree')tiles.add(`${prop.x},${prop.y}`);
+    if(['inn','store','hut'].includes(prop.sprite)){
+      const b=townBuildingBounds(prop);
+      for(let y=b.y0;y<=b.y1;y++)for(let x=b.x0;x<=b.x1;x++)tiles.add(`${x},${y}`);
+    }
+  }
+  art.townTerrain={map:state.map,tiles};return tiles;
+}
+function drawTownBuilding(prop) {
+  const b=townBuildingBounds(prop),camera=renderCamera(),width=(b.x1-b.x0+1)*TILE,size=spriteDimensions(prop.sprite),scale=width/size.width,foot=(b.y1+1)*TILE;
+  if((b.x1+1)*TILE<camera.x*TILE || b.x0*TILE>(camera.x+VIEW_W)*TILE || foot<camera.y*TILE || foot-size.height*scale>(camera.y+VIEW_H)*TILE)return;
+  drawSprite(prop.sprite,(b.x0+b.x1+1)*TILE/2,foot-size.height*scale/2,scale);
+}
+
 function drawFloorDetails() {
   const themed = THEMED_FLOORS[state.depth];
   if (themed) {
     const arena = state.rooms.find(r => r.isArena);
     if (arena) for (const [ox, oy] of [[-4, -3], [4, 3]]) {
       const x = arena.cx + ox, y = arena.cy + oy;
-      if (inRenderCamera(x, y) && state.visited.has(`${x},${y}`)) drawSprite(themed.prop, x * TILE + TILE / 2, y * TILE + TILE / 2, 2);
+      if (inRenderCamera(x, y) && state.visited.has(`${x},${y}`)) drawWorldSprite(themed.prop, x, y, 2);
     }
   }
-  for (const prop of state.props) {
-    if (!inRenderCamera(prop.x, prop.y)) continue;
+  for (const prop of [...state.props].sort((a,b)=>a.y-b.y)) {
+    if(state.area==='town' && ['inn','store','hut'].includes(prop.sprite)){drawTownBuilding(prop);continue;}
+    const sprite=prop.sprite==='tombstone'&&artBiomeAt(prop.x,prop.y)==='throne'?'pillar':prop.sprite;
+    const scale=sprite==='water'?2:prop.scale||2;
+    if (!inArtCamera(sprite,prop.x,prop.y,scale)) continue;
     if (state.area !== 'town' && !state.visited.has(`${prop.x},${prop.y}`)) continue;
-    drawSprite(prop.sprite, prop.x * TILE + TILE / 2, prop.y * TILE + TILE / 2, prop.scale || 2);
+    if(prop.sprite==='bridge'){
+      ctx.save();ctx.translate((prop.x+1)*TILE,(prop.y+.5)*TILE);ctx.scale(1,2/3);drawSprite('bridge',0,0,2);ctx.restore();
+    }else if(prop.sprite==='doorstep'){
+      drawSprite('doorstep',(prop.x+.5)*TILE,prop.y*TILE+spriteDimensions('doorstep').height*scale/2,scale);
+    }else{
+      drawWorldSprite(sprite,prop.x,prop.y,scale);
+      if(state.area==='town'&&prop.sprite==='water'){
+        ctx.fillStyle='#b1a47a';
+        if(state.map[prop.y][prop.x-1]===0)ctx.fillRect(prop.x*TILE,prop.y*TILE,2,TILE);
+        if(state.map[prop.y][prop.x+1]===0)ctx.fillRect((prop.x+1)*TILE-2,prop.y*TILE,2,TILE);
+      }
+    }
   }
   if (state.area === 'town' && state.townPortalOpen && state.townGate && inRenderCamera(state.townGate.x, state.townGate.y)) {
-    drawSprite('townPortal', state.townGate.x * TILE + TILE / 2, state.townGate.y * TILE + TILE / 2 - 4, 2);
+    drawWorldSprite('townPortal', state.townGate.x, state.townGate.y, 2);
   }
   for (const obstacle of state.obstacles) {
-    if (!inRenderCamera(obstacle.x, obstacle.y) || !state.visited.has(`${obstacle.x},${obstacle.y}`)) continue;
-    drawSprite(obstacle.type, obstacle.x * TILE + TILE / 2, obstacle.y * TILE + TILE / 2, 2);
+    if (!inArtCamera(obstacle.type,obstacle.x,obstacle.y) || !state.visited.has(`${obstacle.x},${obstacle.y}`)) continue;
+    drawWorldSprite(obstacle.type, obstacle.x, obstacle.y, 2);
   }
   for (const hazard of state.hazards) {
     if (!hazard.revealed || !inRenderCamera(hazard.x, hazard.y) || !state.visited.has(`${hazard.x},${hazard.y}`)) continue;
     const x = hazard.x * TILE, y = hazard.y * TILE;
     const sprite = hazard.type === 'flame' ? (flameActive(hazard) ? 'flameOn' : 'flameOff')
       : hazard.type === 'rocks' ? (hazard.stage === 'spent' ? 'rockSpent' : 'rockCrack') : 'spikes';
-    drawSprite(sprite, x + TILE / 2, y + TILE / 2, 2, sprite === 'flameOn' ? environmentAnimationFrame(hazard.x, hazard.y) : 0);
+    drawWorldSprite(sprite, hazard.x, hazard.y, 2, sprite === 'flameOn' ? environmentAnimationFrame(hazard.x, hazard.y) : 0);
     if (hazard.type === 'rocks' && hazard.stage === 'warning') {
       const fall = Math.max(0, Math.min(1, 1 - (hazard.impactAt - state.hazardTime) / 1.2));
       ctx.fillStyle = '#ac9981'; ctx.fillRect(x + 6, y - 10 + Math.round(fall * 20), 7, 6); ctx.fillRect(x + 22, y - 8 + Math.round(fall * 20), 5, 5);
@@ -2521,17 +2599,17 @@ function drawFloorDetails() {
   }
   const drop = state.floorKey && state.floorKey.drop;
   if (drop && inRenderCamera(drop.x, drop.y) && state.visited.has(`${drop.x},${drop.y}`)) {
-    drawSprite('key', drop.x * TILE + TILE / 2, drop.y * TILE + TILE / 2, 2);
+    drawWorldSprite('key', drop.x, drop.y, 2);
   }
 }
 
 function drawHazardWarnings() {
   for (const hazard of state.hazards) {
     if (hazard.type !== 'rocks' || hazard.stage !== 'warning' || !inRenderCamera(hazard.x, hazard.y) || fogLevel(hazard.x, hazard.y) >= 3) continue;
-    const x = hazard.x * TILE, y = hazard.y * TILE;
-    ctx.fillStyle = '#ffd07a'; ctx.fillRect(x + 8, y - 23, 16, 19);
+    const x = hazard.x * TILE, top = (hazard.y+1)*TILE-spriteDimensions('knight').height*2;
+    ctx.fillStyle = '#ffd07a'; ctx.fillRect(x + 8, top - 23, 16, 19);
     ctx.fillStyle = '#211b15'; ctx.font = 'bold 18px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText('!', x + 16, y - 13);
+    ctx.fillText('!', x + 16, top - 13);
   }
 }
 
@@ -2570,11 +2648,8 @@ function drawDragonDefeatDragon(scene) {
   ctx.save();
   ctx.globalAlpha = scene.alpha;
   ctx.translate(576 + scene.shake, scene.dragonY);
-  ctx.fillStyle = '#23432d'; ctx.strokeStyle = '#6b9b69'; ctx.lineWidth = 4;
-  ctx.beginPath(); ctx.moveTo(-30, -10); ctx.lineTo(-150, -70 + scene.wing); ctx.lineTo(-134, 12); ctx.lineTo(-48, 34); ctx.closePath(); ctx.fill(); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(30, -10); ctx.lineTo(150, -70 + scene.wing); ctx.lineTo(134, 12); ctx.lineTo(48, 34); ctx.closePath(); ctx.fill(); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(30, 30); ctx.quadraticCurveTo(100, 80, 150, 40); ctx.stroke();
-  drawSprite('dragonBoss', 0, 0, 4);
+  ctx.scale(1,1-Math.min(0.12,scene.wing/1000));
+  drawSprite('dragonBoss', 0, 0, 4, scene.wing>15?1:0);
   ctx.restore();
 }
 
@@ -2712,15 +2787,7 @@ function drawBossIntro(scene) {
   ctx.save();
   ctx.translate(576 + scene.shake, 336);
   ctx.scale(scene.zoom, scene.zoom);
-  const meta = BOSS_ANIMATIONS[scene.kind] || BOSS_ANIMATIONS.mimic;
-  if (meta.motif === 'heads') {
-    for (let i = -1; i <= 1; i++) {
-      ctx.save(); ctx.translate(i * 42, -58 - Math.abs(i) * 12); ctx.rotate(i * 0.28);
-      drawSprite(scene.sprite, 0, 0, scene.scale); ctx.restore();
-    }
-  } else {
-    drawSprite(scene.sprite, 0, 0, scene.scale);
-  }
+  drawSprite(scene.sprite, 0, 0, scene.scale, Math.floor(scene.t * 8 || 0) % 4);
   ctx.restore();
   ctx.globalAlpha = scene.bannerAlpha;
   ctx.fillStyle = '#0a0c13'; ctx.fillRect(176, 600, 800, 112);
@@ -2745,49 +2812,14 @@ function drawProjectiles() {
     const angle = Math.atan2(projectile.toY - projectile.fromY, projectile.toX - projectile.fromX);
     ctx.save();
     ctx.translate(point.x, point.y);
-    if (projectile.kind === 'stinger') {
-      ctx.rotate(angle + Math.PI / 2);
-      ctx.fillStyle = '#f3d891';
-      ctx.beginPath(); ctx.moveTo(0, -7); ctx.lineTo(4, 5); ctx.lineTo(-4, 5); ctx.closePath(); ctx.fill();
-      ctx.fillStyle = '#131b26'; ctx.fillRect(-1, 1, 2, 4);
-    } else if (projectile.kind === 'arrow') {
-      ctx.rotate(angle);
-      ctx.strokeStyle = '#74513a'; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(-9, 0); ctx.lineTo(7, 0); ctx.stroke();
-      ctx.fillStyle = '#e8e3cf';
-      ctx.beginPath(); ctx.moveTo(10, 0); ctx.lineTo(5, -3); ctx.lineTo(5, 3); ctx.closePath(); ctx.fill();
-    } else if (projectile.kind === 'beer') {
-      ctx.fillStyle = '#a3764b'; ctx.fillRect(-5, -6, 10, 12);
-      ctx.fillStyle = '#f3e9cd'; ctx.fillRect(-5, -7, 10, 3);
-      ctx.strokeStyle = '#f3e9cd'; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.arc(7, 0, 4, -1.2, 1.2); ctx.stroke();
-    } else if (projectile.kind === 'fireball') {
-      ctx.fillStyle = `rgba(255, 140, 50, ${1 - point.t * 0.3})`;
-      ctx.beginPath(); ctx.arc(0, 0, 6, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#ffe4ac'; ctx.beginPath(); ctx.arc(0, 0, 3, 0, Math.PI * 2); ctx.fill();
-    } else if (projectile.kind === 'bone') {
-      ctx.rotate(angle);
-      ctx.fillStyle = '#e8e3cf';
-      ctx.fillRect(-9, -2, 14, 4);
-      ctx.beginPath(); ctx.arc(-9, -3, 3, 0, Math.PI * 2); ctx.arc(-9, 3, 3, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(6, -3, 3, 0, Math.PI * 2); ctx.arc(6, 3, 3, 0, Math.PI * 2); ctx.fill();
-    } else if (projectile.kind === 'frost') {
-      ctx.rotate(angle);
-      ctx.fillStyle = '#a8d2cd';
-      ctx.beginPath(); ctx.moveTo(10, 0); ctx.lineTo(0, -5); ctx.lineTo(-8, 0); ctx.lineTo(0, 5); ctx.closePath(); ctx.fill();
-      ctx.fillStyle = '#e8e3cf'; ctx.fillRect(-3, -1, 8, 2);
-    } else if (projectile.kind === 'heal') {
-      const rise = point.t * 18;
-      ctx.fillStyle = '#a8d2cd';
-      for (let i = 0; i < 4; i++) {
-        const a = i * Math.PI / 2 + point.t * 3;
-        ctx.fillRect(Math.cos(a) * 8 - 1, Math.sin(a) * 8 - rise, 3, 3);
-      }
-      ctx.fillStyle = '#e8e3cf'; ctx.fillRect(-2, -2 - rise, 4, 4);
-    } else {
-      ctx.fillStyle = '#9ab4ff'; ctx.beginPath(); ctx.arc(0, 0, 5, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#e8e3cf'; ctx.beginPath(); ctx.arc(0, 0, 2, 0, Math.PI * 2); ctx.fill();
+    const effect={arrow:'arrowFX',stinger:'stingerFX',bone:'boneFX',beer:'beerFX',fireball:'fireballFX',frost:'frostboltFX',heal:'healFX',bolt:'magicBarrierFX'}[projectile.kind]||'magicBarrierFX';
+    if(['arrow','stinger','bone','fireball','frost'].includes(projectile.kind))ctx.rotate(angle);
+    if(projectile.kind==='heal'){
+      ctx.translate(0,-point.t*18);
+      ctx.fillStyle='#afc897';
+      for(let i=0;i<4;i++){const a=i*Math.PI/2+point.t*3;ctx.fillRect(Math.cos(a)*8-1,Math.sin(a)*8,3,3);}
     }
+    drawSprite(effect,0,-4,1);
     ctx.restore();
   }
 }
@@ -2809,36 +2841,37 @@ function draw() {
       drawDungeonTile(x, y);
     }
   }
+  drawDungeonWallFaces();
   drawDungeonTorches();
   drawFloorDetails();
   for (const [stairs, glyph] of [[state.depth < FINAL_DEPTH ? state.stairs : null, '▼'], [state.upstairs, '▲']]) {
     if (!stairs || !inRenderCamera(stairs.x, stairs.y) || !state.visited.has(`${stairs.x},${stairs.y}`)) continue;
     const spriteName = glyph === '▼' ? 'stairsDown' : 'stairsUp';
-    drawSprite(spriteName, stairs.x * TILE + TILE / 2, stairs.y * TILE + TILE / 2, 2);
+    drawWorldSprite(spriteName, stairs.x, stairs.y, 2);
   }
   for (const t of state.treasures) {
     if (!inRenderCamera(t.x, t.y) || !state.visited.has(`${t.x},${t.y}`)) continue;
-    drawSprite('chest', t.x * TILE + TILE / 2, t.y * TILE + TILE / 2, 2);
+    drawWorldSprite('chest', t.x, t.y, 2);
   }
   for (const pot of state.potions) {
     if (!inRenderCamera(pot.x, pot.y) || !state.visited.has(`${pot.x},${pot.y}`)) continue;
-    drawSprite('potion', pot.x * TILE + TILE / 2, pot.y * TILE + TILE / 2, 2);
+    drawWorldSprite('potion', pot.x, pot.y, 2);
   }
-  if (state.prisoner && inRenderCamera(state.prisoner.x, state.prisoner.y) && !state.prisoner.rescued && fogLevel(state.prisoner.x, state.prisoner.y) < 3) {
-    const px = state.prisoner.x * TILE + TILE / 2, py = state.prisoner.y * TILE + TILE / 2;
+  if (state.prisoner && inArtCamera('prisoner',state.prisoner.x, state.prisoner.y) && !state.prisoner.rescued && fogLevel(state.prisoner.x, state.prisoner.y) < 3) {
+    const px = state.prisoner.x * TILE + TILE / 2, py = worldSpriteCenterY('prisoner',state.prisoner.y,2);
     drawActorSprite('prisoner', px, py, 2);
   }
-  if (state.princess && inRenderCamera(state.princess.x, state.princess.y) && !state.princess.rescued && fogLevel(state.princess.x, state.princess.y) < 3) {
-    const px = state.princess.x * TILE + TILE / 2, py = state.princess.y * TILE + TILE / 2;
+  if (state.princess && inArtCamera('princess',state.princess.x, state.princess.y) && !state.princess.rescued && fogLevel(state.princess.x, state.princess.y) < 3) {
+    const px = state.princess.x * TILE + TILE / 2, py = worldSpriteCenterY('princess',state.princess.y,2);
     drawActorSprite('princess', px, py, 2);
   }
-  if (state.merchant && inRenderCamera(state.merchant.x, state.merchant.y) && (inTown || fogLevel(state.merchant.x, state.merchant.y) < 3)) {
-    const px = state.merchant.x * TILE + TILE / 2, py = state.merchant.y * TILE + TILE / 2;
+  if (state.merchant && inArtCamera('merchant',state.merchant.x, state.merchant.y) && (inTown || fogLevel(state.merchant.x, state.merchant.y) < 3)) {
+    const px = state.merchant.x * TILE + TILE / 2, py = worldSpriteCenterY('merchant',state.merchant.y,2);
     drawActorSprite('merchant', px, py, 2);
   }
   if (inTown) drawTownNpcs();
   for (const m of state.monsters) {
-    if (m.hp <= 0 || !inRenderCamera(m.x, m.y)) continue;
+    if (m.hp <= 0 || !inArtCamera(monsterVisual(m).sprite,m.x,m.y,m.isBoss?3:2)) continue;
     if (fogLevel(m.x, m.y) >= 3) continue;
     const visual = monsterVisual(m);
     drawActorSprite(visual.sprite, visual.x, visual.y, visual.scale, m);
@@ -2863,7 +2896,7 @@ function draw() {
   if (inTown) drawTownSpeech();
   // Keep visible actors' health bars readable above the terrain fog.
   for (const m of state.monsters) {
-    if (m.hp <= 0 || !inRenderCamera(m.x, m.y) || fogLevel(m.x, m.y) >= 3) continue;
+    if (m.hp <= 0 || !inArtCamera(monsterVisual(m).sprite,m.x,m.y,m.isBoss?3:2) || fogLevel(m.x, m.y) >= 3) continue;
     const visual = monsterVisual(m);
     const barWidth = m.isBoss ? visual.width - 12 : 24;
     ctx.fillStyle = '#333'; ctx.fillRect(visual.x - barWidth / 2, visual.top - 7, barWidth, 4);
@@ -2882,7 +2915,7 @@ function draw() {
     ctx.fillText(text, px, py - 13);
   }
   const position = actorRenderPosition(p);
-  const px = position.x * TILE + TILE / 2, py = position.y * TILE + TILE / 2;
+  const px = position.x * TILE + TILE / 2, py = worldSpriteCenterY('knight',position.y,2);
   ctx.save(); ctx.translate(px, py);
   drawActorSprite('knight', 0, 0, 2, p);
   ctx.restore();
@@ -3027,14 +3060,9 @@ function drawEndingHeart(x, y, size) {
 }
 
 function drawEndingDragon(x, y, time, health, flying) {
-  const flap = flying ? Math.sin(time * 10) * 35 : 15 * (1 - health);
   ctx.save();
   ctx.globalAlpha = 0.5 + health * 0.5;
-  ctx.fillStyle = '#294b32'; ctx.strokeStyle = '#689465'; ctx.lineWidth = 3;
-  ctx.beginPath(); ctx.moveTo(x - 28, y - 10); ctx.lineTo(x - 110, y - 65 - flap); ctx.lineTo(x - 96, y + 8); ctx.lineTo(x - 45, y + 26); ctx.closePath(); ctx.fill(); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(x + 28, y - 10); ctx.lineTo(x + 110, y - 65 - flap); ctx.lineTo(x + 96, y + 8); ctx.lineTo(x + 45, y + 26); ctx.closePath(); ctx.fill(); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(x + 30, y + 24); ctx.quadraticCurveTo(x + 95, y + 65, x + 130, y + 15); ctx.stroke();
-  drawSprite('dragonBoss', x, y + (flying ? Math.sin(time * 10) * 4 : 0), 3);
+  drawSprite('dragonBoss',x,y+(flying?Math.sin(time*10)*4:0),3,flying?Math.floor(time*8)%4:0);
   ctx.restore();
 }
 
@@ -3044,10 +3072,7 @@ function drawEndingHero(hero, time) {
   const bob = moving ? Math.abs(stride) * hero.scale * 0.7 : 0;
   ctx.save(); ctx.translate(hero.x, hero.y - bob);
   if (hero.crying) ctx.rotate(0.15);
-  drawSprite('knight', 0, 0, hero.scale);
-  ctx.fillStyle = '#343944';
-  ctx.fillRect(-4 * hero.scale, 7 * hero.scale + (moving ? stride * hero.scale : 0), 3 * hero.scale, 2 * hero.scale);
-  ctx.fillRect(hero.scale, 7 * hero.scale - (moving ? stride * hero.scale : 0), 3 * hero.scale, 2 * hero.scale);
+  drawSprite('knight',0,0,hero.scale,moving?Math.floor(time*12)%4:0,hero.crying?'right':'front');
   if (hero.crying) {
     ctx.fillStyle = '#262a34'; ctx.fillRect(-3 * hero.scale, -4.5 * hero.scale, 6 * hero.scale, 2 * hero.scale);
     ctx.fillStyle = '#8ae2ff';
