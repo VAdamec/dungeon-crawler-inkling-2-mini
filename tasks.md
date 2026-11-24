@@ -139,6 +139,9 @@ Current release verification: **155 behavior tests**, both script syntax checks 
 - [x] Verify these fixes: 151 behavior tests pass, both scripts pass syntax checks, external smoke reports `SMOKE_OK`, and both spell hotkeys select the nearest enemy in offline Chrome without browser errors or network requests.
 - [ ] Complete a human campaign and audible quality/balance playtest.
 - [ ] Decide whether to schedule the expansion design’s deferred themed extras: recurring themed encounters, Cook throwing-pan attacks and extra themed food/mug/stool content.
+- [ ] companion selection, plan ready
+- [ ] teleportation system, plan ready
+- [ ] plan market/buying items system, right now it's just whatever store or keeper have, it will be nice to see buy/sell menu, to be able to select what to buy, what to sold (revert before menu closed, if anybody do mistake)
 
 See [review findings](docs/reviews/2026-11-24-status-review.md#findings).
 
