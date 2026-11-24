@@ -2511,3 +2511,56 @@ for (const spell of ['frostbolt', 'magicBarrier']) {
     assert.equal(g.run('state.turn'), turn+1);
   });
 }
+
+test('connected wall edges follow the blocked footprint including corners and obstacle neighbors', () => {
+  const g = game();
+  g.run(`for(let y=24;y<=34;y++)for(let x=34;x<=46;x++)state.map[y][x]=0;
+    for(let y=27;y<=31;y++)for(let x=37;x<=41;x++)state.map[y][x]=1;`);
+  assert.deepEqual(g.json('[[37,27],[39,27],[41,27],[37,29],[39,29],[41,29],[37,31],[39,31],[41,31]].map(([x,y])=>dungeonWallEdges(x,y))'),
+    [9,1,3,8,0,2,12,4,6]);
+  g.run('state.map[29][40]=2');
+  assert.equal(g.run('dungeonWallEdges(39,29)'), 2, 'an obstacle on floor does not connect to solid wall');
+  g.run('state.map[28][38]=0');
+  assert.equal(g.run('dungeonWallEdges(38,27)'), 5, 'an inner corner exposes its real floor boundary');
+});
+
+test('wall painters keep every edge combination inside one blocked tile without RNG or map changes', () => {
+  const g = game(), before = g.json('[state.map,state.visited.size,state.player,state.monsters]');
+  g.run(`window.wallPrimitives=[];jrpgRect=(c,x,y,w,h)=>window.wallPrimitives.push([x,y,x+w,y+h]);
+    jrpgPoly=(c,points)=>{for(const [x,y] of points)window.wallPrimitives.push([x,y,x,y]);};
+    Math.random=()=>{throw Error('Wall painting consumed gameplay RNG')};
+    for(const biome of ['crypt','cavern','kitchen','tavern','throne'])for(let edges=0;edges<16;edges++)
+      paintConnectedWall(ctx,biome,3,4,edges);`);
+  const primitives = g.json('window.wallPrimitives');
+  assert.ok(primitives.length > 80);
+  assert.ok(primitives.every(([x0,y0,x1,y1])=>x0>=0 && y0>=0 && x1<=32 && y1<=32),
+    'no 48px face may overpaint a neighboring walkable tile');
+  assert.deepEqual(g.json('[state.map,state.visited.size,state.player,state.monsters]'), before);
+});
+
+test('wall tile cache distinguishes changed neighboring openings and reuses matching topology', () => {
+  const g = game();
+  g.run(`for(let y=27;y<=29;y++)for(let x=39;x<=41;x++)state.map[y][x]=1;
+    state.art.tiles={};window.wallSurfaces=0;document.createElement=()=>{window.wallSurfaces++;return {getContext:()=>ctx};};
+    drawDungeonTile(40,28);state.map[29][40]=0;drawDungeonTile(40,28);`);
+  assert.equal(g.run('window.wallSurfaces'), 2);
+  g.run('state.map[29][40]=1;drawDungeonTile(40,28)');
+  assert.equal(g.run('window.wallSurfaces'), 2);
+  assert.equal(g.run('Object.keys(state.art.tiles).length'), 2);
+});
+
+test('hero walks along a one-tile corridor while both adjacent walls reject movement', () => {
+  const g = game();
+  g.run(`state.monsters=[];state.hazards=[];state.companion=null;state.pause=null;clearBossIntro();clearBossDefeat();
+    for(let y=29;y<=31;y++)for(let x=35;x<=45;x++)state.map[y][x]=1;
+    for(let x=36;x<=44;x++)state.map[30][x]=0;
+    state.player.x=40;state.player.y=30;clearMovementAnimation();`);
+  const before = g.run('state.turn');
+  g.run('movePlayer(0,-1);movePlayer(0,1)');
+  assert.deepEqual(g.json('[state.player.x,state.player.y,state.turn]'), [40,30,before]);
+  for(let i=0;i<6;i++)g.run('movePlayer(1,0)');
+  assert.deepEqual(g.json('[state.player.x,state.player.y,state.turn]'), [44,30,before+4]);
+  for(let i=0;i<10;i++)g.run('movePlayer(-1,0)');
+  assert.deepEqual(g.json('[state.player.x,state.player.y,state.turn]'), [36,30,before+12]);
+  assert.equal(g.run('state.map[state.player.y][state.player.x]'), 0);
+});

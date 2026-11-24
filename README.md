@@ -13,7 +13,7 @@ Local LLM playground, tooks ~30h to get to v0.11.0 with "better" graphics
 - gemma
 
 
-A plain HTML5 canvas dungeon game, **version 1.0.0** (reviewed 2026-11-24). Open `index.html` directly in a browser (`file://`); there is no install, build step, server, or network dependency.
+A plain HTML5 canvas dungeon game, **version 1.0.1** (reviewed 2026-11-24). Open `index.html` directly in a browser (`file://`); there is no install, build step, server, or network dependency.
 
 The fantasy logo and version appear on the launch screen only. Click **Enter the dungeon** or press a key to begin; the game waits until you start. During play, stats sit at the top; Hero stats sit in a fixed compact panel above a fixed, internally scrolling adventure log (newest first) on the left of the map, and the floor chart with equipment and Spells under Gear bonuses sits to the right. On narrow screens the left and right panels stack below the map. R starts a fresh run without showing the launch screen again; reloading the page shows it.
 
@@ -47,6 +47,8 @@ Help opens with **?** or the HUD button and pauses play.
 The dungeon is displayed at **2× zoom**, with 18×12 tiles visible in the same canvas. Characters, tiles, loot, bubbles, warnings, and world health bars are twice as large. The camera follows you and the minimap outline tracks the smaller view. HUD/sidebar sizes and screen-space cinematic framing stay consistent.
 
 The approved classic JRPG refresh uses original detailed overhead pixel art: pitched roofs and timber facades, organic tree canopies, continuous grass/roads, raised masonry, distinct biome materials and full-body characters. The knight and humanoids have directional views; bosses, loot, equipment, stairs, hazards and spell effects share the same palette. [Approved focus design](docs/previews/2026-11-24-classic-jrpg/design-v3/index.html) · [Expanded artwork](docs/previews/2026-11-24-classic-jrpg/design-v3/collection/index.html). References inspired the direction; no third-party artwork is bundled.
+
+The subsequent [wall readability fix](docs/reviews/2026-11-24-wall-rendering.md) joins neighboring walls and keeps their faces inside blocked tiles. Crypt floors now use chipped flagstones, making walkable corridors distinct from masonry. Earlier full-game captures above predate this correction; the review includes current before/after and corridor captures.
 
 The checked-in sprite grids use compact run-length data and shared pose grids; no preview files or asset build are needed at runtime. Sprites, directional frames, equipment icons and coordinate-derived terrain are cached on local canvases with crisp nearest-neighbor rendering. The four runtime files total about 495 KiB, with no external art/font/network loading and a capped animation drawing loop. Existing boss-defeat and ending scenes use the refreshed figures.
 
@@ -142,7 +144,7 @@ The brief quotations are from *Monty Python and the Holy Grail*: [official Monty
 
 ## Illustrated bestiary
 
-Figures below are exported from the current runtime pixel artwork, enlarged for readability. Stats were checked against `MONSTER_TYPES` and `bossForDepth()` in [game.js](js/game.js) for version 1.0.0.
+Figures below are exported from the current runtime pixel artwork, enlarged for readability. Stats were checked against `MONSTER_TYPES` and `bossForDepth()` in [game.js](js/game.js) for version 1.0.0; the 1.0.1 wall patch leaves these stats unchanged.
 
 ### Ordinary monsters
 

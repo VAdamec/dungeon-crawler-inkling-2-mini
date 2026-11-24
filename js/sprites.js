@@ -323,24 +323,36 @@ function drawActorSprite(name, cx, cy, scale, actor = null) {
   drawSprite(name,0,-foot,scale,pose.frame,directional?direction:'front');ctx.restore();
 }
 
+// Exposed edges of the actual blocked tile: north/east/south/west = 1/2/4/8.
+// Wall art stays inside this footprint, including in one-tile corridors.
+function dungeonWallEdges(x, y) {
+  let edges = 0;
+  for (const [dx, dy, bit] of [[0,-1,1],[1,0,2],[0,1,4],[-1,0,8]]) {
+    const nx = x + dx, ny = y + dy;
+    if (nx >= 0 && nx < W && ny >= 0 && ny < H && state.map[ny][nx] !== 1) edges |= bit;
+  }
+  return edges;
+}
+
 function drawDungeonTile(x, y) {
   const wall = state.map[y][x] === 1 && (state.area !== 'town' || !townSceneryTiles().has(`${x},${y}`));
-  const front = wall && y + 1 < H && state.map[y + 1][x] !== 1;
+  const edges = wall && state.area !== 'town' ? dungeonWallEdges(x, y) : 0;
+  const front = !!(edges & 4);
   const variant = (x * 37 + y * 71) % 11;
   const biome = artBiomeAt(x,y);
   const accent = throneCarpetAt(x,y);
   const sand = biome === 'town' && !wall && ((y >= 28 && y <= 30) || (x >= 37 && x <= 40));
-  const key = `${biome}:${wall ? 'wall' : 'floor'}:${front}:${variant}:${sand}:${x%6}:${y%6}:${accent}`;
+  const key = `${biome}:${wall ? 'wall' : 'floor'}:${edges}:${variant}:${sand}:${x%6}:${y%6}:${accent}`;
   const cache = graphicsCache().tiles;
   if (!cache[key]) {
     const surface = graphicsSurface(TILE, TILE);
-    if (surface) { paintDungeonTile(surface.getContext('2d'), wall, variant, front, biome, sand, x%6, y%6, accent); cache[key] = surface; }
+    if (surface) { paintDungeonTile(surface.getContext('2d'), wall, variant, front, biome, sand, x%6, y%6, accent, edges); cache[key] = surface; }
   }
   if (cache[key]) {
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(cache[key], x * TILE, y * TILE);
   } else {
-    ctx.save(); ctx.translate(x * TILE, y * TILE); paintDungeonTile(ctx, wall, variant, front, biome, sand, x%6, y%6, accent); ctx.restore();
+    ctx.save(); ctx.translate(x * TILE, y * TILE); paintDungeonTile(ctx, wall, variant, front, biome, sand, x%6, y%6, accent, edges); ctx.restore();
   }
   if (!wall) {
     ctx.fillStyle = 'rgba(13, 21, 40, 0.25)';
@@ -396,7 +408,7 @@ function jrpgRect(c, x, y, w, h, color) { c.fillStyle = color; c.fillRect(Math.r
 function jrpgPoly(c, points, color) {
   c.fillStyle = color; c.beginPath(); points.forEach(([x,y],i) => i ? c.lineTo(Math.round(x),Math.round(y)) : c.moveTo(Math.round(x),Math.round(y))); c.closePath(); c.fill();
 }
-function paintDungeonTile(c, wall, variant, front = false, biome = 'crypt', sand = false, tileX = 0, tileY = 0, accent = 0) {
+function paintDungeonTile(c, wall, variant, front = false, biome = 'crypt', sand = false, tileX = 0, tileY = 0, accent = 0, edges = front ? 4 : 0) {
   const n = variant, r = jrpgRect, material = TILE_PALETTES[biome] || TILE_PALETTES.crypt;
   if (biome === 'town') {
     if(wall){
@@ -412,18 +424,7 @@ function paintDungeonTile(c, wall, variant, front = false, biome = 'crypt', sand
     return;
   }
   if (wall) {
-    const p = material.wall;
-    r(c,0,0,32,32,p[1]);
-    if(biome==='cavern') {
-      jrpgPoly(c,[[0,6],[7,0],[24,3],[32,13],[26,31],[8,32]],p[0]);
-      jrpgPoly(c,[[3,7],[9,2],[23,5],[29,14],[23,29],[7,28]],p[1]);
-      r(c,8,3,15,2,p[2]);r(c,6,19,3,8,p[0]);
-    } else if(biome==='tavern') {
-      r(c,0,0,5,32,p[0]);jrpgPoly(c,[[5,0],[9,0],[31,29],[31,32],[27,32]],p[2]);r(c,0,29,32,3,p[0]);
-    } else {
-      r(c,0,0,32,2,p[2]);r(c,0,15,32,2,p[0]);r(c,n%2?10:21,2,2,13,p[0]);r(c,n%2?23:8,17,2,15,p[0]);r(c,3,4,20,1,biome==='kitchen'?'#a18359':'#6b7160');
-    }
-    if(front){r(c,0,2,32,4,p[2]);r(c,0,6,32,3,p[0]);r(c,0,29,32,3,p[0]);}
+    paintConnectedWall(c, biome, tileX, tileY, edges);
     return;
   }
   const ox=tileX*32, oy=tileY*32;
@@ -445,8 +446,12 @@ function paintDungeonTile(c, wall, variant, front = false, biome = 'crypt', sand
     r(c,ox,oy,32,32,'#666b65');r(c,ox+1,oy+1,31,31,(tileX+tileY)%2?'#7d867b':'#acaf99');
     jrpgPoly(c,[[ox+3,oy+8],[ox+16,oy+13],[ox+19,oy+24],[ox+30,oy+28],[ox+19,oy+26],[ox+15,oy+15]],'#919a86');
   } else {
-    r(c,ox,oy,32,32,'#3d423e');
-    for(let y=Math.floor(oy/24)*24;y<oy+32;y+=24)for(let x=Math.floor(ox/48)*48-48;x<ox+80;x+=48){const xx=x+(Math.abs(Math.floor(y/24))%2)*24;r(c,xx+1,y+1,46,22,['#4e514b','#55564c','#494d47','#5b5b50'][Math.abs(Math.floor(xx/48)+Math.floor(y/24))%4]);r(c,xx+2,y+2,44,1,'#68685a');}
+    // Broad, chipped flagstones read as a horizontal floor, not another brick facade.
+    r(c,ox,oy,32,32,'#424740');
+    jrpgPoly(c,[[ox+3,oy+2],[ox+27,oy+1],[ox+31,oy+5],[ox+30,oy+28],[ox+25,oy+31],[ox+2,oy+29],[ox+1,oy+7]],
+      ['#55584d','#5b5d50','#50564c','#5d5f51'][(tileX+tileY*3)%4]);
+    r(c,ox+5,oy+3,16,1,'#66695a');r(c,ox+3,oy+8,1,13,'#5f6455');
+    if(n%4===0)jrpgPoly(c,[[ox+23,oy+2],[ox+21,oy+10],[ox+25,oy+15],[ox+22,oy+12],[ox+20,oy+10]],'#464d43');
   }
   c.restore();
   if(biome==='throne' && accent){
@@ -467,22 +472,39 @@ function throneCarpetAt(x,y){
   return room && x>=room.cx-1 && x<=room.cx+1 && y>room.y && y<room.y+room.h-1 ? x-room.cx+2 : 0;
 }
 
-function drawDungeonWallFaces() {
-  if (state.area === 'town') return;
-  const view=renderViewport(), cache=graphicsCache().tiles;
-  for(let y=view.y0;y<Math.min(H,view.y1+1);y++)for(let x=view.x0;x<view.x1;x++){
-    if(!state.visited.has(`${x},${y}`) || state.map[y][x]!==1 || y+1>=H || state.map[y+1][x]!==0)continue;
-    const biome=artBiomeAt(x,y), key=`face:${biome}:${(x+y)%2}`;
-    if(!cache[key]){const s=graphicsSurface(32,48);if(s){paintWallFace(s.getContext('2d'),biome,(x+y)%2);cache[key]=s;}}
-    if(cache[key])ctx.drawImage(cache[key],x*TILE,(y+1)*TILE-48);
-    else{ctx.save();ctx.translate(x*TILE,(y+1)*TILE-48);paintWallFace(ctx,biome,(x+y)%2);ctx.restore();}
+function paintConnectedWall(c, biome, tileX, tileY, edges) {
+  const r = jrpgRect, p = (TILE_PALETTES[biome] || TILE_PALETTES.crypt).wall;
+  // A continuous dark top plane separates solid rock from the floor's large slabs.
+  // Only exposed edges receive coping; internal tile joins have no bright border.
+  r(c,0,0,32,32,p[0]);
+  if (biome === 'cavern') {
+    r(c,4,8,18,1,p[1]);r(c,20,9,1,6,p[1]);
+  } else if (biome === 'tavern') {
+    r(c,0,14,32,1,'#443b2c');
+  } else {
+    r(c,0,15,32,1,'#202c2b');
+    r(c,tileY%2?8:24,0,1,15,'#202c2b');
+    r(c,tileY%2?24:8,16,1,16,'#202c2b');
   }
-}
-function paintWallFace(c,biome,n){
-  const r=jrpgRect;
-  r(c,0,0,32,48,biome==='cavern'?'#354939':biome==='kitchen'?'#735e45':biome==='tavern'?'#a99a75':'#4d5850');
-  if(biome==='cavern') {jrpgPoly(c,[[0,7],[8,0],[25,4],[32,19],[24,47],[6,48]],'#4d5949');jrpgPoly(c,[[7,2],[11,3],[4,23],[9,43],[6,45],[1,23]],'#798066');}
-  else if(biome==='tavern'){r(c,0,0,4,48,'#594b35');jrpgPoly(c,[[5,0],[9,0],[32,34],[32,40]],'#725a3f');}
-  else{for(let y=8;y<48;y+=12){r(c,0,y,32,1,'#273534');r(c,(n+(y/12|0))%2?10:23,y+1,2,11,'#303c37');r(c,3,y+2,21,1,biome==='kitchen'?'#a18359':'#6b7160');}}
-  r(c,0,0,32,5,biome==='tavern'?'#5b4d36':biome==='kitchen'?'#a88b5b':'#8b8d72');r(c,1,1,30,1,'#b0ad8b');r(c,0,45,32,3,'#27352d');
+  if (edges & 1) { r(c,0,0,32,3,p[2]);r(c,0,3,32,2,p[1]); }
+  if (edges & 8) { r(c,0,0,3,32,p[2]);r(c,3,0,2,32,p[1]); }
+  if (edges & 2) { r(c,29,0,3,32,p[1]);r(c,31,0,1,32,'#172321'); }
+  if (edges & 4) {
+    // The face fits within the southern blocked tile, never the floor to its north.
+    r(c,0,10,32,22,p[1]);
+    if (biome === 'cavern') {
+      jrpgPoly(c,[[4,13],[12,12],[9,20],[14,29],[11,30],[6,21]],p[0]);
+      r(c,22,17,2,12,p[0]);
+    } else if (biome === 'tavern') {
+      r(c,0,12,3,17,p[0]);
+      jrpgPoly(c,[[4,12],[8,12],[26,29],[21,29]],p[2]);
+    } else {
+      r(c,0,20,32,1,p[0]);
+      r(c,tileX%2?8:24,12,1,8,p[0]);r(c,tileX%2?24:8,21,1,8,p[0]);
+      r(c,2,13,24,1,p[2]);
+    }
+    r(c,0,8,32,3,p[2]);r(c,0,11,32,1,p[0]);r(c,0,29,32,3,'#172321');
+    if (edges & 8) r(c,0,11,2,18,p[0]);
+    if (edges & 2) r(c,30,11,2,18,p[0]);
+  }
 }

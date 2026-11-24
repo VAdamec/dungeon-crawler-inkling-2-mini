@@ -1,6 +1,14 @@
 # Handover — Dungeon Crawler
 
-Last updated: 2026-11-24. Current release: v1.0.0; latest committed version: v0.20.0 (`5c5a6b0`).
+Last updated: 2026-11-24. Current working release: v1.0.1; latest committed version: v1.0.0 (`0218989`).
+
+## Release 1.0.1
+
+The user requested 1.0.1 for the wall correction below. Launch branding, README, changelog and current task status now identify 1.0.1. The 1.0.0 commit already contains the JRPG artwork, weighted spawning and nearest spell targeting; those stay under 1.0.0 in the changelog. No staging, commit, tag or remote publication was performed; existing staging is preserved. Earlier snapshots below retain their historical version and verification context.
+
+## Latest follow-up — connected walls and readable floors
+
+User screenshots exposed fragmented wall panels and apparent walking through walls. `dungeonWallEdges()` now uses map neighbors for connected top outlines, and `paintConnectedWall()` draws the lower face entirely within its 32×32 blocked tile. Removed the separate 48px-tall wall overlay that could cover a walkable tile to the north. Cache keys include edge topology. Crypt floors use chipped square flagstones instead of brick rows; other biome floors, collision, generation and movement rules are unchanged. Torches still animate. All 155 tests pass, including four new wall/corridor regressions; syntax and smoke pass. Offline Chrome checks cover arrow-key corridor movement/blocked ends, four wall biomes, throne-room rendering, Help and restart with no errors/network requests. [Evidence and controlled before/after captures](docs/reviews/2026-11-24-wall-rendering.md). No staging/commit/tag commands issued.
 
 ## Latest follow-up — weighted spawning and nearest spell targets
 

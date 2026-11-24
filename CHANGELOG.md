@@ -2,9 +2,19 @@
 
 Versions below distinguish the current working build from committed releases. Entries summarize local source, plans and git history; dates are local commit/review dates. Intermediate working-version numbers are not reconstructed as releases.
 
+## 1.0.1 — 2026-11-24
+
+Wall readability patch on committed 1.0.0 (`0218989`). Runtime launch branding is now 1.0.1.
+
+### Fixed
+
+- Joined dungeon walls using exposed neighbor edges instead of repeating standalone facades. Wall tops and lower faces now fit inside their blocked 32×32 tile, removing the 48px overhang that painted onto walkable corridors. Crypt floors use flat chipped flagstones to distinguish them from walls. Added footprint, corner/cache and narrow-corridor movement regressions; all 155 tests pass.
+- Preserved existing collision and movement rules; offline Chrome verifies blocked walls and corridor ends, walkable narrow passages, animated torches, throne-room rendering, Help and restart without browser errors or network requests.
+- Updated README, tasks, handover and agent guidance with the correction and controlled before/after captures. Both script syntax checks and external `SMOKE_OK` pass. See [wall rendering evidence](docs/reviews/2026-11-24-wall-rendering.md).
+
 ## 1.0.0 — 2026-11-24
 
-Classic JRPG graphics release, based on 0.20.0 (`5c5a6b0`). Runtime launch branding is now 1.0.0.
+Commit `0218989`: classic JRPG graphics release, based on 0.20.0 (`5c5a6b0`), including weighted spawning and nearest spell targeting. Launch branding at this release was 1.0.0.
 
 ### Fixed — 2026-11-24
 

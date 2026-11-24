@@ -86,7 +86,7 @@ const BOSSES = {
   90: { name: 'Dark Wizard', sprite: 'darkWizard', hp: 130, atk: 25, def: 6, xp: 230, gold: 170, magic: true, magicType: 'attack', magicRange: 5 },
   100: { name: 'Dragon', sprite: 'dragon', hp: 160, atk: 26, def: 6, xp: 250, gold: 200, dragon: true },
 };
-const GAME_VERSION = '1.0.0';
+const GAME_VERSION = '1.0.1';
 // Brief quotations from Monty Python and the Holy Grail; official sources in README.
 const MONSTER_QUOTES = ['Ni!', 'None shall pass!', "'Tis but a scratch.", 'Run away!'];
 const MONSTER_SPEECH_DURATION = 5, MONSTER_SPEECH_INTERVAL = 5;
@@ -2841,7 +2841,6 @@ function draw() {
       drawDungeonTile(x, y);
     }
   }
-  drawDungeonWallFaces();
   drawDungeonTorches();
   drawFloorDetails();
   for (const [stairs, glyph] of [[state.depth < FINAL_DEPTH ? state.stairs : null, '▼'], [state.upstairs, '▲']]) {
