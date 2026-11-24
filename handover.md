@@ -1,8 +1,27 @@
 # Handover — Dungeon Crawler
 
-Last updated: 2026-11-23. Current build: v0.12.0.
+Last updated: 2026-11-24. Current working build: v0.20.0; latest committed version: v0.16.3 (`895af42`).
 
-## Objective and result
+## Current handoff — read first
+
+This section and the [status review](docs/reviews/2026-11-24-status-review.md) supersede the dated implementation history below. This pass updates documentation and screenshots only; existing runtime edits and staging are preserved. No staging or commits were performed.
+
+- Current game: 100 floors, level cap 100, 96×64 worlds targeting 32 rooms, 18×12 viewport at 2× zoom, five biomes and saved decorative props. Keys are required on floors 1–99. Boss gates are at 5, 10, 20, 30, 40, 50, 60, 70, 80, 90 and 100. Final dragon defeat then princess interaction at depth 100 starts the ending.
+- Expansion includes ranged/magic enemies, Bow (E), five spells/tomes, active-time MP regeneration, large boss artwork/intros/defeats, the depth-50 throne room and developer console. `bossForDepth()` supplies actual encounter stats; README now lists them.
+- Current uncommitted follow-ups implement all five 2026-11-24 plans: companion following/light, persistent fully visible town, retreat return points, Town Scroll portals and Marmalade. Town stops dungeon simulation; Inn restores HP/MP. Depth-1 ▲ returns to town. Enter can request retreat during ordinary dungeon play as well as the critical-health route.
+- Companions occupy adjacent logical tiles with independent interpolation and a radius-2 light. Marmalade joins at the gate/first descent, attacks every three active seconds for 1 damage (2 against bats) and is replaced by the first defeated boss. Boss companions deal exactly 1 damage every three active seconds.
+- Current runtime contains 62 sprite entries, including runtime town art, and totals about 301 KiB across four files. The minimap is 288×192. Existing movement/wing/flame animation and offline plain-script architecture remain intact.
+- Verification on 2026-11-24: syntax, all 132 behavior tests and external `SMOKE_OK` pass. Selected Chrome file:// checks cover launch, recruitment, gate descent, scroll/portal round trip, console-loaded throne room and mobile Help; no JS errors or remote requests. Full human campaign balance and audible quality remain open.
+- Two source findings remain: monster spawning samples with `2 + depth` rather than weighted pool length; Magic Barrier takes the first eligible monster rather than the intended nearest. Frostbolt also takes the first. See the review for evidence and suggested tests. No runtime fixes were made in this pass.
+- New screenshots/portraits are under `docs/screenshots/2026-11-24/`; prepared encounters are labeled. README has monster images/stats, boss spoilers, spell costs/cooldowns/formulas, archery and item/companion details. [CHANGELOG.md](CHANGELOG.md) separates the working build from committed milestones.
+
+**Next:** fix the two reviewed behavior gaps with focused tests, then playtest representative progression and a complete human campaign before deciding balance changes. Preserve file:// compatibility, floor saves, transient visuals and the user's existing changes.
+
+## Historical implementation notes
+
+The sections below record earlier passes, their then-current versions, dimensions, campaign rules and test counts. They are retained as history, not current configuration.
+
+## Historical objective and result
 
 Latest follow-up (v0.12.0): implemented approved smooth tile-to-tile movement with walking poses, bat/dragon wing cycles, slime hops/squash, and moving Mimic hop. The user's added wall-flame request is included: wall torch flames/light subtly flicker and active floor vents animate. NPCs remain stationary; existing ending and boss-defeat scenes retain their own timing. README now links the native canvas animation preview; the user's separate README hardware/model notes and screenshots were preserved.
 
@@ -31,12 +50,12 @@ Boss generation reserves an `isArena` room before ordinary rooms: 18×14 for the
 
 Follow-up correction: a local LLM introduced `stairsUp`/`stairsDown` sprites that exactly duplicated the knight. Replaced those grids/palettes in `js/sprites.js` with stone steps and gold directional arrows. Existing sprite calls, discovery, camera culling, and travel behavior remain intact. Updated the old glyph-based rendering assertion for sprite-based stairs; all 61 tests and syntax checks pass. Browser captures are `/tmp/dungeon-stairs.png` and `/tmp/dungeon-stairs-detail.png`.
 
-## Read first
+## Reference documents
 - `docs/plans/2026-11-23-static-graphics-design.md` and `docs/previews/2026-11-23-static-graphics/index.html` — approved static art direction, all figures/items, and sample dungeon.
 - `agents.md` — architecture and conventions.
 - `README.md` — launch, controls, campaign/recovery rules, and verification commands.
 - `tasks.md` — completed criteria and remaining human playtest follow-up.
-- `docs/plans/2026-11-23-movement-animation-design.md` — latest approved design. Earlier ending, scrolling/keys/hazards, campaign/balance, and launch/layout designs remain in this directory.
+- `docs/plans/2026-11-23-movement-animation-design.md` — approved movement design; later expansion and 2026-11-24 plans are linked in the current review. Earlier ending, scrolling/keys/hazards, campaign/balance, and launch/layout designs remain in this directory.
 - `docs/plans/2026-11-23-launch-layout-design.md` — user-specified layout and launch behavior.
 - `docs/plans/2026-11-23-campaign-playtest-findings.md` — controlled baseline and before/after diagnostics, with limitations.
 - `js/game.js` and `tests/game.test.cjs` — implementation and dependency-free behavior checks.
@@ -85,10 +104,15 @@ Floor saves (`state.floors`, `FLOOR_FIELDS`, `saveFloor`) retain map/rooms/stair
 - `bossDefeatScene()` derives deterministic poses/particles for drawing and tests. `drawMimicDefeat()` runs inside the camera transform; `drawDragonDefeat()` uses an identity transform and restores context state. Audio cues use the existing effects/music buses and mute controls.
 - `enemyTick()` and gameplay keydowns freeze while active; M/Audio and R still work, and Esc calls `skipBossDefeat()`. Hidden tabs freeze the clock. Completion, travel, death, ending, skip, and restart cancel the frame/animation; identity-bound stale callbacks are rejected.
 
+## First companion cat
+- Marmalade waits two tiles from the town gate as a non-blocking 1.5-scale `catCompanion`; Space beside it recruits it before the first descent, and `enterFloor()` auto-joins it if the hero leaves without asking. It follows across dungeon floors, retreat, and Town Scroll returns, and its 1-damage attacks prefer bats for 2 damage so it can "bring meat and money home to the wife and children".
+- `state.entranceCat = { recruited, entered, retired }` and the cat companion are transient like other companions: no floor/template saves, reset by R/newGame, death, and ending. Cat-specific `CAT_LINES` replace generic remarks while active; the first boss kill logs a one-time retirement and hands the companion slot to the defeated boss. `#companionStat`, objective text, help, and README expose the state.
+
 ## Recovery and audio
 - Potions from ground/treasure/merchant are stored in `inventory`; H drinks one without wasting at full HP.
 - `hurtPlayer()` handles damage/death and threshold pauses immediately. Below 20% HP pauses with Drink/Continue; below 10% adds Retreat. Warnings rearm only on recovery to the threshold; lethal damage still kills. Drinking leaves the dialog open until Continue.
-- Confirmed retreat goes up one floor with full HP (depth 1 returns to its entrance) and sets `retreatReadyAt` to activeTime + 60 seconds. Cancel consumes nothing. Pause/hidden time and stair travel do not bypass cooldown. Availability appears in HUD and critical dialog.
+- Confirmed retreat returns to town with full HP and no MP refill; `state.townExit` records the exact dungeon depth/tile for the gate, which restores it once (or nearest safe walkable tile). `confirmRetreat()` closes `state.townPortalOpen`; death, ending, and restart clear the return point. It sets `retreatReadyAt` to activeTime + 60 seconds. Cancel consumes nothing. Pause/hidden time, town time, and travel do not bypass cooldown. Availability appears in HUD and critical dialog.
+- Town Scrolls are low-weight treasure/merchant items counted in `state.townScrolls`. `useTownScroll()` (`J`) in the dungeon consumes one, stores `{ depth, x, y, reason: 'scroll' }` in `state.townExit`, sets `state.townPortalOpen`, plays the magic cue, and enters town. `J` or Space at the gate calls `returnThroughTownPortal()`; it loads the saved floor/tile through `safeTownExitTile()` and clears both portal fields. Only one portal can be open; duplicate `J` will not consume another scroll, dungeon travel leaves the saved point alone, and retreat/death/ending/restart clear it without refunding. `#spellList`, `#scrolls`, objective text, and the gate sprite/bubble expose availability.
 - Rest heals 2% max HP (rounded, minimum 1) every two seconds after six seconds without combat, with no living monster within three tiles. Pause/hidden/launch time does not accumulate healing or cooldown progress.
 - Separate music/effects gain buses and sliders feed master mute. Defaults: music 45%, effects 80%. M/Sound mutes both; changing sliders while muted keeps master muted. Preferences/context survive R and reset on reload. Sound remains locally synthesized and optional.
 
@@ -103,7 +127,7 @@ Floor saves (`state.floors`, `FLOOR_FIELDS`, `saveFloor`) retain map/rooms/stair
 
 ## Verification and limits
 - Syntax: `node --check js/game.js` and `node --check js/sprites.js` pass.
-- `node --test tests/game.test.cjs`: 78 pass. Includes floor persistence and 130 varied generation checks, health/recovery/audio tests, complete campaign state flow, permanent boss defeats and reward guards, cooldown timing/dodges, volume controls/mute persistence, prepared endgame duel, Enter default-action regression, launch lifecycle, ring pickup/purchase/replacement/sale with level-up and travel, actual sword/shield combat modifiers, full-world reachability/protection, real floor-key campaign flows, key anti-duplication/priority, every hazard type and timer/death integration, camera clamping/culling, rock-warning layer order, all ending phases/poses, healed actor HP, skip at every phase, world/input freeze, repeated-reward prevention, hidden timing, stale callback rejection, restart cleanup, and screen-coordinate ending drawing. Eight new speech tests cover both combat triggers, rotation, active timing, crowd cooldown, paused/hidden clocks, NPC independence, no added randomness/damage changes, lethal-hit/death/travel/respawn/restart/ending cleanup, visibility, all viewport edges, and drawing layer/context balance.
+- `node --test tests/game.test.cjs`: 132 pass. Includes floor persistence and varied generation checks, health/recovery/audio tests, complete campaign state flow, permanent boss defeats and reward guards, cooldown timing/dodges, volume controls/mute persistence, prepared endgame duel, Enter default-action regression, launch lifecycle, equipment effects, full-world reachability/protection, real floor-key campaign flows, key anti-duplication/priority, every hazard type and timer/death integration, camera clamping/culling, rock-warning layer order, all ending phases/poses, hidden timing, stale callback rejection, restart cleanup, screen-coordinate ending drawing, monster speech, boss intros/defeats, town hub, retreat, Town Scrolls, and first-companion cat behavior. Seven cat tests cover gate placement, Space recruitment, exactly-once auto-join, 1.5-scale drawing and save isolation, bat preference/bonus damage, one-time boss retirement, and death/ending/restart cleanup.
 - Legacy external startup smoke prints `SMOKE_OK`: `/var/folders/lp/737kz569419gglsqmvs0x0200000gn/T/opencode/smoke.js`. It remains outside the repo and unchanged.
 - Previous boss/speech follow-up added three tests (59 then) for named once-only chat, five-second speech/cooldown guards, boss visual bounds/bars/bubbles across revisits, and varied boss-arena clearance/connectivity plus three-wide hall carving. Syntax and external smoke pass; sprite/palette counts are now 14 each.
 - Minimap adds two tests (61 total), using an isolated canvas stub to verify discovered-only drawing, secret independence, player/camera/stair markers, no state mutation, and floor/restart exploration lifecycle. Syntax and external smoke pass. Chrome (`/tmp/dungeon-minimap-browser-check.js`) passed 70 real keyboard moves, pixel equality after changing unseen terrain and hidden entities, floor travel/restart, launch hiding, and layouts at 1440/1280/900/390px with no overflow or JavaScript errors. Desktop chart stays above independently scrolling equipment; mobile stacks it below map/log. Captures: `/tmp/dungeon-minimap-desktop.png`, `/tmp/dungeon-minimap-mobile-sidebar.png`.
@@ -116,6 +140,9 @@ Floor saves (`state.floors`, `FLOOR_FIELDS`, `saveFloor`) retain map/rooms/stair
 - Launch/layout browser checks verify launch pause, start via button/Enter, hidden branding across R, top stats, left-side journal history/autoscroll, right-side equipment/icon/HP/strength readouts, and no horizontal overflow at desktop widths. Screenshots inspected.
 - Monster-speech Chrome check over file:// passes real keyboard combat, real-time expiration/global cooldown, rotation, independent NPC dialogue, scrolled and top/right-edge placement, actor death, travel, restart, and ending cleanup with no JavaScript errors. Scrolled/edge screenshots were visually inspected. Script: `/tmp/dungeon-monster-speech-browser-check.js`; captures: `/tmp/dungeon-monster-speech.png`, `/tmp/dungeon-monster-speech-scrolled.png`, `/tmp/dungeon-monster-speech-edge.png`.
 - Prior v0.2 balance baseline and after-tuning diagnostics use the same seed, normal-monster XP, and no gear/incoming damage; they are not a full human campaign. Dragon matchup changes from 16 hits/88 damage per retaliation to 9 hits/25. A separate prepared no-gear duel (full HP, two potions, no dodges, one attack/second, no other attackers) can finish and rescue with real game functions. Human completion rate and subjective audible quality remain unassessed.
+
+- Town Scroll browser check over file:// passes Store purchase, `J` portal opening and exact depth-2 tile return, one-shot/no-reuse behavior, portal sprite/bubble/HUD/ability/objective state, retreat collapse, and death cleanup with no JavaScript errors. Script: `/var/folders/lp/737kz569419gglsqmvs0x0200000gn/T/opencode/town-browser-check.cjs`.
+- First-companion cat browser check over file:// passes oversized `catCompanion` placement two tiles from the gate, objective/prompt text, Space recruitment, companion HUD state, persistence into dungeon/town travel, and death cleanup alongside the Town Scroll flow with no JavaScript errors. External smoke still prints `SMOKE_OK`.
 
 ## Files and tools
 
@@ -133,4 +160,4 @@ Workspace: `/Users/vadamec/workspace/ai_tmp/opencode_testing`. Branch `main` has
 
 Monty Python monster combat bubbles and the new boss-defeat flourishes are implemented and verified following explicit user requests.
 
-No implementation blockers. The next useful step is a human full-run difficulty, animation-feel, and audio-preference playtest. Preserve file:// compatibility, plain-script order, current progression/key/trap persistence, world/viewport coordinate separation, campaign gates, and launch-only branding in future work.
+No implementation blockers. The first-companion cat plan in `docs/plans/2026-11-24-first-companion-cat-plan.md` is implemented and verified; the next useful step is a human full-run difficulty, animation-feel, and audio-preference playtest. Preserve file:// compatibility, plain-script order, current progression/key/trap persistence, world/viewport coordinate separation, campaign gates, and launch-only branding in future work.

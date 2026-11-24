@@ -1,5 +1,74 @@
 // Original static pixel artwork; two source pixels per logical sprite pixel.
 const ART_DENSITY=2;
+function townSpriteGrid(kind) {
+  const grid = Array.from({ length: 32 }, () => Array(32).fill('.'));
+  const rect = (x, y, w, h, color) => {
+    for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) {
+      if (xx >= 0 && yy >= 0 && xx < 32 && yy < 32) grid[yy][xx] = color;
+    }
+  };
+  if (kind === 'inn' || kind === 'store') {
+    rect(4, 13, 24, 17, 'w'); rect(2, 9, 28, 6, kind === 'inn' ? 'r' : 'b');
+    rect(5, 6, 22, 4, kind === 'inn' ? 'R' : 'B'); rect(7, 19, 6, 6, 'l'); rect(19, 19, 6, 6, 'l');
+    rect(13, 21, 6, 9, 'd'); rect(14, 22, 4, 8, 'k'); rect(15, 25, 1, 1, 'y');
+    rect(6, 29, 20, 1, 'k'); rect(9, 15, 14, 2, 'y');
+    rect(11, 3, 10, 4, 'w'); rect(12, 4, 8, 2, kind === 'inn' ? 'r' : 'b');
+  } else if (kind === 'villager') {
+    rect(12, 4, 8, 7, 'p'); rect(11, 3, 10, 3, 'k'); rect(13, 7, 2, 2, 'k'); rect(18, 7, 2, 2, 'k');
+    rect(10, 12, 12, 11, kind === 'villager' ? 't' : 'b'); rect(8, 15, 3, 8, 'p'); rect(21, 15, 3, 8, 'p');
+    rect(12, 23, 3, 7, 'd'); rect(18, 23, 3, 7, 'd'); rect(10, 29, 5, 2, 'k'); rect(18, 29, 5, 2, 'k');
+    rect(14, 15, 4, 2, 'y');
+  } else if (kind === 'tree') {
+    rect(14, 19, 5, 11, 'b'); rect(8, 5, 17, 14, 'g'); rect(5, 9, 23, 10, 'g'); rect(9, 3, 15, 6, 'g');
+    rect(11, 7, 5, 3, 'G'); rect(19, 12, 4, 3, 'G'); rect(15, 17, 4, 2, 'G');
+  } else if (kind === 'water') {
+    rect(0, 0, 32, 32, 'w'); rect(2, 5, 10, 2, 'l'); rect(17, 10, 12, 2, 'l');
+    rect(4, 18, 14, 2, 'l'); rect(20, 25, 9, 2, 'l'); rect(10, 29, 8, 1, 'W');
+  } else if (kind === 'bridge') {
+    rect(0, 4, 32, 24, 'b'); rect(1, 3, 30, 3, 's'); rect(1, 26, 30, 3, 's');
+    rect(3, 8, 2, 18, 'k'); rect(10, 8, 2, 18, 'k'); rect(17, 8, 2, 18, 'k'); rect(24, 8, 2, 18, 'k');
+    rect(0, 14, 32, 2, 'y');
+  } else if (kind === 'townGate') {
+    rect(6, 8, 6, 24, 's'); rect(20, 8, 6, 24, 's'); rect(4, 5, 24, 6, 'w');
+    rect(9, 12, 14, 20, 'k'); rect(12, 16, 8, 16, 'd'); rect(14, 20, 4, 6, 'y');
+    rect(2, 3, 28, 2, 'b'); rect(7, 1, 18, 3, 'B');
+  } else if (kind === 'hut') {
+    rect(5, 14, 22, 16, 'w'); rect(2, 8, 28, 7, 'R'); rect(4, 6, 24, 3, 'b');
+    rect(7, 19, 5, 5, 'l'); rect(20, 19, 5, 5, 'l'); rect(13, 21, 6, 9, 'd');
+    rect(14, 22, 4, 8, 'k'); rect(6, 29, 20, 1, 'k');
+  } else if (kind === 'doorstep') {
+    rect(10, 6, 12, 13, 'd'); rect(11, 7, 10, 11, 'k'); rect(13, 4, 6, 3, 'y');
+    rect(6, 19, 20, 4, 's'); rect(3, 23, 26, 4, 's'); rect(1, 27, 30, 3, 'y');
+  } else if (kind === 'cat') {
+    rect(10, 18, 13, 7, 'k'); rect(8, 12, 9, 8, 'k'); rect(9, 9, 2, 4, 'k');
+    rect(14, 9, 2, 4, 'k'); rect(11, 15, 2, 2, 'y'); rect(16, 15, 2, 2, 'y');
+    rect(21, 13, 3, 10, 'k'); rect(9, 25, 2, 3, 'k'); rect(19, 25, 2, 3, 'k');
+  } else if (kind === 'catCompanion') {
+    rect(10, 18, 13, 7, 'k'); rect(8, 12, 9, 8, 'k'); rect(9, 9, 2, 4, 'k');
+    rect(14, 9, 2, 4, 'k'); rect(11, 15, 2, 2, 'y'); rect(16, 15, 2, 2, 'y');
+    rect(21, 13, 3, 10, 'k'); rect(9, 25, 2, 3, 'k'); rect(19, 25, 2, 3, 'k');
+    rect(10, 20, 12, 2, 'r'); rect(15, 22, 2, 2, 'y');
+  } else if (kind === 'dog') {
+    rect(9, 17, 15, 8, 'b'); rect(20, 11, 8, 8, 'b'); rect(20, 8, 2, 4, 'd');
+    rect(26, 8, 2, 4, 'd'); rect(22, 14, 2, 2, 'k'); rect(26, 14, 2, 2, 'k');
+    rect(6, 12, 4, 8, 'b'); rect(11, 25, 3, 4, 'b'); rect(21, 25, 3, 4, 'b');
+  } else if (kind === 'chicken') {
+    rect(10, 16, 12, 10, 'w'); rect(19, 9, 7, 8, 'w'); rect(25, 12, 5, 2, 'y');
+    rect(20, 7, 2, 3, 'r'); rect(23, 7, 2, 3, 'r'); rect(22, 11, 2, 2, 'k');
+    rect(13, 26, 2, 4, 'y'); rect(20, 26, 2, 4, 'y'); rect(9, 18, 4, 3, 'w');
+  } else if (kind === 'townScroll') {
+    rect(7, 6, 18, 20, 'w'); rect(5, 4, 22, 3, 'b'); rect(5, 25, 22, 3, 'b');
+    rect(5, 7, 3, 18, 'y'); rect(24, 7, 3, 18, 'y');
+    rect(10, 10, 12, 2, 'k'); rect(10, 14, 12, 2, 'l'); rect(10, 18, 12, 2, 'k'); rect(10, 22, 8, 2, 'l');
+    rect(14, 1, 4, 3, 'W');
+  } else if (kind === 'townPortal') {
+    rect(7, 5, 18, 4, 'b'); rect(5, 9, 4, 18, 'b'); rect(23, 9, 4, 18, 'b');
+    rect(9, 8, 14, 20, 'k'); rect(11, 9, 10, 19, 'W');
+    rect(13, 11, 6, 17, 'l'); rect(14, 13, 4, 12, 'w');
+    rect(7, 27, 18, 3, 'b'); rect(10, 2, 4, 3, 'l'); rect(18, 1, 4, 4, 'l');
+  }
+  return grid.map(row => row.join(''));
+}
 const SPRITES={
   "knight": [
     "................................",
@@ -1756,7 +1825,22 @@ const SPRITES={
     "................................",
     "................................",
     "................................"
-  ]
+  ],
+  "inn": townSpriteGrid('inn'),
+  "store": townSpriteGrid('store'),
+  "villager": townSpriteGrid('villager'),
+  "tree": townSpriteGrid('tree'),
+  "water": townSpriteGrid('water'),
+  "bridge": townSpriteGrid('bridge'),
+  "townGate": townSpriteGrid('townGate'),
+  "hut": townSpriteGrid('hut'),
+  "doorstep": townSpriteGrid('doorstep'),
+  "cat": townSpriteGrid('cat'),
+  "catCompanion": townSpriteGrid('catCompanion'),
+  "dog": townSpriteGrid('dog'),
+  "chicken": townSpriteGrid('chicken'),
+  "townScroll": townSpriteGrid('townScroll'),
+  "townPortal": townSpriteGrid('townPortal')
 };
 const SPRITE_PALETTES={
   "knight": {
@@ -2462,7 +2546,22 @@ const SPRITE_PALETTES={
   "crystal": { "k": "#131b26", "s": "#5f8f9b", "l": "#a8d2cd" },
   "banner": { "k": "#131b26", "r": "#8e3b45", "y": "#d7b45e" },
   "bow": { "k": "#131b26", "b": "#74513a", "w": "#e8e3cf" },
-  "spellbook": { "k": "#131b26", "w": "#e8e3cf", "b": "#74513a", "y": "#d7ac5e", "l": "#a8d2cd" }
+  "spellbook": { "k": "#131b26", "w": "#e8e3cf", "b": "#74513a", "y": "#d7ac5e", "l": "#a8d2cd" },
+  "inn": { "k": "#131b26", "w": "#e8e3cf", "W": "#a8d2cd", "r": "#8e3b45", "R": "#b85a4a", "b": "#74513a", "B": "#9a6b3f", "l": "#d9c58f", "d": "#4b3a2b", "y": "#d7ac5e", "s": "#687f92", "p": "#d7a579", "t": "#3f6f61", "g": "#2f5d3a", "G": "#56804e" },
+  "store": { "k": "#131b26", "w": "#e8e3cf", "W": "#a8d2cd", "r": "#8e3b45", "R": "#b85a4a", "b": "#74513a", "B": "#9a6b3f", "l": "#d9c58f", "d": "#4b3a2b", "y": "#d7ac5e", "s": "#687f92", "p": "#d7a579", "t": "#3f6f61", "g": "#2f5d3a", "G": "#56804e" },
+  "villager": { "k": "#131b26", "w": "#e8e3cf", "W": "#a8d2cd", "r": "#8e3b45", "R": "#b85a4a", "b": "#74513a", "B": "#9a6b3f", "l": "#d9c58f", "d": "#4b3a2b", "y": "#d7ac5e", "s": "#687f92", "p": "#d7a579", "t": "#3f6f61", "g": "#2f5d3a", "G": "#56804e" },
+  "tree": { "k": "#131b26", "w": "#e8e3cf", "W": "#a8d2cd", "r": "#8e3b45", "R": "#b85a4a", "b": "#74513a", "B": "#9a6b3f", "l": "#d9c58f", "d": "#4b3a2b", "y": "#d7ac5e", "s": "#687f92", "p": "#d7a579", "t": "#3f6f61", "g": "#2f5d3a", "G": "#56804e" },
+  "water": { "k": "#131b26", "w": "#e8e3cf", "W": "#a8d2cd", "r": "#8e3b45", "R": "#b85a4a", "b": "#74513a", "B": "#9a6b3f", "l": "#d9c58f", "d": "#4b3a2b", "y": "#d7ac5e", "s": "#687f92", "p": "#d7a579", "t": "#3f6f61", "g": "#2f5d3a", "G": "#56804e" },
+  "bridge": { "k": "#131b26", "w": "#e8e3cf", "W": "#a8d2cd", "r": "#8e3b45", "R": "#b85a4a", "b": "#74513a", "B": "#9a6b3f", "l": "#d9c58f", "d": "#4b3a2b", "y": "#d7ac5e", "s": "#687f92", "p": "#d7a579", "t": "#3f6f61", "g": "#2f5d3a", "G": "#56804e" },
+  "townGate": { "k": "#131b26", "w": "#e8e3cf", "W": "#a8d2cd", "r": "#8e3b45", "R": "#b85a4a", "b": "#74513a", "B": "#9a6b3f", "l": "#d9c58f", "d": "#4b3a2b", "y": "#d7ac5e", "s": "#687f92", "p": "#d7a579", "t": "#3f6f61", "g": "#2f5d3a", "G": "#56804e" },
+  "hut": { "k": "#131b26", "w": "#e8e3cf", "W": "#a8d2cd", "r": "#8e3b45", "R": "#b85a4a", "b": "#74513a", "B": "#9a6b3f", "l": "#d9c58f", "d": "#4b3a2b", "y": "#d7ac5e", "s": "#687f92", "p": "#d7a579", "t": "#3f6f61", "g": "#2f5d3a", "G": "#56804e" },
+  "doorstep": { "k": "#131b26", "w": "#e8e3cf", "W": "#a8d2cd", "r": "#8e3b45", "R": "#b85a4a", "b": "#74513a", "B": "#9a6b3f", "l": "#d9c58f", "d": "#4b3a2b", "y": "#d7ac5e", "s": "#687f92", "p": "#d7a579", "t": "#3f6f61", "g": "#2f5d3a", "G": "#56804e" },
+  "cat": { "k": "#131b26", "w": "#e8e3cf", "W": "#a8d2cd", "r": "#8e3b45", "R": "#b85a4a", "b": "#74513a", "B": "#9a6b3f", "l": "#d9c58f", "d": "#4b3a2b", "y": "#d7ac5e", "s": "#687f92", "p": "#d7a579", "t": "#3f6f61", "g": "#2f5d3a", "G": "#56804e" },
+  "catCompanion": { "k": "#131b26", "w": "#e8e3cf", "W": "#a8d2cd", "r": "#c85a49", "R": "#e0785c", "b": "#74513a", "B": "#9a6b3f", "l": "#d9c58f", "d": "#4b3a2b", "y": "#f0cf72", "s": "#687f92", "p": "#d7a579", "t": "#3f6f61", "g": "#2f5d3a", "G": "#56804e" },
+  "dog": { "k": "#131b26", "w": "#e8e3cf", "W": "#a8d2cd", "r": "#8e3b45", "R": "#b85a4a", "b": "#74513a", "B": "#9a6b3f", "l": "#d9c58f", "d": "#4b3a2b", "y": "#d7ac5e", "s": "#687f92", "p": "#d7a579", "t": "#3f6f61", "g": "#2f5d3a", "G": "#56804e" },
+  "chicken": { "k": "#131b26", "w": "#e8e3cf", "W": "#a8d2cd", "r": "#8e3b45", "R": "#b85a4a", "b": "#74513a", "B": "#9a6b3f", "l": "#d9c58f", "d": "#4b3a2b", "y": "#d7ac5e", "s": "#687f92", "p": "#d7a579", "t": "#3f6f61", "g": "#2f5d3a", "G": "#56804e" },
+  "townScroll": { "k": "#131b26", "w": "#e8e3cf", "W": "#a8d2cd", "r": "#8e3b45", "R": "#b85a4a", "b": "#74513a", "B": "#9a6b3f", "l": "#d9c58f", "d": "#4b3a2b", "y": "#d7ac5e", "s": "#687f92", "p": "#d7a579", "t": "#3f6f61", "g": "#2f5d3a", "G": "#56804e" },
+  "townPortal": { "k": "#131b26", "w": "#e8e3cf", "W": "#a8d2cd", "r": "#8e3b45", "R": "#b85a4a", "b": "#74513a", "B": "#9a6b3f", "l": "#d9c58f", "d": "#4b3a2b", "y": "#d7ac5e", "s": "#687f92", "p": "#d7a579", "t": "#3f6f61", "g": "#2f5d3a", "G": "#56804e" }
 };
 
 // Disposable raster caches are shared across restarts, never saved with a floor.
@@ -2629,17 +2728,18 @@ function drawDungeonTile(x, y) {
   const front = wall && y + 1 < H && state.map[y + 1][x] !== 1;
   const variant = (x * 37 + y * 71) % 11;
   const biome = state.biome || 'crypt';
-  const key = `${biome}:${wall ? 'wall' : 'floor'}:${front}:${variant}`;
+  const sand = biome === 'town' && !wall && ((y >= 28 && y <= 30) || (x >= 37 && x <= 40));
+  const key = `${biome}:${wall ? 'wall' : 'floor'}:${front}:${variant}:${sand}`;
   const cache = graphicsCache().tiles;
   if (!cache[key]) {
     const surface = graphicsSurface(TILE, TILE);
-    if (surface) { paintDungeonTile(surface.getContext('2d'), wall, variant, front, biome); cache[key] = surface; }
+    if (surface) { paintDungeonTile(surface.getContext('2d'), wall, variant, front, biome, sand); cache[key] = surface; }
   }
   if (cache[key]) {
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(cache[key], x * TILE, y * TILE);
   } else {
-    ctx.save(); ctx.translate(x * TILE, y * TILE); paintDungeonTile(ctx, wall, variant, front, biome); ctx.restore();
+    ctx.save(); ctx.translate(x * TILE, y * TILE); paintDungeonTile(ctx, wall, variant, front, biome, sand); ctx.restore();
   }
   if (!wall) {
     ctx.fillStyle = 'rgba(13, 21, 40, 0.25)';
@@ -2673,6 +2773,7 @@ function drawDungeonTorches() {
 }
 
 function wallTorchAt(x, y) {
+  if (state.biome === 'town') return false;
   return state.map[y][x] === 1 && y + 1 < H && state.map[y + 1][x] !== 1 && (x * 7 + y * 13) % 6 === 0;
 }
 
@@ -2701,9 +2802,14 @@ const TILE_PALETTES = {
     wallBrick: '#453b5c', frontDark: '#141122', frontEdge: '#4b3f62', frontLight: '#7b6a91', frontBrick: '#2e2843',
     frontLine: '#1a162b', floor: ['#3b3450', '#413955', '#352f49', '#3d3653'], floorLight: '#6d5d85',
     floorDark: '#2a2440', crack: '#30294a', speck: '#a48b5e', accent: '#7a6239' },
+  town: { baseWall: '#294a35', baseFloor: '#536446', wallTop: '#35613c', wallEdge: '#4b7b4b', wallLine: '#24402f',
+    wallBrick: '#3d6c42', frontDark: '#1d3828', frontEdge: '#3e7044', frontLight: '#73916a', frontBrick: '#2f5838',
+    frontLine: '#1b3226', floor: ['#7a8259', '#838a5f', '#727b53', '#7d855b'], floorLight: '#a0a378',
+    floorDark: '#5d6747', crack: '#697250', speck: '#b4b58c', accent: '#6f8a56',
+    sand: '#cbb182', sandLight: '#e4cf9d', sandDark: '#a98d5f', sandSpeck: '#f0dfb2' },
 };
 
-function paintDungeonTile(c, wall, variant, front = false, biome = 'crypt') {
+function paintDungeonTile(c, wall, variant, front = false, biome = 'crypt', sand = false) {
   const n = variant;
   const p = TILE_PALETTES[biome] || TILE_PALETTES.crypt;
   c.fillStyle = wall ? p.baseWall : p.baseFloor; c.fillRect(0, 0, 32, 32);
@@ -2719,10 +2825,21 @@ function paintDungeonTile(c, wall, variant, front = false, biome = 'crypt') {
       c.fillStyle = p.frontBrick; c.fillRect(2, 10, 28, 9); c.fillRect(2, 21, 28, 9);
       c.fillStyle = p.frontLine; c.fillRect(n % 2 ? 10 : 21, 10, 2, 9); c.fillRect(n % 2 ? 23 : 8, 21, 2, 9);
     }
+  } else if (biome === 'town' && sand) {
+    c.fillStyle = p.sand; c.fillRect(1, 1, 30, 30);
+    c.fillStyle = p.sandLight; c.fillRect(2, 2, 27, 1); c.fillRect(2, 4, 2, 24);
+    c.fillStyle = p.sandDark; c.fillRect(2, 29, 28, 2); c.fillRect(29, 2, 2, 27);
+    c.fillStyle = p.sandSpeck;
+    c.fillRect(6 + n, 9, 2, 1); c.fillRect(20 - n, 19, 3, 1); c.fillRect(12, 25 + (n % 3), 2, 1);
   } else {
     c.fillStyle = p.floor[n % 4]; c.fillRect(1, 1, 30, 30);
     c.fillStyle = p.floorLight; c.fillRect(2, 1, 27, 1); c.fillRect(1, 2, 1, 26);
     c.fillStyle = p.floorDark; c.fillRect(2, 29, 28, 2); c.fillRect(29, 2, 2, 27);
+    if (biome === 'town') {
+      c.fillStyle = n % 2 ? p.accent : p.speck;
+      c.fillRect(6 + (n % 5), 8, 2, 3); c.fillRect(19 - (n % 4), 20, 2, 3); c.fillRect(13, 26, 1, 2);
+      return;
+    }
     c.fillStyle = p.crack;
     if (n % 3 === 0) { c.fillRect(4, 14, 10, 1); c.fillRect(13, 14, 1, 7); c.fillRect(14, 20, 6, 1); }
     if (n % 4 === 1) { c.fillStyle = p.speck; c.fillRect(6, 7, 3, 1); c.fillRect(23, 23, 2, 1); }

@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 
-function game(seed = 42, start = true) {
+function game(seed = 42, start = true, area = 'dungeon') {
   const listeners = {};
   const elements = {};
   const calls = [];
@@ -29,7 +29,10 @@ function game(seed = 42, start = true) {
     Math: Object.assign(Object.create(Math), { random: () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 2 ** 32) }),
   });
   for (const file of ['sprites.js', 'game.js']) vm.runInContext(fs.readFileSync(path.join(__dirname, '../js', file), 'utf8'), sandbox);
-  if (start) vm.runInContext('startGame()', sandbox);
+  if (start) {
+    vm.runInContext('startGame()', sandbox);
+    if (area === 'dungeon') vm.runInContext('enterDungeonFromTown(); render()', sandbox);
+  }
   return {
     run: code => vm.runInContext(code, sandbox),
     json: code => JSON.parse(vm.runInContext(`JSON.stringify(${code})`, sandbox)),
@@ -161,31 +164,61 @@ test('enemy attack that crosses threshold stops remaining attackers in the same 
   assert.equal(g.run('state.pause.kind'), 'health');
 });
 
-test('retreat confirms/cancels, returns one floor with full HP, and preserves progression and loot', () => {
+test('retreat confirms/cancels, returns to town with full HP, and preserves progression and loot', () => {
   const g = game(); down(g);
-  g.run("state.player.hp=5; state.potions=[]; state.gold=123; checkHealth(); retreat()");
+  g.run("state.player.hp=5; state.player.mp=7; state.potions=[]; state.gold=123; checkHealth(); retreat()");
   assert.equal(g.run('state.pause.kind'), 'retreat');
   assert.equal(g.run('state.depth'), 2);
+  const exit = g.json('[state.player.x,state.player.y]');
   g.key('Escape'); assert.equal(g.run('state.pause.kind'), 'health');
   g.key('Enter'); g.key('y');
-  assert.equal(g.run('state.depth'), 1);
+  assert.equal(g.run('state.area'), 'town');
+  assert.equal(g.run('state.depth'), 2);
   assert.equal(g.run('state.player.hp'), 60);
+  assert.equal(g.run('state.player.mp'), 7);
   assert.equal(g.run('state.gold'), 123);
   assert.equal(g.run('state.pause'), null);
-  down(g); assert.equal(g.run('state.potions.length'), 0);
+  assert.deepEqual(g.json('state.townExit'), { depth: 2, x: exit[0], y: exit[1], reason: 'retreat' });
+  assert.deepEqual(g.json('[state.player.x,state.player.y]'), g.json('[state.town.spawn.x,state.town.spawn.y]'));
+  g.run('state.player.x = state.townGate.x; state.player.y = state.townGate.y; pickup()');
+  assert.equal(g.run('state.area'), 'dungeon');
+  assert.equal(g.run('state.depth'), 2);
+  assert.deepEqual(g.json('[state.player.x,state.player.y]'), exit);
+  assert.equal(g.run('state.townExit'), null);
+  assert.equal(g.run('state.potions.length'), 0);
 });
 
-test('depth 1 retreat heals at entrance; lethal damage wins over health pause', () => {
+test('depth 1 retreat returns to town and lethal damage wins over health pause', () => {
   const g = game();
+  const exit = g.json('[state.player.x,state.player.y]');
   g.run("hurtPlayer(56,'critical'); retreat(); confirmRetreat()");
+  assert.equal(g.run('state.area'), 'town');
   assert.equal(g.run('state.depth'), 1);
   assert.equal(g.run('state.player.hp'), 60);
-  assert.deepEqual(g.json('[state.player.x,state.player.y]'), g.json('[state.upstairs.x,state.upstairs.y]'));
+  assert.deepEqual(g.json('state.townExit'), { depth: 1, x: exit[0], y: exit[1], reason: 'retreat' });
+  assert.deepEqual(g.json('[state.player.x,state.player.y]'), g.json('[state.town.spawn.x,state.town.spawn.y]'));
+  g.run('state.player.x = state.townGate.x; state.player.y = state.townGate.y; pickup()');
+  assert.equal(g.run('state.area'), 'dungeon');
+  assert.equal(g.run('state.depth'), 1);
+  assert.deepEqual(g.json('[state.player.x,state.player.y]'), exit);
   g.run("hurtPlayer(100,'fatal')");
   assert.equal(g.run('state.gameOver'), true);
   assert.equal(g.run('state.player.hp'), 0);
   assert.equal(g.run('state.pause'), null);
+  assert.equal(g.run('state.townExit'), null);
   g.run('retreat(); drinkPotion()'); assert.equal(g.run('state.player.hp'), 0);
+});
+
+test('retreat closes an open portal and blocked return points resolve safely', () => {
+  const g = game();
+  g.run('state.townPortalOpen = true; state.player.hp = 1; retreat(); confirmRetreat()');
+  assert.equal(g.run('state.townPortalOpen'), false);
+  assert.equal(g.run('state.townExit.reason'), 'retreat');
+  g.run('state.townExit.x = 0; state.townExit.y = 0; state.player.x = state.townGate.x; state.player.y = state.townGate.y; pickup()');
+  assert.equal(g.run('state.area'), 'dungeon');
+  assert.notDeepEqual(g.json('[state.player.x,state.player.y]'), [0, 0]);
+  assert.equal(g.run('state.map[state.player.y][state.player.x]'), 0);
+  assert.equal(g.run('state.townExit'), null);
 });
 
 test('autohealing respects active time, cooldown, nearby enemies, pauses, and HP cap', () => {
@@ -356,13 +389,18 @@ test('retaliation and timed enemy attacks share a per-monster cooldown including
   assert.equal(g.run('state.player.hp'), 51, 'dodging still consumes enemy attack window');
 });
 
-test('retreat cooldown counts only active time, survives travel, and cancellation does not consume it', () => {
+test('retreat cooldown counts only active time, pauses in town, and cancellation does not consume it', () => {
   const g = game();
   g.run('retreat(); cancelRetreat()');
   assert.equal(g.run('retreatRemaining()'), 0);
   g.run('state.player.hp=1; retreat(); confirmRetreat()');
   assert.equal(g.run('retreatRemaining()'), 60);
   assert.equal(g.run('state.player.hp'), 60);
+  assert.equal(g.run('state.area'), 'town');
+  g.run('advanceActiveTime(600); render()');
+  assert.equal(g.run('retreatRemaining()'), 60, 'cooldown does not tick down in town');
+  g.run('state.player.x = state.townGate.x; state.player.y = state.townGate.y; pickup()');
+  assert.equal(g.run('state.area'), 'dungeon');
   g.run('state.player.hp=5; checkHealth(); retreat(); advanceActiveTime(600); render()');
   assert.equal(g.run('state.pause.kind'), 'health', 'unavailable retreat keeps recovery dialog');
   assert.equal(g.run('retreatRemaining()'), 60, 'cannot wait out cooldown while paused');
@@ -1069,8 +1107,8 @@ test('minimap follows floor-local exploration, scrolling and restart without mut
   assert.equal(g.run("state.visited.has('40,30')"),false);
   up(g);assert.equal(g.elements.minimapDepth.textContent,'D1');
   assert.equal(g.run("state.visited.has('40,30')"),true);
-  g.key('r');assert.equal(g.elements.minimapDepth.textContent,'D1');
-  assert.equal(g.run("state.visited.has('40,30')"),false);
+  g.key('r');assert.equal(g.elements.minimapDepth.textContent,'Town');
+  assert.equal(g.run("state.visited.has('2,2')"),false);
 });
 
 test('Mimic defeat plays a short in-world flourish and freezes play until it finishes',()=>{
@@ -1313,6 +1351,7 @@ test('help on launch does not start play and preserves health or retreat dialogs
   g.key('Enter');assert.equal(g.run('state.started'),false);
   g.key('Escape');assert.equal(g.run('state.started'),false);g.key('Enter');
   assert.equal(g.run('state.started'),true);
+  g.run('enterDungeonFromTown()');
   g.run('hurtPlayer(51,"test")');assert.equal(g.run('state.pause.kind'),'health');
   g.key('?');g.key('h');g.key('Escape');
   assert.equal(g.run('state.helpOpen'),false);assert.equal(g.run('state.pause.kind'),'health');
@@ -1866,6 +1905,9 @@ test('defeated bosses become tiny companions that chip in and comment ironically
       atk: 1, def: 0, xp: 1, gold: 0, x: state.player.x + 1, y: state.player.y, isBoss: true }]`);
   g.key('f');
   assert.deepEqual(g.json('[state.companion.name, state.companion.sprite]'), ['Cook', 'orc']);
+  assert.equal(g.run(`Math.max(Math.abs(state.companion.x - state.player.x), Math.abs(state.companion.y - state.player.y)) <= 1 &&
+    state.map[state.companion.y][state.companion.x] === 0 &&
+    !(state.companion.x === state.player.x && state.companion.y === state.player.y)`), true);
   assert.equal(g.run('state.messages.some(m => /Cook:/.test(m))'), true);
   g.run('clearBossDefeat(); state.bossDefeat = null;');
   g.run(`state.companionSpeech = null; state.companionAttackAt = 0; state.activeTime = 30;
@@ -1880,4 +1922,415 @@ test('defeated bosses become tiny companions that chip in and comment ironically
   g.run('newGame(); render()');
   assert.equal(g.run('state.companion'), null);
   assert.equal(g.elements.companionStat.hidden, true);
+});
+
+test('companions stay in a walkable adjacent tile and follow the hero', () => {
+  const g = game();
+  g.run(`state.monsters = [];
+    for (let y = 3; y <= 7; y++) for (let x = 3; x <= 8; x++) state.map[y][x] = 0;
+    state.player.x = 5; state.player.y = 5;
+    state.companion = { name: 'Test', sprite: 'slime', x: 4, y: 5 };
+    state.motion.facing.player = 1;
+    movePlayer(1, 0)`);
+  assert.deepEqual(g.json('[state.player.x, state.player.y, state.companion.x, state.companion.y]'), [6, 5, 5, 5]);
+  assert.equal(g.run(`Math.max(Math.abs(state.companion.x - state.player.x), Math.abs(state.companion.y - state.player.y)) === 1`), true);
+  g.run(`state.monsters = [{ id: 7, name: 'Slime', sprite: 'slime', hp: 10, maxHp: 10, x: 5, y: 5 }];
+    state.companion.x = 3; state.companion.y = 3;
+    placeCompanionNearPlayer()`);
+  assert.deepEqual(g.json('[state.companion.x, state.companion.y]'), [6, 4]);
+  assert.equal(g.run('state.map[state.companion.y][state.companion.x] === 0'), true);
+});
+
+test('companions light nearby tiles without becoming floor-saved state', () => {
+  const g = game();
+  g.run(`state.monsters = [];
+    state.player.x = 5; state.player.y = 5;
+    state.companion = { name: 'Test', sprite: 'slime', x: 8, y: 5 };
+    state.visited.clear();
+    revealAroundPlayer();
+    saveFloor()`);
+  assert.equal(g.run('fogLevel(10, 5)'), 0, 'the companion reduces fog beyond player range');
+  assert.equal(g.run("state.visited.has('10,5')"), true, 'the companion reveals explored terrain');
+  assert.equal(g.run("Object.keys(state.floors[state.depth]).includes('companion')"), false);
+  g.run('state.companion = null');
+  assert.equal(g.run('fogLevel(10, 5)'), 3);
+});
+
+test('death clears the active companion', () => {
+  const g = game();
+  g.run(`state.companion = { name: 'Test', sprite: 'slime', x: state.player.x, y: state.player.y };
+    gameOver(false)`);
+  assert.equal(g.run('state.companion'), null);
+});
+
+test('runs begin in a connected town instead of a dungeon floor', () => {
+  const g = game(42, true, 'town');
+  assert.equal(g.run('state.area'), 'town');
+  assert.equal(g.elements.depth.textContent, 'Town');
+  assert.deepEqual(g.json('Object.keys(state.floors)'), ['1']);
+  assert.equal(g.run('state.monsters.length'), 0);
+  assert.equal(g.run('state.hazards.length'), 0);
+  assert.equal(g.run('state.merchant.stock.length'), 6);
+  assert.equal(g.run('state.map[state.town.spawn.y][state.town.spawn.x]'), 0);
+  assert.equal(g.run('state.map[29][48]'), 0, 'the river bridge is walkable');
+  assert.equal(g.run('state.map[28][48]'), 1, 'the river blocks movement');
+  assert.equal(g.run('floorDistances(state.map, state.town.spawn).has("55,29")'), true);
+});
+
+test('Inn and Store serve the town without advancing dungeon timers', () => {
+  const g = game(42, true, 'town');
+  g.run(`state.player.hp = 5; state.player.mp = 2; state.activeTime = 30; state.hazardTime = 7;
+    state.player.x = state.inn.x; state.player.y = state.inn.y; pickup()`);
+  assert.equal(g.run('state.player.hp'), g.run('state.player.maxHp'));
+  assert.equal(g.run('state.player.mp'), g.run('state.player.maxMp'));
+  assert.equal(g.run('state.pause'), null);
+  g.run('state.gold = 500; state.player.x = state.merchant.x; state.player.y = state.merchant.y; pickup()');
+  assert.equal(g.run('state.merchant.stock.length'), 5);
+  assert.equal(g.run('state.inventory.length'), 1);
+  assert.equal(g.run('state.gold < 500'), true);
+  g.run('enemyTick()');
+  assert.equal(g.run('state.activeTime'), 30);
+  assert.equal(g.run('state.hazardTime'), 7);
+});
+
+test('townspeople patrol, talk on approach, and stay outside floor saves', () => {
+  const g = game(42, true, 'town');
+  const before = g.json('state.town.npcs.map(n => [n.x, n.y])');
+  g.run('for (let i = 0; i < 8; i++) townTick()');
+  assert.notDeepEqual(g.json('state.town.npcs.map(n => [n.x, n.y])'), before);
+  g.run('state.player.x = state.town.npcs[0].x; state.player.y = state.town.npcs[0].y; pickup()');
+  assert.equal(g.run('state.town.speech !== null'), true);
+  assert.equal(g.run('state.messages.some(m => m.includes("Mira:"))'), true);
+  assert.equal(g.run('FLOOR_FIELDS.includes("town")'), false);
+  assert.equal(g.run('Object.keys(state.floors[1]).includes("town")'), false);
+});
+
+test('town is fully visible, decorated, populated, and keeps the player clear of NPCs', () => {
+  const g = game(42, true, 'town');
+  const sprites = g.json('state.props.map(prop => prop.sprite)');
+  for (const sprite of ['tree', 'water', 'bridge', 'inn', 'store', 'hut', 'doorstep', 'townGate']) {
+    assert.equal(sprites.includes(sprite), true, `missing ${sprite}`);
+  }
+  assert.equal(g.run('state.player.y'), 26);
+  assert.equal(g.run('state.town.animals.length >= 5'), true);
+  assert.equal(g.run('!!SPRITES.hut && !!SPRITES.doorstep && !!SPRITES.cat && !!SPRITES.dog && !!SPRITES.chicken && !!SPRITES.townScroll && !!SPRITES.townPortal && !!SPRITES.catCompanion'), true);
+  assert.equal(g.run('!!TILE_PALETTES.town.sand'), true);
+  const animals = g.json('state.town.animals.map(animal => [animal.x, animal.y])');
+  g.run('for (let i = 0; i < 8; i++) townTick()');
+  assert.notDeepEqual(g.json('state.town.animals.map(animal => [animal.x, animal.y])'), animals);
+  const fogCalls = g.run(`(() => {
+    const original = fogLevel;
+    let count = 0;
+    fogLevel = (...args) => { count++; return original(...args); };
+    draw();
+    fogLevel = original;
+    return count;
+  })()`);
+  assert.equal(fogCalls, 0);
+  g.run(`(() => {
+    const npc = state.town.npcs[0];
+    const dx = state.map[npc.y][npc.x - 1] === 0 ? -1 : 1;
+    state.player.x = npc.x + dx; state.player.y = npc.y;
+    movePlayer(-dx, 0);
+  })()`);
+  assert.equal(g.run(`(() => {
+    const npc = state.town.npcs[0];
+    return state.player.x === npc.x && state.player.y === npc.y;
+  })()`), false);
+  assert.equal(g.run('state.town.speech !== null'), true);
+});
+
+test('the town gate enters floor one and town progress survives a return', () => {
+  const g = game(42, true, 'town');
+  g.run('state.gold = 500; state.player.x = state.merchant.x; state.player.y = state.merchant.y; pickup()');
+  const stock = g.run('state.merchant.stock.length');
+  g.run('state.player.x = state.townGate.x; state.player.y = state.townGate.y; pickup()');
+  assert.equal(g.run('state.area'), 'dungeon');
+  assert.equal(g.run('state.depth'), 1);
+  assert.equal(g.run('state.town !== null'), true);
+  g.run('state.gold = 123; state.visited.add("2,2"); enterTown()');
+  assert.equal(g.run('state.area'), 'town');
+  assert.equal(g.run('state.gold'), 123);
+  assert.equal(g.run('state.merchant.stock.length'), stock);
+  assert.equal(g.run('state.monsters.length'), 0);
+  assert.equal(g.run("state.visited.has('2,2')"), false);
+  g.run('state.player.x = state.townGate.x; state.player.y = state.townGate.y; pickup()');
+  assert.equal(g.run('state.area'), 'dungeon');
+  assert.equal(g.run('state.depth'), 1);
+});
+
+test('depth 1 up stairs are drawn and return to town', () => {
+  const g = game(42, true, 'dungeon');
+  assert.equal(g.run('!!state.upstairs'), true);
+  const sprites = g.run(`(() => {
+    const original = drawSprite;
+    const seen = [];
+    drawSprite = (...args) => { seen.push(args[0]); return original(...args); };
+    draw();
+    drawSprite = original;
+    return seen;
+  })()`);
+  assert.equal(sprites.includes('stairsUp'), true);
+  g.run('state.player.x = state.upstairs.x; state.player.y = state.upstairs.y; pickup()');
+  assert.equal(g.run('state.area'), 'town');
+  assert.equal(g.run('state.monsters.length'), 0);
+  assert.equal(g.run('!!state.floors[1]'), true);
+  assert.equal(g.run('state.messages.some(m => m.includes("back to town"))'), true);
+  g.run('state.player.x = state.townGate.x; state.player.y = state.townGate.y; pickup()');
+  assert.equal(g.run('state.area'), 'dungeon');
+  assert.equal(g.run('state.depth'), 1);
+});
+
+test('Town Scroll can be bought, found, and counted without mixing with potions', () => {
+  const g = game(42, true, 'town');
+  g.run(`state.gold = 500;
+    state.merchant.stock = [{ ...ITEM_TABLE.find(item => item.name === 'Town Scroll'), id: 900 }];
+    state.player.x = state.merchant.x; state.player.y = state.merchant.y; pickup()`);
+  assert.equal(g.run('state.townScrolls'), 1);
+  assert.equal(g.run('state.inventory.length'), 0);
+  assert.match(g.elements.spellList.textContent, /J Town Scroll \(1\)/);
+  g.run(`enterDungeonFromTown();
+    state.treasures = [{ x: state.player.x, y: state.player.y, ...ITEM_TABLE.find(item => item.name === 'Town Scroll') }];
+    pickup()`);
+  assert.equal(g.run('state.townScrolls'), 2);
+  assert.equal(g.run('state.inventory.length'), 0);
+});
+
+test('J opens a one-shot Town Scroll portal and returns to the exact dungeon tile', () => {
+  const g = game();
+  g.run('state.townScrolls = 1; state.player.x = 12; state.player.y = 9; state.map[9][12] = 0;');
+  g.key('j');
+  assert.equal(g.run('state.area'), 'town');
+  assert.equal(g.run('state.townScrolls'), 0);
+  assert.deepEqual(g.json('state.townExit'), { depth: 1, x: 12, y: 9, reason: 'scroll' });
+  assert.equal(g.run('state.townPortalOpen'), true);
+  assert.match(g.elements.spellList.textContent, /J Town Portal \(ready\)/);
+  assert.match(g.elements.objective.textContent, /portal/i);
+  g.key('j');
+  assert.equal(g.run('state.area'), 'dungeon');
+  assert.deepEqual(g.json('[state.player.x,state.player.y]'), [12, 9]);
+  assert.equal(g.run('state.townExit'), null);
+  assert.equal(g.run('state.townPortalOpen'), false);
+  g.key('j');
+  assert.equal(g.run('state.area'), 'dungeon');
+  assert.match(g.json('state.messages.at(-1)'), /No Town Scroll stored/);
+});
+
+test('Space at the town gate consumes an open portal instead of normal entry', () => {
+  const g = game();
+  g.run('enterFloor(2, false); state.townScrolls = 1;');
+  const exit = g.json('[state.player.x,state.player.y]');
+  g.key('j');
+  assert.equal(g.run('state.area'), 'town');
+  g.run('state.player.x = state.townGate.x; state.player.y = state.townGate.y; pickup()');
+  assert.equal(g.run('state.area'), 'dungeon');
+  assert.equal(g.run('state.depth'), 2);
+  assert.deepEqual(g.json('[state.player.x,state.player.y]'), exit);
+  assert.equal(g.run('state.townExit'), null);
+  assert.equal(g.run('state.townPortalOpen'), false);
+  assert.match(g.json('state.messages.at(-1)'), /town portal/);
+});
+
+test('a second scroll in the dungeon is not consumed while a portal is open', () => {
+  const g = game();
+  g.run('state.townScrolls = 2; state.townPortalOpen = true; state.townExit = { depth: 1, x: state.player.x, y: state.player.y, reason: "scroll" }');
+  g.key('j');
+  assert.equal(g.run('state.area'), 'dungeon');
+  assert.equal(g.run('state.townScrolls'), 2);
+  assert.match(g.json('state.messages.at(-1)'), /already open/);
+});
+
+test('Town Scroll return reuses the saved floor instead of regenerating it', () => {
+  const g = game(); down(g);
+  g.run(`state.monsters[0].hp = 1; state.potions = []; state.treasures = [];
+    state.merchant.stock = []; state.bossDefeated = true; state.floorKey.collected = true;
+    state.hazards = []; state.townScrolls = 1;`);
+  const saved = g.json('[state.map, state.monsterSpawns, state.merchant, state.bossDefeated, state.floorKey, state.hazards, state.potions, state.treasures]');
+  g.key('j'); g.key('j');
+  assert.equal(g.run('state.depth'), 2);
+  assert.deepEqual(g.json('[state.map, state.monsterSpawns, state.merchant, state.bossDefeated, state.floorKey, state.hazards, state.potions, state.treasures]'), saved);
+});
+
+test('Town Scroll return resolves blocked exit tiles safely', () => {
+  const g = game();
+  g.run('enterFloor(2, false); state.townScrolls = 1;');
+  const exit = g.json('[state.player.x,state.player.y]');
+  g.key('j');
+  g.run(`(() => {
+    const floor = state.floors[2];
+    floor.map[${exit[1]}][${exit[0]}] = 1;
+    state.townExit.x = ${exit[0]}; state.townExit.y = ${exit[1]}; state.townPortalOpen = true;
+  })()`);
+  g.key('j');
+  assert.equal(g.run('state.area'), 'dungeon');
+  assert.equal(g.run('state.map[state.player.y][state.player.x]'), 0);
+  assert.notDeepEqual(g.json('[state.player.x,state.player.y]'), exit);
+});
+
+test('Town Scroll portal survives dungeon travel but clears on retreat, death, ending, and restart', () => {
+  const g = game();
+  g.run('state.townScrolls = 2; state.townPortalOpen = true; state.townExit = { depth: 1, x: state.player.x, y: state.player.y, reason: "scroll" }');
+  const scrollExit = g.json('state.townExit');
+  down(g);
+  assert.equal(g.run('state.depth'), 2);
+  assert.equal(g.run('state.townPortalOpen'), true);
+  assert.deepEqual(g.json('state.townExit'), scrollExit);
+  const retreatExit = g.json('[state.player.x,state.player.y]');
+  g.run('state.retreatReadyAt = 0; state.player.hp = 5; checkHealth(); retreat(); confirmRetreat()');
+  assert.equal(g.run('state.townPortalOpen'), false);
+  assert.deepEqual(g.json('state.townExit'), { depth: 2, x: retreatExit[0], y: retreatExit[1], reason: 'retreat' });
+  assert.match(g.json('state.messages.at(-2)'), /portal collapses/);
+  g.run('state.townPortalOpen = true; state.townExit = { depth: 2, x: 1, y: 1, reason: "scroll" }; gameOver(false)');
+  assert.equal(g.run('state.townPortalOpen'), false);
+  assert.equal(g.run('state.townExit'), null);
+  g.run(`state.gameOver = false; state.won = false; state.depth = 100; state.bossDefeated = true;
+    state.princess = { rescued: true }; state.boss = { sprite: 'dragonBoss', hp: 160, maxHp: 160, x: 5, y: 5 };
+    state.townPortalOpen = true; state.townExit = { depth: 100, x: 1, y: 1, reason: "scroll" }; gameOver(true)`);
+  assert.equal(g.run('state.townPortalOpen'), false);
+  assert.equal(g.run('state.townExit'), null);
+  g.key('r');
+  assert.equal(g.run('state.townPortalOpen'), false);
+  assert.equal(g.run('state.townExit'), null);
+  assert.equal(g.run('state.townScrolls'), 0);
+});
+
+test('help and HUD describe Town Scroll availability and portal state', () => {
+  const g = game(42, true, 'town');
+  const html = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
+  assert.match(html, /J: Town Scroll/);
+  g.run('state.townScrolls = 1; render()');
+  assert.equal(String(g.elements.scrolls.textContent), '1');
+  assert.match(g.elements.spellList.textContent, /J Town Scroll \(1\)/);
+  g.run('state.townPortalOpen = true; render()');
+  assert.match(g.elements.spellList.textContent, /J Town Portal \(ready\)/);
+  assert.match(g.elements.objective.textContent, /portal/i);
+});
+
+test('a twice-size talking cat waits by the dungeon gate', () => {
+  const g = game(42, true, 'town');
+  const html = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
+  assert.match(html, /Marmalade/);
+  assert.equal(g.run('!!SPRITES.catCompanion && !!SPRITE_PALETTES.catCompanion'), true);
+  const cat = g.json(`(() => { const c = entranceCatActor(); return {
+    name: c.name, sprite: c.sprite, scale: c.scale, x: c.x, y: c.y, hidden: !!c.hidden,
+    open: state.map[c.y][c.x] === 0, gateDistance: Math.max(Math.abs(c.x - state.townGate.x), Math.abs(c.y - state.townGate.y))
+  }; })()`);
+  assert.deepEqual([cat.name, cat.sprite, cat.scale], ['Marmalade', 'catCompanion', 1.5]);
+  assert.equal(cat.open, true);
+  assert.ok(cat.gateDistance <= 3 && cat.gateDistance > 1);
+  assert.equal(cat.hidden, false);
+  assert.equal(g.run('state.companion'), null);
+  assert.equal(g.run('state.entranceCat.recruited'), false);
+  assert.match(g.elements.objective.textContent, /huge cat/i);
+});
+
+test('Space recruits the gate cat before entering the dungeon', () => {
+  const g = game(42, true, 'town');
+  g.run(`(() => {
+    const c = entranceCatActor();
+    const spots = [[c.x + 1, c.y], [c.x - 1, c.y], [c.x, c.y + 1], [c.x, c.y - 1]];
+    const tile = spots.find(([x, y]) => state.map[y] && state.map[y][x] === 0);
+    state.player.x = tile[0]; state.player.y = tile[1]; pickup();
+  })()`);
+  assert.equal(g.run('state.area'), 'town');
+  assert.equal(g.run('state.companion.name'), 'Marmalade');
+  assert.equal(g.run('state.companion.kind'), 'cat');
+  assert.equal(g.run('state.companion.scale'), 1.5);
+  assert.equal(g.run('state.entranceCat.recruited'), true);
+  assert.equal(g.run('entranceCatActor().hidden'), true);
+  assert.equal(g.elements.companionStat.hidden, false);
+  assert.equal(g.elements.companionName.textContent, 'Marmalade');
+  assert.match(g.json('state.messages.join(" ")'), /wife and children/i);
+  assert.match(g.json('state.messages.join(" ")'), /Marmalade:/);
+  g.run('state.player.x = state.townGate.x; state.player.y = state.townGate.y; pickup()');
+  assert.equal(g.run('state.area'), 'dungeon');
+  assert.equal(g.run('state.companion.name'), 'Marmalade');
+});
+
+test('the first dungeon entry auto-joins the cat exactly once', () => {
+  const g = game(42, true, 'town');
+  g.run('state.player.x = state.townGate.x; state.player.y = state.townGate.y; pickup()');
+  assert.equal(g.run('state.area'), 'dungeon');
+  assert.equal(g.run('state.companion.name'), 'Marmalade');
+  assert.equal(g.run('state.entranceCat.entered'), true);
+  assert.equal(g.run('state.entranceCat.recruited'), true);
+  assert.equal(g.run('entranceCatActor().hidden'), true);
+  assert.match(g.json('state.messages.join(" ")'), /hops in before you can leave/i);
+  const logCount = g.run('state.messages.filter(m => /hops in before you can leave/i.test(m)).length');
+  up(g);
+  g.run('state.player.x = state.townGate.x; state.player.y = state.townGate.y; pickup()');
+  assert.equal(g.run('state.messages.filter(m => /hops in before you can leave/i.test(m)).length'), logCount);
+});
+
+test('Marmalade follows, renders twice normal cat size, and stays out of floor saves', () => {
+  const g = game();
+  g.run(`state.monsters = [];
+    for (let y = 3; y <= 7; y++) for (let x = 3; x <= 8; x++) state.map[y][x] = 0;
+    state.player.x = 5; state.player.y = 5;
+    state.companion.x = 4; state.companion.y = 5;
+    state.motion.facing.player = 1;
+    movePlayer(1, 0); saveFloor()`);
+  assert.deepEqual(g.json('[state.player.x, state.player.y, state.companion.x, state.companion.y]'), [6, 5, 5, 5]);
+  assert.equal(g.run('Object.keys(state.floors[state.depth]).includes("entranceCat")'), false);
+  assert.equal(g.run('Object.keys(state.floors[state.depth]).includes("companion")'), false);
+  const drawn = g.json(`(() => {
+    state.companionSpeech = null;
+    const original = drawActorSprite, seen = [];
+    drawActorSprite = (...args) => { seen.push([args[0], args[3]]); return original(...args); };
+    draw();
+    drawActorSprite = original;
+    return seen.filter(item => item[0] === 'catCompanion');
+  })()`);
+  assert.deepEqual(drawn[0], ['catCompanion', 1.5]);
+});
+
+test('Marmalade prefers bats and adds only one bonus point against them', () => {
+  const g = game();
+  g.run(`(() => {
+    const c = state.companion;
+    for (let y = c.y - 1; y <= c.y + 1; y++) for (let x = c.x - 1; x <= c.x + 2; x++) state.map[y][x] = 0;
+    state.activeTime = 20; state.companionSpeechReadyAt = 0; state.companionAttackAt = 0;
+    state.monsters = [
+      { id: 1, name: 'Bat', sprite: 'bat', hp: 10, maxHp: 10, atk: 1, def: 0, xp: 1, x: c.x + 2, y: c.y },
+      { id: 2, name: 'Slime', sprite: 'slime', hp: 10, maxHp: 10, atk: 1, def: 0, xp: 1, x: c.x + 1, y: c.y }
+    ];
+    companionTick();
+  })()`);
+  assert.deepEqual(g.json('state.monsters.map(m => m.hp)'), [8, 10]);
+  assert.match(g.json('state.messages.join(" ")'), /Marmalade:.*bat/i);
+  g.run('state.activeTime = 30; state.companionSpeechReadyAt = 0; state.companionAttackAt = 0; state.monsters.shift(); companionTick()');
+  assert.equal(g.run('state.monsters[0].hp'), 9);
+});
+
+test('the first boss kill retires Marmalade once before the boss companion joins', () => {
+  const g = game();
+  g.run(`state.activeTime = 20; state.floorKey = null;
+    state.monsters = [{ id: 99, name: 'Cook', sprite: 'orc', hp: 1, maxHp: 1,
+      atk: 1, def: 0, xp: 1, gold: 0, x: state.player.x + 1, y: state.player.y, isBoss: true }];
+    damageMonster(state.monsters[0], 1); clearBossDefeat(); state.bossDefeat = null;`);
+  assert.equal(g.run('state.companion.name'), 'Cook');
+  assert.equal(g.run('state.companion.kind'), 'boss');
+  assert.equal(g.run('state.entranceCat.retired'), true);
+  assert.match(g.json('state.messages.join(" ")'), /household budget/i);
+  assert.equal(g.run('state.messages.filter(m => /household budget/i.test(m)).length'), 1);
+  g.run(`state.monsters = [{ id: 100, name: 'Bartender', sprite: 'skeleton', hp: 1, maxHp: 1,
+    atk: 1, def: 0, xp: 1, gold: 0, x: state.player.x + 1, y: state.player.y, isBoss: true }];
+    damageMonster(state.monsters[0], 1); clearBossDefeat(); state.bossDefeat = null;`);
+  assert.equal(g.run('state.companion.name'), 'Bartender');
+  assert.equal(g.run('state.messages.filter(m => /household budget/i.test(m)).length'), 1);
+});
+
+test('death, ending, and restart reset the waiting cat and active companion', () => {
+  const g = game();
+  g.run('gameOver(false)');
+  assert.deepEqual(g.json('state.entranceCat'), { recruited: false, entered: false, retired: false });
+  g.run(`state.gameOver = false; state.depth = 100; state.bossDefeated = true;
+    state.princess = { rescued: true }; state.boss = { sprite: 'dragonBoss', hp: 160, maxHp: 160, x: 5, y: 5 };
+    state.entranceCat = { recruited: true, entered: true, retired: false }; gameOver(true)`);
+  assert.equal(g.run('state.companion'), null);
+  assert.deepEqual(g.json('state.entranceCat'), { recruited: false, entered: false, retired: false });
+  g.run('state.entranceCat = { recruited: true, entered: true, retired: true }; newGame()');
+  assert.deepEqual(g.json('state.entranceCat'), { recruited: false, entered: false, retired: false });
+  assert.equal(g.run('state.companion'), null);
+  assert.equal(g.run('!!entranceCatActor().hidden'), false);
 });

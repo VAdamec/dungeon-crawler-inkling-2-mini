@@ -1,6 +1,8 @@
 # Tasks — Dungeon Crawler
 
-Last reviewed: 2026-11-23. Build v0.16.2 adds smooth movement, walking/wing/flame animation, the ? Help & settings dialog, 2× world zoom (18×12 view), the approved static graphics refresh, boss-defeat flourishes, the explored-area minimap with a compact Hero stats panel above a larger log and Spells under Gear bonuses, monster combat quotes, larger bosses/arenas, ranged/magic combat with out-of-combat mana regeneration and Magic Barrier, tiny defeated-boss companions with 1 damage and ironic remarks, five biomes on 96×64 floors, the 100-floor boss campaign with surprise bosses and a max hero level of 100, dedicated boss art and intro/defeat animations, the Skeleton King throne room, the ~ developer console with hero-stat-freezing, monster-killing god mode, and the plot-twist ending. See `handover.md` for details and `README.md` for controls.
+Last reviewed: 2026-11-24. Working build v0.20.0 includes smooth movement, walking/wing/flame animation, the ? Help & settings dialog, 2× world zoom (18×12 view), the approved static graphics refresh, boss-defeat flourishes, the explored-area minimap with a compact Hero stats panel above a larger log and Spells under Gear bonuses, monster combat quotes, larger bosses/arenas, ranged/magic combat with out-of-combat mana regeneration and Magic Barrier, tiny defeated-boss companions with adjacent-tile following, fog light, 1 damage and ironic remarks, the persistent fully visible town hub with grass/sand roads, huts, Inn, Store, villagers, wandering animals, river, bridge and dungeon gate, retreat-to-town with an exact saved dungeon return point, Town Scrolls with one-use town portals, depth 1 ▲ stairs back to town, five biomes on 96×64 floors, the 100-floor boss campaign with surprise bosses and a max hero level of 100, dedicated boss art and intro/defeat animations, the Skeleton King throne room, the ~ developer console with hero-stat-freezing, monster-killing god mode, and the plot-twist ending. See `handover.md` for details and `README.md` for controls.
+
+Current audit: **132 behavior tests**, syntax and external smoke pass. Selected offline Chrome checks and screenshots passed; see [status review](docs/reviews/2026-11-24-status-review.md) for evidence and two open gameplay findings. Historical verification counts below refer to their implementation dates.
 
 ## Existing gameplay
 - [x] Keep a thin HTML shell, CSS, and two plain scripts with no runtime dependencies or build step; launch over `file://`.
@@ -11,7 +13,7 @@ Last reviewed: 2026-11-23. Build v0.16.2 adds smooth movement, walking/wing/flam
 - [x] Preserve layout, rooms, stairs, exploration, remaining treasures/potions, merchant stock, and rescue state across floor changes.
 - [x] Preserve current HP, stats, XP, gear, potion inventory, gold, kills, and turn count; remove old player snapshot rollback.
 - [x] Recreate ordinary monsters at full HP from independent templates on return, away from arrival tiles and without duplicate positions. Defeated bosses remain defeated.
-- [x] Use Space on ▲/▼; Q/Backspace also ascends at ▲. Arrive at the connecting staircase; no ascent above depth 1.
+- [x] Use Space on ▲/▼; Q/Backspace also ascends at ▲. Arrive at the connecting staircase; depth-1 ascent returns to town.
 - [x] Keep explored terrain and discovered stairs, treasures, and potions visible; render treasure chests.
 - [x] Keep collected treasures/potions collected. This follows the later wording and replaces the earlier conflicting potion-respawn request.
 - [x] Award descent/full-clear descent rewards once per floor, preventing repeated staircase rewards.
@@ -21,7 +23,7 @@ Last reviewed: 2026-11-23. Build v0.16.2 adds smooth movement, walking/wing/flam
 - [x] Store found/purchased potions; H drinks one, caps healing, and does not consume at full HP. Show count in HUD.
 - [x] Pause below 20% HP with Drink/Continue; below 10% add Retreat. Lethal damage still kills. Warnings rearm only after recovering to their threshold.
 - [x] Freeze enemies, healing, and combat cooldown while paused. Stop remaining attacks immediately when a threshold is crossed.
-- [x] Confirm or cancel retreat. Confirmation returns one floor up with full HP; at depth 1 return to its entrance. A 60-second active-time cooldown prevents repeated full heals; HUD/dialog show availability.
+- [x] Confirm or cancel retreat. Confirmation returns to town with full HP and saves the exact dungeon depth/tile; the gate returns there once. A 60-second active-time cooldown prevents repeated full heals; HUD/dialog show availability.
 - [x] Heal 2% maximum HP (rounded, minimum 1) per two active seconds after six seconds without combat and no living monster within three tiles; paused/hidden time does not accumulate.
 - [x] Support dialog buttons, keyboard shortcuts, focus restoration, and trapped Tab navigation.
 
@@ -32,7 +34,7 @@ Last reviewed: 2026-11-23. Build v0.16.2 adds smooth movement, walking/wing/flam
 - [x] Update agent guidance, handover, and task status; record approved design and implementation checklist in `docs/plans/`.
 
 ## Campaign and balance — complete
-- [x] Gate depth-5 descent on Mimic defeat; make depth-10 dragon defeat unlock rescue rather than immediately win.
+- [x] Gate depth-5 descent on Mimic defeat; make final depth-100 dragon defeat unlock rescue rather than immediately win.
 - [x] Spawn the princess only at depth 100, require dragon defeat before the final princess interaction, and prevent depth 101.
 - [x] Persist defeated bosses across revisits and prevent repeated boss rewards; preserve ordinary monster respawns.
 - [x] Show the current campaign objective and retreat availability in the HUD.
@@ -49,10 +51,10 @@ Last reviewed: 2026-11-23. Build v0.16.2 adds smooth movement, walking/wing/flam
 - [x] Freeze simulation before start; prevent the start key from also triggering a gameplay action. Keep canvas resolution and file:// support.
 
 ## Scrolling floors, keys, and hazards — complete
-- [x] Generate 72×48-tile worlds with about 22 rooms, branching corridors, loops, and distant stairs; use an 18×12-tile camera viewport at 2× zoom.
+- [x] Generate 96×64-tile worlds targeting 32 rooms, branching corridors, loops, and distant stairs; use an 18×12-tile camera viewport at 2× zoom.
 - [x] Follow the player with a clamped camera, cull every drawing layer to the viewport, and retain world-coordinate exploration on revisits.
-- [x] Secretly assign one ordinary key carrier per floor 1–9; drop/Space-collect the key, permanently unlock stairs, and preserve dropped/collected state without duplicates.
-- [x] Keep depth-5 Mimic defeat as an additional gate; retain depth-10 dragon-then-rescue victory.
+- [x] Secretly assign one ordinary key carrier per floor 1–99; drop/Space-collect the key, permanently unlock stairs, and preserve dropped/collected state without duplicates.
+- [x] Keep depth-5 Mimic defeat as an additional gate; use the data-driven boss gates through depth 100 and final dragon-then-rescue ending.
 - [x] Add visible cycling flame vents, warned one-shot falling rocks, hidden one-shot spikes, and persistent trap state/local clocks.
 - [x] Add blocking pillars/rubble only if flood-fill still reaches every remaining floor tile; reserve key carriers, stairs, NPCs, and loot.
 - [x] Keep hazards outside three-tile arrival/stair buffers and off protected initial objects; use central damage for health pauses/death and freeze timers on pause/hidden/launch/other floors.
@@ -76,7 +78,7 @@ Last reviewed: 2026-11-23. Build v0.16.2 adds smooth movement, walking/wing/flam
 
 ## Verification
 - [x] `node --check js/game.js` and `node --check js/sprites.js`.
-- [x] `node --test tests/game.test.cjs`: 78 tests pass, including 130 varied floor-generation checks, eight monster-speech tests, and three boss-defeat animation tests.
+- [x] `node --test tests/game.test.cjs`: all 132 tests pass in the 2026-11-24 review. Earlier test counts below are historical.
 - [x] Existing external startup/input smoke prints `SMOKE_OK`.
 - [x] Isolated Chrome over `file://`: floor round trip, stored potion/HUD, health and critical dialogs, frozen movement, focus restoration, retreat confirm/cancel, healing HUD, running audio context, and mute/unmute pass without JavaScript errors. Follow-up checks cover campaign gates/final rescue victory, boss persistence, active retreat cooldown/dialogs, scaled healing, separate volume buses and preferences. Launch/layout checks also verify click/Enter start, paused launch, branding hidden across restart, top stats, left journal history/scroll, right equipment panel/icons/bonuses, and desktop width behavior. Scrolling checks also verify a 58-step real keyboard path beyond old bounds, key drop/collection/return persistence, invisible-spike pixel equality before trigger, rock warnings/dodge, flame damage, and hazard pauses. Ending checks cover all story phases, hidden-tab/skip/restart timing, frozen world state, once-only rewards/events, and screen-coordinate rendering. Real-time ending playback took 14.05 seconds, with all six scenes, world freeze, skip, and restart checked without JavaScript errors; a native canvas preview was recorded. Screenshots inspected.
 - [x] Chrome check over `file://` played both boss-defeat flourishes in real time, verified frozen player/monster/activeTime/hazardTime during key input, confirmed Escape skip, and reported no JavaScript errors. Five animation-frame captures were saved to `/tmp` for human visual review.
@@ -116,7 +118,25 @@ Last reviewed: 2026-11-23. Build v0.16.2 adds smooth movement, walking/wing/flam
 - [x] Build unique encounter and death animations for every boss with dedicated large sprites/frame poses and identity-bound, skippable, fully cleaned-up rAF scenes. Verified with 96 tests, syntax checks, and the external smoke script.
 - [x] Build the depth-50 Skeleton King throne room with unique art, long-range attacks, adds, intro/death scenes and non-repeatable rewards.
 - [x] Add a `~` developer console with `loadLevel <1-100>` (fresh boss-floor loading) and `godMode 0|1` (immortality) for scenario testing.
-- [ ] Verify all phases with syntax, behavior tests, external smoke, browser file:// play and updated docs; local Node needs a temporary `DYLD_LIBRARY_PATH` symlink for `libsimdutf.37.dylib`.
+- [x] Review all phases with syntax, 132 behavior tests, external smoke, selected Chrome file:// scenarios and updated docs on 2026-11-24. Full human campaign playtesting remains open. Local Node can use `DYLD_LIBRARY_PATH=/opt/homebrew/Cellar/simdutf/9.3.2_1/lib`; no symlink is required.
+
+## Implemented — companion, town hub, retreat, and Town Scroll (2026-11-24)
+- [x] Implemented: make the defeated-boss minion a logical adjacent follower that is clearly visible and affects fog/exploration. `docs/plans/2026-11-24-companion-follow-fog-plan.md`.
+- [x] Implemented: start runs in a small persistent, fully visible town with grass/sand roads, huts, Inn/Store doorsteps, talking villagers, wandering cats/dogs/chickens, river, trees, bridge, and a dungeon gate. `docs/plans/2026-11-24-town-hub-plan.md`.
+- [x] Implemented: change confirmed retreat to return to town while preserving full HP, the 60-second active-time cooldown, and an exact saved dungeon return point. `docs/plans/2026-11-24-retreat-to-town-plan.md`.
+- [x] Implemented: add a Town Scroll item/shortcut that teleports to town and opens a one-use return portal to the exact dungeon tile. `docs/plans/2026-11-24-town-scroll-plan.md`.
+- [x] Implemented all 2026-11-24 plans in dependency order and updated syntax, behavior tests, smoke, browser checks, help, README, agent guidance, and task status as each plan landed.
+- [x] Implemented the first companion: a very sarcastic twice-size talking cat waiting near the dungeon entrance, joining before the first descent to bring meat and money home to its wife and children, with a tiny attack and a special love of killing bats. `docs/plans/2026-11-24-first-companion-cat-plan.md`.
+
+## Review follow-ups — 2026-11-24
+
+- [x] Update changelog, README screenshots, illustrated bestiary and magic reference; reconcile current plan/handover status.
+- [ ] Sample the full weighted `spawnPool()` rather than clamping a depth-based index; add low/deep-floor regression cases.
+- [ ] Make Magic Barrier choose the nearest eligible target with deterministic ties; decide whether Frostbolt should share this rule.
+- [ ] Complete a human campaign and audible quality/balance playtest.
+- [ ] Decide whether to schedule the expansion design’s deferred themed extras: recurring themed encounters, Cook throwing-pan attacks and extra themed food/mug/stool content.
+
+See [review findings](docs/reviews/2026-11-24-status-review.md#findings).
 
 ## Constraints
 - All runtime files are in this project directory. No runtime installation or server is needed.

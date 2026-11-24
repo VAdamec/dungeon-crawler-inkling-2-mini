@@ -1,10 +1,8 @@
 # Expansion: ranged/magic combat, 100 floors, themed levels and bosses
 
-Status: design + implementation checklist. Approved scope from the user on 2026-11-23.
-A partial implementation already exists in the working tree (Wasp/Mage/Healer, Bow, player
-Fireball/Heal, themed floors 3/7, themed bosses, ranged enemy AI, 81 passing tests). This
-document describes the full requested feature set. All six phases are implemented,
-including Phase 6 (Skeleton King throne room).
+Status: all six implementation phases, including the Skeleton King throne room, are implemented in working build 0.20.0. Scope approved 2026-11-23; reviewed 2026-11-24 with 132 passing behavior tests, syntax and external smoke plus selected browser checks. [Current review](../reviews/2026-11-24-status-review.md) records weighted-spawn and Barrier-targeting gaps; full human campaign balance remains open.
+
+At design time a partial implementation already existed (ranged/magic enemies, Bow, Fireball/Heal and themed floors, with 81 tests). The sections below preserve that implementation sequence; completed checklists and the current review determine status.
 
 ## 1. Architecture constraints (unchanged)
 - Plain HTML5 canvas, no modules, no dependencies, no build step; `sprites.js` then `game.js`;
@@ -31,7 +29,7 @@ Already implemented (repair pass):
   and `Bow` treasure with a dedicated sprite. Fireball costs 8 MP and hits visible foes
   within 3 tiles; Heal costs 12 MP and restores 30% max HP.
 
-Remaining work:
+Implementation checklist (completed):
 1. [done] Art: dedicated Wasp, Mage and Healer pixel grids/palettes, wing/cast frames via
    `spriteFrameGrid()` and `actorAnimationPose()`, and motion-driven frames while visible.
 2. [done] Projectiles: transient `state.motion.projectiles` (kind, from/to world pixels,
@@ -92,9 +90,11 @@ Remaining work:
 
 Implementation note: Phase 4 added the roster, gates, scaling and generic defeat labels.
 Phase 5 added dedicated large sprites/frame poses for the new bosses plus the identity-bound
-intro/defeat animation framework; the Skeleton King throne room remains Phase 6.
+intro/defeat animation framework; Phase 6 completed the Skeleton King throne room.
 
 ## 5. Special themed levels
+
+Review note (2026-11-24): floors 3/7, saved props, Cook/Bartender encounters and persistence exist. Recurrence beyond those two floors, throwing-pan attacks for the Cook and extra food/mug/stool content below remain deferred design ideas. The Cook currently uses melee.
 1. Keep floors 3 (Orc's Kitchen) and 7 (Skeleton Pub) as the first themed rooms; add more
    from a table so they recur in later depth bands with scaled bosses and loot.
 2. Orc's Kitchen: lots of Orc cooks/underlings, cauldron props (already added), a large
@@ -118,11 +118,11 @@ intro/defeat animation framework; the Skeleton King throne room remains Phase 6.
 ## 7. Verification and rollout
 - Syntax: `node --check js/game.js && node --check js/sprites.js`; behavior: `node --test
   tests/game.test.cjs`; external smoke script in the temp directory. Note: the local Node
-  26.12.1 currently needs `DYLD_LIBRARY_PATH` pointing at a symlink from `libsimdutf.37.dylib`
-  to the installed `.38` library; this is an environment workaround, not a code dependency.
+  installation can use `DYLD_LIBRARY_PATH=/opt/homebrew/Cellar/simdutf/9.3.2_1/lib`
+  with the compatible installed library; no symlink is needed. This is local tooling, not a game dependency.
 - Extend tests per phase: ranged LOS/cooldown, spell costs/MP/HUD, merchant cadence, larger
   world connectivity/culling, boss table/gates through depth 100, themed floors, intro/defeat
-  cleanup, and floor-50 throne rules. Keep the current 81 tests green.
+  cleanup, and floor-50 throne rules. All 132 current tests pass; add focused regressions for the two review findings.
 - Manually verify over `file://`: keyboard combat, dialogs, cinematics/skips, sound after a
   user gesture, minimap, mobile layout, and no remote requests.
 - Update `AGENTS.md`, `tasks.md`, help text and preview artifacts as each phase lands. Do not

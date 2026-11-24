@@ -27,6 +27,7 @@ const ITEM_TABLE = [
   { name: 'Frostbolt Tome', sprite: 'spellbook', gold: 70, kind: 'spellbook', spell: 'frostbolt', minDepth: 2 },
   { name: 'Greater Heal Tome', sprite: 'spellbook', gold: 85, kind: 'spellbook', spell: 'greaterHeal', minDepth: 4 },
   { name: 'Magic Barrier Tome', sprite: 'spellbook', gold: 95, kind: 'spellbook', spell: 'magicBarrier', minDepth: 5 },
+  { name: 'Town Scroll', sprite: 'townScroll', gold: 55, kind: 'scroll', scroll: 'town', minDepth: 1, lootWeight: 1 },
 ];
 
 const SPELLS = {
@@ -43,6 +44,25 @@ const COMPANION_LINES = {
   merchant: ['Bought everything? The pouch is now a memorial.', 'That merchant smiled like you were the Quest.', 'You now own six things you cannot use. Character growth.'],
   rescue: ['Another prisoner rescued. My old union is impressed.', 'You cut the ropes. I will take the credit in small font.', 'Heroic. Expensive. Occasionally useful.'],
 };
+const CAT_LINES = {
+  intro: ['I am here for the meat and the money. The wife and children have standards.', 'Try to look heroic. I need material for the family ledger.'],
+  bat: ['A bat. Finally, payroll with wings.', 'I hate bats. They start rumors in the rafters.', 'That one owes me nine mice and an apology.'],
+  boss: ['That should cover the household budget. I am retiring vertically.', 'I have secured enough meat for a small army of kittens. Do not squander it.'],
+  trap: ['You walked into that with impressive confidence.', 'The floor warned you. I admire the commitment.'],
+  retreat: ['A strategic retreat. A noble word for jogging away.', 'I approve. Mostly because I am not carrying you.'],
+  merchant: ['Bought everything? The pantry is now a memorial.', 'That merchant smiled like you were the Quest.'],
+  rescue: ['Another prisoner rescued. My union is impressed.', 'You cut the ropes. I will take credit in small font.'],
+};
+const TOWN_NPC_LINES = [
+  'The dungeon gets louder every year. I sell maps now. Mostly.',
+  'If you find a key, keep it. Nobody remembers finders around here.',
+  'The Inn heals free. The Store does not. Priorities.',
+  'Bridge is sturdy. River is not. Do not test either.',
+  'That little dragon following you is new. I would not ask.',
+  'Depth fifty has a throne. I hear the skeletons gossip there.',
+  'Prices rise deeper down. Shocking, I know.',
+  'I waved at a hero once. They ran into a wall.',
+];
 
 const THEMED_FLOORS = { 3: { name: 'Cook', sprite: 'orc', kind: 'kitchen', prop: 'cookingPot' },
   7: { name: 'Bartender', sprite: 'skeleton', kind: 'pub', prop: 'barCounter' } };
@@ -66,10 +86,11 @@ const BOSSES = {
   90: { name: 'Dark Wizard', sprite: 'darkWizard', hp: 130, atk: 25, def: 6, xp: 230, gold: 170, magic: true, magicType: 'attack', magicRange: 5 },
   100: { name: 'Dragon', sprite: 'dragon', hp: 160, atk: 26, def: 6, xp: 250, gold: 200, dragon: true },
 };
-const GAME_VERSION = '0.16.2';
+const GAME_VERSION = '0.20.0';
 // Brief quotations from Monty Python and the Holy Grail; official sources in README.
 const MONSTER_QUOTES = ['Ni!', 'None shall pass!', "'Tis but a scratch.", 'Run away!'];
 const MONSTER_SPEECH_DURATION = 5, MONSTER_SPEECH_INTERVAL = 5;
+const COMPANION_FOG_RADIUS = 2, CAT_COMPANION_SCALE = 1.5, CAT_BAT_BONUS = 1;
 const ENDING_DURATION = 14;
 const MIMIC_DEFEAT_DURATION = 1.6, DRAGON_DEFEAT_DURATION = 2.6, BOSS_INTRO_DURATION = 1.6;
 const BOSS_ANIMATIONS = {
@@ -143,7 +164,8 @@ function bossAnimation(m) {
 }
 
 function lootPool(depth) {
-  return ITEM_TABLE.filter(it => depth >= (it.minDepth || 1));
+  return ITEM_TABLE.filter(it => depth >= (it.minDepth || 1))
+    .flatMap(it => Array(it.lootWeight || 4).fill(it));
 }
 
 function learnSpell(spellName) {
@@ -165,17 +187,75 @@ function freezePlayerStats() {
   for (const field of GOD_STAT_FIELDS) state.player[field] = state.godModeStats[field];
 }
 
-function adoptBossCompanion(m) {
-  state.companion = { name: m.name, sprite: m.isDragon ? 'dragonBoss' : m.sprite || bossKind(m) };
+function freshEntranceCatState() {
+  return { recruited: false, entered: false, retired: false };
+}
+
+function entranceCatActor() {
+  return state.town && (state.town.animals || []).find(actor => actor.isEntranceCat) || null;
+}
+
+function joinEntranceCat(auto) {
+  if (!state.entranceCat || state.entranceCat.recruited || state.entranceCat.retired || state.companion) return false;
+  const cat = entranceCatActor();
+  state.companion = { name: 'Marmalade', sprite: 'catCompanion', kind: 'cat', scale: CAT_COMPANION_SCALE, damage: 1, batBonus: CAT_BAT_BONUS,
+    x: cat ? cat.x : state.player.x, y: cat ? cat.y : state.player.y };
+  if (cat) cat.hidden = true;
+  state.entranceCat.recruited = true;
   state.companionSpeech = null;
   state.companionSpeechReadyAt = state.activeTime;
   state.companionAttackAt = state.activeTime + 3;
+  placeCompanionNearPlayer();
+  log(auto ? 'Marmalade hops in before you can leave. "Someone has to buy the meat."' : 'Marmalade agrees to join you. "The wife and children are counting on this."');
+  return true;
+}
+
+function talkToEntranceCat() {
+  if (!joinEntranceCat(false)) return false;
+  state.companionSpeechReadyAt = 0;
+  companionTalk('intro');
+  render();
+  return true;
+}
+
+function companionTileOpen(x, y) {
+  if (!state.map || !state.map[y] || state.map[y][x] !== 0) return false;
+  if (x === state.player.x && y === state.player.y) return false;
+  return !monsterAt(x, y);
+}
+
+function placeCompanionNearPlayer(dx = 0, dy = 0) {
+  const companion = state.companion;
+  if (!companion || !state.map) return;
+  if (!Number.isInteger(companion.x) || !Number.isInteger(companion.y)) {
+    companion.x = state.player.x; companion.y = state.player.y;
+    delete state.motion.moves[actorMotionKey(companion)];
+  }
+  if (Math.max(Math.abs(companion.x - state.player.x), Math.abs(companion.y - state.player.y)) <= 1 && companionTileOpen(companion.x, companion.y)) return;
+  const p = state.player;
+  const facing = state.motion.facing.player || 1;
+  const candidates = [];
+  if (dx || dy) candidates.push({ x: p.x - dx, y: p.y - dy });
+  candidates.push({ x: p.x - facing, y: p.y }, { x: p.x, y: p.y - 1 }, { x: p.x, y: p.y + 1 }, { x: p.x - 1, y: p.y }, { x: p.x + 1, y: p.y });
+  for (const tile of candidates) {
+    if (!companionTileOpen(tile.x, tile.y)) continue;
+    moveActorTo(companion, tile.x, tile.y);
+    return;
+  }
+}
+
+function adoptBossCompanion(m) {
+  state.companion = { name: m.name, sprite: m.isDragon ? 'dragonBoss' : m.sprite || bossKind(m), kind: 'boss', x: state.player.x, y: state.player.y };
+  state.companionSpeech = null;
+  state.companionSpeechReadyAt = state.activeTime;
+  state.companionAttackAt = state.activeTime + 3;
+  placeCompanionNearPlayer();
   log(`${m.name} agrees to join you as a tiny, reluctant companion.`);
 }
 
 function companionTalk(kind) {
   if (!state.companion || state.gameOver || state.activeTime < state.companionSpeechReadyAt) return;
-  const pool = COMPANION_LINES[kind];
+  const pool = state.companion.kind === 'cat' ? (CAT_LINES[kind] || COMPANION_LINES[kind]) : COMPANION_LINES[kind];
   if (!pool || !pool.length) return;
   const text = pool[state.companionQuoteIndex % pool.length];
   state.companionQuoteIndex++;
@@ -185,36 +265,39 @@ function companionTalk(kind) {
 }
 
 function companionTick() {
+  if (state.area === 'town') return;
   const companion = state.companion;
   if (!companion || state.gameOver) return;
   if (state.companionSpeech && state.activeTime >= state.companionSpeech.expiresAt) state.companionSpeech = null;
   if (state.activeTime < state.companionAttackAt) return;
   state.companionAttackAt = state.activeTime + 3;
-  const target = visibleTargets(3)[0];
-  if (!target) return;
-  spawnProjectile('bolt', state.player, target, 0.25);
-  damageMonster(target, 1);
-}
-
-function companionRenderPosition() {
-  const position = actorRenderPosition(state.player);
-  return { x: position.x * TILE + TILE * 0.78, y: position.y * TILE + TILE * 0.68 };
+  const targets = visibleTargets(3, companion);
+  if (!targets.length) return;
+  const target = companion.kind === 'cat' ? (targets.find(m => m.sprite === 'bat') || targets[0]) : targets[0];
+  if (companion.kind === 'cat' && target.sprite === 'bat') companionTalk('bat');
+  spawnProjectile('bolt', companion, target, 0.25);
+  const damage = companion.kind === 'cat' && target.sprite === 'bat' ? 1 + (companion.batBonus || 0) : 1;
+  damageMonster(target, damage);
 }
 
 function drawCompanion() {
-  if (!state.companion || state.gameOver) return;
-  const position = companionRenderPosition();
-  drawSprite(state.companion.sprite, position.x, position.y, 0.55);
+  const companion = state.companion;
+  if (!companion || state.gameOver || !Number.isInteger(companion.x) || !Number.isInteger(companion.y)) return;
+  if (!inRenderCamera(companion.x, companion.y) || fogLevel(companion.x, companion.y) >= 3) return;
+  const position = actorRenderPosition(companion);
+  const cx = position.x * TILE + TILE / 2, cy = position.y * TILE + TILE / 2;
+  const scale = companion.scale || 0.55;
+  drawActorSprite(companion.sprite, cx, cy, scale, companion);
   if (!state.companionSpeech) return;
   const text = state.companionSpeech.text;
   ctx.font = '10px monospace';
   const width = ctx.measureText(text).width + 10;
-  const x = position.x - width / 2, y = position.y - 26;
+  const x = cx - width / 2, y = cy - Math.round(18 + 16 * scale);
   ctx.fillStyle = '#f4e7c8';
   ctx.beginPath(); ctx.roundRect(x, y, width, 15, 4); ctx.fill();
   ctx.fillStyle = '#2b241d';
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText(text, position.x, y + 8);
+  ctx.fillText(text, cx, y + 8);
 }
 
 const FINAL_DEPTH = 100, MAX_LEVEL = 100, ENEMY_ATTACK_INTERVAL = 0.8, RETREAT_COOLDOWN = 60;
@@ -235,16 +318,17 @@ function newGame() {
   const audio = state ? state.audio : { context: null, master: null, musicBus: null, effectsBus: null, musicVolume: 0.45, effectsVolume: 0.8, enabled: true, step: 0, nextNote: 0 };
   document.getElementById('overlay').style.display = 'none';
   state = {
-    depth: 1, kills: 0, turn: 0, started, messages: [], helpOpen: false, helpFocus: null,
+    depth: 1, area: 'dungeon', town: null, townExit: null, townPortalOpen: false, inn: null, townGate: null, kills: 0, turn: 0, started, messages: [], helpOpen: false, helpFocus: null,
     consoleOpen: false, consoleLines: [], consoleHistory: [], consoleHistoryIndex: 0, godMode: false, godModeStats: null,
     player: { x: 0, y: 0, hp: 60, maxHp: 60, mp: 20, maxMp: 20, str: 12, dex: 10, def: 3, lvl: 1, xp: 0, xpNext: 40, spells: { fireball: true, heal: true } },
     spellReadyAt: { fireball: 0, heal: 0, frostbolt: 0, greaterHeal: 0, magicBarrier: 0 },
-    inventory: [],
+    inventory: [], townScrolls: 0,
     gold: 0, equipment: { weapon: null, armor: null, ring: null },
     map: null, rooms: [], monsters: [], potions: [], stairs: null, biome: 'crypt', props: [],
     treasures: [], merchant: null, boss: null, prisoner: null, princess: null,
     monsterSpeech: null, monsterSpeechReadyAt: 0, monsterQuoteIndex: 0,
     companion: null, companionSpeech: null, companionSpeechReadyAt: 0, companionQuoteIndex: 0, companionAttackAt: 0,
+    entranceCat: freshEntranceCatState(),
     gameOver: false, won: false, ending: null, bossIntro: null, bossIntroSeen: false, bossDefeat: null, bubble: null, visited: new Set(), floors: {},
     upstairs: null, monsterSpawns: [], pause: null, warnedLow: false, warnedCritical: false,
     combatElapsed: 0, healElapsed: 0, activeTime: 0, manaRegenAt: 0, retreatReadyAt: 0, bossDefeated: false, bossSummonAt: 0,
@@ -260,8 +344,9 @@ function newGame() {
   document.getElementById('gameLayout').hidden = !started;
   document.getElementById('launchVersion').textContent = `v${GAME_VERSION}`;
   genLevel();
+  genTown();
   revealAroundPlayer();
-  log('Enter the dungeon. A hidden monster carries the key to the next floor.');
+  log('You arrive in the village. Rest at the Inn, visit the Store, or enter the dungeon.');
 }
 
 function startGame() {
@@ -439,6 +524,361 @@ function genLevel() {
   saveFloor();
 }
 
+function townStoreStock() {
+  return [ITEM_TABLE[0], ITEM_TABLE[1], ITEM_TABLE[3], ITEM_TABLE[5], ITEM_TABLE[8], ITEM_TABLE[11]]
+    .map((item, index) => ({ ...item, id: 200 + index }));
+}
+
+function genTown() {
+  const map = [];
+  for (let y = 0; y < H; y++) map.push(new Array(W).fill(1));
+  for (let y = 16; y <= 44; y++) for (let x = 20; x <= 60; x++) map[y][x] = 0;
+  for (let y = 28; y <= 30; y++) for (let x = 22; x <= 58; x++) map[y][x] = 0;
+  for (let y = 18; y <= 42; y++) for (let x = 37; x <= 40; x++) map[y][x] = 0;
+  const props = [];
+  for (let y = 16; y <= 44; y++) {
+    for (const x of [48, 49]) {
+      map[y][x] = 1;
+      if (y !== 29) props.push({ x, y, sprite: 'water', scale: 1.6 });
+    }
+  }
+  for (let x = 48; x <= 49; x++) map[29][x] = 0;
+  props.push({ x: 48, y: 29, sprite: 'bridge', scale: 2 });
+  const trees = [[22, 18], [24, 18], [26, 18], [33, 18], [35, 18], [53, 18], [55, 18], [57, 18],
+    [22, 20], [22, 23], [22, 26], [22, 33], [22, 36], [22, 39], [24, 42], [27, 42], [30, 42], [33, 42],
+    [36, 42], [43, 42], [46, 42], [51, 42], [54, 42], [57, 42], [59, 20], [59, 23], [59, 26], [59, 33],
+    [59, 36], [59, 39], [43, 18], [46, 18], [51, 18]];
+  for (const [x, y] of trees) {
+    map[y][x] = 1;
+    props.push({ x, y, sprite: 'tree', scale: 2 });
+  }
+  const buildings = [
+    { x1: 26, y1: 20, x2: 31, y2: 24, sprite: 'inn', door: { x: 29, y: 25 } },
+    { x1: 43, y1: 20, x2: 47, y2: 24, sprite: 'store', door: { x: 45, y: 25 } },
+    { x1: 23, y1: 33, x2: 26, y2: 36, sprite: 'hut', door: { x: 24, y: 37 } },
+    { x1: 32, y1: 34, x2: 35, y2: 37, sprite: 'hut', door: { x: 33, y: 38 } },
+    { x1: 42, y1: 33, x2: 45, y2: 36, sprite: 'hut', door: { x: 43, y: 37 } },
+    { x1: 52, y1: 33, x2: 55, y2: 36, sprite: 'hut', door: { x: 53, y: 37 } },
+  ];
+  for (const b of buildings) {
+    for (let y = b.y1; y <= b.y2; y++) for (let x = b.x1; x <= b.x2; x++) map[y][x] = 1;
+    map[b.door.y][b.door.x] = 0;
+    const scale = b.sprite === 'hut' ? 2 : 3;
+    const cy = b.sprite === 'hut' ? b.y1 + 2 : b.y1 + 3;
+    props.push({ x: b.x1 + 2, y: cy, sprite: b.sprite, scale });
+    props.push({ x: b.door.x, y: b.door.y, sprite: 'doorstep', scale: 1 });
+  }
+  const spawn = { x: 38, y: 26 };
+  const inn = { ...buildings[0].door, sprite: 'inn' };
+  const store = { ...buildings[1].door, sprite: 'store', isMerchant: true, stock: townStoreStock() };
+  const gate = { x: 55, y: 29, sprite: 'townGate' };
+  props.push({ x: 56, y: 29, sprite: 'townGate', scale: 2 });
+  const npcs = [
+    { name: 'Mira', sprite: 'villager', x: 34, y: 28, pathIndex: 0, step: 5, path: [{ x: 34, y: 28 }, { x: 35, y: 28 }, { x: 34, y: 27 }] },
+    { name: 'Bran', sprite: 'villager', x: 41, y: 30, pathIndex: 0, step: 7, path: [{ x: 41, y: 30 }, { x: 40, y: 31 }, { x: 41, y: 32 }] },
+    { name: 'Eda', sprite: 'villager', x: 36, y: 39, pathIndex: 0, step: 6, path: [{ x: 36, y: 39 }, { x: 36, y: 38 }, { x: 36, y: 37 }] },
+    { name: 'Tobin', sprite: 'villager', x: 52, y: 31, pathIndex: 0, step: 8, path: [{ x: 52, y: 31 }, { x: 53, y: 31 }, { x: 52, y: 32 }] },
+  ];
+  const animals = [
+    { name: 'Mochi', sprite: 'cat', x: 31, y: 31, pathIndex: 0, step: 3, path: [{ x: 31, y: 31 }, { x: 32, y: 31 }, { x: 31, y: 32 }] },
+    { name: 'Pip', sprite: 'dog', x: 41, y: 33, pathIndex: 0, step: 4, path: [{ x: 41, y: 33 }, { x: 41, y: 34 }, { x: 42, y: 32 }] },
+    { name: 'Hen', sprite: 'chicken', x: 27, y: 27, pathIndex: 0, step: 2, path: [{ x: 27, y: 27 }, { x: 28, y: 27 }, { x: 27, y: 26 }] },
+    { name: 'Cluck', sprite: 'chicken', x: 46, y: 32, pathIndex: 0, step: 3, path: [{ x: 46, y: 32 }, { x: 47, y: 32 }, { x: 46, y: 33 }] },
+    { name: 'Dot', sprite: 'chicken', x: 54, y: 28, pathIndex: 0, step: 4, path: [{ x: 54, y: 28 }, { x: 55, y: 28 }, { x: 54, y: 27 }] },
+    { name: 'Marmalade', sprite: 'catCompanion', x: 53, y: 30, scale: CAT_COMPANION_SCALE, isEntranceCat: true },
+  ];
+  const gateCat = animals.find(actor => actor.isEntranceCat);
+  if (map[gateCat.y][gateCat.x] !== 0) {
+    for (const tile of [{ x: 53, y: 30 }, { x: 54, y: 30 }, { x: 53, y: 31 }, { x: 52, y: 30 }]) {
+      if (map[tile.y][tile.x] === 0) { gateCat.x = tile.x; gateCat.y = tile.y; break; }
+    }
+  }
+  state.area = 'town';
+  state.biome = 'town';
+  state.map = map;
+  state.rooms = [];
+  state.props = props;
+  state.visited = new Set();
+  state.merchant = store;
+  state.inn = inn;
+  state.townGate = gate;
+  state.town = {
+    map, visited: state.visited, props, npcs, animals, spawn, store,
+    landmarks: { inn, store, gate }, tick: 0, quoteIndex: 0, nextTalkAt: 0, speech: null,
+  };
+  state.monsters = [];
+  state.monsterSpawns = [];
+  state.boss = null;
+  state.prisoner = null;
+  state.princess = null;
+  state.potions = [];
+  state.treasures = [];
+  state.hazards = [];
+  state.obstacles = [];
+  state.hazardTime = 0;
+  state.floorKey = null;
+  state.stairs = null;
+  state.upstairs = null;
+  state.bossDefeated = false;
+  state.bubble = null;
+  state.monsterSpeech = null;
+  state.companionSpeech = null;
+  state.player.x = spawn.x;
+  state.player.y = spawn.y;
+  updateCamera();
+  revealAroundPlayer();
+}
+
+function saveTown() {
+  if (!state.town || state.area !== 'town') return;
+  state.town.map = state.map;
+  state.town.visited = state.visited;
+  state.town.props = state.props;
+  state.town.store = state.merchant || state.town.store;
+}
+
+function enterTown() {
+  if (state.area === 'town' || !state.town) return;
+  saveFloor();
+  clearBossIntro();
+  clearBossDefeat();
+  clearMonsterSpeech();
+  clearMovementAnimation();
+  state.area = 'town';
+  state.biome = 'town';
+  state.map = state.town.map;
+  state.rooms = [];
+  state.props = state.town.props;
+  state.visited = state.town.visited;
+  state.merchant = state.town.store;
+  state.inn = state.town.landmarks.inn;
+  state.townGate = state.town.landmarks.gate;
+  state.monsters = [];
+  state.monsterSpawns = [];
+  state.boss = null;
+  state.prisoner = null;
+  state.princess = null;
+  state.potions = [];
+  state.treasures = [];
+  state.hazards = [];
+  state.obstacles = [];
+  state.hazardTime = 0;
+  state.floorKey = null;
+  state.stairs = null;
+  state.upstairs = null;
+  state.bossDefeated = false;
+  state.bubble = null;
+  state.monsterSpeech = null;
+  state.companionSpeech = null;
+  state.player.x = state.town.spawn.x;
+  state.player.y = state.town.spawn.y;
+  updateCamera();
+  placeCompanionNearPlayer();
+  revealAroundPlayer();
+  playSound('stairs');
+  render();
+}
+
+function clearTownReturn() {
+  state.townExit = null;
+  state.townPortalOpen = false;
+}
+
+function safeTownExitTile(exit) {
+  const floor = exit && state.floors[exit.depth];
+  if (!floor || !floor.map) return null;
+  const occupied = [floor.merchant, floor.prisoner, floor.princess, ...(floor.hazards || [])].filter(Boolean);
+  const open = (x, y) => x >= 0 && y >= 0 && x < W && y < H && floor.map[y] && floor.map[y][x] === 0
+    && !occupied.some(actor => actor.x === x && actor.y === y);
+  if (open(exit.x, exit.y)) return { x: exit.x, y: exit.y };
+  const seen = new Set([`${exit.x},${exit.y}`]);
+  const queue = [{ x: exit.x, y: exit.y }];
+  const directions = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+  while (queue.length) {
+    const current = queue.shift();
+    for (const [dx, dy] of directions) {
+      const x = current.x + dx, y = current.y + dy, key = `${x},${y}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      if (open(x, y)) return { x, y };
+      if (x >= 0 && y >= 0 && x < W && y < H) queue.push({ x, y });
+    }
+  }
+  if (floor.upstairs && open(floor.upstairs.x, floor.upstairs.y)) return { x: floor.upstairs.x, y: floor.upstairs.y };
+  return null;
+}
+
+function enterDungeonFromTown(depth = state.depth, arrival = null) {
+  if (state.area !== 'town') return;
+  if (arrival === null && state.townExit) {
+    const exit = state.townExit;
+    const tile = safeTownExitTile(exit);
+    if (tile) {
+      enterFloor(exit.depth, false, false, tile);
+      clearTownReturn();
+      log(exit.reason === 'scroll' ? 'You step back through the town portal.' : `You return to depth ${exit.depth} where you retreated.`);
+      return;
+    }
+    clearTownReturn();
+  }
+  enterFloor(depth, false, false, arrival);
+  log('You descend into the dungeon.');
+}
+
+function returnThroughTownPortal() {
+  if (state.area !== 'town' || !state.townPortalOpen || !state.townExit) return false;
+  playSound('magic');
+  enterDungeonFromTown();
+  return true;
+}
+
+function useTownScroll() {
+  if (state.gameOver || state.helpOpen || state.consoleOpen || state.pause || state.ending || bossCinematicActive()) return;
+  if (state.area === 'town') {
+    if (!returnThroughTownPortal()) { log('No town portal is open.'); render(); }
+    return;
+  }
+  if (state.townPortalOpen) {
+    log('A town portal is already open. Use it at the gate first.');
+    render(); return;
+  }
+  if (!state.townScrolls) {
+    log('No Town Scroll stored. Buy one at the town Store or find one in loot.');
+    render(); return;
+  }
+  state.townScrolls--;
+  state.townExit = { depth: state.depth, x: state.player.x, y: state.player.y, reason: 'scroll' };
+  state.townPortalOpen = true;
+  playSound('magic');
+  log('The Town Scroll opens a return portal at the town gate.');
+  enterTown();
+  render();
+}
+
+function townTick() {
+  if (!state.started || state.gameOver || state.helpOpen || state.consoleOpen || state.pause || document.hidden) return false;
+  const town = state.town;
+  if (!town) return false;
+  town.tick++;
+  let changed = false;
+  if (town.speech && town.tick >= town.speech.expiresAt) { town.speech = null; changed = true; }
+  if (state.bubble && state.bubble.ttl > 0) { state.bubble.ttl--; changed = true; }
+  for (const actor of [...town.npcs, ...(town.animals || [])]) {
+    if (actor.hidden) continue;
+    if (!actor.path || actor.path.length < 2 || town.tick % actor.step !== 0) continue;
+    actor.pathIndex = (actor.pathIndex + 1) % actor.path.length;
+    const tile = actor.path[actor.pathIndex];
+    if (!state.map[tile.y] || state.map[tile.y][tile.x] !== 0) continue;
+    if (tile.x === state.player.x && tile.y === state.player.y) continue;
+    actor.x = tile.x; actor.y = tile.y; changed = true;
+  }
+  return changed;
+}
+
+function nearbyTile(x, y, target) {
+  return !!target && Math.max(Math.abs(x - target.x), Math.abs(y - target.y)) <= 1;
+}
+
+function townEncounter() {
+  const town = state.town;
+  if (!town || town.tick < town.nextTalkAt) return;
+  const npc = town.npcs.find(n => nearbyTile(state.player.x, state.player.y, n));
+  if (!npc) return;
+  townNpcTalk(npc);
+  town.nextTalkAt = town.tick + 8;
+}
+
+function townNpcTalk(npc) {
+  const town = state.town;
+  if (!town || !npc) return;
+  const line = TOWN_NPC_LINES[town.quoteIndex % TOWN_NPC_LINES.length];
+  town.quoteIndex++;
+  town.speech = { name: npc.name, text: line, expiresAt: town.tick + 6 };
+  log(`${npc.name}: "${line}"`);
+}
+
+function townInteract() {
+  if (state.area !== 'town') return false;
+  const p = state.player;
+  const cat = entranceCatActor();
+  if (cat && !cat.hidden && state.entranceCat && !state.entranceCat.recruited && nearbyTile(p.x, p.y, cat)) return talkToEntranceCat();
+  if (nearbyTile(p.x, p.y, state.townGate)) {
+    if (!state.townPortalOpen || !returnThroughTownPortal()) enterDungeonFromTown();
+    return true;
+  }
+  if (nearbyTile(p.x, p.y, state.inn)) {
+    restAtInn();
+    return true;
+  }
+  if (nearbyTile(p.x, p.y, state.merchant)) {
+    buyFromMerchant();
+    return true;
+  }
+  const npc = state.town.npcs.find(n => nearbyTile(p.x, p.y, n));
+  if (npc) {
+    townNpcTalk(npc);
+    render();
+    return true;
+  }
+  log('Nothing to interact with here.');
+  render();
+  return true;
+}
+
+function restAtInn() {
+  if (state.area !== 'town') return;
+  state.player.hp = state.player.maxHp;
+  state.player.mp = state.player.maxMp;
+  freezePlayerStats();
+  state.warnedLow = false;
+  state.warnedCritical = false;
+  state.combatElapsed = 0;
+  state.healElapsed = 0;
+  state.manaRegenAt = state.activeTime + 4;
+  state.companionAttackAt = state.activeTime + 3;
+  state.lastTick = Date.now();
+  log('The Inn restores your health and mana.');
+  playSound('heal');
+  render();
+}
+
+function drawBubble(text, x, y) {
+  ctx.save();
+  ctx.font = '11px monospace';
+  const w = ctx.measureText(text).width + 12;
+  ctx.fillStyle = '#f4f1e6';
+  ctx.beginPath(); ctx.roundRect(x - w / 2, y - 22, w, 18, 5); ctx.fill();
+  ctx.fillStyle = '#11131c';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(text, x, y - 13);
+  ctx.restore();
+}
+
+function drawTownNpcs() {
+  if (!state.town) return;
+  const actors = [...state.town.npcs, ...(state.town.animals || [])].sort((a, b) => a.y - b.y);
+  for (const actor of actors) {
+    if (actor.hidden || !inRenderCamera(actor.x, actor.y)) continue;
+    const scale = actor.scale || (actor.sprite === 'villager' ? 1.5 : 0.75);
+    drawActorSprite(actor.sprite, actor.x * TILE + TILE / 2, actor.y * TILE + TILE / 2, scale, actor);
+  }
+}
+
+function drawTownSpeech() {
+  const cat = entranceCatActor();
+  if (cat && !cat.hidden && state.entranceCat && !state.entranceCat.recruited && nearbyTile(state.player.x, state.player.y, cat) && inRenderCamera(cat.x, cat.y)) {
+    drawBubble('Space: talk to Marmalade', cat.x * TILE + TILE / 2, cat.y * TILE - 16);
+  }
+  if (state.townPortalOpen && state.townGate && inRenderCamera(state.townGate.x, state.townGate.y)) {
+    drawBubble('Portal ready (J)', state.townGate.x * TILE + TILE / 2, state.townGate.y * TILE - 12);
+  }
+  const speech = state.town && state.town.speech;
+  if (!speech) return;
+  const npc = state.town.npcs.find(n => n.name === speech.name);
+  if (!npc || !inRenderCamera(npc.x, npc.y)) return;
+  drawBubble(speech.text, npc.x * TILE + TILE / 2, npc.y * TILE - 12);
+}
+
 function carveCorridor(map, from, to, width = 1) {
   let x = from.cx, y = from.cy;
   const horizontalFirst = Math.random() < 0.5;
@@ -585,7 +1025,9 @@ function clearMovementAnimation() {
 }
 
 function actorMotionKey(actor) {
-  return actor === state.player ? 'player' : `monster:${actor.id}`;
+  if (actor === state.player) return 'player';
+  if (actor === state.companion) return 'companion';
+  return `monster:${actor.id}`;
 }
 
 function motionProgress(move) {
@@ -652,7 +1094,11 @@ function projectileVisible(projectile) {
 
 function motionNeeded() {
   if (state.motion.projectiles.some(projectileVisible)) return true;
-  if (actorIsMoving(state.player) || state.monsters.some(m => m.hp > 0 &&
+  if (actorIsMoving(state.player)) return true;
+  const companion = state.companion;
+  if (companion && Number.isInteger(companion.x) && Number.isInteger(companion.y) && inRenderCamera(companion.x, companion.y) && fogLevel(companion.x, companion.y) < 3 &&
+    (actorIsMoving(companion) || ['bat', 'wasp', 'dragonBoss'].includes(companion.sprite))) return true;
+  if (state.monsters.some(m => m.hp > 0 &&
     inRenderCamera(m.x, m.y) && fogLevel(m.x, m.y) < 3 &&
     (actorIsMoving(m) || ['bat', 'wasp', 'mage', 'healer'].includes(m.sprite) || m.isDragon))) return true;
   const view = renderViewport();
@@ -721,6 +1167,7 @@ function applyPlayerHazards() {
 }
 
 function hazardTick() {
+  if (state.area === 'town') return;
   if (!state.started || state.gameOver || state.helpOpen || state.consoleOpen || state.pause || document.hidden) return;
   for (const hazard of state.hazards) {
     if (hazard.type !== 'rocks' || hazard.stage !== 'warning' || state.hazardTime < hazard.impactAt) continue;
@@ -786,13 +1233,22 @@ function die() {
   render();
 }
 
+function fogDistanceLevel(distance, radius) {
+  if (distance <= radius - 2) return 0;
+  if (distance <= radius - 1) return 1;
+  if (distance <= radius) return 2;
+  return 3;
+}
+
 function fogLevel(x, y) {
   const p = state.player;
-  const d = Math.max(Math.abs(x - p.x), Math.abs(y - p.y));
-  if (d <= 1) return 0;
-  if (d === 2) return 1;
-  if (d === 3) return 2;
-  return 3;
+  let level = fogDistanceLevel(Math.max(Math.abs(x - p.x), Math.abs(y - p.y)), 3);
+  const companion = state.companion;
+  if (companion && Number.isInteger(companion.x) && Number.isInteger(companion.y)) {
+    const companionDistance = Math.max(Math.abs(x - companion.x), Math.abs(y - companion.y));
+    level = Math.min(level, fogDistanceLevel(companionDistance, COMPANION_FOG_RADIUS + 2));
+  }
+  return level;
 }
 
 function heroDamage(m, dmg) {
@@ -816,8 +1272,14 @@ function damageMonster(m, dmg) {
     let msg = `${m.name} ${m.isDragon ? 'defeated' : m.isThemed ? 'defeated' : 'slain'}! +${xpGain} XP`;
     if (m.gold) { state.gold += m.gold; msg += ` +${m.gold} gold`; }
     log(msg);
+    if (m.sprite === 'bat') companionTalk('bat');
     if (m.isBoss) {
       state.bossDefeated = true;
+      if (state.companion && state.companion.kind === 'cat' && state.entranceCat && !state.entranceCat.retired) {
+        log(`${state.companion.name}: "That should cover the household budget. I am going home."`);
+        state.entranceCat.retired = true;
+        state.companionSpeech = null;
+      }
       adoptBossCompanion(m);
       companionTalk('boss');
       saveFloor();
@@ -875,10 +1337,9 @@ function hasLineOfSight(x0, y0, x1, y1) {
   return true;
 }
 
-function visibleTargets(range) {
-  const p = state.player;
+function visibleTargets(range, source = state.player) {
   return state.monsters.filter(m => m.hp > 0 && inCamera(m.x, m.y) && fogLevel(m.x, m.y) < 3 &&
-    Math.max(Math.abs(m.x - p.x), Math.abs(m.y - p.y)) <= range && hasLineOfSight(p.x, p.y, m.x, m.y));
+    Math.max(Math.abs(m.x - source.x), Math.abs(m.y - source.y)) <= range && hasLineOfSight(source.x, source.y, m.x, m.y));
 }
 
 function spawnProjectile(kind, source, target, duration = 0.35) {
@@ -892,6 +1353,7 @@ function spawnProjectile(kind, source, target, duration = 0.35) {
 }
 
 function shootBow() {
+  if (state.area === 'town') return;
   if (!state.started || state.gameOver || state.helpOpen || state.pause || bossCinematicActive()) return;
   const weapon = rangedWeapon();
   if (!weapon) { log('You need a bow to shoot.'); render(); return; }
@@ -911,6 +1373,7 @@ function shootBow() {
 }
 
 function castSpell(spellName) {
+  if (state.area === 'town') return;
   if (!state.started || state.gameOver || state.helpOpen || state.pause || bossCinematicActive()) return;
   const spell = SPELLS[spellName];
   if (!spell) return;
@@ -979,7 +1442,7 @@ function castSpell(spellName) {
 }
 
 function regenMana() {
-  if (state.godMode) return;
+  if (state.area === 'town' || state.godMode) return;
   const p = state.player;
   if (state.combatElapsed < 4) return;
   if (state.monsters.some(m => m.hp > 0 && Math.max(Math.abs(m.x - p.x), Math.abs(m.y - p.y)) <= 3)) return;
@@ -1109,7 +1572,10 @@ function gameOver(won) {
   clearBossDefeat();
   clearMonsterSpeech();
   clearMovementAnimation();
+  clearTownReturn();
+  state.companion = null;
   state.companionSpeech = null;
+  state.entranceCat = freshEntranceCatState();
   state.gameOver = true; state.won = won; state.pause = null;
   const ov = document.getElementById('overlay');
   document.getElementById('ovTitle').textContent = 'GAME OVER';
@@ -1211,6 +1677,7 @@ function playBossIntroSound(kind) {
 }
 
 function checkBossIntro() {
+  if (state.area === 'town') return;
   const m = state && state.boss;
   if (!m || m.hp <= 0 || state.bossIntroSeen || !state.started || state.gameOver || state.helpOpen || state.pause || bossCinematicActive()) return;
   const p = state.player;
@@ -1450,23 +1917,36 @@ function movePlayer(dx, dy) {
   const nx = p.x + dx, ny = p.y + dy;
   if (nx < 0 || ny < 0 || nx >= W || ny >= H) return;
   if (state.map[ny][nx] !== 0) return;
+  if (state.area === 'town') {
+    const npc = state.town.npcs.find(actor => actor.x === nx && actor.y === ny);
+    if (npc) { townNpcTalk(npc); render(); return; }
+  }
   const m = monsterAt(nx, ny);
   if (m) { state.turn++; attackMonster(m); render(); return; }
   state.bubble = null;
   moveActorTo(p, nx, ny);
+  placeCompanionNearPlayer(dx, dy);
   state.turn++;
   revealAroundPlayer();
-  applyPlayerHazards();
-  checkBossIntro();
+  if (state.area === 'town') townEncounter();
+  else { applyPlayerHazards(); checkBossIntro(); }
   render();
 }
 
-function revealAroundPlayer() {
-  const p = state.player;
-  for (let dy = -3; dy <= 3; dy++) for (let dx = -3; dx <= 3; dx++) {
-    const x = p.x + dx, y = p.y + dy;
+function revealAroundActor(actor, radius) {
+  for (let dy = -radius; dy <= radius; dy++) for (let dx = -radius; dx <= radius; dx++) {
+    const x = actor.x + dx, y = actor.y + dy;
     if (x >= 0 && y >= 0 && x < W && y < H) state.visited.add(`${x},${y}`);
   }
+}
+
+function revealAroundCompanion() {
+  if (state.companion && Number.isInteger(state.companion.x) && Number.isInteger(state.companion.y)) revealAroundActor(state.companion, COMPANION_FOG_RADIUS);
+}
+
+function revealAroundPlayer() {
+  revealAroundActor(state.player, 3);
+  revealAroundCompanion();
 }
 
 function placeFloorObjects() {
@@ -1487,6 +1967,7 @@ function placeFloorObjects() {
 }
 
 function saveFloor() {
+  if (state.area === 'town') return;
   const floor = state.floors[state.depth] || { descentRewarded: false };
   for (const field of FLOOR_FIELDS) floor[field] = state[field];
   state.floors[state.depth] = floor;
@@ -1515,13 +1996,18 @@ function recreateMonsters() {
   state.boss = state.monsters.find(m => m.isBoss) || null;
 }
 
-function enterFloor(depth, fromBelow, fresh = false) {
+function enterFloor(depth, fromBelow, fresh = false, arrivalTile = null) {
   if (depth < 1 || depth > FINAL_DEPTH) return;
   clearBossIntro();
   clearBossDefeat();
   state.bossIntroSeen = false;
   state.bossSummonAt = state.activeTime + 4;
-  saveFloor();
+  if (state.area === 'town' && state.entranceCat && !state.entranceCat.entered) {
+    joinEntranceCat(true);
+    state.entranceCat.entered = true;
+  }
+  if (state.area === 'town') saveTown(); else saveFloor();
+  state.area = 'dungeon';
   state.depth = depth;
   const floor = fresh ? null : state.floors[depth];
   if (floor) {
@@ -1529,11 +2015,12 @@ function enterFloor(depth, fromBelow, fresh = false) {
   } else {
     genLevel();
   }
-  const arrival = fromBelow ? state.stairs : state.upstairs;
+  const arrival = arrivalTile || (fromBelow ? state.stairs : state.upstairs);
   state.player.x = arrival.x; state.player.y = arrival.y;
   recreateMonsters();
   state.bubble = null;
   state.healElapsed = 0;
+  placeCompanionNearPlayer();
   revealAroundPlayer();
   playSound('stairs');
 }
@@ -1564,9 +2051,14 @@ function descendStairs() {
 function ascendStairs() {
   if (state.gameOver || state.helpOpen || state.pause) return;
   const p = state.player;
-  if (state.depth <= 1) { log('There is no floor above this entrance.'); return; }
-  if (p.x !== state.upstairs.x || p.y !== state.upstairs.y) {
+  if (!state.upstairs || p.x !== state.upstairs.x || p.y !== state.upstairs.y) {
     log('Stand on the up stairs (▲) to ascend.'); return;
+  }
+  if (state.depth === 1) {
+    enterTown();
+    log('You climb the stairs back to town.');
+    render();
+    return;
   }
   enterFloor(state.depth - 1, true);
   log(`You ascend to depth ${state.depth}.`);
@@ -1617,6 +2109,9 @@ function buyFromMerchant() {
   } else if (it.kind === 'spellbook') {
     learnSpell(it.spell);
     log(`Bought ${it.name}!`);
+  } else if (it.kind === 'scroll') {
+    state.townScrolls++;
+    log(`Bought ${it.name}! Press J in the dungeon to open a portal home.`);
   } else {
     log(`Bought ${it.name}!`);
   }
@@ -1689,6 +2184,7 @@ function rescuePrincess() {
 
 function pickup() {
   if (state.gameOver || state.helpOpen || state.pause) return;
+  if (state.area === 'town') { townInteract(); return; }
   const p = state.player;
   const key = state.floorKey;
   if (key && key.drop && key.drop.x === p.x && key.drop.y === p.y) {
@@ -1699,7 +2195,6 @@ function pickup() {
     render(); return;
   }
   if (state.stairs && p.x === state.stairs.x && p.y === state.stairs.y) { descendStairs(); return; }
-  if (state.depth > 1 && p.x === state.upstairs.x && p.y === state.upstairs.y) { ascendStairs(); return; }
   if (merchantAt(p.x, p.y)) { buyFromMerchant(); return; }
   const pr = prisonerAt(p.x, p.y);
   if (pr) { rescuePrisoner(); return; }
@@ -1714,7 +2209,10 @@ function pickup() {
     return;
   }
   const t = treasureAt(p.x, p.y);
-  if (!t) { log('Nothing to pick up.'); return; }
+  if (!t) {
+    if (state.upstairs && p.x === state.upstairs.x && p.y === state.upstairs.y) { ascendStairs(); return; }
+    log('Nothing to pick up.'); return;
+  }
   state.treasures = state.treasures.filter(x => x !== t);
   if (t.kind !== 'heal') playSound('pickup');
   if (t.kind === 'heal') {
@@ -1731,6 +2229,9 @@ function pickup() {
   } else if (t.kind === 'spellbook') {
     learnSpell(t.spell);
     log(`${t.name}!`);
+  } else if (t.kind === 'scroll') {
+    state.townScrolls++;
+    log(`${t.name} stored! Press J in the dungeon to open a portal home.`);
   } else {
     state.gold += t.gold;
     log(`${t.name}! +${t.gold} gold`);
@@ -1780,7 +2281,7 @@ function hurtPlayer(damage, message) {
 
 function checkHealth() {
   freezePlayerStats();
-  if (state.gameOver || state.helpOpen || state.godMode) return;
+  if (state.area === 'town' || state.gameOver || state.helpOpen || state.godMode) return;
   const ratio = state.player.hp / state.player.maxHp;
   if (ratio >= 0.2) state.warnedLow = false;
   if (ratio >= 0.1) state.warnedCritical = false;
@@ -1806,6 +2307,7 @@ function retreatRemaining() {
 }
 
 function advanceActiveTime(elapsed) {
+  if (state.area === 'town') return;
   if (!state.started || state.gameOver || state.helpOpen || state.consoleOpen || state.pause || document.hidden || bossCinematicActive()) return;
   state.activeTime += Math.max(0, elapsed);
   state.hazardTime += Math.max(0, elapsed);
@@ -1813,6 +2315,7 @@ function advanceActiveTime(elapsed) {
 }
 
 function retreat() {
+  if (state.area === 'town') { log('No need to retreat while you are in town.'); render(); return; }
   if (state.gameOver || state.helpOpen || (state.pause && state.pause.kind === 'retreat')) return;
   if (retreatRemaining() > 0) { log(`Retreat recovers in ${Math.ceil(retreatRemaining())} active seconds.`); render(); return; }
   state.pause = { kind: 'retreat', previous: state.pause };
@@ -1828,25 +2331,26 @@ function cancelRetreat() {
 
 function confirmRetreat() {
   if (state.gameOver || state.helpOpen || !state.pause || state.pause.kind !== 'retreat' || retreatRemaining() > 0) return;
+  const exit = { depth: state.depth, x: state.player.x, y: state.player.y, reason: 'retreat' };
+  const portalClosed = state.townPortalOpen;
   state.retreatReadyAt = state.activeTime + RETREAT_COOLDOWN;
   state.pause = null;
   companionTalk('retreat');
-  if (state.depth > 1) enterFloor(state.depth - 1, true);
-  else {
-    state.player.x = state.upstairs.x; state.player.y = state.upstairs.y;
-    recreateMonsters();
-    revealAroundPlayer();
-  }
+  state.townExit = exit;
+  state.townPortalOpen = false;
+  if (portalClosed) log('The town portal collapses as you retreat.');
+  enterTown();
   state.player.hp = state.player.maxHp;
   state.warnedLow = false; state.warnedCritical = false;
   markCombat();
   state.lastTick = Date.now();
   playSound('heal');
-  log(`You retreat to ${state.depth === 1 ? 'the first floor' : `depth ${state.depth}`} with full health.`);
+  log('You retreat to town with full health.');
   render();
 }
 
 function recoveryTick(elapsed) {
+  if (state.area === 'town') return;
   if (!state.started || state.gameOver || state.helpOpen || state.pause) return;
   freezePlayerStats();
   if (state.godMode) { state.combatElapsed += elapsed; return; }
@@ -1875,7 +2379,7 @@ function renderPause() {
   const critical = state.player.hp / state.player.maxHp < 0.1;
   document.getElementById('pauseTitle').textContent = confirming ? 'RETREAT?' : critical ? 'CRITICAL HEALTH' : state.player.hp / state.player.maxHp >= 0.2 ? 'HEALTH RESTORED' : 'LOW HEALTH';
   document.getElementById('pauseText').textContent = confirming
-    ? `Return ${state.depth > 1 ? 'to the previous floor' : 'to this floor’s entrance'} with full HP?`
+    ? 'Retreat to town with full HP?'
     : `Time is paused. ${state.inventory.length} potion(s) stored. H: drink · C: continue${critical ? retreatRemaining() > 0 ? ` · Retreat: ${Math.ceil(retreatRemaining())} active seconds remaining` : ' · T: retreat' : ''}`;
   document.getElementById('drinkPotion').hidden = confirming;
   document.getElementById('drinkPotion').disabled = !state.inventory.length || state.player.hp >= state.player.maxHp;
@@ -1928,6 +2432,12 @@ function enemyTick() {
   const elapsed = Math.min(0.5, Math.max(0, (now - state.lastTick) / 1000));
   state.lastTick = now;
   freezePlayerStats();
+  if (state.area === 'town') {
+    if (!state.started || state.gameOver || state.helpOpen || state.consoleOpen || state.pause || document.hidden) return;
+    musicTick();
+    if (townTick()) render();
+    return;
+  }
   if (!state.started || state.gameOver || state.helpOpen || state.consoleOpen || state.pause || document.hidden || bossCinematicActive()) return;
   checkHealth();
   if (state.pause) { render(); return; }
@@ -1987,8 +2497,12 @@ function drawFloorDetails() {
     }
   }
   for (const prop of state.props) {
-    if (!inRenderCamera(prop.x, prop.y) || !state.visited.has(`${prop.x},${prop.y}`)) continue;
-    drawSprite(prop.sprite, prop.x * TILE + TILE / 2, prop.y * TILE + TILE / 2, 2);
+    if (!inRenderCamera(prop.x, prop.y)) continue;
+    if (state.area !== 'town' && !state.visited.has(`${prop.x},${prop.y}`)) continue;
+    drawSprite(prop.sprite, prop.x * TILE + TILE / 2, prop.y * TILE + TILE / 2, prop.scale || 2);
+  }
+  if (state.area === 'town' && state.townPortalOpen && state.townGate && inRenderCamera(state.townGate.x, state.townGate.y)) {
+    drawSprite('townPortal', state.townGate.x * TILE + TILE / 2, state.townGate.y * TILE + TILE / 2 - 4, 2);
   }
   for (const obstacle of state.obstacles) {
     if (!inRenderCamera(obstacle.x, obstacle.y) || !state.visited.has(`${obstacle.x},${obstacle.y}`)) continue;
@@ -2283,6 +2797,7 @@ function draw() {
   const defeat = state.bossDefeat ? bossDefeatScene() : null;
   const intro = state.bossIntro ? bossIntroScene() : null;
   const p = state.player;
+  const inTown = state.area === 'town';
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   updateCamera();
   const view = renderViewport();
@@ -2296,7 +2811,7 @@ function draw() {
   }
   drawDungeonTorches();
   drawFloorDetails();
-  for (const [stairs, glyph] of [[state.depth < FINAL_DEPTH ? state.stairs : null, '▼'], [state.depth > 1 ? state.upstairs : null, '▲']]) {
+  for (const [stairs, glyph] of [[state.depth < FINAL_DEPTH ? state.stairs : null, '▼'], [state.upstairs, '▲']]) {
     if (!stairs || !inRenderCamera(stairs.x, stairs.y) || !state.visited.has(`${stairs.x},${stairs.y}`)) continue;
     const spriteName = glyph === '▼' ? 'stairsDown' : 'stairsUp';
     drawSprite(spriteName, stairs.x * TILE + TILE / 2, stairs.y * TILE + TILE / 2, 2);
@@ -2317,31 +2832,35 @@ function draw() {
     const px = state.princess.x * TILE + TILE / 2, py = state.princess.y * TILE + TILE / 2;
     drawActorSprite('princess', px, py, 2);
   }
-  if (state.merchant && inRenderCamera(state.merchant.x, state.merchant.y) && fogLevel(state.merchant.x, state.merchant.y) < 3) {
+  if (state.merchant && inRenderCamera(state.merchant.x, state.merchant.y) && (inTown || fogLevel(state.merchant.x, state.merchant.y) < 3)) {
     const px = state.merchant.x * TILE + TILE / 2, py = state.merchant.y * TILE + TILE / 2;
     drawActorSprite('merchant', px, py, 2);
   }
+  if (inTown) drawTownNpcs();
   for (const m of state.monsters) {
     if (m.hp <= 0 || !inRenderCamera(m.x, m.y)) continue;
     if (fogLevel(m.x, m.y) >= 3) continue;
     const visual = monsterVisual(m);
     drawActorSprite(visual.sprite, visual.x, visual.y, visual.scale, m);
   }
-  for (let y = view.y0; y < view.y1; y++) {
-    for (let x = view.x0; x < view.x1; x++) {
-      const d = Math.max(Math.abs(x - p.x), Math.abs(y - p.y));
-      if (d <= 1) continue;
-      const key = `${x},${y}`;
-      if (state.visited.has(key)) {
-        ctx.fillStyle = 'rgba(5, 6, 10, 0.45)';
-        ctx.fillRect(x * TILE, y * TILE, TILE, TILE);
-      } else {
-        const a = Math.min(0.95, (d - 1) * 0.35);
-        ctx.fillStyle = `rgba(5, 6, 10, ${a})`;
-        ctx.fillRect(x * TILE, y * TILE, TILE, TILE);
+  if (!inTown) {
+    for (let y = view.y0; y < view.y1; y++) {
+      for (let x = view.x0; x < view.x1; x++) {
+        const fog = fogLevel(x, y);
+        if (fog === 0) continue;
+        const key = `${x},${y}`;
+        if (state.visited.has(key)) {
+          ctx.fillStyle = 'rgba(5, 6, 10, 0.45)';
+          ctx.fillRect(x * TILE, y * TILE, TILE, TILE);
+        } else {
+          const a = Math.min(0.95, fog * 0.35);
+          ctx.fillStyle = `rgba(5, 6, 10, ${a})`;
+          ctx.fillRect(x * TILE, y * TILE, TILE, TILE);
+        }
       }
     }
   }
+  if (inTown) drawTownSpeech();
   // Keep visible actors' health bars readable above the terrain fog.
   for (const m of state.monsters) {
     if (m.hp <= 0 || !inRenderCamera(m.x, m.y) || fogLevel(m.x, m.y) >= 3) continue;
@@ -2406,6 +2925,10 @@ function startEnding() {
   clearBossDefeat();
   clearMonsterSpeech();
   clearMovementAnimation();
+  clearTownReturn();
+  state.companion = null;
+  state.companionSpeech = null;
+  state.entranceCat = freshEntranceCatState();
   state.gameOver = true; state.won = true; state.pause = null; state.bubble = null;
   document.getElementById('overlay').style.display = 'none';
   log('At last, you reach the princess.');
@@ -2694,6 +3217,13 @@ function setAudioVolume(channel, percent) {
 
 function objectiveText() {
   if (state.ending) return endingCaption();
+  if (state.area === 'town') {
+    if (state.townPortalOpen) return 'A Town Scroll portal waits at the gate. Press J there for a one-way return.';
+    if (state.entranceCat && !state.entranceCat.recruited && !state.entranceCat.retired && !state.companion) return 'A huge cat waits by the gate. Press Space beside it to recruit it.';
+    return state.townExit
+      ? 'Rest at the Inn, trade at the Store, or return to the dungeon at the gate.'
+      : 'Rest at the Inn, trade at the Store, or enter the dungeon at the gate.';
+  }
   let campaign;
   if (state.boss && bossGateAt(state.depth) && !state.bossDefeated) {
     campaign = `Defeat ${state.boss.name} here to unlock the stairs.`;
@@ -2729,10 +3259,12 @@ function renderEquipment() {
   document.getElementById('heroAttack').textContent = effectiveAtk();
   document.getElementById('heroDefense').textContent = effectiveDef();
   document.getElementById('heroDexterity').textContent = effectiveDex();
-  document.getElementById('spellList').textContent = Object.keys(SPELLS)
+  const abilities = Object.keys(SPELLS)
     .filter(name => state.player.spells[name])
-    .map(name => `${SPELLS[name].key} ${SPELLS[name].name}`)
-    .join(' · ');
+    .map(name => `${SPELLS[name].key} ${SPELLS[name].name}`);
+  if (state.townPortalOpen) abilities.push('J Town Portal (ready)');
+  else if (state.townScrolls > 0) abilities.push(`J Town Scroll (${state.townScrolls})`);
+  document.getElementById('spellList').textContent = abilities.join(' · ');
 }
 
 function renderMinimap() {
@@ -2741,15 +3273,22 @@ function renderMinimap() {
   const scale = 3;
   mapCtx.fillStyle = '#070b10';
   mapCtx.fillRect(0, 0, W * scale, H * scale);
+  const inTown = state.area === 'town';
   for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
-    if (!state.visited.has(`${x},${y}`)) continue;
-    mapCtx.fillStyle = state.map[y][x] === 0 ? '#51626b' : state.map[y][x] === 2 ? '#8c7957' : '#242d39';
+    if (inTown && (x < 20 || x > 60 || y < 16 || y > 44)) continue;
+    if (!inTown && !state.visited.has(`${x},${y}`)) continue;
+    if (inTown) {
+      const sand = (y >= 28 && y <= 30) || (x >= 37 && x <= 40);
+      mapCtx.fillStyle = state.map[y][x] === 0 ? (sand ? '#cbb182' : '#6d7c52') : '#2d5b6e';
+    } else {
+      mapCtx.fillStyle = state.map[y][x] === 0 ? '#51626b' : state.map[y][x] === 2 ? '#8c7957' : '#242d39';
+    }
     mapCtx.fillRect(x * scale, y * scale, scale, scale);
   }
   mapCtx.strokeStyle = '#9aaac1'; mapCtx.lineWidth = 1;
   const camera = renderCamera();
   mapCtx.strokeRect(camera.x * scale + 0.5, camera.y * scale + 0.5, VIEW_W * scale - 1, VIEW_H * scale - 1);
-  for (const [stairs, color] of [[state.depth > 1 ? state.upstairs : null, '#8ecaff'], [state.depth < FINAL_DEPTH ? state.stairs : null, '#f4cf78']]) {
+  for (const [stairs, color] of [[state.upstairs, '#8ecaff'], [state.depth < FINAL_DEPTH ? state.stairs : null, '#f4cf78']]) {
     if (!stairs || !state.visited.has(`${stairs.x},${stairs.y}`)) continue;
     mapCtx.fillStyle = color;
     mapCtx.fillRect(stairs.x * scale, stairs.y * scale, scale, scale);
@@ -2758,7 +3297,7 @@ function renderMinimap() {
   const px = position.x * scale, py = position.y * scale;
   mapCtx.fillStyle = '#07151a'; mapCtx.fillRect(px - 1, py - 1, scale + 2, scale + 2);
   mapCtx.fillStyle = '#86f2c3'; mapCtx.fillRect(px, py, scale, scale);
-  document.getElementById('minimapDepth').textContent = `D${state.depth}`;
+  document.getElementById('minimapDepth').textContent = state.area === 'town' ? 'Town' : `D${state.depth}`;
 }
 
 function resetHelpClock() {
@@ -2915,11 +3454,12 @@ function render() {
   document.getElementById('mpfill').style.width = (100 * p.mp / p.maxMp) + '%';
   document.getElementById('lvl').textContent = p.lvl;
   document.getElementById('xpfill').style.width = (100 * p.xp / p.xpNext) + '%';
-  document.getElementById('depth').textContent = state.depth;
+  document.getElementById('depth').textContent = state.area === 'town' ? 'Town' : state.depth;
   document.getElementById('kills').textContent = state.kills;
   document.getElementById('turn').textContent = state.turn;
   document.getElementById('gold').textContent = state.gold;
   document.getElementById('potions').textContent = state.inventory.length;
+  document.getElementById('scrolls').textContent = state.townScrolls;
   document.getElementById('keyStatus').textContent = !state.floorKey ? '—' : state.floorKey.collected ? 'Unlocked' : state.floorKey.drop ? 'Dropped' : 'Missing';
   document.getElementById('posText').textContent = `${p.x + 1},${p.y + 1}`;
   document.getElementById('retreatStatus').textContent = retreatRemaining() > 0 ? `${Math.ceil(retreatRemaining())}s` : 'Ready';
@@ -2940,7 +3480,7 @@ function render() {
   renderEquipment();
   const m = state.merchant;
   const stock = m && m.stock && m.stock.length ? m.stock.map(i => i.name).join(', ') : '(sold out)';
-  document.getElementById('merchantStock').textContent = m ? `Merchant: ${stock}` : '';
+  document.getElementById('merchantStock').textContent = m ? `${state.area === 'town' ? 'Store' : 'Merchant'}: ${stock}` : '';
   document.getElementById('merchantStock').hidden = !m;
 }
 
@@ -3027,6 +3567,7 @@ document.addEventListener('keydown', e => {
   else if (e.repeat) return;
   else if (k === ' ') pickup();
   else if (k === 'h') drinkPotion();
+  else if (k === 'j') useTownScroll();
   else if (k === 'x') sellToMerchant();
   else if (k === 'q' || k === 'backspace') ascendStairs();
   else if (k === 'enter') retreat();

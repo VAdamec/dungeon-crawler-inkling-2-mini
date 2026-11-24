@@ -45,6 +45,7 @@
   <div class="stat">Turn <b id="turn"></b></div>
   <div class="stat">Gold <b id="gold"></b></div>
   <div class="stat">Potions <b id="potions"></b></div>
+  <div class="stat">Scrolls <b id="scrolls"></b></div>
   <div class="stat">Key <b id="keyStatus"></b></div>
   <div class="stat">Pos <b id="posText"></b></div>
   <div class="stat">Retreat <b id="retreatStatus"></b></div>
@@ -130,12 +131,13 @@
     <header class="help-header"><div><h2 id="helpTitle">Help &amp; settings</h2><p id="helpHint">Time pauses while this window is open.</p></div><button id="closeHelp" type="button" aria-label="Close help">Close (Esc)</button></header>
     <div class="help-content">
       <h3>Controls</h3>
-<div id="help">Arrows/WASD: move · Space: collect / buy / use stairs · H: drink potion · X: sell all gear<br>
+<div id="help">Arrows/WASD: move · Space: collect / buy / use stairs · H: drink potion · J: Town Scroll / return portal · X: sell all gear<br>
 Q/Backspace: ascend at ▲ · Enter: retreat · C/Esc: continue from health pause · R: restart<br>
 E: bow · F: Fireball (8 MP) · G: Heal (12 MP) · V: Frostbolt · B: Greater Heal · Z: Magic Barrier (knocks a foe back, or slams it into a wall). Learn spells from tomes; each has its own cooldown. MP slowly returns when no fight is near.<br>
-      Defeated bosses join as tiny companions. They chip in for 1 damage and make dry remarks about traps, retreats, shopping sprees, and rescues.<br>
-Find a monster’s key to unlock ▼. Space collects keys. Avoid fire, falling rocks, and hidden spikes.<br>
-Potions are stored. Low HP pauses time; critical HP offers retreat. Retreat has a 60s active cooldown. Rest away from enemies to heal.</div>
+      A huge, sarcastic cat named Marmalade waits near the dungeon gate. Press Space beside it to recruit it before your first descent, or it joins automatically when you enter. It follows you for meat and money for its wife and children, prefers bats, and deals only 1 damage (2 against bats). Defeated bosses later join as tiny companions, follow beside you, light nearby fog, chip in for 1 damage, and make dry remarks about traps, retreats, shopping sprees, and rescues.<br>
+      Runs begin in a fully visible town with grass, sand roads, trees, huts, and wandering cats, dogs, and chickens. Space at the Inn restores HP/MP, Space at the Store buys gear, Space by a villager starts a chat, and Space at the gate enters the dungeon, or returns through an open Town Scroll portal. Dungeon timers stop while you are in town.<br>
+Find a monster’s key to unlock ▼. Space collects keys. Space on ▲ ascends; on depth 1 it returns to town. Avoid fire, falling rocks, and hidden spikes.<br>
+Potions are stored. Low HP pauses time; critical HP offers retreat to town, which saves the exact dungeon spot for the gate. Retreat has a 60s active cooldown. Rest away from enemies to heal. A Town Scroll opens a one-use return portal; press J again at the town gate to go back once.</div>
 <div id="audioControls">
   <button id="audioToggle" type="button" aria-pressed="true">Sound: on (M)</button>
   <label for="musicVolume">Music <input id="musicVolume" type="range" min="0" max="100" value="45"> <output id="musicVolumeText" for="musicVolume">45%</output></label>
