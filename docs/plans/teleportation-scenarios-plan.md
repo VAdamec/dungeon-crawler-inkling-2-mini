@@ -1,161 +1,92 @@
-# Teleportation Scenarios Plan
+# Teleportation Scenarios Plan (Corrected)
 
-## Current State Analysis
+Status: corrected design for the next debug/verification iteration. No implementation yet.
 
-Based on my analysis of `js/game.js`, I understand that:
-1. **Town teleportation is handled through Town Scrolls** (`useTownScroll()` function)
-2. **The system tracks return points in `state.townExit`** and portal status in `state.townPortalOpen`
-3. **Players can use scrolls to create a return portal at the town gate**
-4. **There are different mechanisms for returning to town: retreat, scrolls, or entering from town**
+## What already exists
 
-## Current Teleportation System Components
+Most scenario coverage requested in the earlier draft is already present in `tests/game.test.cjs`. Do not duplicate these tests:
 
-### Key Functions:
-1. **`useTownScroll()`** - Consumes scroll and creates portal
-2. **`returnThroughTownPortal()`** - Uses existing portal to return
-3. **`enterDungeonFromTown()`** - Handles portal-based return logic
-4. **`safeTownExitTile()`** - Validates and finds safe return tiles
-5. **`confirmRetreat()`** - Retreats to town with cooldown
+- Town Scroll is a real loot item: `ITEM_TABLE` entry with `kind: 'scroll'`, `minDepth: 1`, `lootWeight: 1`; `lootPool()` includes it.
+- Town Store stock includes Town Scroll via `townStoreStock()`.
+- Buying and finding scrolls increments `state.townScrolls` and does not mix with potions.
+- `J` in the dungeon consumes one scroll, saves `{ depth, x, y, reason: 'scroll' }` in `state.townExit`, opens the portal, and calls `enterTown()`.
+- `J`/Space at the gate returns through the portal to the exact saved tile.
+- A second scroll is not consumed while a portal is already open.
+- The portal survives dungeon travel.
+- The saved floor is reused instead of regenerated.
+- Blocked exit tiles resolve through `safeTownExitTile()`.
+- Retreat closes an open portal, stores `{ reason: 'retreat' }`, applies the 60-second active-time cooldown, and returns to town with full HP.
+- Portal state clears on retreat, death, ending, and restart.
+- HUD/help text already describes scroll and portal state.
 
-### State Variables:
-- `state.townExit` - Tracks return point (depth, x, y, reason)
-- `state.townPortalOpen` - Boolean tracking portal status
-- `state.townScrolls` - Count of available scrolls
+Current key functions: `useTownScroll()`, `returnThroughTownPortal()`, `enterDungeonFromTown()`, `safeTownExitTile()`, `clearTownReturn()`, `confirmRetreat()`, `townInteract()`.
 
-## Town Scroll Availability Check
+## Single-portal rule to preserve
 
-From examining the code, I can see that:
-1. **Town Scrolls are defined in ITEM_TABLE** (line 30) with `kind: 'scroll'` and `scroll: 'town'`
-2. **They appear in loot pools** via `lootPool()` function which filters items by depth
-3. **They're available for purchase at the town merchant** through the `buyFromMerchant()` function  
-4. **They can be found as treasure drops** in the `treasureAt()` function
+There can be at most one return point and one portal at a time:
 
-## Implementation Plan
+- `state.townExit` holds one `{ depth, x, y, reason }` object.
+- `state.townPortalOpen` is the boolean gate for the open portal.
+- Any action that would create a new portal while one is open must refuse without consuming a scroll and without overwriting `state.townExit`.
+- `confirmRetreat()` may replace a scroll/debug portal with a retreat return point, but must close the portal first and log the collapse as it does today.
+- Death, ending, restart, and successful return call `clearTownReturn()`.
 
-### Phase 1: Verify Town Scroll Availability
+## Debug commands to add
 
-Check that Town Scrolls are properly integrated:
-- Confirm they appear in loot pools (lootWeight: 1)
-- Verify they're available for purchase from merchants (minDepth: 1) 
-- Test drop mechanics through `treasureAt()` function
+Add two console-only commands in `submitConsole()` and include them in both `openConsole()`’s startup line and the `help` response.
 
-### Phase 2: Add Teleport Cheat Command
+### `teleportTown`
 
-Add "teleportTown" command to console for better testing:
+Decision: `teleportTown` is a **free Town Scroll-style debug shortcut that creates a return point**. It does not consume a Town Scroll and does not act like a retreat.
 
-```javascript
-// In submitConsole function, add:
-else if (command === 'teleporttown') {
-  enterTown();
-  log('Teleported to town.');
-}
-```
+Behavior:
 
-### Phase 3: Enhanced Testing Framework
+- Parse as `command === 'teleporttown'`; display as `teleportTown`.
+- Require `state.started`, dungeon area, and no gameOver/ending/help/pause/cinematic state. If already in town, report `Already in town.` and change nothing.
+- If `state.townPortalOpen`, report `A town portal is already open; return through it first.` and change nothing. This preserves the single-portal rule.
+- Otherwise:
+  - save `{ depth: state.depth, x: state.player.x, y: state.player.y, reason: 'cheat' }` into `state.townExit`;
+  - set `state.townPortalOpen = true`;
+  - play the magic sound;
+  - call `enterTown()`;
+  - log a short debug-portal message and `consoleMessage('Teleported to town; debug portal open.')`;
+  - `render()`.
+- Do not restore HP/MP, do not change `retreatReadyAt`, and do not consume `state.townScrolls`.
+- Extend `enterDungeonFromTown()`’s return log so `reason === 'cheat'` reads as stepping back through the debug portal; do not add a new state field.
+- Existing `returnThroughTownPortal()` and `safeTownExitTile()` remain unchanged.
+- No new floor-save field; `townExit`/`townPortalOpen` stay transient.
 
-#### Add Comprehensive Teleportation Tests:
-1. **Scroll Availability Test**: Verify scrolls appear in loot pools
-2. **Merchant Stock Test**: Verify scrolls are available for purchase  
-3. **Portal Creation Test**: Test scroll usage and portal creation
-4. **Return Validation Test**: Test that return points are properly validated
-5. **Edge Case Tests**: Invalid tiles, concurrent portals, etc.
+### `addScrolls <count>`
 
-#### Add to Console Commands:
-```javascript
-// In submitConsole function, add new commands:
-else if (command === 'teleporttown') {
-  enterTown();
-  log('Teleported to town.');
-}
-else if (command === 'addscrolls') {
-  const count = parseInt(args[0]) || 1;
-  state.townScrolls += count;
-  log(`Added ${count} Town Scroll(s). You now have ${state.townScrolls}.`);
-}
-```
+- Parse with `Number(args[0])`; require `Number.isInteger(count) && count > 0`.
+- Reject empty, `0`, negative, fractional, `NaN`, and extra non-count input with `Usage: addScrolls <positive integer>` and no state change.
+- On success: `state.townScrolls += count`; `render()`; `consoleMessage('Added N Town Scroll(s); total M.')`.
+- Keep cheat feedback in the console and HUD; do not add the earlier proposed `logTeleportEvent()` runtime logging layer.
 
-### Phase 4: Enhanced Teleportation Logging
+## Tests to extend, not duplicate
 
-Add detailed logging to track teleportation events:
-```javascript
-function logTeleportEvent(event, details) {
-  const timestamp = new Date().toISOString();
-  console.log(`[TELEPORT ${timestamp}] ${event}:`, details);
-  // Add to game logs as well for debugging
-}
+Add only the gaps created by the new commands:
 
-// Use throughout teleportation functions:
-function useTownScroll() {
-  logTeleportEvent('USE_SCROLL', { 
-    depth: state.depth, 
-    x: state.player.x, 
-    y: state.player.y,
-    scrollsBefore: state.townScrolls 
-  });
-  // ... existing code ...
-}
-```
+1. `teleportTown` from dungeon creates exactly one portal
+   - `townExit.reason === 'cheat'`, exact saved depth/tile, `townPortalOpen === true`, scroll count unchanged, area is town.
+2. Second `teleportTown` while portal is open is rejected
+   - No scroll change, no overwrite of the saved tile.
+3. Return through the debug portal works via `J` and via Space at the gate
+   - Restores the exact floor/tile and clears both return fields.
+4. `teleportTown` is rejected in town and while gameOver/ending/pause
+   - State remains unchanged.
+5. `addScrolls 3` increments the HUD count and `#spellList`; `0`, `-1`, `1.5`, `abc`, and no argument are rejected without changing the count.
+6. Console help lists both commands.
+7. Existing town-scroll, retreat, cooldown, blocked-tile, death/ending/restart tests remain green.
 
-### Phase 5: Validate Town Scroll System
+## Files
 
-#### Check Implementation Details:
-1. **Loot Pool Generation**: Town scrolls are included in loot pools with `lootWeight: 1`
-2. **Merchant Stock**: Scrolls can be purchased from merchants at any depth (minDepth: 1)
-3. **Inventory Tracking**: `state.townScrolls` tracks how many the player has
-4. **Portal Management**: `townExit` and `townPortalOpen` state variables manage portal lifecycle
+- `js/game.js`: `openConsole()`, `submitConsole()`, `enterDungeonFromTown()` log branch, optional small helper such as `addTownScrolls(raw)`.
+- `index.html`: dev-console/help text may mention the new commands only if desired; the console help string is authoritative.
+- `tests/game.test.cjs`: add the focused tests above.
 
-### Phase 6: Test Coverage
+## Verification
 
-Create comprehensive test scenarios:
-1. **Normal Flow Test**: 
-   - Enter dungeon
-   - Find scroll in loot
-   - Use scroll to create portal
-   - Return through portal
-
-2. **Debug Flow Test**:
-   - Use `addScrolls` command
-   - Use `teleportTown` command
-   - Verify teleportation works without needing to find scrolls
-
-3. **Edge Case Tests**:
-   - Invalid return tiles
-   - Multiple portals  
-   - Town exit clearing
-
-## Testing Scenarios
-
-### Scenario 1: Normal Scroll Usage
-1. Player enters dungeon
-2. Finds Town Scroll in loot (treasureAt)
-3. Uses scroll via J key
-4. Portal opens at town gate
-5. Player returns to dungeon through portal
-
-### Scenario 2: Merchant Purchase
-1. Player enters town 
-2. Visits merchant
-3. Buys Town Scroll
-4. Uses scroll to create portal
-5. Returns to dungeon through portal
-
-### Scenario 3: Debug Testing
-1. Use `addscrolls` command to get scrolls
-2. Use `teleporttown` command to instantly return to town
-3. Test various teleportation scenarios without gameplay progression
-
-### Scenario 4: Invalid Tile Handling
-1. Create portal at valid location
-2. Block the return tile (monster, hazard, obstacle)
-3. Attempt to return through portal
-4. System should find alternative safe tile or fail gracefully
-
-## Expected Behavior Verification
-
-The teleportation system should:
-- Allow players to create portals with Town Scrolls
-- Validate return points and find alternatives when needed  
-- Handle multiple concurrent portals appropriately
-- Maintain proper cooldowns for retreat functionality
-- Provide clear feedback on portal status
-- Preserve game state during teleportation operations
+- `node --check js/game.js && node --check js/sprites.js`
+- `node --test tests/game.test.cjs`
+- Manual `file://` check: `~`, `loadLevel 2`, `addScrolls 1`, `teleportTown`, then `J` at the gate returns to the saved depth-2 tile.
