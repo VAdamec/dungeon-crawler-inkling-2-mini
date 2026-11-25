@@ -34,7 +34,7 @@ node docs/previews/2026-11-25-0x72/bake-runtime.cjs --out /tmp/dungeon-art-runti
 cmp js/art-runtime.js /tmp/dungeon-art-runtime.js
 ```
 
-The current bake is byte-identical to the generated runtime script. Do not hand-edit it. No build, package install, external image/font/audio service or relaxed browser file-access flag is needed to play.
+The current bake is byte-identical to the generated runtime script. Do not hand-edit it. No build, package install, external image/font/audio service or relaxed browser file-access flag is needed to play. The two imported 0x72 README copies retain their upstream final blank line to preserve source hashes; project-owned changes pass the whitespace check.
 
 ## Scope and checks
 

@@ -17,5 +17,6 @@
   "capture": "8 browser views, 18 transparent figures, nine-boss contact sheet; zero page/console errors or remote requests",
   "releaseZip": "five required runtime files; extracted bytes equal source; actual file:// Chrome player Help/focus/mobile/version checks pass",
   "nativeBackgroundTab": "UNVERIFIED \u2014 unchanged GR-09 exception",
-  "sourceArtAndGameplay": "unchanged in GR-10; only player Help copy and GAME_VERSION are authorized runtime edits"
+  "sourceArtAndGameplay": "unchanged in GR-10; only player Help copy and GAME_VERSION are authorized runtime edits",
+  "whitespace": "Project-owned staged diff passes. Two imported 0x72 README copies retain their upstream final blank line to preserve recorded source hashes."
 }
