@@ -2,6 +2,24 @@
 
 Versions below distinguish the current working build from committed releases. Entries summarize local source, plans and git history; dates are local commit/review dates. Intermediate working-version numbers are not reconstructed as releases.
 
+## 2.0.0 — 2026-11-25
+
+Integrated graphics release, with a concise player README/Help and separate player reference/developer documentation. Includes the required offline art payload; no install, server or runtime network dependency. **GR-09 native background-tab/minimize observation remains unverified**; the explicit visibility-handler fixture passing is not native validation.
+
+### Graphics and documentation
+
+- Completed GR-10 documentation: fresh integrated runtime/Help/mobile screenshots, 18 bestiary figures and nine-boss sheet, verified stat tables, credits/provenance, current offline load-order/bake guidance and artifact/hash ledger. GR-10 itself changes documentation, player Help and release branding; no game mechanics or source art changes. **GR-09 native background-tab/minimize verification remains unverified**; documentation completion does not close it. [GR-10 record](docs/reviews/2026-11-25-graphics-recovery/gr10/README.md).
+
+- GR-09 acceptance follow-up fixes live-monster foot alignment and unbounded duplicate canvases from continuous cinematic scaling; adds two regressions. Full browser/secrecy/state and paired performance evidence is recorded; native background-tab visibility remains unverified in automation. [GR-09 report](docs/reviews/2026-11-25-graphics-recovery/gr09/README.md).
+
+- Completed GR-08 cinematic audit: fitted/anchored boss portraits and defeats, authored dragon wings and princess run, rear-facing sunset hero with corrected tears, real skeleton guard collapse and unobscured defeat scenes. Guards now stop fighting after the king's collapse without extra rewards. Added eight regressions and file:// captures for all nine boss kinds/companions and six ending phases. [Audit and evidence](docs/reviews/2026-11-25-graphics-recovery/gr08/README.md).
+
+- Completed GR-07: removed duplicate procedural gait from prepared actors and stabilized feet; corrected vent/rock/spike visual states, animated spell phases and projectile orientation, separated Greater Heal art, kept projectile pixels under fog and enabled visible portal animation. Added seven regressions and file:// casts/trap/motion/secrecy checks. [GR-07 evidence](docs/reviews/2026-11-25-graphics-recovery/gr07/README.md).
+
+- Completed GR-05/06: fixed material-cache collisions behind fragmented dungeon floors/walls, matched approved wall corners, enabled prepared town terrain, and aligned bridge deck/banks, building doors and gate to existing interaction tiles.
+- Stabilized wall torch mounts while retaining animated flames; grounded world potions/items on their own floor tile without changing icon anchors or collision.
+- Verified 164 game tests, 27 preview tests, normal `file://` browser wall/town/portal scenarios and nine seeded before/after state comparisons. [Evidence and screenshots](docs/reviews/2026-11-25-graphics-recovery/gr0506/README.md). Wider graphics integration remains in progress; release branding is 2.0.0.
+
 ## 1.0.1 — 2026-11-24
 
 Wall readability patch on committed 1.0.0 (`0218989`). Runtime launch branding is now 1.0.1.

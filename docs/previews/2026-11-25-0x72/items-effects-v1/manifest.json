@@ -1,0 +1,2649 @@
+{
+  "version": 1,
+  "scope": "preview only",
+  "complete": true,
+  "missing": [],
+  "assets": [
+    {
+      "id": "sword",
+      "name": "sword",
+      "description": "Silver sword with brown grip",
+      "group": "equipment",
+      "sourceFrames": 1,
+      "columns": 1,
+      "maxVisible": [
+        24,
+        32
+      ],
+      "cell": 64,
+      "states": "static",
+      "sheet": "items-effects-v1/sword/sheet.png",
+      "anchor": [
+        32,
+        32
+      ],
+      "screenScale": 2,
+      "alphaCutoff": 64,
+      "sharedScale": 0.0415944540727903,
+      "nativeDirection": null,
+      "source": "generated-source.png",
+      "frames": [
+        {
+          "index": 0,
+          "label": "static",
+          "empty": false,
+          "file": "frames/0.png",
+          "crop": [
+            0,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 20,
+            "y": 17,
+            "width": 24,
+            "height": 30
+          },
+          "sourceCell": [
+            0,
+            0,
+            1536,
+            1024
+          ],
+          "sha256": "5efb759c4a9f76404719f8c5700360253bd92077f8826ec6825cfa79f34e4a65"
+        }
+      ],
+      "scope": "preview only; awaiting review"
+    },
+    {
+      "id": "bow",
+      "name": "bow",
+      "description": "Curved wooden bow with bowstring",
+      "group": "equipment",
+      "sourceFrames": 1,
+      "columns": 1,
+      "maxVisible": [
+        18,
+        32
+      ],
+      "cell": 64,
+      "states": "static",
+      "sheet": "items-effects-v1/bow/sheet.png",
+      "anchor": [
+        32,
+        32
+      ],
+      "screenScale": 2,
+      "alphaCutoff": 64,
+      "sharedScale": 0.037422037422037424,
+      "nativeDirection": null,
+      "source": "generated-source.png",
+      "frames": [
+        {
+          "index": 0,
+          "label": "static",
+          "empty": false,
+          "file": "frames/0.png",
+          "crop": [
+            0,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 23,
+            "y": 17,
+            "width": 18,
+            "height": 30
+          },
+          "sourceCell": [
+            0,
+            0,
+            1536,
+            1024
+          ],
+          "sha256": "82fbab392f448dbb6ffbbc05d9ba44c7d34df729b50abd815318c2d07d5e43e2"
+        }
+      ],
+      "scope": "preview only; awaiting review"
+    },
+    {
+      "id": "armor",
+      "name": "armor",
+      "description": "Brown leather and chainmail torso armor ONLY; no mannequin, stand, pedestal or person",
+      "group": "equipment",
+      "sourceFrames": 1,
+      "columns": 1,
+      "maxVisible": [
+        28,
+        30
+      ],
+      "cell": 64,
+      "states": "static",
+      "sheet": "items-effects-v1/armor/sheet.png",
+      "anchor": [
+        32,
+        32
+      ],
+      "screenScale": 2,
+      "alphaCutoff": 64,
+      "sharedScale": 0.03416856492027335,
+      "nativeDirection": null,
+      "source": "generated-source.png",
+      "frames": [
+        {
+          "index": 0,
+          "label": "static",
+          "empty": false,
+          "file": "frames/0.png",
+          "crop": [
+            0,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 20,
+            "y": 17,
+            "width": 24,
+            "height": 30
+          },
+          "sourceCell": [
+            0,
+            0,
+            1312,
+            1199
+          ],
+          "sha256": "38c4331d76775db5073da7f421ac96fe537c8507163eab3dc12106362cfae821"
+        }
+      ],
+      "scope": "preview only; awaiting review"
+    },
+    {
+      "id": "helmet",
+      "name": "helmet",
+      "description": "Steel closed knight helmet with dark visor",
+      "group": "equipment",
+      "sourceFrames": 1,
+      "columns": 1,
+      "maxVisible": [
+        26,
+        26
+      ],
+      "cell": 64,
+      "states": "static",
+      "sheet": "items-effects-v1/helmet/sheet.png",
+      "anchor": [
+        32,
+        32
+      ],
+      "screenScale": 2,
+      "alphaCutoff": 64,
+      "sharedScale": 0.03363518758085381,
+      "nativeDirection": null,
+      "source": "generated-source.png",
+      "frames": [
+        {
+          "index": 0,
+          "label": "static",
+          "empty": false,
+          "file": "frames/0.png",
+          "crop": [
+            0,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 22,
+            "y": 19,
+            "width": 20,
+            "height": 26
+          },
+          "sourceCell": [
+            0,
+            0,
+            1312,
+            1199
+          ],
+          "sha256": "b52613dd94c1bc2ae940149eccd4ce2bc9dff7c4d6b86d88bcc4f3f1e94316f8"
+        }
+      ],
+      "scope": "preview only; awaiting review"
+    },
+    {
+      "id": "shield",
+      "name": "shield",
+      "description": "Steel pointed shield with pale heraldic lion",
+      "group": "equipment",
+      "sourceFrames": 1,
+      "columns": 1,
+      "maxVisible": [
+        24,
+        30
+      ],
+      "cell": 64,
+      "states": "static",
+      "sheet": "items-effects-v1/shield/sheet.png",
+      "anchor": [
+        32,
+        32
+      ],
+      "screenScale": 2,
+      "alphaCutoff": 64,
+      "sharedScale": 0.037267080745341616,
+      "nativeDirection": null,
+      "source": "generated-source.png",
+      "frames": [
+        {
+          "index": 0,
+          "label": "static",
+          "empty": false,
+          "file": "frames/0.png",
+          "crop": [
+            0,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 21,
+            "y": 17,
+            "width": 22,
+            "height": 30
+          },
+          "sourceCell": [
+            0,
+            0,
+            1312,
+            1199
+          ],
+          "sha256": "e6abb480ba327dc604bc53feddcaa96d4df0935a2bd631aa55ab5aa6857c26cf"
+        }
+      ],
+      "scope": "preview only; awaiting review"
+    },
+    {
+      "id": "ring",
+      "name": "ring",
+      "description": "Gold ring with dark blue gem",
+      "group": "equipment",
+      "sourceFrames": 1,
+      "columns": 1,
+      "maxVisible": [
+        24,
+        18
+      ],
+      "cell": 64,
+      "states": "static",
+      "sheet": "items-effects-v1/ring/sheet.png",
+      "anchor": [
+        32,
+        32
+      ],
+      "screenScale": 2,
+      "alphaCutoff": 64,
+      "sharedScale": 0.0391304347826087,
+      "nativeDirection": null,
+      "source": "generated-source.png",
+      "frames": [
+        {
+          "index": 0,
+          "label": "static",
+          "empty": false,
+          "file": "frames/0.png",
+          "crop": [
+            0,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 22,
+            "y": 23,
+            "width": 20,
+            "height": 18
+          },
+          "sourceCell": [
+            0,
+            0,
+            1536,
+            1024
+          ],
+          "sha256": "671959b337b779ae3735f9ca32989786a89089133ea9d8d9dbe47489ea460901"
+        }
+      ],
+      "scope": "preview only; awaiting review"
+    },
+    {
+      "id": "potion",
+      "name": "potion",
+      "description": "Red health potion in stoppered glass bottle",
+      "group": "loot",
+      "sourceFrames": 1,
+      "columns": 1,
+      "maxVisible": [
+        18,
+        24
+      ],
+      "cell": 64,
+      "states": "static",
+      "sheet": "items-effects-v1/potion/sheet.png",
+      "anchor": [
+        32,
+        32
+      ],
+      "screenScale": 2,
+      "alphaCutoff": 64,
+      "sharedScale": 0.034934497816593885,
+      "nativeDirection": null,
+      "source": "generated-source.png",
+      "frames": [
+        {
+          "index": 0,
+          "label": "static",
+          "empty": false,
+          "file": "frames/0.png",
+          "crop": [
+            0,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 24,
+            "y": 20,
+            "width": 16,
+            "height": 24
+          },
+          "sourceCell": [
+            0,
+            0,
+            1263,
+            1245
+          ],
+          "sha256": "09a1f7a541de45542dfd3225ac54603e368c3aac07088054e17a18d49308c725"
+        }
+      ],
+      "scope": "preview only; awaiting review"
+    },
+    {
+      "id": "elixir",
+      "name": "elixir",
+      "description": "Blue violet elixir in distinctive angular glass bottle",
+      "group": "loot",
+      "sourceFrames": 1,
+      "columns": 1,
+      "maxVisible": [
+        18,
+        24
+      ],
+      "cell": 64,
+      "states": "static",
+      "sheet": "items-effects-v1/elixir/sheet.png",
+      "anchor": [
+        32,
+        32
+      ],
+      "screenScale": 2,
+      "alphaCutoff": 64,
+      "sharedScale": 0.031209362808842653,
+      "nativeDirection": null,
+      "source": "generated-source.png",
+      "frames": [
+        {
+          "index": 0,
+          "label": "static",
+          "empty": false,
+          "file": "frames/0.png",
+          "crop": [
+            0,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 25,
+            "y": 20,
+            "width": 14,
+            "height": 24
+          },
+          "sourceCell": [
+            0,
+            0,
+            1261,
+            1247
+          ],
+          "sha256": "0444b4476fadc992a5e8a8fc1393a1c61a065bf229455e535326c217195f875e"
+        }
+      ],
+      "scope": "preview only; awaiting review"
+    },
+    {
+      "id": "townScroll",
+      "name": "townScroll",
+      "description": "Rolled parchment bound with red ribbon",
+      "group": "loot",
+      "sourceFrames": 1,
+      "columns": 1,
+      "maxVisible": [
+        28,
+        18
+      ],
+      "cell": 64,
+      "states": "static",
+      "sheet": "items-effects-v1/townScroll/sheet.png",
+      "anchor": [
+        32,
+        32
+      ],
+      "screenScale": 2,
+      "alphaCutoff": 64,
+      "sharedScale": 0.02903225806451613,
+      "nativeDirection": null,
+      "source": "generated-source.png",
+      "frames": [
+        {
+          "index": 0,
+          "label": "static",
+          "empty": false,
+          "file": "frames/0.png",
+          "crop": [
+            0,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 23,
+            "y": 23,
+            "width": 18,
+            "height": 18
+          },
+          "sourceCell": [
+            0,
+            0,
+            1536,
+            1024
+          ],
+          "sha256": "2aad22d09d88f8c1a3f16e7f5e3d20f579fbd079a00d59f9f4d042bf0393ecfe"
+        }
+      ],
+      "scope": "preview only; awaiting review"
+    },
+    {
+      "id": "key",
+      "name": "key",
+      "description": "Old bronze dungeon key",
+      "group": "loot",
+      "sourceFrames": 1,
+      "columns": 1,
+      "maxVisible": [
+        22,
+        28
+      ],
+      "cell": 64,
+      "states": "static",
+      "sheet": "items-effects-v1/key/sheet.png",
+      "anchor": [
+        32,
+        32
+      ],
+      "screenScale": 2,
+      "alphaCutoff": 64,
+      "sharedScale": 0.03666666666666667,
+      "nativeDirection": null,
+      "source": "generated-source.png",
+      "frames": [
+        {
+          "index": 0,
+          "label": "static",
+          "empty": false,
+          "file": "frames/0.png",
+          "crop": [
+            0,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 21,
+            "y": 20,
+            "width": 22,
+            "height": 24
+          },
+          "sourceCell": [
+            0,
+            0,
+            1536,
+            1024
+          ],
+          "sha256": "79e47233bb527c5dadf423ca6bc172ef4f6a5f2133cfd4de2baea8502f6095d9"
+        }
+      ],
+      "scope": "preview only; awaiting review"
+    },
+    {
+      "id": "chest",
+      "name": "chest",
+      "description": "Wood and gold ordinary treasure chest, NEVER eyes, teeth, tongue or limbs",
+      "group": "loot",
+      "sourceFrames": 4,
+      "columns": 2,
+      "maxVisible": [
+        32,
+        28
+      ],
+      "cell": 64,
+      "states": "closed; lid opening; fully open full of gold; fully open empty",
+      "sheet": "items-effects-v1/chest/sheet.png",
+      "anchor": [
+        32,
+        32
+      ],
+      "screenScale": 2,
+      "alphaCutoff": 64,
+      "sharedScale": 0.06862745098039216,
+      "nativeDirection": null,
+      "source": "generated-source.png",
+      "frames": [
+        {
+          "index": 0,
+          "label": "closed",
+          "empty": false,
+          "file": "frames/0.png",
+          "crop": [
+            0,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 22,
+            "y": 25,
+            "width": 21,
+            "height": 21
+          },
+          "sourceCell": [
+            0,
+            0,
+            639,
+            615
+          ],
+          "sha256": "953de3c5345e32c9eef38851d5ec1ad8d2f0def9c34208259edbbf9c313f26a8"
+        },
+        {
+          "index": 1,
+          "label": "lid opening",
+          "empty": false,
+          "file": "frames/1.png",
+          "crop": [
+            64,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 19,
+            "y": 23,
+            "width": 22,
+            "height": 23
+          },
+          "sourceCell": [
+            639,
+            0,
+            639,
+            615
+          ],
+          "sha256": "6eb04c34927d247aa51b12d6ad2f747f1ab16809fb590bc4c47d7470fc91d9dd"
+        },
+        {
+          "index": 2,
+          "label": "fully open full of gold",
+          "empty": false,
+          "file": "frames/2.png",
+          "crop": [
+            128,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 22,
+            "y": 18,
+            "width": 23,
+            "height": 26
+          },
+          "sourceCell": [
+            0,
+            615,
+            639,
+            615
+          ],
+          "sha256": "9cc031b084a7c5f7a28d6689e247f4cc044cb7d7107963a8a37830952976bb04"
+        },
+        {
+          "index": 3,
+          "label": "fully open empty",
+          "empty": false,
+          "file": "frames/3.png",
+          "crop": [
+            192,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 19,
+            "y": 18,
+            "width": 23,
+            "height": 26
+          },
+          "sourceCell": [
+            639,
+            615,
+            639,
+            615
+          ],
+          "sha256": "fad578b71f22281758f18c62156591de2e048dae772ec9f4af81540fec5d469a"
+        }
+      ],
+      "scope": "preview only; awaiting review"
+    },
+    {
+      "id": "spellbook",
+      "name": "spellbook",
+      "description": "Brown leather generic spellbook with gold rune",
+      "group": "books",
+      "sourceFrames": 1,
+      "columns": 1,
+      "maxVisible": [
+        28,
+        24
+      ],
+      "cell": 64,
+      "states": "static",
+      "sheet": "items-effects-v1/spellbook/sheet.png",
+      "anchor": [
+        32,
+        32
+      ],
+      "screenScale": 2,
+      "alphaCutoff": 64,
+      "sharedScale": 0.03709428129829984,
+      "nativeDirection": null,
+      "source": "generated-source.png",
+      "frames": [
+        {
+          "index": 0,
+          "label": "static",
+          "empty": false,
+          "file": "frames/0.png",
+          "crop": [
+            0,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 20,
+            "y": 20,
+            "width": 24,
+            "height": 24
+          },
+          "sourceCell": [
+            0,
+            0,
+            1536,
+            1024
+          ],
+          "sha256": "413d26ed1591d1db4f413a5c557cf3e97766e5f6332714b672efbe517a051675"
+        }
+      ],
+      "scope": "preview only; awaiting review"
+    },
+    {
+      "id": "frostboltTome",
+      "name": "frostboltTome",
+      "description": "Icy blue spellbook with snowflake emblem",
+      "group": "books",
+      "sourceFrames": 1,
+      "columns": 1,
+      "maxVisible": [
+        28,
+        24
+      ],
+      "cell": 64,
+      "states": "static",
+      "sheet": "items-effects-v1/frostboltTome/sheet.png",
+      "anchor": [
+        32,
+        32
+      ],
+      "screenScale": 2,
+      "alphaCutoff": 64,
+      "sharedScale": 0.037209302325581395,
+      "nativeDirection": null,
+      "source": "generated-source.png",
+      "frames": [
+        {
+          "index": 0,
+          "label": "static",
+          "empty": false,
+          "file": "frames/0.png",
+          "crop": [
+            0,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 20,
+            "y": 20,
+            "width": 24,
+            "height": 24
+          },
+          "sourceCell": [
+            0,
+            0,
+            1536,
+            1024
+          ],
+          "sha256": "ba418120d87eb06cdeaa3d235e45c61437fe246e40454a7582da703086e89352"
+        }
+      ],
+      "scope": "preview only; awaiting review"
+    },
+    {
+      "id": "greaterHealTome",
+      "name": "greaterHealTome",
+      "description": "Ivory spellbook with gold healing sun emblem",
+      "group": "books",
+      "sourceFrames": 1,
+      "columns": 1,
+      "maxVisible": [
+        28,
+        24
+      ],
+      "cell": 64,
+      "states": "static",
+      "sheet": "items-effects-v1/greaterHealTome/sheet.png",
+      "anchor": [
+        32,
+        32
+      ],
+      "screenScale": 2,
+      "alphaCutoff": 64,
+      "sharedScale": 0.038461538461538464,
+      "nativeDirection": null,
+      "source": "generated-source.png",
+      "frames": [
+        {
+          "index": 0,
+          "label": "static",
+          "empty": false,
+          "file": "frames/0.png",
+          "crop": [
+            0,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 20,
+            "y": 20,
+            "width": 24,
+            "height": 24
+          },
+          "sourceCell": [
+            0,
+            0,
+            1536,
+            1024
+          ],
+          "sha256": "838db882a7b4447d095b668148e5e33217b023eaac30f354245422b4cb171f02"
+        }
+      ],
+      "scope": "preview only; awaiting review"
+    },
+    {
+      "id": "barrierTome",
+      "name": "barrierTome",
+      "description": "Purple spellbook with geometric violet rune",
+      "group": "books",
+      "sourceFrames": 1,
+      "columns": 1,
+      "maxVisible": [
+        28,
+        24
+      ],
+      "cell": 64,
+      "states": "static",
+      "sheet": "items-effects-v1/barrierTome/sheet.png",
+      "anchor": [
+        32,
+        32
+      ],
+      "screenScale": 2,
+      "alphaCutoff": 64,
+      "sharedScale": 0.037037037037037035,
+      "nativeDirection": null,
+      "source": "generated-source.png",
+      "frames": [
+        {
+          "index": 0,
+          "label": "static",
+          "empty": false,
+          "file": "frames/0.png",
+          "crop": [
+            0,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 20,
+            "y": 20,
+            "width": 24,
+            "height": 24
+          },
+          "sourceCell": [
+            0,
+            0,
+            1536,
+            1024
+          ],
+          "sha256": "74ad35ec636ba0ef692801ac2919d95754f3d23d5c50e397446298c78574abb9"
+        }
+      ],
+      "scope": "preview only; awaiting review"
+    },
+    {
+      "id": "arrowFX",
+      "name": "arrowFX",
+      "description": "Single small wooden arrow pointing RIGHT, steel tip at right, feathers left",
+      "group": "projectiles",
+      "sourceFrames": 1,
+      "columns": 1,
+      "maxVisible": [
+        28,
+        8
+      ],
+      "cell": 64,
+      "states": "static",
+      "sheet": "items-effects-v1/arrowFX/sheet.png",
+      "anchor": [
+        32,
+        32
+      ],
+      "screenScale": 2,
+      "alphaCutoff": 64,
+      "sharedScale": 0.037889039242219216,
+      "nativeDirection": "right",
+      "source": "generated-source.png",
+      "frames": [
+        {
+          "index": 0,
+          "label": "static",
+          "empty": false,
+          "file": "frames/0.png",
+          "crop": [
+            0,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 18,
+            "y": 29,
+            "width": 28,
+            "height": 6
+          },
+          "sourceCell": [
+            0,
+            0,
+            2172,
+            724
+          ],
+          "sha256": "9f408672053197fd50ed551a5f616f8536d8e8578265a9e756bed1f6da4c8153"
+        }
+      ],
+      "scope": "preview only; awaiting review"
+    },
+    {
+      "id": "stingerFX",
+      "name": "stingerFX",
+      "description": "Single tiny wasp venom dart/barb pointing RIGHT, pointed dark amber tip at right, subtle green venom. A dart only, NEVER a whole wasp, wings, legs, insect or face",
+      "group": "projectiles",
+      "sourceFrames": 1,
+      "columns": 1,
+      "maxVisible": [
+        14,
+        6
+      ],
+      "cell": 64,
+      "states": "static",
+      "sheet": "items-effects-v1/stingerFX/sheet.png",
+      "anchor": [
+        32,
+        32
+      ],
+      "screenScale": 2,
+      "alphaCutoff": 64,
+      "sharedScale": 0.0213089802130898,
+      "nativeDirection": "right",
+      "source": "generated-source.png",
+      "frames": [
+        {
+          "index": 0,
+          "label": "static",
+          "empty": false,
+          "file": "frames/0.png",
+          "crop": [
+            0,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 25,
+            "y": 30,
+            "width": 13,
+            "height": 4
+          },
+          "sourceCell": [
+            0,
+            0,
+            1774,
+            887
+          ],
+          "sha256": "8a3ee16b6e1754ca09af103aa94b12a5f29d1d833910e439fb9fa90f883d9058"
+        }
+      ],
+      "scope": "preview only; awaiting review"
+    },
+    {
+      "id": "boneFX",
+      "name": "boneFX",
+      "description": "Single thrown ivory bone, no skeleton or hand",
+      "group": "projectiles",
+      "sourceFrames": 1,
+      "columns": 1,
+      "maxVisible": [
+        22,
+        12
+      ],
+      "cell": 64,
+      "states": "static",
+      "sheet": "items-effects-v1/boneFX/sheet.png",
+      "anchor": [
+        32,
+        32
+      ],
+      "screenScale": 2,
+      "alphaCutoff": 64,
+      "sharedScale": 0.022018348623853212,
+      "nativeDirection": "right",
+      "source": "generated-source.png",
+      "frames": [
+        {
+          "index": 0,
+          "label": "static",
+          "empty": false,
+          "file": "frames/0.png",
+          "crop": [
+            0,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 26,
+            "y": 26,
+            "width": 12,
+            "height": 12
+          },
+          "sourceCell": [
+            0,
+            0,
+            1536,
+            1024
+          ],
+          "sha256": "c6ee7362db302d3b5a4b85b69199f63f7000527a8b1b6007370d91ccd94ca187"
+        }
+      ],
+      "scope": "preview only; awaiting review"
+    },
+    {
+      "id": "beerFX",
+      "name": "beerFX",
+      "description": "Single small wooden foaming beer tankard in flight, no person or hand",
+      "group": "projectiles",
+      "sourceFrames": 1,
+      "columns": 1,
+      "maxVisible": [
+        18,
+        22
+      ],
+      "cell": 64,
+      "states": "static",
+      "sheet": "items-effects-v1/beerFX/sheet.png",
+      "anchor": [
+        32,
+        32
+      ],
+      "screenScale": 2,
+      "alphaCutoff": 64,
+      "sharedScale": 0.03125,
+      "nativeDirection": "right",
+      "source": "generated-source.png",
+      "frames": [
+        {
+          "index": 0,
+          "label": "static",
+          "empty": false,
+          "file": "frames/0.png",
+          "crop": [
+            0,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 23,
+            "y": 24,
+            "width": 18,
+            "height": 16
+          },
+          "sourceCell": [
+            0,
+            0,
+            1536,
+            1024
+          ],
+          "sha256": "d3a6599354beeec01b6e1500e1c5042ddf1cc94802d85856d5fbd0689f034ff5"
+        }
+      ],
+      "scope": "preview only; awaiting review"
+    },
+    {
+      "id": "fireballFX",
+      "name": "fireballFX",
+      "description": "Rightward orange fireball, bright head RIGHT, tapered flame trail LEFT",
+      "group": "projectiles",
+      "sourceFrames": 4,
+      "columns": 2,
+      "maxVisible": [
+        32,
+        18
+      ],
+      "cell": 64,
+      "states": "four looping flame shapes, all RIGHTWARD, same head position",
+      "sheet": "items-effects-v1/fireballFX/sheet.png",
+      "anchor": [
+        32,
+        32
+      ],
+      "screenScale": 2,
+      "alphaCutoff": 64,
+      "sharedScale": 0.07960199004975124,
+      "nativeDirection": "right",
+      "source": "generated-source.png",
+      "frames": [
+        {
+          "index": 0,
+          "label": "four looping flame shapes, all RIGHTWARD, same head position",
+          "empty": false,
+          "file": "frames/0.png",
+          "crop": [
+            0,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 21,
+            "y": 28,
+            "width": 26,
+            "height": 11
+          },
+          "sourceCell": [
+            0,
+            0,
+            634,
+            621
+          ],
+          "sha256": "66206122d2204538c5194f826fa79371cacab826a03debc3e6d22f695616d602"
+        },
+        {
+          "index": 1,
+          "label": "phase 1",
+          "empty": false,
+          "file": "frames/1.png",
+          "crop": [
+            64,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 17,
+            "y": 27,
+            "width": 30,
+            "height": 13
+          },
+          "sourceCell": [
+            634,
+            0,
+            634,
+            621
+          ],
+          "sha256": "f619bf0d8eed21cc342b493985b3defe6b5a5befba57ea8ec7c2ddb4f0cdbe63"
+        },
+        {
+          "index": 2,
+          "label": "phase 2",
+          "empty": false,
+          "file": "frames/2.png",
+          "crop": [
+            128,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 17,
+            "y": 23,
+            "width": 31,
+            "height": 16
+          },
+          "sourceCell": [
+            0,
+            621,
+            634,
+            620
+          ],
+          "sha256": "3d6777101bb83427a435efeeb7a48175db914dd1bdb7aa9544c37e64bc64ad8a"
+        },
+        {
+          "index": 3,
+          "label": "phase 3",
+          "empty": false,
+          "file": "frames/3.png",
+          "crop": [
+            192,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 16,
+            "y": 26,
+            "width": 31,
+            "height": 12
+          },
+          "sourceCell": [
+            634,
+            621,
+            634,
+            620
+          ],
+          "sha256": "4d7268fccbc128f9e68f6e9650ed7848cdac873ff5c8e7b5a9df640ab70ace32"
+        }
+      ],
+      "scope": "preview only; awaiting review"
+    },
+    {
+      "id": "frostboltFX",
+      "name": "frostboltFX",
+      "description": "Rightward icy blue magical dart, sharp bright head RIGHT and tapered cold trail LEFT",
+      "group": "projectiles",
+      "sourceFrames": 4,
+      "columns": 2,
+      "maxVisible": [
+        32,
+        16
+      ],
+      "cell": 64,
+      "states": "four looping ice shimmer shapes, all RIGHTWARD, same head position",
+      "sheet": "items-effects-v1/frostboltFX/sheet.png",
+      "anchor": [
+        32,
+        32
+      ],
+      "screenScale": 2,
+      "alphaCutoff": 64,
+      "sharedScale": 0.05351170568561873,
+      "nativeDirection": "right",
+      "source": "generated-source.png",
+      "frames": [
+        {
+          "index": 0,
+          "label": "four looping ice shimmer shapes, all RIGHTWARD, same head position",
+          "empty": false,
+          "file": "frames/0.png",
+          "crop": [
+            0,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 16,
+            "y": 28,
+            "width": 32,
+            "height": 9
+          },
+          "sourceCell": [
+            0,
+            0,
+            887,
+            444
+          ],
+          "sha256": "de7b764f5a96ce5c97f8864ef13325ae0dc7ba55d80340b3b77246a1dd4f3379"
+        },
+        {
+          "index": 1,
+          "label": "phase 1",
+          "empty": false,
+          "file": "frames/1.png",
+          "crop": [
+            64,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 19,
+            "y": 29,
+            "width": 29,
+            "height": 8
+          },
+          "sourceCell": [
+            887,
+            0,
+            887,
+            444
+          ],
+          "sha256": "f3af1e8bb025deec16b437973cd6332297aaea484f50fb6a3c75b9bd92b054dc"
+        },
+        {
+          "index": 2,
+          "label": "phase 2",
+          "empty": false,
+          "file": "frames/2.png",
+          "crop": [
+            128,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 19,
+            "y": 28,
+            "width": 29,
+            "height": 9
+          },
+          "sourceCell": [
+            0,
+            444,
+            887,
+            443
+          ],
+          "sha256": "bf7079c339ddbb1eac7c8d7abeff1afa0838c2e3a16cb1310094ca1bdb928b61"
+        },
+        {
+          "index": 3,
+          "label": "phase 3",
+          "empty": false,
+          "file": "frames/3.png",
+          "crop": [
+            192,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 20,
+            "y": 29,
+            "width": 28,
+            "height": 8
+          },
+          "sourceCell": [
+            887,
+            444,
+            887,
+            443
+          ],
+          "sha256": "022f8688b08091ed2f13680c947fb45f63c55ee84275913955df70f61d00007e"
+        }
+      ],
+      "scope": "preview only; awaiting review"
+    },
+    {
+      "id": "healFX",
+      "name": "healFX",
+      "description": "Modest green and gold healing motes rising from a small ground ring; no character",
+      "group": "spells",
+      "sourceFrames": 4,
+      "columns": 2,
+      "maxVisible": [
+        36,
+        30
+      ],
+      "cell": 128,
+      "states": "small ring; rising green motes; brighter green gold ring; fading motes",
+      "sheet": "items-effects-v1/healFX/sheet.png",
+      "anchor": [
+        64,
+        64
+      ],
+      "screenScale": 2,
+      "alphaCutoff": 64,
+      "sharedScale": 0.11428571428571428,
+      "nativeDirection": null,
+      "source": "generated-source.png",
+      "frames": [
+        {
+          "index": 0,
+          "label": "small ring",
+          "empty": false,
+          "file": "frames/0.png",
+          "crop": [
+            0,
+            0,
+            128,
+            128
+          ],
+          "bounds": {
+            "x": 51,
+            "y": 70,
+            "width": 29,
+            "height": 9
+          },
+          "sourceCell": [
+            0,
+            0,
+            631,
+            624
+          ],
+          "sha256": "4b3a0e402f2b61122539be877f672957a958ee3b4a1510e6ffefe8d633b16a09"
+        },
+        {
+          "index": 1,
+          "label": "rising green motes",
+          "empty": false,
+          "file": "frames/1.png",
+          "crop": [
+            128,
+            0,
+            128,
+            128
+          ],
+          "bounds": {
+            "x": 48,
+            "y": 53,
+            "width": 29,
+            "height": 26
+          },
+          "sourceCell": [
+            631,
+            0,
+            630,
+            624
+          ],
+          "sha256": "c1e11bb750ed13665f6902053143025b871796d0608113a041f9c0cc3f51ac26"
+        },
+        {
+          "index": 2,
+          "label": "brighter green gold ring",
+          "empty": false,
+          "file": "frames/2.png",
+          "crop": [
+            256,
+            0,
+            128,
+            128
+          ],
+          "bounds": {
+            "x": 50,
+            "y": 49,
+            "width": 30,
+            "height": 29
+          },
+          "sourceCell": [
+            0,
+            624,
+            631,
+            623
+          ],
+          "sha256": "1f703f049eaa6b326e6cfa22a6f93e75c2618b63bb7d2357e6bf741002b5547e"
+        },
+        {
+          "index": 3,
+          "label": "fading motes",
+          "empty": false,
+          "file": "frames/3.png",
+          "crop": [
+            384,
+            0,
+            128,
+            128
+          ],
+          "bounds": {
+            "x": 48,
+            "y": 54,
+            "width": 29,
+            "height": 24
+          },
+          "sourceCell": [
+            631,
+            624,
+            630,
+            623
+          ],
+          "sha256": "6847be48e1630fac42f9eb2c58d4a645ad1775ee9b1bf29623f46554d0a89d7a"
+        }
+      ],
+      "scope": "preview only; awaiting review"
+    },
+    {
+      "id": "greaterHealFX",
+      "name": "greaterHealFX",
+      "description": "Strong radiant golden healing starburst above ground ring with many bright motes, visibly stronger and larger than basic heal; no character",
+      "group": "spells",
+      "sourceFrames": 4,
+      "columns": 2,
+      "maxVisible": [
+        52,
+        48
+      ],
+      "cell": 128,
+      "states": "small golden star; expanding bright starburst; strongest golden starburst and motes; fading gold sparks",
+      "sheet": "items-effects-v1/greaterHealFX/sheet.png",
+      "anchor": [
+        64,
+        64
+      ],
+      "screenScale": 2,
+      "alphaCutoff": 64,
+      "sharedScale": 0.10933940774487472,
+      "nativeDirection": null,
+      "source": "generated-source.png",
+      "frames": [
+        {
+          "index": 0,
+          "label": "small golden star",
+          "empty": false,
+          "file": "frames/0.png",
+          "crop": [
+            0,
+            0,
+            128,
+            128
+          ],
+          "bounds": {
+            "x": 53,
+            "y": 58,
+            "width": 23,
+            "height": 22
+          },
+          "sourceCell": [
+            0,
+            0,
+            631,
+            624
+          ],
+          "sha256": "d87b346d171d0449d845b789c95f0af41990a6b05d3e17ef02cac2b5dc0485f6"
+        },
+        {
+          "index": 1,
+          "label": "expanding bright starburst",
+          "empty": false,
+          "file": "frames/1.png",
+          "crop": [
+            128,
+            0,
+            128,
+            128
+          ],
+          "bounds": {
+            "x": 44,
+            "y": 51,
+            "width": 33,
+            "height": 30
+          },
+          "sourceCell": [
+            631,
+            0,
+            630,
+            624
+          ],
+          "sha256": "5481a52fd9568b82ad15883c4d2f6f95f6a61e9bef09233e8c6b8e0fe4fc5f3c"
+        },
+        {
+          "index": 2,
+          "label": "strongest golden starburst and motes",
+          "empty": false,
+          "file": "frames/2.png",
+          "crop": [
+            256,
+            0,
+            128,
+            128
+          ],
+          "bounds": {
+            "x": 38,
+            "y": 40,
+            "width": 50,
+            "height": 48
+          },
+          "sourceCell": [
+            0,
+            624,
+            631,
+            623
+          ],
+          "sha256": "eac6a205d6f85d09f934a3c68edef02e0064187cae5962669378ef4574c5bb38"
+        },
+        {
+          "index": 3,
+          "label": "fading gold sparks",
+          "empty": false,
+          "file": "frames/3.png",
+          "crop": [
+            384,
+            0,
+            128,
+            128
+          ],
+          "bounds": {
+            "x": 41,
+            "y": 49,
+            "width": 39,
+            "height": 37
+          },
+          "sourceCell": [
+            631,
+            624,
+            630,
+            623
+          ],
+          "sha256": "b91391a122d127e59eac2cb08c0bf1b8cf57bd9f3c739be8748ad7e7d2bc23cb"
+        }
+      ],
+      "scope": "preview only; awaiting review"
+    },
+    {
+      "id": "magicBarrierFX",
+      "name": "magicBarrierFX",
+      "description": "Instant directional telekinetic PUSH pulse travelling RIGHT: curved aqua violet shockwave and impact sparks, never a shield bubble, dome, protective aura or person",
+      "group": "spells",
+      "sourceFrames": 4,
+      "columns": 2,
+      "maxVisible": [
+        48,
+        36
+      ],
+      "cell": 128,
+      "states": "small initial rightward pulse; expanding curved push wave; bright rightward impact; dissipating sparks",
+      "sheet": "items-effects-v1/magicBarrierFX/sheet.png",
+      "anchor": [
+        64,
+        64
+      ],
+      "screenScale": 2,
+      "alphaCutoff": 64,
+      "sharedScale": 0.09944751381215469,
+      "nativeDirection": null,
+      "source": "generated-source.png",
+      "frames": [
+        {
+          "index": 0,
+          "label": "small initial rightward pulse",
+          "empty": false,
+          "file": "frames/0.png",
+          "crop": [
+            0,
+            0,
+            128,
+            128
+          ],
+          "bounds": {
+            "x": 53,
+            "y": 58,
+            "width": 16,
+            "height": 17
+          },
+          "sourceCell": [
+            0,
+            0,
+            632,
+            623
+          ],
+          "sha256": "3c5eb6ec60ee1343a7ef1e8c27184c72e9a8771d09c6e216ce259ad8ea869463"
+        },
+        {
+          "index": 1,
+          "label": "expanding curved push wave",
+          "empty": false,
+          "file": "frames/1.png",
+          "crop": [
+            128,
+            0,
+            128,
+            128
+          ],
+          "bounds": {
+            "x": 47,
+            "y": 52,
+            "width": 26,
+            "height": 29
+          },
+          "sourceCell": [
+            632,
+            0,
+            631,
+            623
+          ],
+          "sha256": "107a14339420db12a6360537a2353a02aac8029819c98d304c1b6c416714d2eb"
+        },
+        {
+          "index": 2,
+          "label": "bright rightward impact",
+          "empty": false,
+          "file": "frames/2.png",
+          "crop": [
+            256,
+            0,
+            128,
+            128
+          ],
+          "bounds": {
+            "x": 46,
+            "y": 46,
+            "width": 36,
+            "height": 36
+          },
+          "sourceCell": [
+            0,
+            623,
+            632,
+            623
+          ],
+          "sha256": "4ca0fae55c11ea0cd86b44e717f702a0d3ac449002ec15340348b3a3a12f985a"
+        },
+        {
+          "index": 3,
+          "label": "dissipating sparks",
+          "empty": false,
+          "file": "frames/3.png",
+          "crop": [
+            384,
+            0,
+            128,
+            128
+          ],
+          "bounds": {
+            "x": 46,
+            "y": 47,
+            "width": 32,
+            "height": 32
+          },
+          "sourceCell": [
+            632,
+            623,
+            631,
+            623
+          ],
+          "sha256": "c3ff7fdcb0d53c897754f0cfc5ae3af098102d2089ffd06ddcaa6edd4844ed4e"
+        }
+      ],
+      "scope": "preview only; awaiting review"
+    },
+    {
+      "id": "townPortal",
+      "name": "townPortal",
+      "description": "Open purple blue magical portal ARCH with transparent opening and fine glowing rim, ground ring, no solid fill or scenery",
+      "group": "travel",
+      "sourceFrames": 4,
+      "columns": 2,
+      "maxVisible": [
+        40,
+        50
+      ],
+      "cell": 128,
+      "states": "four subtle looping phases of the same fully open portal arch; NEVER closed or filled opening",
+      "sheet": "items-effects-v1/townPortal/sheet.png",
+      "anchor": [
+        64,
+        64
+      ],
+      "screenScale": 2,
+      "alphaCutoff": 64,
+      "sharedScale": 0.09291521486643438,
+      "nativeDirection": null,
+      "source": "generated-source.png",
+      "frames": [
+        {
+          "index": 0,
+          "label": "closed",
+          "empty": true,
+          "file": "frames/0.png",
+          "crop": [
+            0,
+            0,
+            128,
+            128
+          ],
+          "bounds": null,
+          "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        },
+        {
+          "index": 1,
+          "label": "four subtle looping phases of the same fully open portal arch",
+          "empty": false,
+          "file": "frames/1.png",
+          "crop": [
+            128,
+            0,
+            128,
+            128
+          ],
+          "bounds": {
+            "x": 47,
+            "y": 46,
+            "width": 37,
+            "height": 39
+          },
+          "sourceCell": [
+            0,
+            0,
+            631,
+            624
+          ],
+          "sha256": "730e18a11fac0e94b24f83b05f14124f4eb92e7eaffffb946f5c2e1b71afca45"
+        },
+        {
+          "index": 2,
+          "label": "NEVER closed or filled opening",
+          "empty": false,
+          "file": "frames/2.png",
+          "crop": [
+            256,
+            0,
+            128,
+            128
+          ],
+          "bounds": {
+            "x": 44,
+            "y": 45,
+            "width": 38,
+            "height": 39
+          },
+          "sourceCell": [
+            631,
+            0,
+            630,
+            624
+          ],
+          "sha256": "0642822b3b2fc49561b9745b630afcebd78a26b9dd02f9c81d910350776be9c0"
+        },
+        {
+          "index": 3,
+          "label": "phase 2",
+          "empty": false,
+          "file": "frames/3.png",
+          "crop": [
+            384,
+            0,
+            128,
+            128
+          ],
+          "bounds": {
+            "x": 47,
+            "y": 44,
+            "width": 36,
+            "height": 39
+          },
+          "sourceCell": [
+            0,
+            624,
+            631,
+            623
+          ],
+          "sha256": "0a432d391ce4678a290b5e2d6718461c53cbf209086c091f9f73efd61d38d910"
+        },
+        {
+          "index": 4,
+          "label": "phase 3",
+          "empty": false,
+          "file": "frames/4.png",
+          "crop": [
+            512,
+            0,
+            128,
+            128
+          ],
+          "bounds": {
+            "x": 45,
+            "y": 44,
+            "width": 36,
+            "height": 38
+          },
+          "sourceCell": [
+            631,
+            624,
+            630,
+            623
+          ],
+          "sha256": "b18c4309d5d8f5b91cada56172a3410c922b52c8130485146cb75ec3bdb0a565"
+        }
+      ],
+      "scope": "preview only; awaiting review"
+    },
+    {
+      "id": "torch",
+      "name": "torch",
+      "description": "Wall mounted wooden torch WITH black iron wall bracket and burning flame, no wall background",
+      "group": "hazards",
+      "sourceFrames": 4,
+      "columns": 2,
+      "maxVisible": [
+        14,
+        32
+      ],
+      "cell": 64,
+      "states": "four flame flicker phases, same bracket and wood base position",
+      "sheet": "items-effects-v1/torch/sheet.png",
+      "anchor": [
+        32,
+        32
+      ],
+      "screenScale": 2,
+      "alphaCutoff": 64,
+      "sharedScale": 0.0462046204620462,
+      "nativeDirection": null,
+      "source": "generated-source.png",
+      "frames": [
+        {
+          "index": 0,
+          "label": "four flame flicker phases, same bracket and wood base position",
+          "empty": false,
+          "file": "frames/0.png",
+          "crop": [
+            0,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 29,
+            "y": 23,
+            "width": 10,
+            "height": 20
+          },
+          "sourceCell": [
+            0,
+            0,
+            639,
+            615
+          ],
+          "sha256": "ad08040ee951c51e2ed13205491ea06ec83020c8a639dabaf3ba55184244dfed"
+        },
+        {
+          "index": 1,
+          "label": "phase 1",
+          "empty": false,
+          "file": "frames/1.png",
+          "crop": [
+            64,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 25,
+            "y": 21,
+            "width": 11,
+            "height": 22
+          },
+          "sourceCell": [
+            639,
+            0,
+            639,
+            615
+          ],
+          "sha256": "6d50a258a4b67c1d91bfb73e3116bf4ca10534c6317aa3f4dead47ddb529fc3c"
+        },
+        {
+          "index": 2,
+          "label": "phase 2",
+          "empty": false,
+          "file": "frames/2.png",
+          "crop": [
+            128,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 29,
+            "y": 23,
+            "width": 10,
+            "height": 19
+          },
+          "sourceCell": [
+            0,
+            615,
+            639,
+            615
+          ],
+          "sha256": "774f80a20f3148918b10d8d6f3bf3af13597fe46b8caa19241b3d65a1cf7c8a5"
+        },
+        {
+          "index": 3,
+          "label": "phase 3",
+          "empty": false,
+          "file": "frames/3.png",
+          "crop": [
+            192,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 26,
+            "y": 25,
+            "width": 10,
+            "height": 17
+          },
+          "sourceCell": [
+            639,
+            615,
+            639,
+            615
+          ],
+          "sha256": "1eaf137ef105c043d3431e2b099a8eacb02d08c42294c0c46931ab60a9d6ba82"
+        }
+      ],
+      "scope": "preview only; awaiting review"
+    },
+    {
+      "id": "fireVent",
+      "name": "fireVent",
+      "description": "Square dark iron floor fire vent grate, fire vertically rising from it; consistent same grate in each cell",
+      "group": "hazards",
+      "sourceFrames": 4,
+      "columns": 2,
+      "maxVisible": [
+        30,
+        32
+      ],
+      "cell": 64,
+      "states": "inactive grate without fire; ignition small flames; tall active flames; cooling embers without tall fire",
+      "sheet": "items-effects-v1/fireVent/sheet.png",
+      "anchor": [
+        32,
+        32
+      ],
+      "screenScale": 2,
+      "alphaCutoff": 64,
+      "sharedScale": 0.0761904761904762,
+      "nativeDirection": null,
+      "source": "generated-source.png",
+      "frames": [
+        {
+          "index": 0,
+          "label": "inactive grate without fire",
+          "empty": false,
+          "file": "frames/0.png",
+          "crop": [
+            0,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 24,
+            "y": 32,
+            "width": 21,
+            "height": 15
+          },
+          "sourceCell": [
+            0,
+            0,
+            637,
+            618
+          ],
+          "sha256": "e78b94d9abe1dcc12e4d74c82dbe84a3fa6023776bff5835a45a18e1da84db6c"
+        },
+        {
+          "index": 1,
+          "label": "ignition small flames",
+          "empty": false,
+          "file": "frames/1.png",
+          "crop": [
+            64,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 19,
+            "y": 28,
+            "width": 21,
+            "height": 19
+          },
+          "sourceCell": [
+            637,
+            0,
+            637,
+            618
+          ],
+          "sha256": "cea7604eaee735ebf347b0ac83d64a75c0b9e103c1049f04829dd6c4db5fab1f"
+        },
+        {
+          "index": 2,
+          "label": "tall active flames",
+          "empty": false,
+          "file": "frames/2.png",
+          "crop": [
+            128,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 24,
+            "y": 16,
+            "width": 21,
+            "height": 32
+          },
+          "sourceCell": [
+            0,
+            618,
+            637,
+            617
+          ],
+          "sha256": "011eb77439e6cb6cf23e0b93cea414809b2527b02ae05a0bfb73aefd01faecc3"
+        },
+        {
+          "index": 3,
+          "label": "cooling embers without tall fire",
+          "empty": false,
+          "file": "frames/3.png",
+          "crop": [
+            192,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 19,
+            "y": 26,
+            "width": 21,
+            "height": 22
+          },
+          "sourceCell": [
+            637,
+            618,
+            637,
+            617
+          ],
+          "sha256": "aaa92100a1ef9d4552137977d6fa8dd82f114269cf97597fda7f1b70bcca211c"
+        }
+      ],
+      "scope": "preview only; awaiting review"
+    },
+    {
+      "id": "spikes",
+      "name": "spikes",
+      "description": "Cluster of steel floor spikes rising from tiny floor slots, no surrounding floor tile, no grate, no baked background",
+      "group": "hazards",
+      "sourceFrames": 4,
+      "columns": 2,
+      "maxVisible": [
+        28,
+        22
+      ],
+      "cell": 64,
+      "states": "just emerging small tips; half raised; fully raised; retracting short tips. All four cells visible phases; the completely hidden zero-alpha phase will be added separately by exporter",
+      "sheet": "items-effects-v1/spikes/sheet.png",
+      "anchor": [
+        32,
+        32
+      ],
+      "screenScale": 2,
+      "alphaCutoff": 64,
+      "sharedScale": 0.07035175879396985,
+      "nativeDirection": null,
+      "source": "generated-source.png",
+      "frames": [
+        {
+          "index": 0,
+          "label": "hidden",
+          "empty": true,
+          "file": "frames/0.png",
+          "crop": [
+            0,
+            0,
+            64,
+            64
+          ],
+          "bounds": null,
+          "sha256": "4fe7b59af6de3b665b67788cc2f99892ab827efae3a467342b3bb4e3bc8e5bfe"
+        },
+        {
+          "index": 1,
+          "label": "just emerging small tips",
+          "empty": false,
+          "file": "frames/1.png",
+          "crop": [
+            64,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 23,
+            "y": 35,
+            "width": 22,
+            "height": 5
+          },
+          "sourceCell": [
+            0,
+            0,
+            639,
+            615
+          ],
+          "sha256": "ca6239e2e6d4de5f0a5941edcb11d0362f7f994571d3a1829cd0e82b69ed7f31"
+        },
+        {
+          "index": 2,
+          "label": "half raised",
+          "empty": false,
+          "file": "frames/2.png",
+          "crop": [
+            128,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 18,
+            "y": 31,
+            "width": 24,
+            "height": 9
+          },
+          "sourceCell": [
+            639,
+            0,
+            639,
+            615
+          ],
+          "sha256": "0b75489edfd7a6df173480e6910ca1f17145cd4252b28b8c479190962183f5b8"
+        },
+        {
+          "index": 3,
+          "label": "fully raised",
+          "empty": false,
+          "file": "frames/3.png",
+          "crop": [
+            192,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 22,
+            "y": 24,
+            "width": 24,
+            "height": 15
+          },
+          "sourceCell": [
+            0,
+            615,
+            639,
+            615
+          ],
+          "sha256": "85bf9a28924c6509ce8e96f3f24c168e3ac6b7cac9805c7cf19d89d2f1e17cce"
+        },
+        {
+          "index": 4,
+          "label": "retracting short tips. All four cells visible phases",
+          "empty": false,
+          "file": "frames/4.png",
+          "crop": [
+            256,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 18,
+            "y": 32,
+            "width": 24,
+            "height": 7
+          },
+          "sourceCell": [
+            639,
+            615,
+            639,
+            615
+          ],
+          "sha256": "965d2e64954fe48cba85e4eea25cd09867fa22317f6da84b42219ee1fd82b2f1"
+        }
+      ],
+      "scope": "preview only; awaiting review"
+    },
+    {
+      "id": "rockCrack",
+      "name": "rockCrack",
+      "description": "Cracked floor WARNING decal only: dark jagged cracks, transparent between cracks; no triangle, exclamation mark, rubble, floor texture or UI",
+      "group": "hazards",
+      "sourceFrames": 4,
+      "columns": 2,
+      "maxVisible": [
+        30,
+        20
+      ],
+      "cell": 64,
+      "states": "hairline cracks; widening cracks; branching cracks; strongest cracks",
+      "sheet": "items-effects-v1/rockCrack/sheet.png",
+      "anchor": [
+        32,
+        32
+      ],
+      "screenScale": 2,
+      "alphaCutoff": 64,
+      "sharedScale": 0.0635593220338983,
+      "nativeDirection": null,
+      "source": "generated-source.png",
+      "frames": [
+        {
+          "index": 0,
+          "label": "hairline cracks",
+          "empty": false,
+          "file": "frames/0.png",
+          "crop": [
+            0,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 26,
+            "y": 30,
+            "width": 13,
+            "height": 8
+          },
+          "sourceCell": [
+            0,
+            0,
+            631,
+            624
+          ],
+          "sha256": "d4733d407846b9f0e337ae93f5117ef7d5f3e6b1fba249e30a0c38dfe46bee3d"
+        },
+        {
+          "index": 1,
+          "label": "widening cracks",
+          "empty": false,
+          "file": "frames/1.png",
+          "crop": [
+            64,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 22,
+            "y": 28,
+            "width": 18,
+            "height": 11
+          },
+          "sourceCell": [
+            631,
+            0,
+            630,
+            624
+          ],
+          "sha256": "ad628a17ff3d1aa48f6eab37eba20d7abde1dbbaab2fd82aed64278a4ac70055"
+        },
+        {
+          "index": 2,
+          "label": "branching cracks",
+          "empty": false,
+          "file": "frames/2.png",
+          "crop": [
+            128,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 22,
+            "y": 25,
+            "width": 24,
+            "height": 14
+          },
+          "sourceCell": [
+            0,
+            624,
+            631,
+            623
+          ],
+          "sha256": "881d212a1794af793241dd4add358ac5c984aea1633b0d7ecdf69a450c9d885c"
+        },
+        {
+          "index": 3,
+          "label": "strongest cracks",
+          "empty": false,
+          "file": "frames/3.png",
+          "crop": [
+            192,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 20,
+            "y": 23,
+            "width": 25,
+            "height": 17
+          },
+          "sourceCell": [
+            631,
+            624,
+            630,
+            623
+          ],
+          "sha256": "cbdfee04cb6fb9d2b3a0fcd7f9db414f1fee4d0324d07cda1c56ea04e61fa6ce"
+        }
+      ],
+      "scope": "preview only; awaiting review"
+    },
+    {
+      "id": "rockSpent",
+      "name": "rockSpent",
+      "description": "Falling rocks impact then settling brown gray rubble and dust, no floor tile",
+      "group": "hazards",
+      "sourceFrames": 4,
+      "columns": 2,
+      "maxVisible": [
+        32,
+        28
+      ],
+      "cell": 64,
+      "states": "impact stone fragments and dust; falling dust over rocks; dust clearing; settled rubble without dust",
+      "sheet": "items-effects-v1/rockSpent/sheet.png",
+      "anchor": [
+        32,
+        32
+      ],
+      "screenScale": 2,
+      "alphaCutoff": 64,
+      "sharedScale": 0.059813084112149535,
+      "nativeDirection": null,
+      "source": "generated-source.png",
+      "frames": [
+        {
+          "index": 0,
+          "label": "impact stone fragments and dust",
+          "empty": false,
+          "file": "frames/0.png",
+          "crop": [
+            0,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 17,
+            "y": 22,
+            "width": 31,
+            "height": 20
+          },
+          "sourceCell": [
+            0,
+            0,
+            887,
+            444
+          ],
+          "sha256": "9c16708d9193aea5f5b7dd462a16299b36cc6c5881180cd1eeebfcb3e150ac86"
+        },
+        {
+          "index": 1,
+          "label": "falling dust over rocks",
+          "empty": false,
+          "file": "frames/1.png",
+          "crop": [
+            64,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 16,
+            "y": 24,
+            "width": 30,
+            "height": 18
+          },
+          "sourceCell": [
+            887,
+            0,
+            887,
+            444
+          ],
+          "sha256": "c02110062947290c4ec66acea17c0ff3c4159333c5c62e7b844d86019c19c7bc"
+        },
+        {
+          "index": 2,
+          "label": "dust clearing",
+          "empty": false,
+          "file": "frames/2.png",
+          "crop": [
+            128,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 19,
+            "y": 31,
+            "width": 26,
+            "height": 11
+          },
+          "sourceCell": [
+            0,
+            444,
+            887,
+            443
+          ],
+          "sha256": "698de7f618d043d169065696a88d78e13ad752298266d5e2907d189ce36b72e7"
+        },
+        {
+          "index": 3,
+          "label": "settled rubble without dust",
+          "empty": false,
+          "file": "frames/3.png",
+          "crop": [
+            192,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 21,
+            "y": 32,
+            "width": 21,
+            "height": 10
+          },
+          "sourceCell": [
+            887,
+            444,
+            887,
+            443
+          ],
+          "sha256": "2e9f09286507543e57eac68cab7d45dfc45c6b8a8d5e8d8f4f05e6fab5374cd6"
+        }
+      ],
+      "scope": "preview only; awaiting review"
+    },
+    {
+      "id": "stairs",
+      "name": "stairs",
+      "description": "Clear gray stone staircase in a square dungeon opening. Steps must read as stairs, never a person, knight, ladder or platform",
+      "group": "stairs",
+      "sourceFrames": 4,
+      "columns": 2,
+      "maxVisible": [
+        32,
+        32
+      ],
+      "cell": 64,
+      "states": "ascending stairs climbing away upward; descending stairs receding downward into dark opening; ascending stairs same as first; descending stairs same as second",
+      "sheet": "items-effects-v1/stairs/sheet.png",
+      "anchor": [
+        32,
+        32
+      ],
+      "screenScale": 2,
+      "alphaCutoff": 64,
+      "sharedScale": 0.06926406926406926,
+      "nativeDirection": null,
+      "source": "generated-source.png",
+      "frames": [
+        {
+          "index": 0,
+          "label": "ascending stairs climbing away upward",
+          "empty": false,
+          "file": "frames/0.png",
+          "crop": [
+            0,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 20,
+            "y": 19,
+            "width": 28,
+            "height": 29
+          },
+          "sourceCell": [
+            0,
+            0,
+            631,
+            623
+          ],
+          "sha256": "e00fd23d0abcdccd26233f8c2d1f2842ad87a9b3f826aade529916408756f4ba"
+        },
+        {
+          "index": 1,
+          "label": "descending stairs receding downward into dark opening",
+          "empty": false,
+          "file": "frames/1.png",
+          "crop": [
+            64,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 16,
+            "y": 19,
+            "width": 28,
+            "height": 29
+          },
+          "sourceCell": [
+            631,
+            0,
+            631,
+            623
+          ],
+          "sha256": "619a63100b650da5b8383529ef2a50fc6859c5e3122c7433f4ca242ec6dfdb6a"
+        },
+        {
+          "index": 2,
+          "label": "ascending stairs same as first",
+          "empty": false,
+          "file": "frames/2.png",
+          "crop": [
+            128,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 20,
+            "y": 16,
+            "width": 28,
+            "height": 29
+          },
+          "sourceCell": [
+            0,
+            623,
+            631,
+            623
+          ],
+          "sha256": "fc5defe9264f0b33f8569bd4d2ef238b5790f1ef140450c7c96eb70a21942348"
+        },
+        {
+          "index": 3,
+          "label": "descending stairs same as second",
+          "empty": false,
+          "file": "frames/3.png",
+          "crop": [
+            192,
+            0,
+            64,
+            64
+          ],
+          "bounds": {
+            "x": 16,
+            "y": 16,
+            "width": 28,
+            "height": 29
+          },
+          "sourceCell": [
+            631,
+            623,
+            631,
+            623
+          ],
+          "sha256": "f66516910e4971a9f0e83d470cce25091bfe24749f32577f60e15abc1fc0a340"
+        }
+      ],
+      "scope": "preview only; awaiting review"
+    }
+  ],
+  "aliases": {
+    "flameOff": {
+      "id": "fireVent",
+      "frame": 0
+    },
+    "flameOn": {
+      "id": "fireVent",
+      "frame": 2
+    },
+    "stairsUp": {
+      "id": "stairs",
+      "frame": 0
+    },
+    "stairsDown": {
+      "id": "stairs",
+      "frame": 1
+    },
+    "spikesHidden": {
+      "id": "spikes",
+      "frame": 0
+    },
+    "portalClosed": {
+      "id": "townPortal",
+      "frame": 0
+    }
+  }
+}

@@ -1,0 +1,39 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>0x72 autotile sheets</title>
+<style>
+body{background:#15120f;color:#e8dcc4;font:11px monospace;margin:14px}
+h1{font:18px Georgia,serif;color:#e8c68d;margin:0 0 4px}
+h2{font:15px Georgia,serif;color:#d8b981;margin:14px 0 6px}
+.grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.cell{background:conic-gradient(#242424 25%,#1a1a1a 0 50%,#242424 0 75%,#1a1a1a 0) 0 0/16px 16px;border:1px solid #3a2e24}
+canvas{image-rendering:pixelated;display:block}
+.lab{font-size:9px;color:#c9b183;text-align:center;margin-top:2px}
+</style></head><body>
+<h1>0x72 low-wall + floor atlas cells</h1>
+<div id="out"></div>
+<script>
+(async()=>{
+ const load=src=>new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=src});
+ const low=await load('assets/walls-low.png');
+ const floor=await load('assets/floors.png');
+ const out=document.getElementById('out');
+ function sheet(name,img,scale){
+  const h=document.createElement('h2');h.textContent=`${name} ${img.width}x${img.height}`;out.append(h);
+  for(let y=0;y<img.height;y+=16){
+   const row=document.createElement('div');row.className='grid';
+   for(let x=0;x<img.width;x+=16){
+    const d=document.createElement('div');
+    const cv=document.createElement('canvas');cv.width=16*scale;cv.height=16*scale;
+    const c=cv.getContext('2d');c.imageSmoothingEnabled=false;
+    c.drawImage(img,x,y,16,16,0,0,cv.width,cv.height);
+    const cell=document.createElement('div');cell.className='cell';cell.append(cv);
+    const lab=document.createElement('div');lab.className='lab';lab.textContent=`${x/16},${y/16}`;
+    d.append(cell,lab);row.append(d);
+   }
+   out.append(row);
+  }
+ }
+ sheet('low walls',low,6);
+ sheet('floors',floor,6);
+})();
+</script></body></html>

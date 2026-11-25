@@ -1,0 +1,49 @@
+{
+  "id": "tree",
+  "kind": "sprite",
+  "group": "town",
+  "maxVisible": [
+    40,
+    60
+  ],
+  "columns": 1,
+  "parts": [
+    "sprite"
+  ],
+  "file": "environment-v1/tree/atlas.png",
+  "size": [
+    56,
+    76
+  ],
+  "records": [
+    {
+      "name": "sprite",
+      "crop": [
+        0,
+        0,
+        56,
+        76
+      ],
+      "bounds": {
+        "x": 8,
+        "y": 28,
+        "width": 40,
+        "height": 40
+      },
+      "anchor": [
+        28,
+        68
+      ],
+      "sourceBounds": {
+        "x": 144,
+        "y": 132,
+        "width": 964,
+        "height": 975
+      },
+      "scale": 0.04149377593360996
+    }
+  ],
+  "sha256": "ae80c92d66826b120852b0d95dd57e8bdcd88c53e7fbeba71970023e3710ba4a",
+  "sourceSHA256": "7949f25f743afa982e21d32cf4023a89b3ed464c042be036d99efc0695bab2ec",
+  "scope": "standalone review; runtime unchanged"
+}

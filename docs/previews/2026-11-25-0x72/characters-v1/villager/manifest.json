@@ -1,0 +1,571 @@
+{
+  "id": "villager",
+  "name": "Villager",
+  "group": "npc",
+  "w": 32,
+  "h": 44,
+  "desc": "Friendly adult human villager with chestnut hair, short green tunic over cream shirt, brown belt/trousers and boots, simple brown shoulder bag. Clear ordinary noncombatant, no armor, weapons, staff or hat resembling a wizard.",
+  "motion": "walking",
+  "scope": "standalone preview only",
+  "generator": "Built-in image_gen; prompt.md retains exact request",
+  "sourceSHA256": "dde423a9e3996a54a23cc65e8976af03757c099b7e75a5bae7dd279c50e1d762",
+  "sourceSize": [
+    1254,
+    1254
+  ],
+  "sheet": "characters-v1/villager/walk-sheet.png",
+  "sheetSize": [
+    256,
+    256
+  ],
+  "cellSize": [
+    64,
+    64
+  ],
+  "directions": [
+    "front",
+    "back",
+    "left",
+    "right"
+  ],
+  "framesPerDirection": 4,
+  "frames": [
+    {
+      "direction": "front",
+      "frame": 0,
+      "crop": [
+        0,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "bounds": {
+        "x": 21,
+        "y": 13,
+        "width": 22,
+        "height": 43
+      },
+      "sha256": "ab29517d24bf0f10e4aa89d61f28e78294ef41cf2e9e66ed1c36d7a5b7892fae",
+      "sourceCell": [
+        0,
+        0,
+        314,
+        314
+      ],
+      "sourceBounds": {
+        "x": 92,
+        "y": 39,
+        "width": 128,
+        "height": 254
+      }
+    },
+    {
+      "direction": "front",
+      "frame": 1,
+      "crop": [
+        64,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "bounds": {
+        "x": 21,
+        "y": 13,
+        "width": 21,
+        "height": 43
+      },
+      "sha256": "cd3303a0e19c29f4be50d51776e7f95bfa3937fe367fc4cffb4cb194a19bb31d",
+      "sourceCell": [
+        314,
+        0,
+        313,
+        314
+      ],
+      "sourceBounds": {
+        "x": 92,
+        "y": 39,
+        "width": 123,
+        "height": 252
+      }
+    },
+    {
+      "direction": "front",
+      "frame": 2,
+      "crop": [
+        128,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "bounds": {
+        "x": 21,
+        "y": 13,
+        "width": 20,
+        "height": 43
+      },
+      "sha256": "619b199a8b71766c7d4ea6c279d6afa2a9e090bfe1f2274ffdfd7c595ee438c9",
+      "sourceCell": [
+        627,
+        0,
+        314,
+        314
+      ],
+      "sourceBounds": {
+        "x": 94,
+        "y": 39,
+        "width": 118,
+        "height": 254
+      }
+    },
+    {
+      "direction": "front",
+      "frame": 3,
+      "crop": [
+        192,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "bounds": {
+        "x": 22,
+        "y": 13,
+        "width": 20,
+        "height": 43
+      },
+      "sha256": "a89332971b0836f9252844e28fade5e49e0d3d6b6eb4bf78d36f4de508479075",
+      "sourceCell": [
+        941,
+        0,
+        313,
+        314
+      ],
+      "sourceBounds": {
+        "x": 95,
+        "y": 39,
+        "width": 122,
+        "height": 252
+      }
+    },
+    {
+      "direction": "back",
+      "frame": 0,
+      "crop": [
+        0,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "bounds": {
+        "x": 20,
+        "y": 12,
+        "width": 23,
+        "height": 44
+      },
+      "sha256": "1bb837223ad9171ab0f58e94ac5b4fbeba53f018c5896ebacad099e653decbb0",
+      "sourceCell": [
+        0,
+        314,
+        314,
+        313
+      ],
+      "sourceBounds": {
+        "x": 88,
+        "y": 37,
+        "width": 132,
+        "height": 258
+      }
+    },
+    {
+      "direction": "back",
+      "frame": 1,
+      "crop": [
+        64,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "bounds": {
+        "x": 21,
+        "y": 13,
+        "width": 21,
+        "height": 43
+      },
+      "sha256": "a180576e68b15b4714ec9108b49110256c8f5f7644ebbe5292d7a609b37cf852",
+      "sourceCell": [
+        314,
+        314,
+        313,
+        313
+      ],
+      "sourceBounds": {
+        "x": 94,
+        "y": 37,
+        "width": 124,
+        "height": 253
+      }
+    },
+    {
+      "direction": "back",
+      "frame": 2,
+      "crop": [
+        128,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "bounds": {
+        "x": 22,
+        "y": 12,
+        "width": 20,
+        "height": 44
+      },
+      "sha256": "002680d135d18685583f3815d53965b5aa2dcd2529355de5ccff309bf766a61e",
+      "sourceCell": [
+        627,
+        314,
+        314,
+        313
+      ],
+      "sourceBounds": {
+        "x": 96,
+        "y": 37,
+        "width": 120,
+        "height": 258
+      }
+    },
+    {
+      "direction": "back",
+      "frame": 3,
+      "crop": [
+        192,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "bounds": {
+        "x": 22,
+        "y": 13,
+        "width": 20,
+        "height": 43
+      },
+      "sha256": "4345f8ac48bccb50cc9e03c47d564a2c451f19f59387d950437bed5894bd1325",
+      "sourceCell": [
+        941,
+        314,
+        313,
+        313
+      ],
+      "sourceBounds": {
+        "x": 95,
+        "y": 37,
+        "width": 122,
+        "height": 254
+      }
+    },
+    {
+      "direction": "left",
+      "frame": 0,
+      "crop": [
+        0,
+        128,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "bounds": {
+        "x": 19,
+        "y": 14,
+        "width": 23,
+        "height": 42
+      },
+      "sha256": "6530d16d5931d43b2cefbeac3bbc2168ad58cf84858a63a3b125f663a7ba2d7f",
+      "sourceCell": [
+        0,
+        627,
+        314,
+        314
+      ],
+      "sourceBounds": {
+        "x": 82,
+        "y": 39,
+        "width": 136,
+        "height": 247
+      }
+    },
+    {
+      "direction": "left",
+      "frame": 1,
+      "crop": [
+        64,
+        128,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "bounds": {
+        "x": 22,
+        "y": 14,
+        "width": 18,
+        "height": 42
+      },
+      "sha256": "123d187321b29a94c04836f0a4ecf60c4475d5e2a560e521672457ab2bd56958",
+      "sourceCell": [
+        314,
+        627,
+        313,
+        314
+      ],
+      "sourceBounds": {
+        "x": 96,
+        "y": 39,
+        "width": 109,
+        "height": 245
+      }
+    },
+    {
+      "direction": "left",
+      "frame": 2,
+      "crop": [
+        128,
+        128,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "bounds": {
+        "x": 21,
+        "y": 14,
+        "width": 20,
+        "height": 42
+      },
+      "sha256": "2b675750dfe75ec8b28d1b46c7fd2c701c2975cc3b84dd056e770a387b5c7b3b",
+      "sourceCell": [
+        627,
+        627,
+        314,
+        314
+      ],
+      "sourceBounds": {
+        "x": 95,
+        "y": 39,
+        "width": 113,
+        "height": 246
+      }
+    },
+    {
+      "direction": "left",
+      "frame": 3,
+      "crop": [
+        192,
+        128,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "bounds": {
+        "x": 22,
+        "y": 15,
+        "width": 18,
+        "height": 41
+      },
+      "sha256": "23929309ab659bd71bba7333fd209c5f45f04391c9238558aabc35a954a1af5b",
+      "sourceCell": [
+        941,
+        627,
+        313,
+        314
+      ],
+      "sourceBounds": {
+        "x": 96,
+        "y": 40,
+        "width": 109,
+        "height": 241
+      }
+    },
+    {
+      "direction": "right",
+      "frame": 0,
+      "crop": [
+        0,
+        192,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "bounds": {
+        "x": 20,
+        "y": 14,
+        "width": 23,
+        "height": 42
+      },
+      "sha256": "78a018fc58cd4bbcf62ce7a004072d40f64b3913b18c27a86a6c4948af73cdef",
+      "sourceCell": [
+        0,
+        941,
+        314,
+        313
+      ],
+      "sourceBounds": {
+        "x": 87,
+        "y": 37,
+        "width": 134,
+        "height": 247
+      }
+    },
+    {
+      "direction": "right",
+      "frame": 1,
+      "crop": [
+        64,
+        192,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "bounds": {
+        "x": 23,
+        "y": 14,
+        "width": 17,
+        "height": 42
+      },
+      "sha256": "c10202c4d1cf3a72fd4fa45c454da1150205e737880a68d9c7d8b542ec6ec6c4",
+      "sourceCell": [
+        314,
+        941,
+        313,
+        313
+      ],
+      "sourceBounds": {
+        "x": 104,
+        "y": 37,
+        "width": 101,
+        "height": 245
+      }
+    },
+    {
+      "direction": "right",
+      "frame": 2,
+      "crop": [
+        128,
+        192,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "bounds": {
+        "x": 20,
+        "y": 14,
+        "width": 22,
+        "height": 42
+      },
+      "sha256": "389716958a7246da3add8538051208e5ea0e0d7c8a81cfd470d12e5c3cf02a92",
+      "sourceCell": [
+        627,
+        941,
+        314,
+        313
+      ],
+      "sourceBounds": {
+        "x": 85,
+        "y": 37,
+        "width": 130,
+        "height": 248
+      }
+    },
+    {
+      "direction": "right",
+      "frame": 3,
+      "crop": [
+        192,
+        192,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "bounds": {
+        "x": 23,
+        "y": 14,
+        "width": 17,
+        "height": 42
+      },
+      "sha256": "9e16c0b93b0e8e3636676764a97100cac320094c811441672c39cfd0095bd81f",
+      "sourceCell": [
+        941,
+        941,
+        313,
+        313
+      ],
+      "sourceBounds": {
+        "x": 104,
+        "y": 37,
+        "width": 102,
+        "height": 246
+      }
+    }
+  ],
+  "anchor": [
+    32,
+    56
+  ],
+  "anchorMode": "feet",
+  "screenScale": 2,
+  "sharedResampleScale": 0.17054263565891473,
+  "alphaCutoff": 64,
+  "reference": "approved knight style"
+}

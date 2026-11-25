@@ -1,0 +1,49 @@
+{
+  "id": "banner",
+  "kind": "sprite",
+  "group": "throne",
+  "maxVisible": [
+    24,
+    48
+  ],
+  "columns": 1,
+  "parts": [
+    "sprite"
+  ],
+  "file": "environment-v1/banner/atlas.png",
+  "size": [
+    40,
+    64
+  ],
+  "records": [
+    {
+      "name": "sprite",
+      "crop": [
+        0,
+        0,
+        40,
+        64
+      ],
+      "bounds": {
+        "x": 8,
+        "y": 26,
+        "width": 24,
+        "height": 30
+      },
+      "anchor": [
+        20,
+        56
+      ],
+      "sourceBounds": {
+        "x": 225,
+        "y": 132,
+        "width": 800,
+        "height": 989
+      },
+      "scale": 0.03
+    }
+  ],
+  "sha256": "7264c1defc7ff20b4bccb3b4864141fe4616a5a51296ada490e0cb694a68f550",
+  "sourceSHA256": "b357a76e239a312ad3dc2c11e6b0827613ab246d96b41b196c27a16bd1986cd7",
+  "scope": "standalone review; runtime unchanged"
+}

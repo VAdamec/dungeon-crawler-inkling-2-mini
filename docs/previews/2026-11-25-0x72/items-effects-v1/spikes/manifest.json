@@ -1,0 +1,141 @@
+{
+  "id": "spikes",
+  "name": "spikes",
+  "description": "Cluster of steel floor spikes rising from tiny floor slots, no surrounding floor tile, no grate, no baked background",
+  "group": "hazards",
+  "sourceFrames": 4,
+  "columns": 2,
+  "maxVisible": [
+    28,
+    22
+  ],
+  "cell": 64,
+  "states": "just emerging small tips; half raised; fully raised; retracting short tips. All four cells visible phases; the completely hidden zero-alpha phase will be added separately by exporter",
+  "sheet": "items-effects-v1/spikes/sheet.png",
+  "anchor": [
+    32,
+    32
+  ],
+  "screenScale": 2,
+  "alphaCutoff": 64,
+  "sharedScale": 0.07035175879396985,
+  "nativeDirection": null,
+  "source": "generated-source.png",
+  "frames": [
+    {
+      "index": 0,
+      "label": "hidden",
+      "empty": true,
+      "file": "frames/0.png",
+      "crop": [
+        0,
+        0,
+        64,
+        64
+      ],
+      "bounds": null,
+      "sha256": "4fe7b59af6de3b665b67788cc2f99892ab827efae3a467342b3bb4e3bc8e5bfe"
+    },
+    {
+      "index": 1,
+      "label": "just emerging small tips",
+      "empty": false,
+      "file": "frames/1.png",
+      "crop": [
+        64,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 23,
+        "y": 35,
+        "width": 22,
+        "height": 5
+      },
+      "sourceCell": [
+        0,
+        0,
+        639,
+        615
+      ],
+      "sha256": "ca6239e2e6d4de5f0a5941edcb11d0362f7f994571d3a1829cd0e82b69ed7f31"
+    },
+    {
+      "index": 2,
+      "label": "half raised",
+      "empty": false,
+      "file": "frames/2.png",
+      "crop": [
+        128,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 18,
+        "y": 31,
+        "width": 24,
+        "height": 9
+      },
+      "sourceCell": [
+        639,
+        0,
+        639,
+        615
+      ],
+      "sha256": "0b75489edfd7a6df173480e6910ca1f17145cd4252b28b8c479190962183f5b8"
+    },
+    {
+      "index": 3,
+      "label": "fully raised",
+      "empty": false,
+      "file": "frames/3.png",
+      "crop": [
+        192,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 22,
+        "y": 24,
+        "width": 24,
+        "height": 15
+      },
+      "sourceCell": [
+        0,
+        615,
+        639,
+        615
+      ],
+      "sha256": "85bf9a28924c6509ce8e96f3f24c168e3ac6b7cac9805c7cf19d89d2f1e17cce"
+    },
+    {
+      "index": 4,
+      "label": "retracting short tips. All four cells visible phases",
+      "empty": false,
+      "file": "frames/4.png",
+      "crop": [
+        256,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 18,
+        "y": 32,
+        "width": 24,
+        "height": 7
+      },
+      "sourceCell": [
+        639,
+        615,
+        639,
+        615
+      ],
+      "sha256": "965d2e64954fe48cba85e4eea25cd09867fa22317f6da84b42219ee1fd82b2f1"
+    }
+  ],
+  "scope": "preview only; awaiting review"
+}

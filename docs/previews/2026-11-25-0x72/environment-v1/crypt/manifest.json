@@ -1,0 +1,86 @@
+{
+  "id": "crypt",
+  "kind": "material",
+  "group": "biome",
+  "maxVisible": [
+    32,
+    32
+  ],
+  "columns": 2,
+  "parts": [
+    "floor",
+    "top",
+    "face",
+    "accent"
+  ],
+  "file": "environment-v1/crypt/atlas.png",
+  "size": [
+    64,
+    64
+  ],
+  "records": [
+    {
+      "name": "floor",
+      "crop": [
+        0,
+        0,
+        32,
+        32
+      ],
+      "sourceCell": [
+        0,
+        0,
+        627,
+        627
+      ]
+    },
+    {
+      "name": "top",
+      "crop": [
+        32,
+        0,
+        32,
+        32
+      ],
+      "sourceCell": [
+        627,
+        0,
+        627,
+        627
+      ]
+    },
+    {
+      "name": "face",
+      "crop": [
+        0,
+        32,
+        32,
+        32
+      ],
+      "sourceCell": [
+        0,
+        627,
+        627,
+        627
+      ]
+    },
+    {
+      "name": "accent",
+      "crop": [
+        32,
+        32,
+        32,
+        32
+      ],
+      "sourceCell": [
+        627,
+        627,
+        627,
+        627
+      ]
+    }
+  ],
+  "sha256": "6ba30bea4ab8d27c3e2b0efbc7c086cdeeda515fc88c185ad823d86f6bc1bb4d",
+  "sourceSHA256": "5bfe4cc3692f554e45809013b40fbbf0d21eec7970edd1967a2a589644112fd2",
+  "scope": "standalone review; runtime unchanged"
+}

@@ -1,0 +1,127 @@
+{
+  "id": "frostboltFX",
+  "name": "frostboltFX",
+  "description": "Rightward icy blue magical dart, sharp bright head RIGHT and tapered cold trail LEFT",
+  "group": "projectiles",
+  "sourceFrames": 4,
+  "columns": 2,
+  "maxVisible": [
+    32,
+    16
+  ],
+  "cell": 64,
+  "states": "four looping ice shimmer shapes, all RIGHTWARD, same head position",
+  "sheet": "items-effects-v1/frostboltFX/sheet.png",
+  "anchor": [
+    32,
+    32
+  ],
+  "screenScale": 2,
+  "alphaCutoff": 64,
+  "sharedScale": 0.05351170568561873,
+  "nativeDirection": "right",
+  "source": "generated-source.png",
+  "frames": [
+    {
+      "index": 0,
+      "label": "four looping ice shimmer shapes, all RIGHTWARD, same head position",
+      "empty": false,
+      "file": "frames/0.png",
+      "crop": [
+        0,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 16,
+        "y": 28,
+        "width": 32,
+        "height": 9
+      },
+      "sourceCell": [
+        0,
+        0,
+        887,
+        444
+      ],
+      "sha256": "de7b764f5a96ce5c97f8864ef13325ae0dc7ba55d80340b3b77246a1dd4f3379"
+    },
+    {
+      "index": 1,
+      "label": "phase 1",
+      "empty": false,
+      "file": "frames/1.png",
+      "crop": [
+        64,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 19,
+        "y": 29,
+        "width": 29,
+        "height": 8
+      },
+      "sourceCell": [
+        887,
+        0,
+        887,
+        444
+      ],
+      "sha256": "f3af1e8bb025deec16b437973cd6332297aaea484f50fb6a3c75b9bd92b054dc"
+    },
+    {
+      "index": 2,
+      "label": "phase 2",
+      "empty": false,
+      "file": "frames/2.png",
+      "crop": [
+        128,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 19,
+        "y": 28,
+        "width": 29,
+        "height": 9
+      },
+      "sourceCell": [
+        0,
+        444,
+        887,
+        443
+      ],
+      "sha256": "bf7079c339ddbb1eac7c8d7abeff1afa0838c2e3a16cb1310094ca1bdb928b61"
+    },
+    {
+      "index": 3,
+      "label": "phase 3",
+      "empty": false,
+      "file": "frames/3.png",
+      "crop": [
+        192,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 20,
+        "y": 29,
+        "width": 28,
+        "height": 8
+      },
+      "sourceCell": [
+        887,
+        444,
+        887,
+        443
+      ],
+      "sha256": "022f8688b08091ed2f13680c947fb45f63c55ee84275913955df70f61d00007e"
+    }
+  ],
+  "scope": "preview only; awaiting review"
+}

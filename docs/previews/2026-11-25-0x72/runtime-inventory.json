@@ -1,0 +1,3156 @@
+{
+  "count": 76,
+  "uniqueFrames": 211,
+  "assets": [
+    {
+      "name": "knight",
+      "logical": [
+        16,
+        22
+      ],
+      "source": [
+        32,
+        44
+      ],
+      "directions": [
+        "front",
+        "back",
+        "left",
+        "right"
+      ],
+      "frameCounts": {
+        "front": 3,
+        "back": 3,
+        "left": 3,
+        "right": 3
+      },
+      "frames": 12,
+      "uniqueFrames": 12,
+      "anchor": "bottom-center",
+      "world": [
+        32,
+        44
+      ],
+      "screen": [
+        64,
+        88
+      ],
+      "alias": null,
+      "category": "hero",
+      "pack": [],
+      "status": "custom",
+      "note": "User-selected silver-helmet/navy-tabard reference. A generated transparent 4-direction × 4-frame walking sheet is included in the standalone preview, normalized to a 64px cell with fixed (32,56) feet. This baseline row still describes the unchanged 1.0.1 runtime dimensions/frames, not the proposed sheet. Preview only; no runtime integration.",
+      "proposed": {
+        "source": "knight-reference-v1/walk-sheet.png",
+        "status": "preview-ready",
+        "directions": [
+          "front",
+          "back",
+          "left",
+          "right"
+        ],
+        "framesPerDirection": 4
+      }
+    },
+    {
+      "name": "slime",
+      "logical": [
+        22,
+        14
+      ],
+      "source": [
+        44,
+        28
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 2
+      },
+      "frames": 2,
+      "uniqueFrames": 2,
+      "anchor": "bottom-center",
+      "world": [
+        44,
+        28
+      ],
+      "screen": [
+        88,
+        56
+      ],
+      "alias": null,
+      "category": "monster",
+      "pack": [],
+      "status": "custom",
+      "note": "Prepared reference-derived Slime / blob sheet: four directions × four squash-and-stretch hopping, four genuinely different compression/extension phases, never add legs poses. Transparent cells, fixed shared scale/anchor; preview only, new collection awaiting review. Runtime dimensions and frame counts in this row remain the unchanged 1.0.1 baseline.",
+      "proposed": {
+        "source": "characters-v1/slime/walk-sheet.png",
+        "status": "preview-ready",
+        "directions": [
+          "front",
+          "back",
+          "left",
+          "right"
+        ],
+        "framesPerDirection": 4,
+        "cellSize": [
+          64,
+          64
+        ],
+        "anchor": [
+          32,
+          56
+        ],
+        "screenScale": 2
+      }
+    },
+    {
+      "name": "bat",
+      "logical": [
+        32,
+        20
+      ],
+      "source": [
+        64,
+        40
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 2
+      },
+      "frames": 2,
+      "uniqueFrames": 2,
+      "anchor": "bottom-center",
+      "world": [
+        64,
+        40
+      ],
+      "screen": [
+        128,
+        80
+      ],
+      "alias": null,
+      "category": "monster",
+      "pack": [],
+      "status": "custom",
+      "note": "Prepared reference-derived Bat sheet: four directions × four flying wingbeat: wings raised, spread, lowered, recovering; keep body center steady poses. Transparent cells, fixed shared scale/anchor; preview only, new collection awaiting review. Runtime dimensions and frame counts in this row remain the unchanged 1.0.1 baseline.",
+      "proposed": {
+        "source": "characters-v1/bat/walk-sheet.png",
+        "status": "preview-ready",
+        "directions": [
+          "front",
+          "back",
+          "left",
+          "right"
+        ],
+        "framesPerDirection": 4,
+        "cellSize": [
+          64,
+          64
+        ],
+        "anchor": [
+          32,
+          32
+        ],
+        "screenScale": 2
+      }
+    },
+    {
+      "name": "goblin",
+      "logical": [
+        20,
+        22
+      ],
+      "source": [
+        40,
+        44
+      ],
+      "directions": [
+        "front",
+        "back",
+        "left",
+        "right"
+      ],
+      "frameCounts": {
+        "front": 3,
+        "back": 3,
+        "left": 3,
+        "right": 3
+      },
+      "frames": 12,
+      "uniqueFrames": 12,
+      "anchor": "bottom-center",
+      "world": [
+        40,
+        44
+      ],
+      "screen": [
+        80,
+        88
+      ],
+      "alias": null,
+      "category": "monster",
+      "pack": [],
+      "status": "custom",
+      "note": "Prepared reference-derived Goblin sheet: four directions × four walking poses. Transparent cells, fixed shared scale/anchor; preview only, new collection awaiting review. Runtime dimensions and frame counts in this row remain the unchanged 1.0.1 baseline.",
+      "proposed": {
+        "source": "characters-v1/goblin/walk-sheet.png",
+        "status": "preview-ready",
+        "directions": [
+          "front",
+          "back",
+          "left",
+          "right"
+        ],
+        "framesPerDirection": 4,
+        "cellSize": [
+          64,
+          64
+        ],
+        "anchor": [
+          32,
+          56
+        ],
+        "screenScale": 2
+      }
+    },
+    {
+      "name": "skeleton",
+      "logical": [
+        16,
+        20
+      ],
+      "source": [
+        32,
+        40
+      ],
+      "directions": [
+        "front",
+        "back",
+        "left",
+        "right"
+      ],
+      "frameCounts": {
+        "front": 3,
+        "back": 3,
+        "left": 3,
+        "right": 3
+      },
+      "frames": 12,
+      "uniqueFrames": 12,
+      "anchor": "bottom-center",
+      "world": [
+        32,
+        40
+      ],
+      "screen": [
+        64,
+        80
+      ],
+      "alias": null,
+      "category": "monster",
+      "pack": [],
+      "status": "custom",
+      "note": "Prepared reference-derived Skeleton sheet: four directions × four walking poses. Transparent cells, fixed shared scale/anchor; preview only, new collection awaiting review. Runtime dimensions and frame counts in this row remain the unchanged 1.0.1 baseline.",
+      "proposed": {
+        "source": "characters-v1/skeleton/walk-sheet.png",
+        "status": "preview-ready",
+        "directions": [
+          "front",
+          "back",
+          "left",
+          "right"
+        ],
+        "framesPerDirection": 4,
+        "cellSize": [
+          64,
+          64
+        ],
+        "anchor": [
+          32,
+          56
+        ],
+        "screenScale": 2
+      }
+    },
+    {
+      "name": "orc",
+      "logical": [
+        32,
+        28
+      ],
+      "source": [
+        64,
+        56
+      ],
+      "directions": [
+        "front",
+        "back",
+        "left",
+        "right"
+      ],
+      "frameCounts": {
+        "front": 3,
+        "back": 3,
+        "left": 3,
+        "right": 3
+      },
+      "frames": 12,
+      "uniqueFrames": 12,
+      "anchor": "bottom-center",
+      "world": [
+        64,
+        56
+      ],
+      "screen": [
+        128,
+        112
+      ],
+      "alias": null,
+      "category": "monster",
+      "pack": [],
+      "status": "custom",
+      "note": "Prepared reference-derived Orc sheet: four directions × four heavy walking poses. Transparent cells, fixed shared scale/anchor; preview only, new collection awaiting review. Runtime dimensions and frame counts in this row remain the unchanged 1.0.1 baseline.",
+      "proposed": {
+        "source": "characters-v1/orc/walk-sheet.png",
+        "status": "preview-ready",
+        "directions": [
+          "front",
+          "back",
+          "left",
+          "right"
+        ],
+        "framesPerDirection": 4,
+        "cellSize": [
+          64,
+          64
+        ],
+        "anchor": [
+          32,
+          56
+        ],
+        "screenScale": 2
+      }
+    },
+    {
+      "name": "wasp",
+      "logical": [
+        26,
+        24
+      ],
+      "source": [
+        52,
+        48
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 2
+      },
+      "frames": 2,
+      "uniqueFrames": 2,
+      "anchor": "bottom-center",
+      "world": [
+        52,
+        48
+      ],
+      "screen": [
+        104,
+        96
+      ],
+      "alias": null,
+      "category": "monster",
+      "pack": [],
+      "status": "custom",
+      "note": "Prepared reference-derived Wasp sheet: four directions × four hovering wingbeat: raised, spread, downstroke, recovery, legs tucked; stable body center poses. Transparent cells, fixed shared scale/anchor; preview only, new collection awaiting review. Runtime dimensions and frame counts in this row remain the unchanged 1.0.1 baseline.",
+      "proposed": {
+        "source": "characters-v1/wasp/walk-sheet.png",
+        "status": "preview-ready",
+        "directions": [
+          "front",
+          "back",
+          "left",
+          "right"
+        ],
+        "framesPerDirection": 4,
+        "cellSize": [
+          64,
+          64
+        ],
+        "anchor": [
+          32,
+          32
+        ],
+        "screenScale": 2
+      }
+    },
+    {
+      "name": "mage",
+      "logical": [
+        20,
+        22
+      ],
+      "source": [
+        40,
+        44
+      ],
+      "directions": [
+        "front",
+        "back",
+        "left",
+        "right"
+      ],
+      "frameCounts": {
+        "front": 3,
+        "back": 3,
+        "left": 3,
+        "right": 3
+      },
+      "frames": 12,
+      "uniqueFrames": 12,
+      "anchor": "bottom-center",
+      "world": [
+        40,
+        44
+      ],
+      "screen": [
+        80,
+        88
+      ],
+      "alias": null,
+      "category": "monster",
+      "pack": [],
+      "status": "custom",
+      "note": "Prepared reference-derived Mage sheet: four directions × four walking with visible alternating boots and moving robe hem poses. Transparent cells, fixed shared scale/anchor; preview only, new collection awaiting review. Runtime dimensions and frame counts in this row remain the unchanged 1.0.1 baseline.",
+      "proposed": {
+        "source": "characters-v1/mage/walk-sheet.png",
+        "status": "preview-ready",
+        "directions": [
+          "front",
+          "back",
+          "left",
+          "right"
+        ],
+        "framesPerDirection": 4,
+        "cellSize": [
+          64,
+          64
+        ],
+        "anchor": [
+          32,
+          56
+        ],
+        "screenScale": 2
+      }
+    },
+    {
+      "name": "healer",
+      "logical": [
+        20,
+        22
+      ],
+      "source": [
+        40,
+        44
+      ],
+      "directions": [
+        "front",
+        "back",
+        "left",
+        "right"
+      ],
+      "frameCounts": {
+        "front": 3,
+        "back": 3,
+        "left": 3,
+        "right": 3
+      },
+      "frames": 12,
+      "uniqueFrames": 12,
+      "anchor": "bottom-center",
+      "world": [
+        40,
+        44
+      ],
+      "screen": [
+        80,
+        88
+      ],
+      "alias": null,
+      "category": "monster",
+      "pack": [],
+      "status": "custom",
+      "note": "Prepared reference-derived Healer sheet: four directions × four walking with visible alternating boots and robe hem poses. Transparent cells, fixed shared scale/anchor; preview only, new collection awaiting review. Runtime dimensions and frame counts in this row remain the unchanged 1.0.1 baseline.",
+      "proposed": {
+        "source": "characters-v1/healer/walk-sheet.png",
+        "status": "preview-ready",
+        "directions": [
+          "front",
+          "back",
+          "left",
+          "right"
+        ],
+        "framesPerDirection": 4,
+        "cellSize": [
+          64,
+          64
+        ],
+        "anchor": [
+          32,
+          56
+        ],
+        "screenScale": 2
+      }
+    },
+    {
+      "name": "mimic",
+      "logical": [
+        32,
+        22
+      ],
+      "source": [
+        64,
+        44
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 2
+      },
+      "frames": 2,
+      "uniqueFrames": 2,
+      "anchor": "bottom-center",
+      "world": [
+        64,
+        44
+      ],
+      "screen": [
+        128,
+        88
+      ],
+      "alias": null,
+      "category": "boss",
+      "pack": [],
+      "status": "custom",
+      "note": "Prepared reference-derived Mimic sheet: four directions × four reveal/hop: column 1 convincingly closed innocent chest, column 2 lid slightly open with eye peeking, column 3 open toothed mouth with tongue, column 4 clawed-limb stepping/hopping open-mouth pose. The rear views show chest back, not a front face pasted on its back poses. Transparent cells, fixed shared scale/anchor; preview only, new collection awaiting review. Runtime dimensions and frame counts in this row remain the unchanged 1.0.1 baseline.",
+      "proposed": {
+        "source": "characters-v1/mimic/walk-sheet.png",
+        "status": "preview-ready",
+        "directions": [
+          "front",
+          "back",
+          "left",
+          "right"
+        ],
+        "framesPerDirection": 4,
+        "cellSize": [
+          128,
+          128
+        ],
+        "anchor": [
+          64,
+          116
+        ],
+        "screenScale": 2
+      }
+    },
+    {
+      "name": "hydra",
+      "logical": [
+        36,
+        32
+      ],
+      "source": [
+        72,
+        64
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 2
+      },
+      "frames": 2,
+      "uniqueFrames": 2,
+      "anchor": "bottom-center",
+      "world": [
+        72,
+        64
+      ],
+      "screen": [
+        144,
+        128
+      ],
+      "alias": null,
+      "category": "boss",
+      "pack": [],
+      "status": "custom",
+      "note": "Prepared reference-derived Hydra sheet: four directions × four ponderous four-legged walking with three necks swaying and alternating feet poses. Transparent cells, fixed shared scale/anchor; preview only, new collection awaiting review. Runtime dimensions and frame counts in this row remain the unchanged 1.0.1 baseline.",
+      "proposed": {
+        "source": "characters-v1/hydra/walk-sheet.png",
+        "status": "preview-ready",
+        "directions": [
+          "front",
+          "back",
+          "left",
+          "right"
+        ],
+        "framesPerDirection": 4,
+        "cellSize": [
+          128,
+          128
+        ],
+        "anchor": [
+          64,
+          116
+        ],
+        "screenScale": 2
+      }
+    },
+    {
+      "name": "boar",
+      "logical": [
+        36,
+        24
+      ],
+      "source": [
+        72,
+        48
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 3
+      },
+      "frames": 3,
+      "uniqueFrames": 3,
+      "anchor": "bottom-center",
+      "world": [
+        72,
+        48
+      ],
+      "screen": [
+        144,
+        96
+      ],
+      "alias": null,
+      "category": "boss",
+      "pack": [],
+      "status": "custom",
+      "note": "Prepared reference-derived Wild Boar sheet: four directions × four four-legged walking/trotting, alternate diagonal leg pairs; do not duplicate standing poses poses. Transparent cells, fixed shared scale/anchor; preview only, new collection awaiting review. Runtime dimensions and frame counts in this row remain the unchanged 1.0.1 baseline.",
+      "proposed": {
+        "source": "characters-v1/boar/walk-sheet.png",
+        "status": "preview-ready",
+        "directions": [
+          "front",
+          "back",
+          "left",
+          "right"
+        ],
+        "framesPerDirection": 4,
+        "cellSize": [
+          128,
+          128
+        ],
+        "anchor": [
+          64,
+          116
+        ],
+        "screenScale": 2
+      }
+    },
+    {
+      "name": "medusa",
+      "logical": [
+        32,
+        32
+      ],
+      "source": [
+        64,
+        64
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 2
+      },
+      "frames": 2,
+      "uniqueFrames": 2,
+      "anchor": "bottom-center",
+      "world": [
+        64,
+        64
+      ],
+      "screen": [
+        128,
+        128
+      ],
+      "alias": null,
+      "category": "boss",
+      "pack": [],
+      "status": "custom",
+      "note": "Prepared reference-derived Medusa sheet: four directions × four four flowing slither phases with tail S-curve changing and snake hair swaying; never add human legs poses. Transparent cells, fixed shared scale/anchor; preview only, new collection awaiting review. Runtime dimensions and frame counts in this row remain the unchanged 1.0.1 baseline.",
+      "proposed": {
+        "source": "characters-v1/medusa/walk-sheet.png",
+        "status": "preview-ready",
+        "directions": [
+          "front",
+          "back",
+          "left",
+          "right"
+        ],
+        "framesPerDirection": 4,
+        "cellSize": [
+          128,
+          128
+        ],
+        "anchor": [
+          64,
+          116
+        ],
+        "screenScale": 2
+      }
+    },
+    {
+      "name": "darkWizard",
+      "logical": [
+        32,
+        32
+      ],
+      "source": [
+        64,
+        64
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 2
+      },
+      "frames": 2,
+      "uniqueFrames": 2,
+      "anchor": "bottom-center",
+      "world": [
+        64,
+        64
+      ],
+      "screen": [
+        128,
+        128
+      ],
+      "alias": null,
+      "category": "boss",
+      "pack": [],
+      "status": "custom",
+      "note": "Prepared reference-derived Dark Wizard sheet: four directions × four slow walking with alternating boots, robe hem and staff movement poses. Transparent cells, fixed shared scale/anchor; preview only, new collection awaiting review. Runtime dimensions and frame counts in this row remain the unchanged 1.0.1 baseline.",
+      "proposed": {
+        "source": "characters-v1/darkWizard/walk-sheet.png",
+        "status": "preview-ready",
+        "directions": [
+          "front",
+          "back",
+          "left",
+          "right"
+        ],
+        "framesPerDirection": 4,
+        "cellSize": [
+          128,
+          128
+        ],
+        "anchor": [
+          64,
+          116
+        ],
+        "screenScale": 2
+      }
+    },
+    {
+      "name": "skeletonKing",
+      "logical": [
+        32,
+        36
+      ],
+      "source": [
+        64,
+        72
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 2
+      },
+      "frames": 2,
+      "uniqueFrames": 2,
+      "anchor": "bottom-center",
+      "world": [
+        64,
+        72
+      ],
+      "screen": [
+        128,
+        144
+      ],
+      "alias": null,
+      "category": "boss",
+      "pack": [],
+      "status": "custom",
+      "note": "Prepared reference-derived Skeleton King sheet: four directions × four regal heavy walking, alternating leg bones and boots, cape following each step poses. Transparent cells, fixed shared scale/anchor; preview only, new collection awaiting review. Runtime dimensions and frame counts in this row remain the unchanged 1.0.1 baseline.",
+      "proposed": {
+        "source": "characters-v1/skeletonKing/walk-sheet.png",
+        "status": "preview-ready",
+        "directions": [
+          "front",
+          "back",
+          "left",
+          "right"
+        ],
+        "framesPerDirection": 4,
+        "cellSize": [
+          128,
+          128
+        ],
+        "anchor": [
+          64,
+          116
+        ],
+        "screenScale": 2
+      }
+    },
+    {
+      "name": "dragonBoss",
+      "logical": [
+        40,
+        36
+      ],
+      "source": [
+        80,
+        72
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 2
+      },
+      "frames": 2,
+      "uniqueFrames": 2,
+      "anchor": "bottom-center",
+      "world": [
+        80,
+        72
+      ],
+      "screen": [
+        160,
+        144
+      ],
+      "alias": null,
+      "category": "boss",
+      "pack": [],
+      "status": "custom",
+      "note": "Prepared reference-derived Dragon sheet: four directions × four four-legged walking with restrained wing flex/wingbeats and tail counter-sway, four unique phases. Four legs PLUS two wings; full wings and tail never clipped poses. Transparent cells, fixed shared scale/anchor; preview only, new collection awaiting review. Runtime dimensions and frame counts in this row remain the unchanged 1.0.1 baseline.",
+      "proposed": {
+        "source": "characters-v1/dragonBoss/walk-sheet.png",
+        "status": "preview-ready",
+        "directions": [
+          "front",
+          "back",
+          "left",
+          "right"
+        ],
+        "framesPerDirection": 4,
+        "cellSize": [
+          128,
+          128
+        ],
+        "anchor": [
+          64,
+          116
+        ],
+        "screenScale": 2
+      }
+    },
+    {
+      "name": "cook",
+      "logical": [
+        18,
+        22
+      ],
+      "source": [
+        36,
+        44
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 3
+      },
+      "frames": 3,
+      "uniqueFrames": 3,
+      "anchor": "bottom-center",
+      "world": [
+        36,
+        44
+      ],
+      "screen": [
+        72,
+        88
+      ],
+      "alias": null,
+      "category": "boss",
+      "pack": [],
+      "status": "custom",
+      "note": "Prepared reference-derived Cook sheet: four directions × four heavy walking with alternating boots and subtle cleaver/pan swing poses. Transparent cells, fixed shared scale/anchor; preview only, new collection awaiting review. Runtime dimensions and frame counts in this row remain the unchanged 1.0.1 baseline.",
+      "proposed": {
+        "source": "characters-v1/cook/walk-sheet.png",
+        "status": "preview-ready",
+        "directions": [
+          "front",
+          "back",
+          "left",
+          "right"
+        ],
+        "framesPerDirection": 4,
+        "cellSize": [
+          128,
+          128
+        ],
+        "anchor": [
+          64,
+          116
+        ],
+        "screenScale": 2
+      }
+    },
+    {
+      "name": "bartender",
+      "logical": [
+        12,
+        15
+      ],
+      "source": [
+        24,
+        30
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 3
+      },
+      "frames": 3,
+      "uniqueFrames": 3,
+      "anchor": "bottom-center",
+      "world": [
+        24,
+        30
+      ],
+      "screen": [
+        48,
+        60
+      ],
+      "alias": null,
+      "category": "boss",
+      "pack": [],
+      "status": "custom",
+      "note": "Prepared reference-derived Bartender sheet: four directions × four walking, alternating boots and careful tankard swing; no spilling particle effects poses. Transparent cells, fixed shared scale/anchor; preview only, new collection awaiting review. Runtime dimensions and frame counts in this row remain the unchanged 1.0.1 baseline.",
+      "proposed": {
+        "source": "characters-v1/bartender/walk-sheet.png",
+        "status": "preview-ready",
+        "directions": [
+          "front",
+          "back",
+          "left",
+          "right"
+        ],
+        "framesPerDirection": 4,
+        "cellSize": [
+          128,
+          128
+        ],
+        "anchor": [
+          64,
+          116
+        ],
+        "screenScale": 2
+      }
+    },
+    {
+      "name": "merchant",
+      "logical": [
+        16,
+        20
+      ],
+      "source": [
+        32,
+        40
+      ],
+      "directions": [
+        "front",
+        "back",
+        "left",
+        "right"
+      ],
+      "frameCounts": {
+        "front": 3,
+        "back": 3,
+        "left": 3,
+        "right": 3
+      },
+      "frames": 12,
+      "uniqueFrames": 12,
+      "anchor": "bottom-center",
+      "world": [
+        32,
+        40
+      ],
+      "screen": [
+        64,
+        80
+      ],
+      "alias": null,
+      "category": "npc",
+      "pack": [],
+      "status": "custom",
+      "note": "Prepared reference-derived Merchant sheet: four directions × four walking poses. Transparent cells, fixed shared scale/anchor; preview only, new collection awaiting review. Runtime dimensions and frame counts in this row remain the unchanged 1.0.1 baseline.",
+      "proposed": {
+        "source": "characters-v1/merchant/walk-sheet.png",
+        "status": "preview-ready",
+        "directions": [
+          "front",
+          "back",
+          "left",
+          "right"
+        ],
+        "framesPerDirection": 4,
+        "cellSize": [
+          64,
+          64
+        ],
+        "anchor": [
+          32,
+          56
+        ],
+        "screenScale": 2
+      }
+    },
+    {
+      "name": "prisoner",
+      "logical": [
+        16,
+        20
+      ],
+      "source": [
+        32,
+        40
+      ],
+      "directions": [
+        "front",
+        "back",
+        "left",
+        "right"
+      ],
+      "frameCounts": {
+        "front": 3,
+        "back": 3,
+        "left": 3,
+        "right": 3
+      },
+      "frames": 12,
+      "uniqueFrames": 12,
+      "anchor": "bottom-center",
+      "world": [
+        32,
+        40
+      ],
+      "screen": [
+        64,
+        80
+      ],
+      "alias": null,
+      "category": "npc",
+      "pack": [],
+      "status": "custom",
+      "note": "Prepared reference-derived Prisoner sheet: four directions × four cautious walking with alternating feet; whole body visible poses. Transparent cells, fixed shared scale/anchor; preview only, new collection awaiting review. Runtime dimensions and frame counts in this row remain the unchanged 1.0.1 baseline.",
+      "proposed": {
+        "source": "characters-v1/prisoner/walk-sheet.png",
+        "status": "preview-ready",
+        "directions": [
+          "front",
+          "back",
+          "left",
+          "right"
+        ],
+        "framesPerDirection": 4,
+        "cellSize": [
+          64,
+          64
+        ],
+        "anchor": [
+          32,
+          56
+        ],
+        "screenScale": 2
+      }
+    },
+    {
+      "name": "princess",
+      "logical": [
+        16,
+        25
+      ],
+      "source": [
+        32,
+        50
+      ],
+      "directions": [
+        "front",
+        "back",
+        "left",
+        "right"
+      ],
+      "frameCounts": {
+        "front": 3,
+        "back": 3,
+        "left": 3,
+        "right": 3
+      },
+      "frames": 12,
+      "uniqueFrames": 12,
+      "anchor": "bottom-center",
+      "world": [
+        32,
+        50
+      ],
+      "screen": [
+        64,
+        100
+      ],
+      "alias": null,
+      "category": "npc",
+      "pack": [],
+      "status": "custom",
+      "note": "Prepared reference-derived Princess sheet: four directions × four walking/running-ready four-step loop, skirt and hair swaying with alternate feet; no single static gown repeated poses. Transparent cells, fixed shared scale/anchor; preview only, new collection awaiting review. Runtime dimensions and frame counts in this row remain the unchanged 1.0.1 baseline.",
+      "proposed": {
+        "source": "characters-v1/princess/walk-sheet.png",
+        "status": "preview-ready",
+        "directions": [
+          "front",
+          "back",
+          "left",
+          "right"
+        ],
+        "framesPerDirection": 4,
+        "cellSize": [
+          64,
+          64
+        ],
+        "anchor": [
+          32,
+          56
+        ],
+        "screenScale": 2
+      }
+    },
+    {
+      "name": "villager",
+      "logical": [
+        16,
+        20
+      ],
+      "source": [
+        32,
+        40
+      ],
+      "directions": [
+        "front",
+        "back",
+        "left",
+        "right"
+      ],
+      "frameCounts": {
+        "front": 3,
+        "back": 3,
+        "left": 3,
+        "right": 3
+      },
+      "frames": 12,
+      "uniqueFrames": 12,
+      "anchor": "bottom-center",
+      "world": [
+        32,
+        40
+      ],
+      "screen": [
+        64,
+        80
+      ],
+      "alias": null,
+      "category": "npc",
+      "pack": [],
+      "status": "custom",
+      "note": "Prepared reference-derived Villager sheet: four directions × four walking poses. Transparent cells, fixed shared scale/anchor; preview only, new collection awaiting review. Runtime dimensions and frame counts in this row remain the unchanged 1.0.1 baseline.",
+      "proposed": {
+        "source": "characters-v1/villager/walk-sheet.png",
+        "status": "preview-ready",
+        "directions": [
+          "front",
+          "back",
+          "left",
+          "right"
+        ],
+        "framesPerDirection": 4,
+        "cellSize": [
+          64,
+          64
+        ],
+        "anchor": [
+          32,
+          56
+        ],
+        "screenScale": 2
+      }
+    },
+    {
+      "name": "catCompanion",
+      "logical": [
+        20,
+        12
+      ],
+      "source": [
+        40,
+        24
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 3
+      },
+      "frames": 3,
+      "uniqueFrames": 3,
+      "anchor": "bottom-center",
+      "world": [
+        40,
+        24
+      ],
+      "screen": [
+        80,
+        48
+      ],
+      "alias": null,
+      "category": "companion",
+      "pack": [],
+      "status": "custom",
+      "note": "Prepared reference-derived Marmalade sheet: four directions × four quadruped walking poses. Transparent cells, fixed shared scale/anchor; preview only, new collection awaiting review. Runtime dimensions and frame counts in this row remain the unchanged 1.0.1 baseline.",
+      "proposed": {
+        "source": "characters-v1/catCompanion/walk-sheet.png",
+        "status": "preview-ready",
+        "directions": [
+          "front",
+          "back",
+          "left",
+          "right"
+        ],
+        "framesPerDirection": 4,
+        "cellSize": [
+          64,
+          64
+        ],
+        "anchor": [
+          32,
+          56
+        ],
+        "screenScale": 2
+      }
+    },
+    {
+      "name": "cat",
+      "logical": [
+        13,
+        9
+      ],
+      "source": [
+        26,
+        18
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 3
+      },
+      "frames": 3,
+      "uniqueFrames": 3,
+      "anchor": "bottom-center",
+      "world": [
+        26,
+        18
+      ],
+      "screen": [
+        52,
+        36
+      ],
+      "alias": null,
+      "category": "animal",
+      "pack": [],
+      "status": "custom",
+      "note": "Prepared reference-derived Town cat sheet: four directions × four quadruped walking with alternating paws and tail sway poses. Transparent cells, fixed shared scale/anchor; preview only, new collection awaiting review. Runtime dimensions and frame counts in this row remain the unchanged 1.0.1 baseline.",
+      "proposed": {
+        "source": "characters-v1/cat/walk-sheet.png",
+        "status": "preview-ready",
+        "directions": [
+          "front",
+          "back",
+          "left",
+          "right"
+        ],
+        "framesPerDirection": 4,
+        "cellSize": [
+          64,
+          64
+        ],
+        "anchor": [
+          32,
+          56
+        ],
+        "screenScale": 2
+      }
+    },
+    {
+      "name": "dog",
+      "logical": [
+        19,
+        14
+      ],
+      "source": [
+        38,
+        28
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 3
+      },
+      "frames": 3,
+      "uniqueFrames": 3,
+      "anchor": "bottom-center",
+      "world": [
+        38,
+        28
+      ],
+      "screen": [
+        76,
+        56
+      ],
+      "alias": null,
+      "category": "animal",
+      "pack": [],
+      "status": "custom",
+      "note": "Prepared reference-derived Pip / town dog sheet: four directions × four four-legged walking/trotting with diagonal paw pairs poses. Transparent cells, fixed shared scale/anchor; preview only, new collection awaiting review. Runtime dimensions and frame counts in this row remain the unchanged 1.0.1 baseline.",
+      "proposed": {
+        "source": "characters-v1/dog/walk-sheet.png",
+        "status": "preview-ready",
+        "directions": [
+          "front",
+          "back",
+          "left",
+          "right"
+        ],
+        "framesPerDirection": 4,
+        "cellSize": [
+          64,
+          64
+        ],
+        "anchor": [
+          32,
+          56
+        ],
+        "screenScale": 2
+      }
+    },
+    {
+      "name": "chicken",
+      "logical": [
+        14,
+        14
+      ],
+      "source": [
+        28,
+        28
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 3
+      },
+      "frames": 3,
+      "uniqueFrames": 3,
+      "anchor": "bottom-center",
+      "world": [
+        28,
+        28
+      ],
+      "screen": [
+        56,
+        56
+      ],
+      "alias": null,
+      "category": "animal",
+      "pack": [],
+      "status": "custom",
+      "note": "Prepared reference-derived Chicken sheet: four directions × four walking with alternating bird feet and gentle head bob poses. Transparent cells, fixed shared scale/anchor; preview only, new collection awaiting review. Runtime dimensions and frame counts in this row remain the unchanged 1.0.1 baseline.",
+      "proposed": {
+        "source": "characters-v1/chicken/walk-sheet.png",
+        "status": "preview-ready",
+        "directions": [
+          "front",
+          "back",
+          "left",
+          "right"
+        ],
+        "framesPerDirection": 4,
+        "cellSize": [
+          64,
+          64
+        ],
+        "anchor": [
+          32,
+          56
+        ],
+        "screenScale": 2
+      }
+    },
+    {
+      "name": "sword",
+      "logical": [
+        16,
+        20
+      ],
+      "source": [
+        32,
+        40
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        32,
+        40
+      ],
+      "screen": [
+        64,
+        80
+      ],
+      "alias": null,
+      "category": "item",
+      "pack": [
+        "weapon_knight_sword",
+        "weapon_regular_sword",
+        "weapon_rusty_sword"
+      ],
+      "status": "modified",
+      "note": "Several sword crops exist; pick and normalize icon/world scale."
+    },
+    {
+      "name": "bow",
+      "logical": [
+        24,
+        20
+      ],
+      "source": [
+        48,
+        40
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        48,
+        40
+      ],
+      "screen": [
+        96,
+        80
+      ],
+      "alias": null,
+      "category": "item",
+      "pack": [
+        "weapon_bow",
+        "weapon_bow_2",
+        "weapon_arrow"
+      ],
+      "status": "modified",
+      "note": "Bow crops exist."
+    },
+    {
+      "name": "armor",
+      "logical": [
+        16,
+        20
+      ],
+      "source": [
+        32,
+        40
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        32,
+        40
+      ],
+      "screen": [
+        64,
+        80
+      ],
+      "alias": null,
+      "category": "item",
+      "pack": [],
+      "status": "custom",
+      "note": "No armor icon/body item; custom required."
+    },
+    {
+      "name": "helmet",
+      "logical": [
+        16,
+        20
+      ],
+      "source": [
+        32,
+        40
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        32,
+        40
+      ],
+      "screen": [
+        64,
+        80
+      ],
+      "alias": null,
+      "category": "item",
+      "pack": [],
+      "status": "custom",
+      "note": "No helmet item; custom required."
+    },
+    {
+      "name": "shield",
+      "logical": [
+        16,
+        20
+      ],
+      "source": [
+        32,
+        40
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        32,
+        40
+      ],
+      "screen": [
+        64,
+        80
+      ],
+      "alias": null,
+      "category": "item",
+      "pack": [],
+      "status": "custom",
+      "note": "No shield item; custom required."
+    },
+    {
+      "name": "ring",
+      "logical": [
+        16,
+        18
+      ],
+      "source": [
+        32,
+        36
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        32,
+        36
+      ],
+      "screen": [
+        64,
+        72
+      ],
+      "alias": null,
+      "category": "item",
+      "pack": [],
+      "status": "custom",
+      "note": "No ring item; custom required."
+    },
+    {
+      "name": "elixir",
+      "logical": [
+        12,
+        18
+      ],
+      "source": [
+        24,
+        36
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        24,
+        36
+      ],
+      "screen": [
+        48,
+        72
+      ],
+      "alias": null,
+      "category": "item",
+      "pack": [
+        "flask_big_yellow",
+        "flask_yellow"
+      ],
+      "status": "modified",
+      "note": "Use flask variant; preserve game meaning."
+    },
+    {
+      "name": "potion",
+      "logical": [
+        10,
+        12
+      ],
+      "source": [
+        20,
+        24
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        20,
+        24
+      ],
+      "screen": [
+        40,
+        48
+      ],
+      "alias": null,
+      "category": "item",
+      "pack": [
+        "flask_big_red",
+        "flask_red"
+      ],
+      "status": "modified",
+      "note": "Red flask match."
+    },
+    {
+      "name": "chest",
+      "logical": [
+        16,
+        14
+      ],
+      "source": [
+        32,
+        28
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        32,
+        28
+      ],
+      "screen": [
+        64,
+        56
+      ],
+      "alias": null,
+      "category": "item",
+      "pack": [
+        "chest_empty_open_anim_f0..2",
+        "chest_full_open_anim_f0..2"
+      ],
+      "status": "modified",
+      "note": "Chest frames exist; map to open/closed/state as needed."
+    },
+    {
+      "name": "key",
+      "logical": [
+        20,
+        18
+      ],
+      "source": [
+        40,
+        36
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        40,
+        36
+      ],
+      "screen": [
+        80,
+        72
+      ],
+      "alias": null,
+      "category": "item",
+      "pack": [],
+      "status": "custom",
+      "note": "No key icon; custom required."
+    },
+    {
+      "name": "townScroll",
+      "logical": [
+        16,
+        18
+      ],
+      "source": [
+        32,
+        36
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        32,
+        36
+      ],
+      "screen": [
+        64,
+        72
+      ],
+      "alias": null,
+      "category": "item",
+      "pack": [],
+      "status": "custom",
+      "note": "No scroll; custom required."
+    },
+    {
+      "name": "townPortal",
+      "logical": [
+        24,
+        28
+      ],
+      "source": [
+        48,
+        56
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        48,
+        56
+      ],
+      "screen": [
+        96,
+        112
+      ],
+      "alias": null,
+      "category": "effect/item",
+      "pack": [],
+      "status": "custom",
+      "note": "No portal; custom required (matches town gate state)."
+    },
+    {
+      "name": "spellbook",
+      "logical": [
+        16,
+        16
+      ],
+      "source": [
+        32,
+        32
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        32,
+        32
+      ],
+      "screen": [
+        64,
+        64
+      ],
+      "alias": null,
+      "category": "item",
+      "pack": [],
+      "status": "custom",
+      "note": "No book/spellbook; custom required."
+    },
+    {
+      "name": "frostboltTome",
+      "logical": [
+        16,
+        16
+      ],
+      "source": [
+        32,
+        32
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        32,
+        32
+      ],
+      "screen": [
+        64,
+        64
+      ],
+      "alias": null,
+      "category": "item",
+      "pack": [],
+      "status": "custom",
+      "note": "Spellbook variant; custom required."
+    },
+    {
+      "name": "greaterHealTome",
+      "logical": [
+        16,
+        16
+      ],
+      "source": [
+        32,
+        32
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        32,
+        32
+      ],
+      "screen": [
+        64,
+        64
+      ],
+      "alias": null,
+      "category": "item",
+      "pack": [],
+      "status": "custom",
+      "note": "Spellbook variant; custom required."
+    },
+    {
+      "name": "barrierTome",
+      "logical": [
+        16,
+        16
+      ],
+      "source": [
+        32,
+        32
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        32,
+        32
+      ],
+      "screen": [
+        64,
+        64
+      ],
+      "alias": null,
+      "category": "item",
+      "pack": [],
+      "status": "custom",
+      "note": "Spellbook variant; custom required."
+    },
+    {
+      "name": "stairsUp",
+      "logical": [
+        16,
+        16
+      ],
+      "source": [
+        32,
+        32
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        32,
+        32
+      ],
+      "screen": [
+        64,
+        64
+      ],
+      "alias": null,
+      "category": "terrain/prop",
+      "pack": [
+        "floor_ladder",
+        "floor_stairs"
+      ],
+      "status": "modified",
+      "note": "Ladder/stairs crops exist; decide semantics for ascent/descent."
+    },
+    {
+      "name": "stairsDown",
+      "logical": [
+        16,
+        16
+      ],
+      "source": [
+        32,
+        32
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        32,
+        32
+      ],
+      "screen": [
+        64,
+        64
+      ],
+      "alias": null,
+      "category": "terrain/prop",
+      "pack": [
+        "floor_ladder",
+        "floor_stairs"
+      ],
+      "status": "modified",
+      "note": "Same family; distinguish clearly from stairsUp."
+    },
+    {
+      "name": "torch",
+      "logical": [
+        12,
+        20
+      ],
+      "source": [
+        24,
+        40
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 3
+      },
+      "frames": 3,
+      "uniqueFrames": 3,
+      "anchor": "bottom-center",
+      "world": [
+        24,
+        40
+      ],
+      "screen": [
+        48,
+        80
+      ],
+      "alias": null,
+      "category": "prop",
+      "pack": [
+        "wall_fountain_mid_red_anim_f0..2",
+        "wall_fountain_basin_red_anim_f0..2"
+      ],
+      "status": "modified",
+      "note": "Proposed red fountain/flame-and-bowl adaptation; previewed as a wall fire. Not an unchanged native torch. Four-frame clock mapping still pending."
+    },
+    {
+      "name": "flameOff",
+      "logical": [
+        16,
+        20
+      ],
+      "source": [
+        32,
+        40
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        32,
+        40
+      ],
+      "screen": [
+        64,
+        80
+      ],
+      "alias": null,
+      "category": "hazard",
+      "pack": [],
+      "status": "custom",
+      "note": "No dormant flame vent; custom required, must preserve unrevealed/active states."
+    },
+    {
+      "name": "flameOn",
+      "logical": [
+        16,
+        20
+      ],
+      "source": [
+        32,
+        40
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 3
+      },
+      "frames": 3,
+      "uniqueFrames": 3,
+      "anchor": "bottom-center",
+      "world": [
+        32,
+        40
+      ],
+      "screen": [
+        64,
+        80
+      ],
+      "alias": null,
+      "category": "hazard",
+      "pack": [],
+      "status": "custom",
+      "note": "No active flame vent; custom animated hazard required."
+    },
+    {
+      "name": "spikes",
+      "logical": [
+        16,
+        16
+      ],
+      "source": [
+        32,
+        32
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        32,
+        32
+      ],
+      "screen": [
+        64,
+        64
+      ],
+      "alias": null,
+      "category": "hazard",
+      "pack": [
+        "floor_spikes_anim_f0..3"
+      ],
+      "status": "modified",
+      "note": "Direct match. Hidden/unrevealed state must remain pixel-identical to floor until triggered."
+    },
+    {
+      "name": "rockCrack",
+      "logical": [
+        16,
+        16
+      ],
+      "source": [
+        32,
+        32
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        32,
+        32
+      ],
+      "screen": [
+        64,
+        64
+      ],
+      "alias": null,
+      "category": "hazard",
+      "pack": [
+        "floor_* cracked variant? none"
+      ],
+      "status": "custom",
+      "note": "No cracked floor warning tile; custom required."
+    },
+    {
+      "name": "rockSpent",
+      "logical": [
+        20,
+        16
+      ],
+      "source": [
+        40,
+        32
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        40,
+        32
+      ],
+      "screen": [
+        80,
+        64
+      ],
+      "alias": null,
+      "category": "hazard",
+      "pack": [],
+      "status": "custom",
+      "note": "No spent rock hazard; custom required."
+    },
+    {
+      "name": "rubble",
+      "logical": [
+        20,
+        12
+      ],
+      "source": [
+        40,
+        24
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        40,
+        24
+      ],
+      "screen": [
+        80,
+        48
+      ],
+      "alias": null,
+      "category": "prop",
+      "pack": [],
+      "status": "custom",
+      "note": "No rubble; custom required."
+    },
+    {
+      "name": "pillar",
+      "logical": [
+        16,
+        28
+      ],
+      "source": [
+        32,
+        56
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        32,
+        56
+      ],
+      "screen": [
+        64,
+        112
+      ],
+      "alias": null,
+      "category": "prop",
+      "pack": [
+        "column",
+        "column_wall"
+      ],
+      "status": "modified",
+      "note": "Column crops exist; check bounds/footprint and do not imply collision change."
+    },
+    {
+      "name": "tombstone",
+      "logical": [
+        16,
+        18
+      ],
+      "source": [
+        32,
+        36
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        32,
+        36
+      ],
+      "screen": [
+        64,
+        72
+      ],
+      "alias": null,
+      "category": "prop",
+      "pack": [],
+      "status": "custom",
+      "note": "No tombstone; custom required."
+    },
+    {
+      "name": "crystal",
+      "logical": [
+        24,
+        24
+      ],
+      "source": [
+        48,
+        48
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        48,
+        48
+      ],
+      "screen": [
+        96,
+        96
+      ],
+      "alias": null,
+      "category": "prop",
+      "pack": [],
+      "status": "custom",
+      "note": "No crystal; custom required."
+    },
+    {
+      "name": "cookingPot",
+      "logical": [
+        20,
+        24
+      ],
+      "source": [
+        40,
+        48
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        40,
+        48
+      ],
+      "screen": [
+        80,
+        96
+      ],
+      "alias": null,
+      "category": "prop",
+      "pack": [],
+      "status": "custom",
+      "note": "No cooking pot; custom required for kitchen/throne/themed areas as needed."
+    },
+    {
+      "name": "barCounter",
+      "logical": [
+        32,
+        24
+      ],
+      "source": [
+        64,
+        48
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        64,
+        48
+      ],
+      "screen": [
+        128,
+        96
+      ],
+      "alias": null,
+      "category": "prop",
+      "pack": [],
+      "status": "custom",
+      "note": "No bar counter; custom required."
+    },
+    {
+      "name": "banner",
+      "logical": [
+        20,
+        30
+      ],
+      "source": [
+        40,
+        60
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        40,
+        60
+      ],
+      "screen": [
+        80,
+        120
+      ],
+      "alias": null,
+      "category": "prop",
+      "pack": [
+        "wall_banner_blue",
+        "wall_banner_green",
+        "wall_banner_red",
+        "wall_banner_yellow"
+      ],
+      "status": "modified",
+      "note": "Wall banners exist; map to in-world prop carefully."
+    },
+    {
+      "name": "throne",
+      "logical": [
+        32,
+        42
+      ],
+      "source": [
+        64,
+        84
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        64,
+        84
+      ],
+      "screen": [
+        128,
+        168
+      ],
+      "alias": null,
+      "category": "prop",
+      "pack": [],
+      "status": "custom",
+      "note": "No throne prop; custom required for depth-50 throne room."
+    },
+    {
+      "name": "inn",
+      "logical": [
+        64,
+        56
+      ],
+      "source": [
+        128,
+        112
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        128,
+        112
+      ],
+      "screen": [
+        256,
+        224
+      ],
+      "alias": null,
+      "category": "town",
+      "pack": [],
+      "status": "custom",
+      "note": "No building; custom town architecture in 0x72 style required."
+    },
+    {
+      "name": "store",
+      "logical": [
+        56,
+        56
+      ],
+      "source": [
+        112,
+        112
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        112,
+        112
+      ],
+      "screen": [
+        224,
+        224
+      ],
+      "alias": null,
+      "category": "town",
+      "pack": [],
+      "status": "custom",
+      "note": "No building; custom required."
+    },
+    {
+      "name": "hut",
+      "logical": [
+        64,
+        60
+      ],
+      "source": [
+        128,
+        120
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        128,
+        120
+      ],
+      "screen": [
+        256,
+        240
+      ],
+      "alias": null,
+      "category": "town",
+      "pack": [],
+      "status": "custom",
+      "note": "No building; custom required."
+    },
+    {
+      "name": "tree",
+      "logical": [
+        40,
+        40
+      ],
+      "source": [
+        80,
+        80
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        80,
+        80
+      ],
+      "screen": [
+        160,
+        160
+      ],
+      "alias": null,
+      "category": "town",
+      "pack": [],
+      "status": "custom",
+      "note": "No tree; custom required."
+    },
+    {
+      "name": "bridge",
+      "logical": [
+        32,
+        24
+      ],
+      "source": [
+        64,
+        48
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        64,
+        48
+      ],
+      "screen": [
+        128,
+        96
+      ],
+      "alias": null,
+      "category": "town",
+      "pack": [
+        "floor_ladder? no",
+        "doors/wood? no"
+      ],
+      "status": "custom",
+      "note": "No bridge; custom required."
+    },
+    {
+      "name": "water",
+      "logical": [
+        16,
+        16
+      ],
+      "source": [
+        32,
+        32
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        32,
+        32
+      ],
+      "screen": [
+        64,
+        64
+      ],
+      "alias": null,
+      "category": "town",
+      "pack": [
+        "wall_fountain_basin_*",
+        "wall_goo*? not water"
+      ],
+      "status": "custom",
+      "note": "No water tile; custom required."
+    },
+    {
+      "name": "townGate",
+      "logical": [
+        24,
+        32
+      ],
+      "source": [
+        48,
+        64
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        48,
+        64
+      ],
+      "screen": [
+        96,
+        128
+      ],
+      "alias": null,
+      "category": "town",
+      "pack": [
+        "doors_frame_*",
+        "doors_leaf_closed/open"
+      ],
+      "status": "modified",
+      "note": "Door frames/leaves exist; can inspire gate but town gate has portal/state behavior and larger footprint."
+    },
+    {
+      "name": "doorstep",
+      "logical": [
+        16,
+        8
+      ],
+      "source": [
+        32,
+        16
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        32,
+        16
+      ],
+      "screen": [
+        64,
+        32
+      ],
+      "alias": null,
+      "category": "town",
+      "pack": [],
+      "status": "custom",
+      "note": "No doorstep marker; custom/subtle required."
+    },
+    {
+      "name": "dragon",
+      "logical": [
+        40,
+        36
+      ],
+      "source": [
+        80,
+        72
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 2
+      },
+      "frames": 2,
+      "uniqueFrames": 2,
+      "anchor": "bottom-center",
+      "world": [
+        80,
+        72
+      ],
+      "screen": [
+        160,
+        144
+      ],
+      "alias": "dragonBoss",
+      "category": "alias",
+      "pack": [],
+      "status": "alias",
+      "note": "Legacy alias to dragonBoss; keep mapping, no new asset needed.",
+      "proposed": {
+        "source": "characters-v1/dragonBoss/walk-sheet.png",
+        "status": "preview-ready",
+        "directions": [
+          "front",
+          "back",
+          "left",
+          "right"
+        ],
+        "framesPerDirection": 4,
+        "cellSize": [
+          128,
+          128
+        ],
+        "anchor": [
+          64,
+          116
+        ],
+        "screenScale": 2
+      }
+    },
+    {
+      "name": "arrowFX",
+      "logical": [
+        24,
+        24
+      ],
+      "source": [
+        48,
+        48
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        48,
+        48
+      ],
+      "screen": [
+        96,
+        96
+      ],
+      "alias": null,
+      "category": "fx",
+      "pack": [
+        "weapon_arrow"
+      ],
+      "status": "modified",
+      "note": "Arrow projectile exists as weapon sprite; needs FX orientation/scale treatment."
+    },
+    {
+      "name": "stingerFX",
+      "logical": [
+        24,
+        24
+      ],
+      "source": [
+        48,
+        48
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        48,
+        48
+      ],
+      "screen": [
+        96,
+        96
+      ],
+      "alias": null,
+      "category": "fx",
+      "pack": [],
+      "status": "custom",
+      "note": "No stinger projectile; custom required."
+    },
+    {
+      "name": "boneFX",
+      "logical": [
+        24,
+        24
+      ],
+      "source": [
+        48,
+        48
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        48,
+        48
+      ],
+      "screen": [
+        96,
+        96
+      ],
+      "alias": null,
+      "category": "fx",
+      "pack": [],
+      "status": "custom",
+      "note": "No bone projectile; custom required."
+    },
+    {
+      "name": "beerFX",
+      "logical": [
+        24,
+        24
+      ],
+      "source": [
+        48,
+        48
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        48,
+        48
+      ],
+      "screen": [
+        96,
+        96
+      ],
+      "alias": null,
+      "category": "fx",
+      "pack": [],
+      "status": "custom",
+      "note": "No beer projectile; custom required."
+    },
+    {
+      "name": "fireballFX",
+      "logical": [
+        24,
+        24
+      ],
+      "source": [
+        48,
+        48
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        48,
+        48
+      ],
+      "screen": [
+        96,
+        96
+      ],
+      "alias": null,
+      "category": "fx",
+      "pack": [],
+      "status": "custom",
+      "note": "No fireball; custom required."
+    },
+    {
+      "name": "frostboltFX",
+      "logical": [
+        24,
+        24
+      ],
+      "source": [
+        48,
+        48
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        48,
+        48
+      ],
+      "screen": [
+        96,
+        96
+      ],
+      "alias": null,
+      "category": "fx",
+      "pack": [],
+      "status": "custom",
+      "note": "No frostbolt; custom required."
+    },
+    {
+      "name": "healFX",
+      "logical": [
+        24,
+        24
+      ],
+      "source": [
+        48,
+        48
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        48,
+        48
+      ],
+      "screen": [
+        96,
+        96
+      ],
+      "alias": null,
+      "category": "fx",
+      "pack": [
+        "ui_heart_full? no"
+      ],
+      "status": "custom",
+      "note": "No heal effect; custom required."
+    },
+    {
+      "name": "greaterHealFX",
+      "logical": [
+        24,
+        24
+      ],
+      "source": [
+        48,
+        48
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        48,
+        48
+      ],
+      "screen": [
+        96,
+        96
+      ],
+      "alias": null,
+      "category": "fx",
+      "pack": [],
+      "status": "custom",
+      "note": "No greater heal effect; custom required."
+    },
+    {
+      "name": "magicBarrierFX",
+      "logical": [
+        24,
+        24
+      ],
+      "source": [
+        48,
+        48
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "anchor": "bottom-center",
+      "world": [
+        48,
+        48
+      ],
+      "screen": [
+        96,
+        96
+      ],
+      "alias": null,
+      "category": "fx",
+      "pack": [],
+      "status": "custom",
+      "note": "No barrier effect; custom required."
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "id": "hut",
+  "kind": "sprite",
+  "group": "town",
+  "maxVisible": [
+    128,
+    128
+  ],
+  "columns": 1,
+  "parts": [
+    "sprite"
+  ],
+  "file": "environment-v1/hut/atlas.png",
+  "size": [
+    144,
+    144
+  ],
+  "records": [
+    {
+      "name": "sprite",
+      "crop": [
+        0,
+        0,
+        144,
+        144
+      ],
+      "bounds": {
+        "x": 15,
+        "y": 8,
+        "width": 114,
+        "height": 128
+      },
+      "anchor": [
+        72,
+        136
+      ],
+      "sourceBounds": {
+        "x": 202,
+        "y": 126,
+        "width": 846,
+        "height": 946
+      },
+      "scale": 0.13530655391120508
+    }
+  ],
+  "sha256": "bb7536f7f1bcd55a49bb5990c5178b0e568ec5ed7c6b4dae43b7bfd549e25df7",
+  "sourceSHA256": "b20797068cc202e6eda5584f55c798668b38c0ea425b904024e80a76e03b4236",
+  "scope": "standalone review; runtime unchanged"
+}

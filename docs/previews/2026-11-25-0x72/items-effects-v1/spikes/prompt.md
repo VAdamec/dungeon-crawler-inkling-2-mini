@@ -1,0 +1,5 @@
+Use case: stylized-concept. Asset type: transparent pixel-art dungeon sprite animation sheet.
+Primary request: Cluster of steel floor spikes rising from tiny floor slots, no surrounding floor tile, no grate, no baked background.
+Input image 1 is STYLE AND SUBJECT reference only; do not copy its background, captions, labels or collage. Match its detailed dark-outlined classic JRPG pixel clusters, muted medieval colors and readable small silhouettes.
+Composition: EXACT 2 by 2 equal-cell grid, four frames in reading order: just emerging small tips; half raised; fully raised; retracting short tips. All four cells visible phases; the completely hidden zero-alpha phase will be added separately by exporter. Each centered in its own cell, fixed scale and base position, generous transparent gutters, nothing crossing cells.
+Real transparent RGBA background, no checkerboard drawing, no scenery, no text, no labels, no borders, no watermark. Crisp pixel clusters, no soft photographic edges. Keep all content safely within cells.

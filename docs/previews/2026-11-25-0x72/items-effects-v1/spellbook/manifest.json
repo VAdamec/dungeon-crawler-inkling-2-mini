@@ -1,0 +1,52 @@
+{
+  "id": "spellbook",
+  "name": "spellbook",
+  "description": "Brown leather generic spellbook with gold rune",
+  "group": "books",
+  "sourceFrames": 1,
+  "columns": 1,
+  "maxVisible": [
+    28,
+    24
+  ],
+  "cell": 64,
+  "states": "static",
+  "sheet": "items-effects-v1/spellbook/sheet.png",
+  "anchor": [
+    32,
+    32
+  ],
+  "screenScale": 2,
+  "alphaCutoff": 64,
+  "sharedScale": 0.03709428129829984,
+  "nativeDirection": null,
+  "source": "generated-source.png",
+  "frames": [
+    {
+      "index": 0,
+      "label": "static",
+      "empty": false,
+      "file": "frames/0.png",
+      "crop": [
+        0,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 20,
+        "y": 20,
+        "width": 24,
+        "height": 24
+      },
+      "sourceCell": [
+        0,
+        0,
+        1536,
+        1024
+      ],
+      "sha256": "413d26ed1591d1db4f413a5c557cf3e97766e5f6332714b672efbe517a051675"
+    }
+  ],
+  "scope": "preview only; awaiting review"
+}

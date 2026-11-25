@@ -1,0 +1,7 @@
+{
+  "index.html": "45c5cbdfa1198afbbacb802fb84c451c769a17c328fb6eb4281352c2e5967e86",
+  "style.css": "ef69e6affa88543a029cb380eb4c2a547d37231396091cbaa144f3eee0e8f459",
+  "js/game.js": "123588e74e60a28bb28c4d3131e7883a9f3c4e9c2d0463362bfe705b663dbe72",
+  "js/sprites.js": "aff4c0fa9cbe722a74829eb44b95584b7a363312ead8decf87707112baea1a8c",
+  "tests/game.test.cjs": "0d2d41b847d72729c4bad226875278bf67eb26a6af1f5227875b14ceb7ec96c3"
+}

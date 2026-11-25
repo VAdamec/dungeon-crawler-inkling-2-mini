@@ -1,0 +1,216 @@
+{
+  "protocol": "normal file:// Chrome; no relaxed flags",
+  "controlledAnimationClock": true,
+  "bosses": [
+    {
+      "depth": 5,
+      "kind": "mimic",
+      "sprite": "mimic",
+      "hp": 118,
+      "gold": 0,
+      "kills": 0,
+      "introStale": true,
+      "guards": 0,
+      "guardsCollapsed": true,
+      "reward": "[160,1,50,true]",
+      "lifecycle": {
+        "frozen": true,
+        "noCatchup": true,
+        "stale": true,
+        "rewardsOnce": true
+      }
+    },
+    {
+      "depth": 10,
+      "kind": "hydra",
+      "sprite": "hydra",
+      "hp": 229,
+      "gold": 160,
+      "kills": 1,
+      "introStale": true,
+      "guards": 0,
+      "guardsCollapsed": true,
+      "reward": "[485,2,200,true]",
+      "lifecycle": {
+        "frozen": true,
+        "noCatchup": true,
+        "stale": true,
+        "rewardsOnce": true
+      }
+    },
+    {
+      "depth": 20,
+      "kind": "boar",
+      "sprite": "boar",
+      "hp": 426,
+      "gold": 485,
+      "kills": 2,
+      "introStale": true,
+      "guards": 0,
+      "guardsCollapsed": true,
+      "reward": "[1146,3,415,true]",
+      "lifecycle": {
+        "frozen": true,
+        "noCatchup": true,
+        "stale": true,
+        "rewardsOnce": true
+      }
+    },
+    {
+      "depth": 30,
+      "kind": "medusa",
+      "sprite": "medusa",
+      "hp": 515,
+      "gold": 1146,
+      "kills": 3,
+      "introStale": true,
+      "guards": 0,
+      "guardsCollapsed": true,
+      "reward": "[2136,4,141,true]",
+      "lifecycle": {
+        "frozen": true,
+        "noCatchup": true,
+        "stale": true,
+        "rewardsOnce": true
+      }
+    },
+    {
+      "depth": 40,
+      "kind": "wizard",
+      "sprite": "darkWizard",
+      "hp": 682,
+      "gold": 2136,
+      "kills": 4,
+      "introStale": true,
+      "guards": 0,
+      "guardsCollapsed": true,
+      "reward": "[3534,5,583,true]",
+      "lifecycle": {
+        "frozen": true,
+        "noCatchup": true,
+        "stale": true,
+        "rewardsOnce": true
+      }
+    },
+    {
+      "depth": 50,
+      "kind": "skeletonKing",
+      "sprite": "skeletonKing",
+      "hp": 1032,
+      "gold": 3534,
+      "kills": 5,
+      "introStale": true,
+      "guards": 2,
+      "guardsCollapsed": true,
+      "reward": "[5919,6,1601,true]",
+      "lifecycle": {
+        "frozen": true,
+        "noCatchup": true,
+        "stale": true,
+        "rewardsOnce": true
+      }
+    },
+    {
+      "depth": 100,
+      "kind": "dragon",
+      "sprite": "dragonBoss",
+      "hp": 2061,
+      "gold": 5919,
+      "kills": 6,
+      "introStale": true,
+      "guards": 0,
+      "guardsCollapsed": true,
+      "reward": "[11069,7,4557,true]",
+      "lifecycle": {
+        "frozen": true,
+        "noCatchup": true,
+        "stale": true,
+        "rewardsOnce": true
+      }
+    },
+    {
+      "depth": 3,
+      "kind": "cook",
+      "sprite": "cook",
+      "hp": 140,
+      "gold": 11069,
+      "kills": 7,
+      "introStale": true,
+      "guards": 0,
+      "guardsCollapsed": true,
+      "reward": "[11239,8,4812,true]",
+      "lifecycle": {
+        "frozen": true,
+        "noCatchup": true,
+        "stale": true,
+        "rewardsOnce": true
+      }
+    },
+    {
+      "depth": 7,
+      "kind": "bartender",
+      "sprite": "bartender",
+      "hp": 220,
+      "gold": 11239,
+      "kills": 8,
+      "introStale": true,
+      "guards": 0,
+      "guardsCollapsed": true,
+      "reward": "[11549,9,54,true]",
+      "lifecycle": {
+        "frozen": true,
+        "noCatchup": true,
+        "stale": true,
+        "rewardsOnce": true
+      }
+    }
+  ],
+  "ending": [
+    {
+      "phase": "reveal",
+      "hp": 0,
+      "maxHp": 2061,
+      "health": 0,
+      "overlay": "none"
+    },
+    {
+      "phase": "heal",
+      "hp": 0,
+      "maxHp": 2061,
+      "health": 0,
+      "overlay": "none"
+    },
+    {
+      "phase": "heal",
+      "hp": 1030,
+      "maxHp": 2061,
+      "health": 0.49999999999999983,
+      "overlay": "none"
+    },
+    {
+      "phase": "escape",
+      "hp": 2061,
+      "maxHp": 2061,
+      "health": 1,
+      "overlay": "none"
+    },
+    {
+      "phase": "sunset",
+      "hp": 2061,
+      "maxHp": 2061,
+      "health": 1,
+      "overlay": "none"
+    },
+    {
+      "phase": "done",
+      "hp": 2061,
+      "maxHp": 2061,
+      "health": 1,
+      "overlay": "none"
+    }
+  ],
+  "restart": true,
+  "realSkipAndRestart": true,
+  "errors": [],
+  "remote": []
+}

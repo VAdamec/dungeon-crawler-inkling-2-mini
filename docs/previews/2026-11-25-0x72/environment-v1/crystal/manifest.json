@@ -1,0 +1,49 @@
+{
+  "id": "crystal",
+  "kind": "sprite",
+  "group": "cavern",
+  "maxVisible": [
+    30,
+    36
+  ],
+  "columns": 1,
+  "parts": [
+    "sprite"
+  ],
+  "file": "environment-v1/crystal/atlas.png",
+  "size": [
+    46,
+    52
+  ],
+  "records": [
+    {
+      "name": "sprite",
+      "crop": [
+        0,
+        0,
+        46,
+        52
+      ],
+      "bounds": {
+        "x": 8,
+        "y": 13,
+        "width": 30,
+        "height": 31
+      },
+      "anchor": [
+        23,
+        44
+      ],
+      "sourceBounds": {
+        "x": 365,
+        "y": 339,
+        "width": 517,
+        "height": 533
+      },
+      "scale": 0.058027079303675046
+    }
+  ],
+  "sha256": "fc1f23b810b02a22cd11d04e4953bb4f2f90cf7597d05a93fbc0116d79e1f2ae",
+  "sourceSHA256": "4a2a3e8147e7d06d48f248b414791889348a8804c8f6ea489c4f5473fd66935d",
+  "scope": "standalone review; runtime unchanged"
+}

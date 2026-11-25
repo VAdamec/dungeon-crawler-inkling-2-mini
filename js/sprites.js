@@ -5,6 +5,226 @@ const ART_DENSITY = 2;
 function decodeSpriteGrid(encoded) {
   return encoded.split('|').map(row => Array.from(row.matchAll(/(.)([0-9a-z]+),/gu), m => m[1].repeat(parseInt(m[2], 36))).join(''));
 }
+
+function hasArtRuntime() { return typeof ART_RUNTIME !== 'undefined' && ART_RUNTIME && ART_RUNTIME.characters; }
+function artRuntime() { return hasArtRuntime() ? ART_RUNTIME : null; }
+function artWarn(msg) {
+  try { if (typeof console !== 'undefined' && console.warn) console.warn('[art]', msg); } catch {}
+}
+function artFail(msg) {
+  artWarn(msg);
+  throw new Error('[art] ' + msg);
+}
+function artRoleKind(rt, name) {
+  if (!rt || !name) return null;
+  if (rt.characters && rt.characters[name]) return 'character';
+  if (rt.items && rt.items[name]) return 'item';
+  const env = rt.environment && rt.environment[name];
+  if (env && env.kind === 'sprite') return 'environment';
+  if (env && env.kind === 'material') return 'material';
+  return null;
+}
+function artNormalizeRole(name, frame = 0, direction = 'front', seen = Object.create(null)) {
+  const rt = artRuntime();
+  if (!rt) return { name, frame, direction, kind: 'none', missing: false, covered: false };
+  const raw = String(name || '');
+  if (!raw) return { name: raw, frame, direction, kind: 'missing', missing: true, covered: false };
+  if (seen[raw]) return { name: raw, frame, direction, kind: 'missing', missing: true, covered: true, error: 'alias cycle: ' + raw };
+  seen[raw] = true;
+  const sem = rt.aliases && rt.aliases[raw];
+  if (sem) {
+    const targetKind = sem.kind;
+    if (targetKind === 'character') {
+      const id = String(sem.id || '');
+      const out = artNormalizeRole(id, sem.fixed ? 0 : frame + (sem.frame || 0), sem.dir || direction, seen);
+      if (!out.covered) out.covered = !!(rt.coverage || []).some(c => c && c.runtime === raw);
+      if (out.kind === 'missing') { out.error = out.error || `alias ${raw} -> missing character ${id}`; }
+      return out;
+    }
+    if (targetKind === 'material') {
+      const mat = String(sem.material || sem.id || '');
+      const part = String(sem.part || 'floor');
+      const env = rt.environment && rt.environment[mat];
+      const ok = !!(env && env.kind === 'material' && env.parts && env.parts[part]);
+      return { name: raw, frame: sem.fixed ? 0 : frame, direction: 'front', kind: ok ? 'material' : 'missing', material: mat, part, covered: true, missing: !ok, fixed: !!sem.fixed, error: ok ? null : `alias ${raw} -> missing material ${mat}.${part}` };
+    }
+    if (targetKind === 'environment') {
+      const id = String(sem.id || '');
+      const env = rt.environment && rt.environment[id];
+      const ok = !!(env && env.kind === 'sprite');
+      return { name: raw, frame: sem.fixed ? 0 : frame, direction: 'front', kind: ok ? 'environment' : 'missing', target: id, covered: true, missing: !ok, fixed: !!sem.fixed, error: ok ? null : `alias ${raw} -> missing environment sprite ${id}` };
+    }
+    if (targetKind === 'item') {
+      const id = String(sem.id || '');
+      const it = rt.items && rt.items[id];
+      const base = sem.fixed ? (sem.frame || 0) : (sem.frame || 0) + (frame || 0);
+      const ok = !!(it && Array.isArray(it.frames) && it.frames.length);
+      const inRange = ok && base >= 0 && base < it.frames.length;
+      return { name: raw, frame: base, direction: 'front', kind: ok && inRange ? 'item' : 'missing', target: id, covered: true, missing: !(ok && inRange), fixed: !!sem.fixed, error: !ok ? `alias ${raw} -> missing item ${id}` : (!inRange ? `alias ${raw} frame out of range` : null) };
+    }
+    return { name: raw, frame, direction, kind: 'missing', covered: true, missing: true, error: `alias ${raw} has unsupported kind ${String(targetKind)}` };
+  }
+  const itemAlias = rt.itemAliases && rt.itemAliases[raw];
+  if (itemAlias) {
+    const id = String(itemAlias.id || '');
+    const it = rt.items && rt.items[id];
+    const fixed = itemAlias.fixed !== false; // itemAliases are fixed states by default
+    const base = fixed ? (itemAlias.frame || 0) : (itemAlias.frame || 0) + (frame || 0);
+    const ok = !!(it && Array.isArray(it.frames) && it.frames.length);
+    const inRange = ok && base >= 0 && base < it.frames.length;
+    return { name: raw, frame: base, direction: 'front', kind: ok && inRange ? 'item' : 'missing', target: id, covered: true, missing: !(ok && inRange), fixed, error: !ok ? `item alias ${raw} -> missing item ${id}` : (!inRange ? `item alias ${raw} frame out of range` : null) };
+  }
+  const kind = artRoleKind(rt, raw);
+  if (kind === 'character') return { name: raw, frame, direction, kind, target: raw, covered: true, missing: false, fixed: false };
+  if (kind === 'item') return { name: raw, frame, direction: 'front', kind, target: raw, covered: true, missing: false, fixed: false };
+  if (kind === 'environment') return { name: raw, frame, direction: 'front', kind, target: raw, covered: true, missing: false, fixed: false };
+  if (kind === 'material') return { name: raw, frame, direction: 'front', kind, material: raw, part: 'floor', covered: true, missing: false, fixed: false };
+  const covered = Array.isArray(rt.coverage) && rt.coverage.some(c => c && c.runtime === raw);
+  return { name: raw, frame, direction, kind: 'missing', covered, missing: true, fixed: false };
+}
+function artResolve(name, frame = 0) {
+  const r = artNormalizeRole(name, frame, 'front');
+  if (r.kind === 'material') return { name: r.material, part: r.part, frame: r.frame, material: true, kind: 'material', covered: r.covered, missing: r.missing, fixed: !!r.fixed };
+  if (r.kind === 'character') return { name: r.target, frame: r.frame, dir: r.direction, kind: 'character', covered: r.covered, missing: r.missing, fixed: !!r.fixed };
+  if (r.kind === 'environment') return { name: r.target, frame: r.frame, env: true, kind: 'environment', covered: r.covered, missing: r.missing, fixed: !!r.fixed };
+  if (r.kind === 'item') return { name: r.target, frame: r.frame, kind: 'item', covered: r.covered, missing: r.missing, fixed: !!r.fixed };
+  return { name, frame, missing: !!r.missing, covered: !!r.covered, kind: r.kind, error: r.error };
+}
+function artFrame(name, frame = 0, direction = 'front') {
+  const rt = artRuntime();
+  if (!rt) return null;
+  const r = artNormalizeRole(name, frame, direction);
+  if (r.error) { artWarn(r.error); if (r.covered) return null; }
+  if (r.kind === 'material') {
+    const env = rt.environment[r.material];
+    const part = env && env.parts && env.parts[r.part];
+    if (part) return { ...part, _kind:'material', _name:r.material, _part:r.part, _dir:'front', _fi:0 };
+    if (r.covered) artWarn(`missing material ${r.material}.${r.part}`);
+    return null;
+  }
+  if (r.kind === 'character') {
+    const ch = rt.characters[r.target];
+    const dirs = ch && ch.dirs;
+    const list = dirs && dirs[direction];
+    if (!list || !list.length) {
+      if (r.covered) artWarn(`missing required dir ${r.target}.${direction}`);
+      return null;
+    }
+    const idx = ((r.frame % list.length) + list.length) % list.length;
+    const f = list[idx];
+    return { ...f, _kind:'char', _name:r.target, _dir:direction, _fi:idx };
+  }
+  if (r.kind === 'item') {
+    const it = rt.items[r.target];
+    if (!it || !Array.isArray(it.frames) || !it.frames.length) {
+      if (r.covered) artWarn(`missing item frames ${r.target}`);
+      return null;
+    }
+    if (r.frame < 0 || r.frame >= it.frames.length) {
+      if (r.covered) artWarn(`item frame out of range ${r.target}:${r.frame}`);
+      return null;
+    }
+    const f = it.frames[r.frame];
+    return { ...f, _kind:'item', _name:r.target, _dir:'front', _fi:r.frame };
+  }
+  if (r.kind === 'environment') {
+    const env = rt.environment[r.target];
+    if (env && env.kind === 'sprite' && env.frame) return { ...env.frame, _kind:'env', _name:r.target, _dir:'front', _fi:0 };
+    if (r.covered) artWarn(`missing environment sprite ${r.target}`);
+    return null;
+  }
+  if (r.covered) artWarn(`missing art ${name}`);
+  return null;
+}
+function artRequire(name, frame = 0, direction = 'front') {
+  const r = artNormalizeRole(name, frame, direction);
+  if (r.missing && r.covered) artFail(`missing required art ${name}${r.error ? ': ' + r.error : ''}`);
+  const f = artFrame(name, frame, direction);
+  if (!f && r.covered) artFail(`missing required frame for ${name} frame=${frame} dir=${direction}`);
+  return f;
+}
+function b64ToBytes(b64) {
+  if (typeof atob === 'function') {
+    const bin = atob(b64); const out = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
+  if (typeof Buffer !== 'undefined') return new Uint8Array(Buffer.from(b64, 'base64'));
+  // minimal base64 decoder for no-DOM/no-Buffer environments
+  const t = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+  const map = b64ToBytes._m || (b64ToBytes._m = (() => { const m = new Int16Array(128).fill(-1); for (let i=0;i<64;i++) m[t.charCodeAt(i)] = i; return m; })());
+  const clean = b64.replace(/[^A-Za-z0-9+/]/g, '');
+  const out = new Uint8Array((clean.length * 3 / 4) | 0);
+  let o = 0, bits = 0, val = 0;
+  for (let i = 0; i < clean.length; i++) {
+    const c = clean.charCodeAt(i);
+    const v = c < 128 ? map[c] : -1;
+    if (v < 0) continue;
+    val = (val << 6) | v; bits += 6;
+    if (bits >= 8) { bits -= 8; out[o++] = (val >> bits) & 255; }
+  }
+  return out.subarray(0, o);
+}
+function decodeArtFrame(frame) {
+  if (!frame || frame.empty) return null;
+  const w = frame.w, h = frame.h, pal = frame.p;
+  const rgba = new Uint8ClampedArray(w * h * 4);
+  const bin = b64ToBytes(frame.r);
+  let p = 0;
+  for (let i = 0; i < bin.length; i += 4) {
+    const count = bin[i] | (bin[i+1] << 8);
+    const idx = bin[i+2] | (bin[i+3] << 8);
+    const hex = pal[idx];
+    if (hex === '00000000') { p += count; continue; }
+    const r = parseInt(hex.slice(0,2),16), g = parseInt(hex.slice(2,4),16), b = parseInt(hex.slice(4,6),16), a = parseInt(hex.slice(6,8),16);
+    for (let k = 0; k < count; k++, p++) {
+      const o = p * 4;
+      rgba[o]=r; rgba[o+1]=g; rgba[o+2]=b; rgba[o+3]=a;
+    }
+  }
+  return { w, h, rgba, anchor: frame.a || [w/2,h/2], bounds: frame.b || {x:0,y:0,width:w,height:h}, empty: !!frame.empty };
+}
+function fixedWallTorchPose(decoded, frame) {
+  // Authored flame cells also shift/repaint the mount. Keep frame zero's
+  // bracket/handle below row 31; align only the animated flame above it.
+  const base=decodeArtFrame(artFrame('torch',0,'front'));
+  const offsets=[[0,0],[3,0],[0,1],[3,1]], [dx,dy]=offsets[((frame%4)+4)%4];
+  const rgba=new Uint8ClampedArray(base.rgba);
+  rgba.fill(0,0,31*base.w*4);
+  for(let y=0;y<decoded.h;y++) for(let x=0;x<decoded.w;x++) {
+    const tx=x+dx,ty=y+dy;
+    if(tx<0 || tx>=base.w || ty<0 || ty>=31) continue;
+    const si=(y*decoded.w+x)*4,di=(ty*base.w+tx)*4;
+    if(decoded.rgba[si+3]) rgba.set(decoded.rgba.subarray(si,si+4),di);
+  }
+  let x0=base.w,y0=base.h,x1=0,y1=0;
+  for(let y=0;y<base.h;y++)for(let x=0;x<base.w;x++)if(rgba[(y*base.w+x)*4+3]){
+    x0=Math.min(x0,x);y0=Math.min(y0,y);x1=Math.max(x1,x);y1=Math.max(y1,y);
+  }
+  return {...base,rgba,bounds:{x:x0,y:y0,width:x1-x0+1,height:y1-y0+1}};
+}
+function artDecoded(name, frame = 0, direction = 'front') {
+  const cache = graphicsCache().decoded || (graphicsCache().decoded = {});
+  const key = `${name}:${direction}:${frame}`;
+  if (cache[key] !== undefined) return cache[key];
+  const f = artFrame(name, frame, direction);
+  const decoded=f ? decodeArtFrame(f) : null;
+  cache[key] = name==='torch' && decoded ? fixedWallTorchPose(decoded,frame) : decoded;
+  return cache[key];
+}
+function artCovered(name) {
+  const rt = artRuntime();
+  if (!rt) return false;
+  const r = artNormalizeRole(name, 0, 'front');
+  if (r.covered) return true;
+  return Array.isArray(rt.coverage) && rt.coverage.some(c => c && c.runtime === name);
+}
+function artHas(name) {
+  const rt = artRuntime();
+  if (!rt) return false;
+  const r = artNormalizeRole(name, 0, 'front');
+  return r.kind === 'character' || r.kind === 'item' || r.kind === 'environment' || r.kind === 'material';
+}
 const JRPG_GRIDS = [
   ".w,|.e,Ā3,ā1,.e,|.e,Ā3,ā1,.e,|.b,Ă1,ă3,ā3,ă3,Ă1,.a,|.a,Ă1,ă4,ā3,ă4,.a,|.9,Ă1,ă1,Ą1,ą3,ā3,ą3,Ą1,Ć1,.9,|.9,ă2,Ą1,ą9,Ą1,ă1,Ă1,.8,|.9,Ć1,ă1,Ąb,ă2,.8,|.9,Ć1,ă1,Ąb,ă1,Ć1,.8,|.9,Ă1,ă1,Ąb,ă1,Ă1,.8,|.9,Ă1,ă1,ćb,ă1,Ă1,.8,|.a,Ĉ2,ć9,ĉ2,Ă1,.8,|.a,Ĉ2,Ċ9,ĉ2,.9,|.a,Ĉ2,Ċ1,ċ2,Ċ3,ċ2,Ċ1,ĉ2,.9,|.a,Ĉ2,Ċ9,ĉ2,.9,|.a,Ĉ2,Ċ9,ĉ2,.9,|.8,Ć1,ă6,Č3,ă5,Ć1,.8,|.6,Ą5,čc,ă1,Ď4,.4,|.6,Ą5,ďa,č2,ă1,Ď4,.4,|.6,Ą5,ďa,č2,ă1,Ď4,.4,|.6,Ĉ4,čd,ă1,Đ3,.5,|.6,Ĉ4,č2,đ9,č2,ă1,Đ3,.5,|.6,Ĉ4,č2,đ9,č2,ă1,Đ3,.5,|.6,Ĉ4,č2,đ9,č2,ă1,Đ3,.5,|.6,Ĉ4,č2,đ9,č2,Ć1,Đ3,.5,|.6,Ĉ4,čd,Ć1,Đ3,.5,|.5,Ē2,Ĉ3,ă1,ē5,Ĕ3,ē4,ĕ1,Ė2,Đ1,.5,|.5,Ē2,.1,ė2,ă1,ē5,Ĕ3,ē4,Ę1,ę1,Ě1,ę1,ě1,.4,|.5,Ē2,.1,ė2,Ĝ1,ē5,Ĕ3,ē4,Ę1,ĝ1,Ğ2,Ě1,ę1,ě1,.2,|.5,Ē2,.1,ė2,Ĝb,ğ2,Ġ1,ĝ1,Ğ1,ġ1,Ğ2,Ě1,ę1,.1,|.5,Ē2,.1,ė2,Ĝb,ğ2,Ġ1,Ě1,ġ1,Ģ1,ģ1,ġ1,Ğ1,ě1,.1,|.4,Ĥ5,ė1,ĥ5,Ĝ3,ĉ5,Ġ1,Ě1,ġ1,Ģ1,ģ2,Ħ1,ě1,.1,|.4,Ĥ5,ė1,ĥ5,Ĝ3,ĉ5,Ġ1,Ħ1,ħ1,Ģ1,ģ1,ġ1,Ě1,ě1,.1,|.5,Ĩ2,ĩ1,ė2,ĥ5,Ĝ3,ĉ5,Ī1,Ħ1,ģ1,Ģ1,ģ1,ġ1,Ě1,ě1,.1,|.5,Ĩ2,ĩ1,ė2,ĥ5,Ĝ3,ĉ5,Ī1,Ğ1,ħ1,Ģ1,ģ1,ī1,ĝ1,.2,|.5,Ĩ2,ĩ1,Ĝ2,ĥ5,Ĝ3,ĉ5,ę1,Ě1,Ğ1,Ģ1,ģ1,Ğ1,ę1,.2,|.5,Ĩ2,ĩ1,Ĝ2,ĥ5,Ĝ3,ĉ5,Ġ1,ę1,Ħ1,ī1,ġ1,Ě1,ę1,.2,|.5,Ē2,ĩ1,Ĝ2,ĥ5,Ĝ3,ĉ5,Ĝ1,Ī1,ĝ1,Ğ2,ę1,ě1,.2,|.5,Ē2,ĩ1,Ĝ2,ĥ5,Ĝ3,ĉ5,Ĝ2,ę1,Ě2,ě1,.3,|.5,Ē2,Ĝ2,Ĭ1,ĭ3,Ĭ2,Ĝ3,Ĭ1,ĭ4,Ĭ2,.1,ę2,.4,|.5,Ē2,.2,Ĭ6,.3,Ĭ7,.1,ě2,.4,|.5,Ē2,.2,Ĭ6,.3,Ĭ7,.7,|.9,Ĭ6,.3,Ĭ7,.7,|.w,",
   ".w,|.e,Ā3,ā1,.e,|.e,Ā3,ā1,.e,|.b,Ă1,ă3,ā3,ă3,Ă1,.a,|.a,Ă1,ă4,ā3,ă4,.a,|.9,Ă1,ă1,Ą1,ą3,ā3,ą3,Ą1,Ć1,.9,|.9,ă2,Ą1,ą9,Ą1,ă1,Ă1,.8,|.9,Ć1,ă1,Ąb,ă2,.8,|.9,Ć1,ă1,Ąb,ă1,Ć1,.8,|.9,Ă1,ă1,Ąb,ă1,Ă1,.8,|.9,Ă1,ă1,ćb,ă1,Ă1,.8,|.a,Ĉ2,ć9,ĉ2,Ă1,.8,|.a,Ĉ2,Ċ9,ĉ2,.9,|.a,Ĉ2,Ċ1,ċ2,Ċ3,ċ2,Ċ1,ĉ2,.9,|.a,Ĉ2,Ċ9,ĉ2,.9,|.8,Ć1,ă1,Ĉ2,Ċ9,ĉ2,Ć1,.8,|.6,Ą5,č4,Č3,č5,ă1,Ď4,.4,|.6,Ą5,ďa,č2,ă1,Ď4,.4,|.6,Ą5,ďa,č2,ă1,Ď4,.4,|.6,Ĉ4,čd,ă1,Đ3,.5,|.6,Ĉ4,č2,đ9,č2,ă1,Đ3,.5,|.6,Ĉ4,č2,đ9,č2,ă1,Đ3,.5,|.6,Ĉ4,č2,đ9,č2,ă1,Đ3,.5,|.6,Ĉ4,č2,đ9,č2,Ć1,Đ3,.5,|.6,Ĉ4,čd,Ć1,Đ3,.5,|.6,Ĉ4,ă1,ē5,Ĕ3,ē4,.1,Đ3,.5,|.5,Ē2,.1,ė2,ă1,ē5,Ĕ3,ē4,ĩ1,Ė2,Đ1,.5,|.5,Ē2,.1,ė2,Ĝ1,ē5,Ĕ3,ē4,Ę1,ę1,Ě1,ę1,ě1,.4,|.5,Ē2,.1,ė2,Ĝb,ğ2,Ę1,ĝ1,Ğ2,Ě1,ę1,ě1,.2,|.5,Ē2,.1,ė2,Ĝb,ğ2,Ġ1,ĝ1,Ğ1,ġ1,Ğ2,Ě1,ę1,.1,|.3,Ĥ5,ė1,ĥ5,Ĝ7,ğ2,Ġ1,Ě1,ġ1,Ģ1,ģ1,ġ1,Ğ1,ě1,.1,|.3,Ĥ5,ė1,ĥ5,Ĝ1,.2,Ĝ2,ĉ5,Ġ1,Ě1,ġ1,Ģ1,ģ2,Ħ1,ě1,|.4,Ĩ2,ĩ1,ė2,ĥ5,Ĝ1,.2,Ĝ2,ĉ5,Ġ1,Ħ1,ħ1,Ģ1,ģ1,ġ1,Ě1,ě1,|.4,Ĩ2,ĩ1,ė2,ĥ5,Ĝ1,.2,Ĝ2,ĉ5,Ī1,Ħ1,ģ1,Ģ1,ģ1,ġ1,Ě1,ě1,|.4,Ĩ2,ĩ1,Ĝ2,ĥ5,Ĝ1,.2,Ĝ2,ĉ5,Ī1,Ğ1,ħ1,Ģ1,ģ1,ī1,ĝ1,.1,|.4,Ĩ2,ĩ1,Ĝ2,ĥ5,Ĝ1,.2,Ĝ2,ĉ5,ę1,Ě1,Ğ1,Ģ1,ģ1,Ğ1,ę1,.1,|.4,Ē2,ĩ1,Ĝ1,Ĭ1,ĭ3,Ĭ2,Ĝ1,.2,Ĝ2,ĉ5,Ġ1,ę1,Ħ1,ī1,ġ1,Ě1,ę1,.1,|.4,Ē2,ĩ1,Ĝ1,Ĭ6,Ĝ1,.2,Ĝ2,ĉ5,Ĝ1,Ī1,ĝ1,Ğ2,ę1,ě1,.1,|.4,Ē2,Ĝ2,Ĭ6,Ĝ1,.2,Ĝ2,ĉ5,Ĝ2,ę1,Ě2,ě1,.2,|.4,Ē2,.2,Ĭ6,.3,Ĝ2,Ĭ1,ĭ4,Ĭ2,.1,ę2,.3,|.4,Ē2,.d,Ĭ7,.1,ě2,.3,|.j,Ĭ7,.6,|.j,Ĭ7,.6,|.w,",
@@ -235,19 +455,87 @@ function graphicsSurface(width, height) {
   return surface;
 }
 
+function artBounds(frame) {
+  if (!frame) return { x: 0, y: 0, width: 0, height: 0 };
+  const b = frame.b;
+  if (b && typeof b.width === 'number') return b;
+  if (frame.empty) return { x: 0, y: 0, width: 0, height: 0 };
+  const w = frame.w || 0, h = frame.h || 0;
+  return { x: 0, y: 0, width: w, height: h };
+}
+function artUnionBounds(frames) {
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const f of frames || []) {
+    if (f && f.empty && !(f.b && typeof f.b.width === 'number')) continue;
+    const b = artBounds(f);
+    if (b.width <= 0 || b.height <= 0) continue;
+    minX = Math.min(minX, b.x); minY = Math.min(minY, b.y);
+    maxX = Math.max(maxX, b.x + b.width); maxY = Math.max(maxY, b.y + b.height);
+  }
+  if (!Number.isFinite(minX)) return { x: 0, y: 0, width: 0, height: 0 };
+  return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
+}
+function artFrameList(role, rt) {
+  if (!role || !rt) return [];
+  if (role.kind === 'character') {
+    const ch = rt.characters[role.target];
+    return ch ? Object.values(ch.dirs).flat() : [];
+  }
+  if (role.kind === 'item') {
+    const it = rt.items[role.target];
+    return it && Array.isArray(it.frames) ? it.frames : [];
+  }
+  if (role.kind === 'environment') {
+    const env = rt.environment[role.target];
+    return env && env.frame ? [env.frame] : [];
+  }
+  if (role.kind === 'material') {
+    const env = rt.environment[role.material];
+    const part = env && env.parts && env.parts[role.part];
+    return part ? [part] : [];
+  }
+  return [];
+}
 function spriteDimensions(name) {
+  const rt = artRuntime();
+  if (rt) {
+    const r = artNormalizeRole(name, 0, 'front');
+    const frames = artFrameList(r, rt);
+    if (frames.length) {
+      const first = frames[0];
+      const union = artUnionBounds(frames);
+      const anchor = (r.kind === 'item' && rt.items[r.target] && rt.items[r.target].anchor) ? rt.items[r.target].anchor : (first.a || [first.w / 2, first.h]);
+      return {
+        width: union.width / ART_DENSITY,
+        height: union.height / ART_DENSITY,
+        cellW: first.w / ART_DENSITY,
+        cellH: first.h / ART_DENSITY,
+        anchorX: anchor[0] / ART_DENSITY,
+        anchorY: anchor[1] / ART_DENSITY,
+        unionX: union.x / ART_DENSITY,
+        unionY: union.y / ART_DENSITY,
+        art: true,
+        material: r.kind === 'material',
+        kind: r.kind,
+        target: r.target || r.material,
+      };
+    }
+  }
   const grid = SPRITES[name];
+  if (!grid) return { width: 16, height: 16 };
   return { width: Math.max(...grid.map(row => row.length)) / ART_DENSITY, height: grid.length / ART_DENSITY };
 }
 
 function spriteFrameGrid(name, frame = 0, direction = 'front') {
   const dirs = JRPG_VARIANTS[name];
+  if (!dirs) return SPRITES[name] || [[]];
   const frames = dirs[direction] || dirs.front;
   return JRPG_GRIDS[frames[((frame % 4) + 4) % 4]];
 }
 
-function paintSprite(target, name, x = 0, y = 0, scale = 1, frame = 0, direction = 'front') {
+function paintLegacySprite(target, name, x = 0, y = 0, scale = 1, frame = 0, direction = 'front') {
   const grid = spriteFrameGrid(name, frame, direction), palette = SPRITE_PALETTES[name];
+  if (!grid || !palette) return;
   for (let row = 0; row < grid.length; row++) for (let col = 0; col < grid[row].length; col++) {
     const color = palette[grid[row][col]];
     if (!color) continue;
@@ -256,36 +544,109 @@ function paintSprite(target, name, x = 0, y = 0, scale = 1, frame = 0, direction
   }
 }
 
-function drawSprite(name, cx, cy, scale, frame = 0, direction = 'front') {
+function drawArtDecoded(target, dec, dx, dy, dw, dh) {
+  if (!dec || !dec.rgba) return;
+  // no-DOM fallback: paint pixel by pixel
+  for (let y = 0; y < dec.h; y++) for (let x = 0; x < dec.w; x++) {
+    const o = (y * dec.w + x) * 4, a = dec.rgba[o+3];
+    if (!a) continue;
+    target.fillStyle = `rgba(${dec.rgba[o]},${dec.rgba[o+1]},${dec.rgba[o+2]},${a/255})`;
+    target.fillRect(dx + x * dw / dec.w, dy + y * dh / dec.h, Math.ceil(dw / dec.w), Math.ceil(dh / dec.h));
+  }
+}
+
+function drawSprite(name, cx, cy, scale, frame = 0, direction = 'front', anchored = false) {
+  const rt = artRuntime();
+  const covered = rt && artCovered(name);
+  const role = rt ? artNormalizeRole(name, frame, direction) : null;
+  if (rt && ((role && role.kind !== 'missing' && role.kind !== 'material') || covered)) {
+    const dec = artDecoded(name, frame, direction);
+    if (dec) {
+      const dw = dec.w * scale / ART_DENSITY, dh = dec.h * scale / ART_DENSITY;
+      let dx, dy;
+      if (anchored) {
+        const ax = dec.anchor[0] * scale / ART_DENSITY, ay = dec.anchor[1] * scale / ART_DENSITY;
+        dx = Math.round(cx - ax); dy = Math.round(cy - ay);
+      } else {
+        dx = Math.round(cx - dw / 2); dy = Math.round(cy - dh / 2);
+      }
+      const cache = graphicsCache().sprites;
+      // Cached canvases hold source pixels; scale belongs only to drawImage.
+      const key = `rt:${name}:${direction}:${frame}`;
+      if (!cache[key]) {
+        const surface = graphicsSurface(dec.w, dec.h);
+        if (surface) {
+          const sctx = surface.getContext('2d');
+          const img = sctx && typeof sctx.createImageData === 'function' ? sctx.createImageData(dec.w, dec.h) : null;
+          if (img && img.data && typeof img.data.set === 'function' && typeof sctx.putImageData === 'function') {
+            img.data.set(dec.rgba);
+            sctx.putImageData(img, 0, 0);
+            cache[key] = surface;
+          } else {
+            cache[key] = { _direct: dec };
+          }
+        }
+      }
+      const legacyKey = direction !== 'front' ? `${name}:${direction}:${frame}` : frame ? `${name}:${frame}` : name;
+      if (cache[key] && !cache[legacyKey]) cache[legacyKey] = cache[key];
+      const cached = cache[key];
+      if (cached && !cached._direct) { ctx.imageSmoothingEnabled = false; ctx.drawImage(cached, dx, dy, dw, dh); }
+      else drawArtDecoded(ctx, dec, dx, dy, dw, dh);
+      return;
+    }
+    const f = artFrame(name, frame, direction);
+    if (f && f.empty) return;
+    if (covered) { artWarn(`missing required art ${name}:${direction}:${frame}`); return; }
+  }
   const size = spriteDimensions(name), width = size.width * scale, height = size.height * scale;
-  const x = Math.round(cx - width / 2), y = Math.round(cy - height / 2);
+  let x, y;
+  if (anchored) { x = Math.round(cx - width / 2); y = Math.round(cy - height); }
+  else { x = Math.round(cx - width / 2); y = Math.round(cy - height / 2); }
   const cache = graphicsCache().sprites;
   const key = direction !== 'front' ? `${name}:${direction}:${frame}` : frame ? `${name}:${frame}` : name;
   if (!cache[key]) {
     const surface = graphicsSurface(size.width * ART_DENSITY, size.height * ART_DENSITY);
-    if (surface) { paintSprite(surface.getContext('2d'), name, 0, 0, 1, frame, direction); cache[key] = surface; }
+    if (surface) { paintLegacySprite(surface.getContext('2d'), name, 0, 0, 1, frame, direction); cache[key] = surface; }
   }
   if (cache[key]) {
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(cache[key], x, y, width, height);
   } else {
-    // Preserve the dependency-free no-DOM smoke harness.
-    paintSprite(ctx, name, x, y, scale / ART_DENSITY, frame, direction);
+    paintLegacySprite(ctx, name, x, y, scale / ART_DENSITY, frame, direction);
   }
 }
 
+function drawSpriteAnchored(name, anchorX, anchorY, scale, frame = 0, direction = 'front') {
+  drawSprite(name, anchorX, anchorY, scale, frame, direction, true);
+}
+
 function drawEquipmentIcon(slot, item) {
-  const name = item && SPRITES[item.sprite] ? item.sprite : { weapon: 'sword', armor: 'shield', ring: 'ring' }[slot];
-  const target = document.getElementById(`${slot}Icon`).getContext('2d');
+  const name = item && (SPRITES[item.sprite] || artHas(item.sprite) || artCovered(item.sprite)) ? item.sprite : { weapon: 'sword', armor: 'shield', ring: 'ring' }[slot];
+  const targetEl = document.getElementById(`${slot}Icon`);
+  if (!targetEl) return;
+  const target = targetEl.getContext('2d');
   target.clearRect(0, 0, 32, 32);
+  const rt = artRuntime();
+  if (rt && (artHas(name) || artCovered(name))) {
+    const dec = artDecoded(name, 0, 'front');
+    if (dec) {
+      const b = dec.bounds || {x:0,y:0,width:dec.w,height:dec.h};
+      const ratio = Math.min(28 / b.width, 28 / b.height);
+      const dw = b.width * ratio, dh = b.height * ratio;
+      const dx = (32 - dw) / 2 - b.x * ratio, dy = (32 - dh) / 2 - b.y * ratio;
+      drawArtDecoded(target, dec, dx, dy, dec.w * ratio, dec.h * ratio);
+      return;
+    }
+    if (artCovered(name)) { artWarn(`missing equipment icon art ${name}`); return; }
+  }
   const size = spriteDimensions(name), ratio = Math.min(28 / size.width, 28 / size.height);
   const cache = graphicsCache().sprites, key = `icon:${name}`;
   if (!cache[key]) {
     const surface = graphicsSurface(32, 32);
-    if (surface) { paintSprite(surface.getContext('2d'), name, (32 - size.width * ratio) / 2, (32 - size.height * ratio) / 2, ratio / ART_DENSITY); cache[key] = surface; }
+    if (surface) { paintLegacySprite(surface.getContext('2d'), name, (32 - size.width * ratio) / 2, (32 - size.height * ratio) / 2, ratio / ART_DENSITY); cache[key] = surface; }
   }
   if (cache[key]) { target.imageSmoothingEnabled = false; target.drawImage(cache[key], 0, 0); }
-  else paintSprite(target, name, (32 - size.width * ratio) / 2, (32 - size.height * ratio) / 2, ratio / ART_DENSITY);
+  else paintLegacySprite(target, name, (32 - size.width * ratio) / 2, (32 - size.height * ratio) / 2, ratio / ART_DENSITY);
 }
 
 function actorAnimationPose(name, actor) {
@@ -293,6 +654,14 @@ function actorAnimationPose(name, actor) {
   if (!actor || typeof window.requestAnimationFrame !== 'function') return pose;
   const moving = actorIsMoving(actor), key = actorMotionKey(actor), time = state.motion.time;
   pose.facing = state.motion.facing[key] || 1;
+  const role = artNormalizeRole(name);
+  if (role.kind === 'character') {
+    // Prepared poses already contain gait, hops and wing deformation.
+    if (['bat','wasp','dragonBoss'].includes(role.target)) pose.frame = Math.floor(time * 8 + (actor.id || 0) % 4) % 4;
+    else if (['mage','healer','hydra','medusa','darkWizard','skeletonKing'].includes(role.target)) pose.frame = Math.floor(time * 6 + (actor.id || 0) % 4) % 4;
+    else if (moving) pose.frame = Math.floor(time * 12) % 4;
+    return pose;
+  }
   if (name === 'bat' || name === 'wasp' || name === 'dragonBoss') {
     pose.frame = Math.floor(time * 8 + (actor.id || 0) % 4) % 4;
     if (name === 'bat' || name === 'wasp') pose.rise = Math.sin(time * 8) * 0.8;
@@ -312,15 +681,70 @@ function actorAnimationPose(name, actor) {
   return pose;
 }
 
+function spriteAnchor(name, frame=0, direction='front') {
+  const rt = artRuntime();
+  const size = spriteDimensions(name);
+  if (rt) {
+    const r = artNormalizeRole(name, frame, direction);
+    if (r.kind !== 'missing' && r.kind !== 'none') {
+      const dec = artDecoded(name, frame, direction);
+      if (dec) {
+        const b = dec.bounds || { x: 0, y: 0, width: dec.w, height: dec.h };
+        return {
+          ax: dec.anchor[0] / ART_DENSITY,
+          ay: dec.anchor[1] / ART_DENSITY,
+          w: dec.w / ART_DENSITY,
+          h: dec.h / ART_DENSITY,
+          bw: b.width / ART_DENSITY,
+          bh: b.height / ART_DENSITY,
+          bx: b.x / ART_DENSITY,
+          by: b.y / ART_DENSITY,
+          unionW: size.width,
+          unionH: size.height,
+          unionX: size.unionX || 0,
+          unionY: size.unionY || 0,
+        };
+      }
+    }
+  }
+  return {
+    ax: (size.anchorX != null ? size.anchorX : size.width / 2),
+    ay: (size.anchorY != null ? size.anchorY : size.height),
+    w: size.cellW || size.width,
+    h: size.cellH || size.height,
+    bw: size.width,
+    bh: size.height,
+    bx: size.unionX || 0,
+    by: size.unionY || 0,
+    unionW: size.width,
+    unionH: size.height,
+    unionX: size.unionX || 0,
+    unionY: size.unionY || 0,
+  };
+}
+
 function drawActorSprite(name, cx, cy, scale, actor = null) {
-  const size = spriteDimensions(name), pose = actorAnimationPose(name,actor);
-  const key=actor?actorMotionKey(actor):null;
-  const direction=key && state.motion.directions ? state.motion.directions[key]||'front' : 'front';
-  const directional=!!JRPG_VARIANTS[name][direction] && Object.keys(JRPG_VARIANTS[name]).length>1;
-  const foot=size.height*scale/2;
-  ctx.save();ctx.fillStyle='rgba(7,14,26,0.35)';ctx.beginPath();ctx.ellipse(cx,cy+foot-1,Math.min(24,size.width*scale*.3),Math.max(2,scale*1.5),0,0,Math.PI*2);ctx.fill();ctx.restore();
-  ctx.save();ctx.translate(cx,cy+foot+pose.rise);ctx.scale(pose.sx*(directional?1:pose.facing),pose.sy);
-  drawSprite(name,0,-foot,scale,pose.frame,directional?direction:'front');ctx.restore();
+  const pose = actorAnimationPose(name, actor);
+  const key = actor ? actorMotionKey(actor) : null;
+  const direction = key && state.motion.directions ? state.motion.directions[key] || 'front' : 'front';
+  const hasDirs = !!(JRPG_VARIANTS[name] && JRPG_VARIANTS[name][direction] && Object.keys(JRPG_VARIANTS[name]).length > 1);
+  const rt = artRuntime();
+  const rtChar = rt && rt.characters && rt.characters[name];
+  const directional = hasDirs || !!rtChar;
+  const anc = spriteAnchor(name, pose.frame, directional ? direction : 'front');
+  // cy is the world anchor/center point passed by callers (worldSpriteCenterY gives center; old drew center).
+  // For legacy, foot was at cy + size.height*scale/2. For anchored art, we want anchor at foot.
+  // Callers pass cy as center of sprite. We'll draw with anchor at cy + anc.bh*scale/2 (legacy foot) adjusted.
+  const centerToFoot = spriteDimensions(name).height * scale / 2;
+  const footY = cy + centerToFoot + pose.rise;
+  ctx.save(); ctx.fillStyle = 'rgba(7,14,26,0.35)'; ctx.beginPath();
+  ctx.ellipse(cx, cy + centerToFoot - 1, Math.min(24, anc.bw * scale * 0.3), Math.max(2, scale * 1.5), 0, 0, Math.PI * 2);
+  ctx.fill(); ctx.restore();
+  ctx.save();
+  ctx.translate(cx, footY);
+  ctx.scale(pose.sx * (directional ? 1 : pose.facing), pose.sy);
+  drawSpriteAnchored(name, 0, 0, scale, pose.frame, directional ? direction : 'front');
+  ctx.restore();
 }
 
 // Exposed edges of the actual blocked tile: north/east/south/west = 1/2/4/8.
@@ -334,27 +758,178 @@ function dungeonWallEdges(x, y) {
   return edges;
 }
 
+function artWallAt(x, y) {
+  return x < 0 || x >= W || y < 0 || y >= H || state.map[y][x] === 1;
+}
+function artNormalizeWallMask(mask) {
+  for (const [bit, a, b] of [[16,1,2],[32,2,4],[64,4,8],[128,8,1]]) if (!(mask & a) || !(mask & b)) mask &= ~bit;
+  return mask;
+}
+function artWallMaskAt(x, y) {
+  let mask = 0;
+  for (const [dx, dy, bit] of [[0,-1,1],[1,0,2],[0,1,4],[-1,0,8],[1,-1,16],[1,1,32],[-1,1,64],[-1,-1,128]]) {
+    if (artWallAt(x + dx, y + dy)) mask |= bit;
+  }
+  return artNormalizeWallMask(mask);
+}
+function artWallPlan(mask) {
+  const m = artNormalizeWallMask(mask), edges = (~m) & 15, corners = [];
+  for (const [bit, a, b, x, y] of [[128,1,8,0,0],[16,1,2,28,0],[32,2,4,28,28],[64,4,8,0,28]]) if ((m & a) && (m & b) && !(m & bit)) corners.push([x, y]);
+  return { mask: m, edges, corners };
+}
+function artMaterialPart(biome, part) {
+  const rt = artRuntime();
+  if (!rt) return null;
+  const env = rt.environment[biome] || rt.environment.crypt;
+  return env && env.parts ? env.parts[part] : null;
+}
+function artPartSurface(part) {
+  if (!part) return null;
+  // Baked parts are immutable objects. Identity separates equal-sized textures,
+  // palettes and replacement payloads without hashing pixels on every draw.
+  const art = graphicsCache();
+  const cache = art.materials || (art.materials = new WeakMap());
+  if (cache.has(part)) return cache.get(part);
+  const dec = decodeArtFrame(part);
+  if (!dec) return null;
+  const surface = graphicsSurface(dec.w, dec.h);
+  if (surface) {
+    const sctx = surface.getContext('2d');
+    const img = sctx && typeof sctx.createImageData === 'function' ? sctx.createImageData(dec.w, dec.h) : null;
+    if (img && img.data && typeof img.data.set === 'function') {
+      img.data.set(dec.rgba); sctx.putImageData(img, 0, 0); cache.set(part, surface); return surface;
+    }
+  }
+  const direct = { _direct: dec };
+  cache.set(part, direct);
+  return direct;
+}
+function artDrawMaterialPart(c, part, dx, dy, dw, dh, sx=0, sy=0, sw=null, sh=null) {
+  if (!part) return false;
+  const s = artPartSurface(part);
+  if (!s) return false;
+  const dec = s._direct || null;
+  const w = dec ? dec.w : s.width, h = dec ? dec.h : s.height;
+  sw = sw == null ? w : sw; sh = sh == null ? h : sh;
+  if (!dec && typeof c.drawImage === 'function') {
+    c.imageSmoothingEnabled = false;
+    c.drawImage(s, sx, sy, sw, sh, dx, dy, dw, dh);
+    return true;
+  }
+  const src = dec || decodeArtFrame(part);
+  for (let y = 0; y < sh; y++) for (let x = 0; x < sw; x++) {
+    const srcX = sx + x, srcY = sy + y;
+    if (srcX < 0 || srcY < 0 || srcX >= src.w || srcY >= src.h) continue;
+    const o = (srcY * src.w + srcX) * 4, a = src.rgba[o+3];
+    if (!a) continue;
+    c.fillStyle = `rgba(${src.rgba[o]},${src.rgba[o+1]},${src.rgba[o+2]},${a/255})`;
+    c.fillRect(dx + x * dw / sw, dy + y * dh / sh, Math.ceil(dw / sw), Math.ceil(dh / sh));
+  }
+  return true;
+}
+function paintArtFloorTile(c, biome, tileX, tileY, accent = 0, sand = false) {
+  const rt = artRuntime();
+  if (!rt) return false;
+  if (biome === 'town') {
+    const town = rt.environment.town && rt.environment.town.parts;
+    if (!town) return false;
+    const layout = townMaterialLayout(), key = `${tileX},${tileY}`;
+    const water = layout.water.has(key);
+    const part = water ? town.water : layout.roads.has(key)
+      ? (tileX >= 37 && tileX <= 40 ? town.cobble : town.dirt) : town.grass;
+    artDrawMaterialPart(c, part, 0, 0, TILE, TILE);
+    if (water) {
+      c.fillStyle = '#a18f6f';
+      if (!layout.water.has(`${tileX-1},${tileY}`)) c.fillRect(0, 0, 1, TILE);
+      if (!layout.water.has(`${tileX+1},${tileY}`)) c.fillRect(TILE-1, 0, 1, TILE);
+    } else if (state.map[tileY] && state.map[tileY][tileX] === 1 && !townSceneryTiles().has(key)) {
+      c.fillStyle = 'rgba(7,18,13,0.3)'; c.fillRect(0, 0, TILE, TILE);
+    }
+    return true;
+  }
+  const env = rt.environment[biome] || rt.environment.crypt;
+  if (!env || !env.parts) return false;
+  const floor = accent ? env.parts.accent : env.parts.floor;
+  // Only the outer lanes retain carpet edging; no gold seams down its middle.
+  if (biome === 'throne' && accent) {
+    const left = accent === 1 ? 0 : 2, right = accent === 3 ? 32 : 30;
+    artDrawMaterialPart(c, floor, 0, 0, TILE, TILE, left, 0, right-left, 32);
+  } else artDrawMaterialPart(c, floor, 0, 0, TILE, TILE);
+  return true;
+}
+const ART_WALL_EDGE_PALETTE = {
+  crypt: ['#9b9e94', '#161b20'],
+  cavern: ['#8f8879', '#171a1c'],
+  kitchen: ['#b5a28c', '#211c1b'],
+  tavern: ['#a38b5d', '#19191a'],
+  throne: ['#c3b68a', '#1b2023'],
+};
+function paintArtWallTile(c, biome, tileX, tileY, mask) {
+  const rt = artRuntime();
+  if (!rt) return false;
+  const env = rt.environment[biome] || rt.environment.crypt;
+  if (!env || !env.parts) return false;
+  const plan = artWallPlan(mask);
+  const [light, dark] = ART_WALL_EDGE_PALETTE[biome] || ART_WALL_EDGE_PALETTE.crypt;
+  // Whole wall tile remains opaque. No walkable floor is drawn beneath it.
+  c.fillStyle = '#1b2024';
+  c.fillRect(0, 0, TILE, TILE);
+  artDrawMaterialPart(c, env.parts.top, 0, 0, TILE, TILE);
+  c.fillStyle = 'rgba(5,12,20,0.4)';
+  c.fillRect(0, 0, TILE, TILE);
+  // Exposed face/coping inside this blocked tile only (accepted preview treatment).
+  if (plan.edges & 4) {
+    artDrawMaterialPart(c, env.parts.face, 0, 20, TILE, 12, 0, 20, 32, 12);
+    c.fillStyle = light; c.fillRect(0, 18, TILE, 2);
+    c.fillStyle = dark; c.fillRect(0, 31, TILE, 1);
+  }
+  if (plan.edges & 1) { c.fillStyle = light; c.fillRect(0, 0, TILE, 2); c.fillStyle = dark; c.fillRect(0, 2, TILE, 1); }
+  if (plan.edges & 8) { c.fillStyle = light; c.fillRect(0, 0, 2, TILE); c.fillStyle = dark; c.fillRect(2, 0, 1, TILE); }
+  if (plan.edges & 2) { c.fillStyle = light; c.fillRect(30, 0, 2, TILE); c.fillStyle = dark; c.fillRect(29, 0, 1, TILE); }
+  for (const [cx, cy] of plan.corners) { c.fillStyle = light; c.fillRect(cx, cy, 4, 4); }
+  return true;
+}
+
 function drawDungeonTile(x, y) {
   const wall = state.map[y][x] === 1 && (state.area !== 'town' || !townSceneryTiles().has(`${x},${y}`));
-  const edges = wall && state.area !== 'town' ? dungeonWallEdges(x, y) : 0;
-  const front = !!(edges & 4);
-  const variant = (x * 37 + y * 71) % 11;
   const biome = artBiomeAt(x,y);
   const accent = throneCarpetAt(x,y);
   const sand = biome === 'town' && !wall && ((y >= 28 && y <= 30) || (x >= 37 && x <= 40));
-  const key = `${biome}:${wall ? 'wall' : 'floor'}:${edges}:${variant}:${sand}:${x%6}:${y%6}:${accent}`;
+  const mask = wall && state.area !== 'town' ? artWallMaskAt(x, y) : 0;
+  const edges = mask & 15; // legacy front/shadow behavior; front means open south
+  const front = !!(edges & 4);
+  const variant = (x * 37 + y * 71) % 11;
+  const townLayout = state.area === 'town' && artRuntime() ? townMaterialLayout() : null;
+  const townKey = `${x},${y}`;
+  const water = townLayout && townLayout.water.has(townKey);
+  const townKind = water ? `water:${townLayout.water.has(`${x-1},${y}`)}:${townLayout.water.has(`${x+1},${y}`)}`
+    : townLayout && townLayout.roads.has(townKey) ? (x >= 37 && x <= 40 ? 'cobble' : 'dirt') : wall ? 'forest' : 'grass';
+  const key = artRuntime()
+    ? biome === 'town' ? `art:town:${townKind}` : `art:${biome}:${wall ? 'wall' : 'floor'}:${mask}:${sand}:${accent}`
+    : `${biome}:${wall ? 'wall' : 'floor'}:${edges}:${variant}:${sand}:${x%6}:${y%6}:${accent}`;
   const cache = graphicsCache().tiles;
   if (!cache[key]) {
     const surface = graphicsSurface(TILE, TILE);
-    if (surface) { paintDungeonTile(surface.getContext('2d'), wall, variant, front, biome, sand, x%6, y%6, accent, edges); cache[key] = surface; }
+    if (surface) {
+      const sc = surface.getContext('2d');
+      let painted = false;
+      if (artRuntime()) {
+        painted = wall && state.area !== 'town' ? paintArtWallTile(sc, biome, x, y, mask) : paintArtFloorTile(sc, biome, x, y, accent, sand);
+      }
+      if (!painted) paintDungeonTile(sc, wall, variant, front, biome, sand, x%6, y%6, accent, edges);
+      cache[key] = surface;
+    }
   }
   if (cache[key]) {
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(cache[key], x * TILE, y * TILE);
   } else {
-    ctx.save(); ctx.translate(x * TILE, y * TILE); paintDungeonTile(ctx, wall, variant, front, biome, sand, x%6, y%6, accent, edges); ctx.restore();
+    ctx.save(); ctx.translate(x * TILE, y * TILE);
+    const painted = artRuntime() ? (wall && state.area !== 'town' ? paintArtWallTile(ctx, biome, x, y, mask) : paintArtFloorTile(ctx, biome, x, y, accent, sand)) : false;
+    if (!painted) paintDungeonTile(ctx, wall, variant, front, biome, sand, x%6, y%6, accent, edges);
+    ctx.restore();
   }
-  if (!wall) {
+  if (!wall && state.area !== 'town') {
     ctx.fillStyle = 'rgba(13, 21, 40, 0.25)';
     if (y > 0 && state.map[y - 1][x] === 1) ctx.fillRect(x * TILE, y * TILE, TILE, 7);
     if (x > 0 && state.map[y][x - 1] === 1) ctx.fillRect(x * TILE, y * TILE, 5, TILE);

@@ -1,0 +1,49 @@
+{
+  "id": "doorstep",
+  "kind": "sprite",
+  "group": "town",
+  "maxVisible": [
+    30,
+    12
+  ],
+  "columns": 1,
+  "parts": [
+    "sprite"
+  ],
+  "file": "environment-v1/doorstep/atlas.png",
+  "size": [
+    46,
+    28
+  ],
+  "records": [
+    {
+      "name": "sprite",
+      "crop": [
+        0,
+        0,
+        46,
+        28
+      ],
+      "bounds": {
+        "x": 8,
+        "y": 10,
+        "width": 30,
+        "height": 10
+      },
+      "anchor": [
+        23,
+        20
+      ],
+      "sourceBounds": {
+        "x": 343,
+        "y": 412,
+        "width": 849,
+        "height": 293
+      },
+      "scale": 0.0353356890459364
+    }
+  ],
+  "sha256": "4f6d9a89426f4c237deb2339a438a550f5ae6798c754fe1fc92e6f8f8c3255ea",
+  "sourceSHA256": "b1be1c97c425fe512dd3a77bdc0a0ea4106b06d96fe49741de76d7983f60d16a",
+  "scope": "standalone review; runtime unchanged"
+}

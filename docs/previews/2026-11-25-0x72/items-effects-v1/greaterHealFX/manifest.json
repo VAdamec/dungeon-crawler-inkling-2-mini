@@ -1,0 +1,127 @@
+{
+  "id": "greaterHealFX",
+  "name": "greaterHealFX",
+  "description": "Strong radiant golden healing starburst above ground ring with many bright motes, visibly stronger and larger than basic heal; no character",
+  "group": "spells",
+  "sourceFrames": 4,
+  "columns": 2,
+  "maxVisible": [
+    52,
+    48
+  ],
+  "cell": 128,
+  "states": "small golden star; expanding bright starburst; strongest golden starburst and motes; fading gold sparks",
+  "sheet": "items-effects-v1/greaterHealFX/sheet.png",
+  "anchor": [
+    64,
+    64
+  ],
+  "screenScale": 2,
+  "alphaCutoff": 64,
+  "sharedScale": 0.10933940774487472,
+  "nativeDirection": null,
+  "source": "generated-source.png",
+  "frames": [
+    {
+      "index": 0,
+      "label": "small golden star",
+      "empty": false,
+      "file": "frames/0.png",
+      "crop": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "bounds": {
+        "x": 53,
+        "y": 58,
+        "width": 23,
+        "height": 22
+      },
+      "sourceCell": [
+        0,
+        0,
+        631,
+        624
+      ],
+      "sha256": "d87b346d171d0449d845b789c95f0af41990a6b05d3e17ef02cac2b5dc0485f6"
+    },
+    {
+      "index": 1,
+      "label": "expanding bright starburst",
+      "empty": false,
+      "file": "frames/1.png",
+      "crop": [
+        128,
+        0,
+        128,
+        128
+      ],
+      "bounds": {
+        "x": 44,
+        "y": 51,
+        "width": 33,
+        "height": 30
+      },
+      "sourceCell": [
+        631,
+        0,
+        630,
+        624
+      ],
+      "sha256": "5481a52fd9568b82ad15883c4d2f6f95f6a61e9bef09233e8c6b8e0fe4fc5f3c"
+    },
+    {
+      "index": 2,
+      "label": "strongest golden starburst and motes",
+      "empty": false,
+      "file": "frames/2.png",
+      "crop": [
+        256,
+        0,
+        128,
+        128
+      ],
+      "bounds": {
+        "x": 38,
+        "y": 40,
+        "width": 50,
+        "height": 48
+      },
+      "sourceCell": [
+        0,
+        624,
+        631,
+        623
+      ],
+      "sha256": "eac6a205d6f85d09f934a3c68edef02e0064187cae5962669378ef4574c5bb38"
+    },
+    {
+      "index": 3,
+      "label": "fading gold sparks",
+      "empty": false,
+      "file": "frames/3.png",
+      "crop": [
+        384,
+        0,
+        128,
+        128
+      ],
+      "bounds": {
+        "x": 41,
+        "y": 49,
+        "width": 39,
+        "height": 37
+      },
+      "sourceCell": [
+        631,
+        624,
+        630,
+        623
+      ],
+      "sha256": "b91391a122d127e59eac2cb08c0bf1b8cf57bd9f3c739be8748ad7e7d2bc23cb"
+    }
+  ],
+  "scope": "preview only; awaiting review"
+}

@@ -1,0 +1,1405 @@
+{
+  "version": 1,
+  "complete": true,
+  "missing": [],
+  "assets": [
+    {
+      "id": "inn",
+      "kind": "sprite",
+      "group": "town",
+      "maxVisible": [
+        192,
+        160
+      ],
+      "columns": 1,
+      "parts": [
+        "sprite"
+      ],
+      "file": "environment-v1/inn/atlas.png",
+      "size": [
+        208,
+        176
+      ],
+      "records": [
+        {
+          "name": "sprite",
+          "crop": [
+            0,
+            0,
+            208,
+            176
+          ],
+          "bounds": {
+            "x": 30,
+            "y": 8,
+            "width": 148,
+            "height": 160
+          },
+          "anchor": [
+            104,
+            168
+          ],
+          "sourceBounds": {
+            "x": 132,
+            "y": 72,
+            "width": 990,
+            "height": 1069
+          },
+          "scale": 0.14967259120673526
+        }
+      ],
+      "sha256": "d646fd1ec9411a6280d29e62127cacc9df84925bb7e50fc74b1c4a6877fe6321",
+      "sourceSHA256": "cbfc656c60959bfbc8e16d5f2f1642fb1b1db2eededfc6f75119c7d36cee323e",
+      "scope": "standalone review; runtime unchanged"
+    },
+    {
+      "id": "store",
+      "kind": "sprite",
+      "group": "town",
+      "maxVisible": [
+        160,
+        160
+      ],
+      "columns": 1,
+      "parts": [
+        "sprite"
+      ],
+      "file": "environment-v1/store/atlas.png",
+      "size": [
+        176,
+        176
+      ],
+      "records": [
+        {
+          "name": "sprite",
+          "crop": [
+            0,
+            0,
+            176,
+            176
+          ],
+          "bounds": {
+            "x": 17,
+            "y": 8,
+            "width": 142,
+            "height": 160
+          },
+          "anchor": [
+            88,
+            168
+          ],
+          "sourceBounds": {
+            "x": 172,
+            "y": 89,
+            "width": 911,
+            "height": 1027
+          },
+          "scale": 0.15579357351509251
+        }
+      ],
+      "sha256": "6fd9b07521bc9c9fe7aed2868fa5f41a95905aa8e276b2b1b994aaac6f90f364",
+      "sourceSHA256": "a5c15cae4d1a9181d4fefacaea662d27a0377d184a62753c8572712ef9842811",
+      "scope": "standalone review; runtime unchanged"
+    },
+    {
+      "id": "hut",
+      "kind": "sprite",
+      "group": "town",
+      "maxVisible": [
+        128,
+        128
+      ],
+      "columns": 1,
+      "parts": [
+        "sprite"
+      ],
+      "file": "environment-v1/hut/atlas.png",
+      "size": [
+        144,
+        144
+      ],
+      "records": [
+        {
+          "name": "sprite",
+          "crop": [
+            0,
+            0,
+            144,
+            144
+          ],
+          "bounds": {
+            "x": 15,
+            "y": 8,
+            "width": 114,
+            "height": 128
+          },
+          "anchor": [
+            72,
+            136
+          ],
+          "sourceBounds": {
+            "x": 202,
+            "y": 126,
+            "width": 846,
+            "height": 946
+          },
+          "scale": 0.13530655391120508
+        }
+      ],
+      "sha256": "bb7536f7f1bcd55a49bb5990c5178b0e568ec5ed7c6b4dae43b7bfd549e25df7",
+      "sourceSHA256": "b20797068cc202e6eda5584f55c798668b38c0ea425b904024e80a76e03b4236",
+      "scope": "standalone review; runtime unchanged"
+    },
+    {
+      "id": "townGate",
+      "kind": "sprite",
+      "group": "town",
+      "maxVisible": [
+        72,
+        68
+      ],
+      "columns": 1,
+      "parts": [
+        "sprite"
+      ],
+      "file": "environment-v1/townGate/atlas.png",
+      "size": [
+        88,
+        84
+      ],
+      "records": [
+        {
+          "name": "sprite",
+          "crop": [
+            0,
+            0,
+            88,
+            84
+          ],
+          "bounds": {
+            "x": 8,
+            "y": 40,
+            "width": 72,
+            "height": 36
+          },
+          "anchor": [
+            44,
+            76
+          ],
+          "sourceBounds": {
+            "x": 181,
+            "y": 217,
+            "width": 1172,
+            "height": 578
+          },
+          "scale": 0.06143344709897611
+        }
+      ],
+      "sha256": "78441f7c8392676b7dd6eb3769bf84a63f6d982b22552a3d6f11f4d3c5951c41",
+      "sourceSHA256": "781ca83765174cbce821ddcf0c599608dd71a13ebe8cf9ff9eaf5a1f0e242398",
+      "scope": "standalone review; runtime unchanged"
+    },
+    {
+      "id": "bridge",
+      "kind": "sprite",
+      "group": "town",
+      "maxVisible": [
+        64,
+        32
+      ],
+      "columns": 1,
+      "parts": [
+        "sprite"
+      ],
+      "file": "environment-v1/bridge/atlas.png",
+      "size": [
+        80,
+        48
+      ],
+      "records": [
+        {
+          "name": "sprite",
+          "crop": [
+            0,
+            0,
+            80,
+            48
+          ],
+          "bounds": {
+            "x": 12,
+            "y": 8,
+            "width": 56,
+            "height": 32
+          },
+          "anchor": [
+            40,
+            40
+          ],
+          "sourceBounds": {
+            "x": 238,
+            "y": 225,
+            "width": 1052,
+            "height": 598
+          },
+          "scale": 0.05351170568561873
+        }
+      ],
+      "sha256": "8c0af83f06a229980248423e9499372dfd7f3f0ae76e27cb7be8c37069397539",
+      "sourceSHA256": "ccef45d0025ff3b8a22fc7997d902475584a11a90e0639293b4b748e325be3b9",
+      "scope": "standalone review; runtime unchanged"
+    },
+    {
+      "id": "tree",
+      "kind": "sprite",
+      "group": "town",
+      "maxVisible": [
+        40,
+        60
+      ],
+      "columns": 1,
+      "parts": [
+        "sprite"
+      ],
+      "file": "environment-v1/tree/atlas.png",
+      "size": [
+        56,
+        76
+      ],
+      "records": [
+        {
+          "name": "sprite",
+          "crop": [
+            0,
+            0,
+            56,
+            76
+          ],
+          "bounds": {
+            "x": 8,
+            "y": 28,
+            "width": 40,
+            "height": 40
+          },
+          "anchor": [
+            28,
+            68
+          ],
+          "sourceBounds": {
+            "x": 144,
+            "y": 132,
+            "width": 964,
+            "height": 975
+          },
+          "scale": 0.04149377593360996
+        }
+      ],
+      "sha256": "ae80c92d66826b120852b0d95dd57e8bdcd88c53e7fbeba71970023e3710ba4a",
+      "sourceSHA256": "7949f25f743afa982e21d32cf4023a89b3ed464c042be036d99efc0695bab2ec",
+      "scope": "standalone review; runtime unchanged"
+    },
+    {
+      "id": "pine",
+      "kind": "sprite",
+      "group": "town",
+      "maxVisible": [
+        40,
+        64
+      ],
+      "columns": 1,
+      "parts": [
+        "sprite"
+      ],
+      "file": "environment-v1/pine/atlas.png",
+      "size": [
+        56,
+        80
+      ],
+      "records": [
+        {
+          "name": "sprite",
+          "crop": [
+            0,
+            0,
+            56,
+            80
+          ],
+          "bounds": {
+            "x": 10,
+            "y": 8,
+            "width": 36,
+            "height": 64
+          },
+          "anchor": [
+            28,
+            72
+          ],
+          "sourceBounds": {
+            "x": 318,
+            "y": 81,
+            "width": 592,
+            "height": 1071
+          },
+          "scale": 0.059757236227824466
+        }
+      ],
+      "sha256": "20aea86a6f2ac42e0fc026006e93480f3f2a55734126256d398646996853e233",
+      "sourceSHA256": "c15ae0ffad0683bb92436557739776ba4bc01a781c7833e95b5afe58bcfcd9a5",
+      "scope": "standalone review; runtime unchanged"
+    },
+    {
+      "id": "tombstone",
+      "kind": "sprite",
+      "group": "crypt",
+      "maxVisible": [
+        28,
+        32
+      ],
+      "columns": 1,
+      "parts": [
+        "sprite"
+      ],
+      "file": "environment-v1/tombstone/atlas.png",
+      "size": [
+        44,
+        48
+      ],
+      "records": [
+        {
+          "name": "sprite",
+          "crop": [
+            0,
+            0,
+            44,
+            48
+          ],
+          "bounds": {
+            "x": 11,
+            "y": 8,
+            "width": 22,
+            "height": 32
+          },
+          "anchor": [
+            22,
+            40
+          ],
+          "sourceBounds": {
+            "x": 374,
+            "y": 236,
+            "width": 503,
+            "height": 746
+          },
+          "scale": 0.04289544235924933
+        }
+      ],
+      "sha256": "36da0278d1033cb57200802533fa0a9eed8812d861b3ba276f10e75b2f28a867",
+      "sourceSHA256": "d1e45da08d8691c08383f46441bf5302614e651bafc5362c11f4c2901647e559",
+      "scope": "standalone review; runtime unchanged"
+    },
+    {
+      "id": "crystal",
+      "kind": "sprite",
+      "group": "cavern",
+      "maxVisible": [
+        30,
+        36
+      ],
+      "columns": 1,
+      "parts": [
+        "sprite"
+      ],
+      "file": "environment-v1/crystal/atlas.png",
+      "size": [
+        46,
+        52
+      ],
+      "records": [
+        {
+          "name": "sprite",
+          "crop": [
+            0,
+            0,
+            46,
+            52
+          ],
+          "bounds": {
+            "x": 8,
+            "y": 13,
+            "width": 30,
+            "height": 31
+          },
+          "anchor": [
+            23,
+            44
+          ],
+          "sourceBounds": {
+            "x": 365,
+            "y": 339,
+            "width": 517,
+            "height": 533
+          },
+          "scale": 0.058027079303675046
+        }
+      ],
+      "sha256": "fc1f23b810b02a22cd11d04e4953bb4f2f90cf7597d05a93fbc0116d79e1f2ae",
+      "sourceSHA256": "4a2a3e8147e7d06d48f248b414791889348a8804c8f6ea489c4f5473fd66935d",
+      "scope": "standalone review; runtime unchanged"
+    },
+    {
+      "id": "cookingPot",
+      "kind": "sprite",
+      "group": "kitchen",
+      "maxVisible": [
+        32,
+        32
+      ],
+      "columns": 1,
+      "parts": [
+        "sprite"
+      ],
+      "file": "environment-v1/cookingPot/atlas.png",
+      "size": [
+        48,
+        48
+      ],
+      "records": [
+        {
+          "name": "sprite",
+          "crop": [
+            0,
+            0,
+            48,
+            48
+          ],
+          "bounds": {
+            "x": 8,
+            "y": 8,
+            "width": 32,
+            "height": 32
+          },
+          "anchor": [
+            24,
+            40
+          ],
+          "sourceBounds": {
+            "x": 167,
+            "y": 202,
+            "width": 919,
+            "height": 920
+          },
+          "scale": 0.034782608695652174
+        }
+      ],
+      "sha256": "b735f8e8a0ce03ab639bfe595456bed4e49118d7f3a4652554ac3dffe21f8941",
+      "sourceSHA256": "2303e1494ddc269aff1430bf44b2b76506023e041baf79326af65b4589c40d09",
+      "scope": "standalone review; runtime unchanged"
+    },
+    {
+      "id": "barCounter",
+      "kind": "sprite",
+      "group": "tavern",
+      "maxVisible": [
+        64,
+        32
+      ],
+      "columns": 1,
+      "parts": [
+        "sprite"
+      ],
+      "file": "environment-v1/barCounter/atlas.png",
+      "size": [
+        80,
+        48
+      ],
+      "records": [
+        {
+          "name": "sprite",
+          "crop": [
+            0,
+            0,
+            80,
+            48
+          ],
+          "bounds": {
+            "x": 10,
+            "y": 8,
+            "width": 60,
+            "height": 32
+          },
+          "anchor": [
+            40,
+            40
+          ],
+          "sourceBounds": {
+            "x": 372,
+            "y": 302,
+            "width": 785,
+            "height": 416
+          },
+          "scale": 0.07692307692307693
+        }
+      ],
+      "sha256": "4d42ca5ed301cdc41796e4453a88178a5522536a608c26d3124b8ca6e649f2b5",
+      "sourceSHA256": "d577176ee7cc1ca410873f37042310dec632cddd0304dc81ee36547c264a8c14",
+      "scope": "standalone review; runtime unchanged"
+    },
+    {
+      "id": "banner",
+      "kind": "sprite",
+      "group": "throne",
+      "maxVisible": [
+        24,
+        48
+      ],
+      "columns": 1,
+      "parts": [
+        "sprite"
+      ],
+      "file": "environment-v1/banner/atlas.png",
+      "size": [
+        40,
+        64
+      ],
+      "records": [
+        {
+          "name": "sprite",
+          "crop": [
+            0,
+            0,
+            40,
+            64
+          ],
+          "bounds": {
+            "x": 8,
+            "y": 26,
+            "width": 24,
+            "height": 30
+          },
+          "anchor": [
+            20,
+            56
+          ],
+          "sourceBounds": {
+            "x": 225,
+            "y": 132,
+            "width": 800,
+            "height": 989
+          },
+          "scale": 0.03
+        }
+      ],
+      "sha256": "7264c1defc7ff20b4bccb3b4864141fe4616a5a51296ada490e0cb694a68f550",
+      "sourceSHA256": "b357a76e239a312ad3dc2c11e6b0827613ab246d96b41b196c27a16bd1986cd7",
+      "scope": "standalone review; runtime unchanged"
+    },
+    {
+      "id": "pillar",
+      "kind": "sprite",
+      "group": "throne",
+      "maxVisible": [
+        30,
+        54
+      ],
+      "columns": 1,
+      "parts": [
+        "sprite"
+      ],
+      "file": "environment-v1/pillar/atlas.png",
+      "size": [
+        46,
+        70
+      ],
+      "records": [
+        {
+          "name": "sprite",
+          "crop": [
+            0,
+            0,
+            46,
+            70
+          ],
+          "bounds": {
+            "x": 14,
+            "y": 8,
+            "width": 18,
+            "height": 54
+          },
+          "anchor": [
+            23,
+            62
+          ],
+          "sourceBounds": {
+            "x": 445,
+            "y": 75,
+            "width": 364,
+            "height": 1095
+          },
+          "scale": 0.049315068493150684
+        }
+      ],
+      "sha256": "c27a9b5c571a485d81e2e0d3907bc0c6d919c73770e57c1966c674865480e6a3",
+      "sourceSHA256": "cccbac9048dbe138e9b7e193e8561fe3e64444813490c24de37c9987796ab5f3",
+      "scope": "standalone review; runtime unchanged"
+    },
+    {
+      "id": "dais",
+      "kind": "sprite",
+      "group": "throne",
+      "maxVisible": [
+        128,
+        64
+      ],
+      "columns": 1,
+      "parts": [
+        "sprite"
+      ],
+      "file": "environment-v1/dais/atlas.png",
+      "size": [
+        144,
+        80
+      ],
+      "records": [
+        {
+          "name": "sprite",
+          "crop": [
+            0,
+            0,
+            144,
+            80
+          ],
+          "bounds": {
+            "x": 8,
+            "y": 15,
+            "width": 128,
+            "height": 57
+          },
+          "anchor": [
+            72,
+            72
+          ],
+          "sourceBounds": {
+            "x": 146,
+            "y": 239,
+            "width": 1246,
+            "height": 559
+          },
+          "scale": 0.10272873194221509
+        }
+      ],
+      "sha256": "63b44881b2d40084733c8dcc6d32a7785ae01c424f840b6817afd884413bac8f",
+      "sourceSHA256": "a6490726cae9f9d117363003bbf516e36ffda3a1a3e8fba8c795cce21ba22c65",
+      "scope": "standalone review; runtime unchanged"
+    },
+    {
+      "id": "crate",
+      "kind": "sprite",
+      "group": "prop",
+      "maxVisible": [
+        28,
+        28
+      ],
+      "columns": 1,
+      "parts": [
+        "sprite"
+      ],
+      "file": "environment-v1/crate/atlas.png",
+      "size": [
+        44,
+        44
+      ],
+      "records": [
+        {
+          "name": "sprite",
+          "crop": [
+            0,
+            0,
+            44,
+            44
+          ],
+          "bounds": {
+            "x": 10,
+            "y": 8,
+            "width": 24,
+            "height": 28
+          },
+          "anchor": [
+            22,
+            36
+          ],
+          "sourceBounds": {
+            "x": 317,
+            "y": 266,
+            "width": 620,
+            "height": 745
+          },
+          "scale": 0.03758389261744966
+        }
+      ],
+      "sha256": "d73a8e161d5d4748446dc2f62d15e72340829c49bdc8176cc3f9b7bf273c06eb",
+      "sourceSHA256": "7e4db417dfed808d84d6fe2a696a11d5f75eb7f6c2bdd91039b6833f77fd0f8c",
+      "scope": "standalone review; runtime unchanged"
+    },
+    {
+      "id": "barrel",
+      "kind": "sprite",
+      "group": "prop",
+      "maxVisible": [
+        26,
+        32
+      ],
+      "columns": 1,
+      "parts": [
+        "sprite"
+      ],
+      "file": "environment-v1/barrel/atlas.png",
+      "size": [
+        42,
+        48
+      ],
+      "records": [
+        {
+          "name": "sprite",
+          "crop": [
+            0,
+            0,
+            42,
+            48
+          ],
+          "bounds": {
+            "x": 10,
+            "y": 8,
+            "width": 22,
+            "height": 32
+          },
+          "anchor": [
+            21,
+            40
+          ],
+          "sourceBounds": {
+            "x": 337,
+            "y": 224,
+            "width": 576,
+            "height": 832
+          },
+          "scale": 0.038461538461538464
+        }
+      ],
+      "sha256": "e9ac6df867a3d74b6ac07754589cd1172721deb7825773837685d79cb84d7106",
+      "sourceSHA256": "3b78ae26e813a9aaf40dfd1f8ec29618873d46c3a6fc75d8e9f630252c988f12",
+      "scope": "standalone review; runtime unchanged"
+    },
+    {
+      "id": "rock",
+      "kind": "sprite",
+      "group": "prop",
+      "maxVisible": [
+        30,
+        28
+      ],
+      "columns": 1,
+      "parts": [
+        "sprite"
+      ],
+      "file": "environment-v1/rock/atlas.png",
+      "size": [
+        46,
+        44
+      ],
+      "records": [
+        {
+          "name": "sprite",
+          "crop": [
+            0,
+            0,
+            46,
+            44
+          ],
+          "bounds": {
+            "x": 8,
+            "y": 12,
+            "width": 30,
+            "height": 24
+          },
+          "anchor": [
+            23,
+            36
+          ],
+          "sourceBounds": {
+            "x": 191,
+            "y": 277,
+            "width": 865,
+            "height": 691
+          },
+          "scale": 0.03468208092485549
+        }
+      ],
+      "sha256": "25cf948fc95037df67da24f815033b64990160039653d5be5391bf33e3396ee4",
+      "sourceSHA256": "5346bfc838348bf8f418af9b0a49a1d7da2d2aca7d3de546e8396ca894d79bc6",
+      "scope": "standalone review; runtime unchanged"
+    },
+    {
+      "id": "doorstep",
+      "kind": "sprite",
+      "group": "town",
+      "maxVisible": [
+        30,
+        12
+      ],
+      "columns": 1,
+      "parts": [
+        "sprite"
+      ],
+      "file": "environment-v1/doorstep/atlas.png",
+      "size": [
+        46,
+        28
+      ],
+      "records": [
+        {
+          "name": "sprite",
+          "crop": [
+            0,
+            0,
+            46,
+            28
+          ],
+          "bounds": {
+            "x": 8,
+            "y": 10,
+            "width": 30,
+            "height": 10
+          },
+          "anchor": [
+            23,
+            20
+          ],
+          "sourceBounds": {
+            "x": 343,
+            "y": 412,
+            "width": 849,
+            "height": 293
+          },
+          "scale": 0.0353356890459364
+        }
+      ],
+      "sha256": "4f6d9a89426f4c237deb2339a438a550f5ae6798c754fe1fc92e6f8f8c3255ea",
+      "sourceSHA256": "b1be1c97c425fe512dd3a77bdc0a0ea4106b06d96fe49741de76d7983f60d16a",
+      "scope": "standalone review; runtime unchanged"
+    },
+    {
+      "id": "crypt",
+      "kind": "material",
+      "group": "biome",
+      "maxVisible": [
+        32,
+        32
+      ],
+      "columns": 2,
+      "parts": [
+        "floor",
+        "top",
+        "face",
+        "accent"
+      ],
+      "file": "environment-v1/crypt/atlas.png",
+      "size": [
+        64,
+        64
+      ],
+      "records": [
+        {
+          "name": "floor",
+          "crop": [
+            0,
+            0,
+            32,
+            32
+          ],
+          "sourceCell": [
+            0,
+            0,
+            627,
+            627
+          ]
+        },
+        {
+          "name": "top",
+          "crop": [
+            32,
+            0,
+            32,
+            32
+          ],
+          "sourceCell": [
+            627,
+            0,
+            627,
+            627
+          ]
+        },
+        {
+          "name": "face",
+          "crop": [
+            0,
+            32,
+            32,
+            32
+          ],
+          "sourceCell": [
+            0,
+            627,
+            627,
+            627
+          ]
+        },
+        {
+          "name": "accent",
+          "crop": [
+            32,
+            32,
+            32,
+            32
+          ],
+          "sourceCell": [
+            627,
+            627,
+            627,
+            627
+          ]
+        }
+      ],
+      "sha256": "6ba30bea4ab8d27c3e2b0efbc7c086cdeeda515fc88c185ad823d86f6bc1bb4d",
+      "sourceSHA256": "5bfe4cc3692f554e45809013b40fbbf0d21eec7970edd1967a2a589644112fd2",
+      "scope": "standalone review; runtime unchanged"
+    },
+    {
+      "id": "cavern",
+      "kind": "material",
+      "group": "biome",
+      "maxVisible": [
+        32,
+        32
+      ],
+      "columns": 2,
+      "parts": [
+        "floor",
+        "top",
+        "face",
+        "accent"
+      ],
+      "file": "environment-v1/cavern/atlas.png",
+      "size": [
+        64,
+        64
+      ],
+      "records": [
+        {
+          "name": "floor",
+          "crop": [
+            0,
+            0,
+            32,
+            32
+          ],
+          "sourceCell": [
+            0,
+            0,
+            627,
+            627
+          ]
+        },
+        {
+          "name": "top",
+          "crop": [
+            32,
+            0,
+            32,
+            32
+          ],
+          "sourceCell": [
+            627,
+            0,
+            627,
+            627
+          ]
+        },
+        {
+          "name": "face",
+          "crop": [
+            0,
+            32,
+            32,
+            32
+          ],
+          "sourceCell": [
+            0,
+            627,
+            627,
+            627
+          ]
+        },
+        {
+          "name": "accent",
+          "crop": [
+            32,
+            32,
+            32,
+            32
+          ],
+          "sourceCell": [
+            627,
+            627,
+            627,
+            627
+          ]
+        }
+      ],
+      "sha256": "3173e20f6bfab88c289f56f18b97665ad1189a1d0022df60de6f52e85850424c",
+      "sourceSHA256": "74661e11f2d1188132983c033243a189a1b5ed192346ceeceb3381ecf43c4f4a",
+      "scope": "standalone review; runtime unchanged"
+    },
+    {
+      "id": "kitchen",
+      "kind": "material",
+      "group": "biome",
+      "maxVisible": [
+        32,
+        32
+      ],
+      "columns": 2,
+      "parts": [
+        "floor",
+        "top",
+        "face",
+        "accent"
+      ],
+      "file": "environment-v1/kitchen/atlas.png",
+      "size": [
+        64,
+        64
+      ],
+      "records": [
+        {
+          "name": "floor",
+          "crop": [
+            0,
+            0,
+            32,
+            32
+          ],
+          "sourceCell": [
+            0,
+            0,
+            627,
+            627
+          ]
+        },
+        {
+          "name": "top",
+          "crop": [
+            32,
+            0,
+            32,
+            32
+          ],
+          "sourceCell": [
+            627,
+            0,
+            627,
+            627
+          ]
+        },
+        {
+          "name": "face",
+          "crop": [
+            0,
+            32,
+            32,
+            32
+          ],
+          "sourceCell": [
+            0,
+            627,
+            627,
+            627
+          ]
+        },
+        {
+          "name": "accent",
+          "crop": [
+            32,
+            32,
+            32,
+            32
+          ],
+          "sourceCell": [
+            627,
+            627,
+            627,
+            627
+          ]
+        }
+      ],
+      "sha256": "d2ee3a87922272c645cf73525f13a813795b3c3af7ef79e2adee8d763e865891",
+      "sourceSHA256": "41598062a49167ea661531d33fa942f541e8efd57467f05937ee06b0a922877c",
+      "scope": "standalone review; runtime unchanged"
+    },
+    {
+      "id": "tavern",
+      "kind": "material",
+      "group": "biome",
+      "maxVisible": [
+        32,
+        32
+      ],
+      "columns": 2,
+      "parts": [
+        "floor",
+        "top",
+        "face",
+        "accent"
+      ],
+      "file": "environment-v1/tavern/atlas.png",
+      "size": [
+        64,
+        64
+      ],
+      "records": [
+        {
+          "name": "floor",
+          "crop": [
+            0,
+            0,
+            32,
+            32
+          ],
+          "sourceCell": [
+            0,
+            0,
+            627,
+            627
+          ]
+        },
+        {
+          "name": "top",
+          "crop": [
+            32,
+            0,
+            32,
+            32
+          ],
+          "sourceCell": [
+            627,
+            0,
+            627,
+            627
+          ]
+        },
+        {
+          "name": "face",
+          "crop": [
+            0,
+            32,
+            32,
+            32
+          ],
+          "sourceCell": [
+            0,
+            627,
+            627,
+            627
+          ]
+        },
+        {
+          "name": "accent",
+          "crop": [
+            32,
+            32,
+            32,
+            32
+          ],
+          "sourceCell": [
+            627,
+            627,
+            627,
+            627
+          ]
+        }
+      ],
+      "sha256": "1139b4210cd61a3ac981b17eac96dba4cdb68406d6854980e040ff99b7adfafe",
+      "sourceSHA256": "afaaaeeee75c6dd92ce174ea6cbc198d6ce680c7ec9a564b2df9dd55cc15a87e",
+      "scope": "standalone review; runtime unchanged"
+    },
+    {
+      "id": "throne",
+      "kind": "material",
+      "group": "biome",
+      "maxVisible": [
+        32,
+        32
+      ],
+      "columns": 2,
+      "parts": [
+        "floor",
+        "top",
+        "face",
+        "accent"
+      ],
+      "file": "environment-v1/throne/atlas.png",
+      "size": [
+        64,
+        64
+      ],
+      "records": [
+        {
+          "name": "floor",
+          "crop": [
+            0,
+            0,
+            32,
+            32
+          ],
+          "sourceCell": [
+            0,
+            0,
+            627,
+            627
+          ]
+        },
+        {
+          "name": "top",
+          "crop": [
+            32,
+            0,
+            32,
+            32
+          ],
+          "sourceCell": [
+            627,
+            0,
+            627,
+            627
+          ]
+        },
+        {
+          "name": "face",
+          "crop": [
+            0,
+            32,
+            32,
+            32
+          ],
+          "sourceCell": [
+            0,
+            627,
+            627,
+            627
+          ]
+        },
+        {
+          "name": "accent",
+          "crop": [
+            32,
+            32,
+            32,
+            32
+          ],
+          "sourceCell": [
+            627,
+            627,
+            627,
+            627
+          ]
+        }
+      ],
+      "sha256": "0f4ccb8785f2934a243e8e7955f270339b447e61184824be66c3c8f10e6dfd7e",
+      "sourceSHA256": "7744af8b38b6a1b6adc58c7406b1917dc9f2a1988b961e6c7128cac915aeb9a8",
+      "scope": "standalone review; runtime unchanged"
+    },
+    {
+      "id": "town",
+      "kind": "material",
+      "group": "town",
+      "maxVisible": [
+        32,
+        32
+      ],
+      "columns": 2,
+      "parts": [
+        "grass",
+        "dirt",
+        "cobble",
+        "water"
+      ],
+      "file": "environment-v1/town/atlas.png",
+      "size": [
+        64,
+        64
+      ],
+      "records": [
+        {
+          "name": "grass",
+          "crop": [
+            0,
+            0,
+            32,
+            32
+          ],
+          "sourceCell": [
+            0,
+            0,
+            627,
+            627
+          ]
+        },
+        {
+          "name": "dirt",
+          "crop": [
+            32,
+            0,
+            32,
+            32
+          ],
+          "sourceCell": [
+            627,
+            0,
+            627,
+            627
+          ]
+        },
+        {
+          "name": "cobble",
+          "crop": [
+            0,
+            32,
+            32,
+            32
+          ],
+          "sourceCell": [
+            0,
+            627,
+            627,
+            627
+          ]
+        },
+        {
+          "name": "water",
+          "crop": [
+            32,
+            32,
+            32,
+            32
+          ],
+          "sourceCell": [
+            627,
+            627,
+            627,
+            627
+          ]
+        }
+      ],
+      "sha256": "99880c9b616b1508fa9af183bc2424ed8f392167ab05409d7e628fe197be72a1",
+      "sourceSHA256": "3f7e0a8267741ff7fbda8e9e22dd22f345a897138454c0bf5c8de8ed83f31561",
+      "scope": "standalone review; runtime unchanged"
+    }
+  ]
+}

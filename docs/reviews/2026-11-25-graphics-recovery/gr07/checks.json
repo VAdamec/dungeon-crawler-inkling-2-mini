@@ -1,0 +1,22 @@
+{
+  "task": "GR-07",
+  "gameTests": {
+    "passed": 171,
+    "failed": 0,
+    "skipped": 0,
+    "durationMs": 98869.578083
+  },
+  "previewTests": {
+    "passed": 27,
+    "failed": 0,
+    "skipped": 0
+  },
+  "newRegressionTests": 7,
+  "focusedWithLegacyAnimation": 8,
+  "seededGameplayScenarios": 17,
+  "protectedFiles": 823,
+  "protectedChanges": [],
+  "runtimeArtUnchanged": true,
+  "release": "1.0.1",
+  "commitPerformed": false
+}

@@ -1,0 +1,49 @@
+{
+  "id": "cookingPot",
+  "kind": "sprite",
+  "group": "kitchen",
+  "maxVisible": [
+    32,
+    32
+  ],
+  "columns": 1,
+  "parts": [
+    "sprite"
+  ],
+  "file": "environment-v1/cookingPot/atlas.png",
+  "size": [
+    48,
+    48
+  ],
+  "records": [
+    {
+      "name": "sprite",
+      "crop": [
+        0,
+        0,
+        48,
+        48
+      ],
+      "bounds": {
+        "x": 8,
+        "y": 8,
+        "width": 32,
+        "height": 32
+      },
+      "anchor": [
+        24,
+        40
+      ],
+      "sourceBounds": {
+        "x": 167,
+        "y": 202,
+        "width": 919,
+        "height": 920
+      },
+      "scale": 0.034782608695652174
+    }
+  ],
+  "sha256": "b735f8e8a0ce03ab639bfe595456bed4e49118d7f3a4652554ac3dffe21f8941",
+  "sourceSHA256": "2303e1494ddc269aff1430bf44b2b76506023e041baf79326af65b4589c40d09",
+  "scope": "standalone review; runtime unchanged"
+}

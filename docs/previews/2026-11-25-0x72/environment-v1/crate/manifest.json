@@ -1,0 +1,49 @@
+{
+  "id": "crate",
+  "kind": "sprite",
+  "group": "prop",
+  "maxVisible": [
+    28,
+    28
+  ],
+  "columns": 1,
+  "parts": [
+    "sprite"
+  ],
+  "file": "environment-v1/crate/atlas.png",
+  "size": [
+    44,
+    44
+  ],
+  "records": [
+    {
+      "name": "sprite",
+      "crop": [
+        0,
+        0,
+        44,
+        44
+      ],
+      "bounds": {
+        "x": 10,
+        "y": 8,
+        "width": 24,
+        "height": 28
+      },
+      "anchor": [
+        22,
+        36
+      ],
+      "sourceBounds": {
+        "x": 317,
+        "y": 266,
+        "width": 620,
+        "height": 745
+      },
+      "scale": 0.03758389261744966
+    }
+  ],
+  "sha256": "d73a8e161d5d4748446dc2f62d15e72340829c49bdc8176cc3f9b7bf273c06eb",
+  "sourceSHA256": "7e4db417dfed808d84d6fe2a696a11d5f75eb7f6c2bdd91039b6833f77fd0f8c",
+  "scope": "standalone review; runtime unchanged"
+}

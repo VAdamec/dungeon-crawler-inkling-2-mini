@@ -1,0 +1,994 @@
+{
+  "date": "2026-11-25",
+  "browser": "158.0.8127.37",
+  "viewport": [
+    1450,
+    1100
+  ],
+  "seed": 713,
+  "trials": 3,
+  "method": "Same Chrome process/machine, fresh contexts, alternating order, warm filesystem; intervals disabled. Seven matched seeded scenes, 20 warmups/100 draw+minimap samples. Canvas figures are RGBA backing-size estimates, not GPU/RSS. V8 heap from forced-GC CDP; typed arrays counted separately. Constructor compile is lazy-function diagnostic, not isolated eager parse time. Fresh-page launch includes parse/execute/layout; this is not cold-machine startup.",
+  "summary": {
+    "baseline": {
+      "launchMedianMs": 57.05904200000077,
+      "initialScriptMedianMs": 30.082,
+      "constructorCompileMedianMs": 1.899999976158142,
+      "sourceBytes": 507406,
+      "scenes": [
+        {
+          "label": "town",
+          "p50MedianMs": 0.19999998807907104,
+          "p95MedianMs": 0.3999999761581421,
+          "canvasRGBABytes": 1024336,
+          "decodedBytes": 0,
+          "jsHeapBytes": 3381560
+        },
+        {
+          "label": "crypt",
+          "p50MedianMs": 0.3999999761581421,
+          "p95MedianMs": 0.5,
+          "canvasRGBABytes": 2034320,
+          "decodedBytes": 0,
+          "jsHeapBytes": 3598792
+        },
+        {
+          "label": "cavern",
+          "p50MedianMs": 0.3999999761581421,
+          "p95MedianMs": 0.5,
+          "canvasRGBABytes": 2928272,
+          "decodedBytes": 0,
+          "jsHeapBytes": 3681600
+        },
+        {
+          "label": "kitchen",
+          "p50MedianMs": 0.3999999761581421,
+          "p95MedianMs": 0.5,
+          "canvasRGBABytes": 3813008,
+          "decodedBytes": 0,
+          "jsHeapBytes": 3750672
+        },
+        {
+          "label": "tavern",
+          "p50MedianMs": 0.3999999761581421,
+          "p95MedianMs": 0.5,
+          "canvasRGBABytes": 4710032,
+          "decodedBytes": 0,
+          "jsHeapBytes": 3848740
+        },
+        {
+          "label": "throne",
+          "p50MedianMs": 0.40000003576278687,
+          "p95MedianMs": 0.6000000238418579,
+          "canvasRGBABytes": 5596688,
+          "decodedBytes": 0,
+          "jsHeapBytes": 3945752
+        },
+        {
+          "label": "dragon",
+          "p50MedianMs": 0.3999999761581421,
+          "p95MedianMs": 0.5,
+          "canvasRGBABytes": 5905296,
+          "decodedBytes": 0,
+          "jsHeapBytes": 4024684
+        }
+      ],
+      "animation": {
+        "paints": 44,
+        "spanMs": 2007.699999988079,
+        "fps": 21.417542461650307,
+        "motionSeconds": 2.033232000000001
+      },
+      "scaleStress": {
+        "addedFirst": 4,
+        "addedSecond": 0
+      }
+    },
+    "candidate": {
+      "launchMedianMs": 124.27850000000035,
+      "initialScriptMedianMs": 32.351,
+      "constructorCompileMedianMs": 54,
+      "sourceBytes": 11840998,
+      "scenes": [
+        {
+          "label": "town",
+          "p50MedianMs": 0.19999998807907104,
+          "p95MedianMs": 0.30000001192092896,
+          "canvasRGBABytes": 381984,
+          "decodedBytes": 504864,
+          "jsHeapBytes": 19376336
+        },
+        {
+          "label": "crypt",
+          "p50MedianMs": 0.40000003576278687,
+          "p95MedianMs": 0.5,
+          "canvasRGBABytes": 663904,
+          "decodedBytes": 611616,
+          "jsHeapBytes": 19555828
+        },
+        {
+          "label": "cavern",
+          "p50MedianMs": 0.40000003576278687,
+          "p95MedianMs": 0.5,
+          "canvasRGBABytes": 755392,
+          "decodedBytes": 621184,
+          "jsHeapBytes": 19596384
+        },
+        {
+          "label": "kitchen",
+          "p50MedianMs": 0.3999999761581421,
+          "p95MedianMs": 0.5,
+          "canvasRGBABytes": 825024,
+          "decodedBytes": 621184,
+          "jsHeapBytes": 19650468
+        },
+        {
+          "label": "tavern",
+          "p50MedianMs": 0.40000003576278687,
+          "p95MedianMs": 0.5,
+          "canvasRGBABytes": 901824,
+          "decodedBytes": 636544,
+          "jsHeapBytes": 19671548
+        },
+        {
+          "label": "throne",
+          "p50MedianMs": 0.5,
+          "p95MedianMs": 0.6000000238418579,
+          "canvasRGBABytes": 1000128,
+          "decodedBytes": 652928,
+          "jsHeapBytes": 19764280
+        },
+        {
+          "label": "dragon",
+          "p50MedianMs": 0.40000003576278687,
+          "p95MedianMs": 0.5,
+          "canvasRGBABytes": 1010368,
+          "decodedBytes": 663168,
+          "jsHeapBytes": 19815732
+        }
+      ],
+      "animation": {
+        "paints": 48,
+        "spanMs": 2096.599999964237,
+        "fps": 22.41724697166923,
+        "motionSeconds": 2.0998700000000006
+      },
+      "scaleStress": {
+        "addedFirst": 4,
+        "addedSecond": 0
+      }
+    }
+  },
+  "samples": [
+    {
+      "variant": "baseline",
+      "trial": 0,
+      "launchMs": 66.13683300000002,
+      "initialScriptMs": 33.279,
+      "constructorCompileMs": 2.200000047683716,
+      "sourceBytes": {
+        "index.html": 10703,
+        "style.css": 13293,
+        "js/game.js": 164062,
+        "js/sprites.js": 319348
+      },
+      "scenes": [
+        {
+          "label": "town",
+          "p50": 0.19999998807907104,
+          "p95": 0.40000003576278687,
+          "max": 2.400000035762787,
+          "tiles": 216,
+          "player": [
+            38,
+            26
+          ],
+          "depth": 1,
+          "liveCacheCanvases": 226,
+          "canvasRGBABytes": 1024336,
+          "decodedBytes": 0,
+          "jsHeapBytes": 3381560
+        },
+        {
+          "label": "crypt",
+          "p50": 0.3999999761581421,
+          "p95": 0.5,
+          "max": 0.6000000238418579,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 1,
+          "liveCacheCanvases": 450,
+          "canvasRGBABytes": 2034320,
+          "decodedBytes": 0,
+          "jsHeapBytes": 3598792
+        },
+        {
+          "label": "cavern",
+          "p50": 0.3999999761581421,
+          "p95": 0.5,
+          "max": 0.5,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 2,
+          "liveCacheCanvases": 667,
+          "canvasRGBABytes": 2928272,
+          "decodedBytes": 0,
+          "jsHeapBytes": 3681600
+        },
+        {
+          "label": "kitchen",
+          "p50": 0.3999999761581421,
+          "p95": 0.5,
+          "max": 0.6000000238418579,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 3,
+          "liveCacheCanvases": 883,
+          "canvasRGBABytes": 3813008,
+          "decodedBytes": 0,
+          "jsHeapBytes": 3750672
+        },
+        {
+          "label": "tavern",
+          "p50": 0.3999999761581421,
+          "p95": 0.5,
+          "max": 0.5,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 7,
+          "liveCacheCanvases": 1100,
+          "canvasRGBABytes": 4710032,
+          "decodedBytes": 0,
+          "jsHeapBytes": 3848740
+        },
+        {
+          "label": "throne",
+          "p50": 0.5,
+          "p95": 0.6000000238418579,
+          "max": 0.6000000238418579,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 50,
+          "liveCacheCanvases": 1317,
+          "canvasRGBABytes": 5596688,
+          "decodedBytes": 0,
+          "jsHeapBytes": 3945752
+        },
+        {
+          "label": "dragon",
+          "p50": 0.3999999761581421,
+          "p95": 0.5,
+          "max": 0.5999999642372131,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 100,
+          "liveCacheCanvases": 1391,
+          "canvasRGBABytes": 5905296,
+          "decodedBytes": 0,
+          "jsHeapBytes": 4024684
+        }
+      ],
+      "plateau": {
+        "before": 1391,
+        "after": 1391
+      },
+      "scaleStress": {
+        "addedFirst": 4,
+        "addedSecond": 0
+      },
+      "animation": {
+        "paints": 44,
+        "spanMs": 2007.699999988079,
+        "fps": 21.417542461650307,
+        "motionSeconds": 2.033232000000001
+      }
+    },
+    {
+      "variant": "candidate",
+      "trial": 0,
+      "launchMs": 136.8923749999999,
+      "initialScriptMs": 33.492000000000004,
+      "constructorCompileMs": 55.90000003576279,
+      "sourceBytes": {
+        "index.html": 10745,
+        "style.css": 13293,
+        "js/game.js": 170975,
+        "js/sprites.js": 346723,
+        "js/art-runtime.js": 11299262
+      },
+      "scenes": [
+        {
+          "label": "town",
+          "p50": 0.19999998807907104,
+          "p95": 0.30000001192092896,
+          "max": 2.800000011920929,
+          "tiles": 216,
+          "player": [
+            38,
+            26
+          ],
+          "depth": 1,
+          "liveCacheCanvases": 14,
+          "canvasRGBABytes": 381984,
+          "decodedBytes": 504864,
+          "jsHeapBytes": 19376336
+        },
+        {
+          "label": "crypt",
+          "p50": 0.40000003576278687,
+          "p95": 0.5,
+          "max": 0.6000000238418579,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 1,
+          "liveCacheCanvases": 41,
+          "canvasRGBABytes": 663904,
+          "decodedBytes": 611616,
+          "jsHeapBytes": 19555828
+        },
+        {
+          "label": "cavern",
+          "p50": 0.40000003576278687,
+          "p95": 0.5,
+          "max": 0.6000000238418579,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 2,
+          "liveCacheCanvases": 62,
+          "canvasRGBABytes": 755392,
+          "decodedBytes": 621184,
+          "jsHeapBytes": 19596384
+        },
+        {
+          "label": "kitchen",
+          "p50": 0.3999999761581421,
+          "p95": 0.5,
+          "max": 0.6000000238418579,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 3,
+          "liveCacheCanvases": 79,
+          "canvasRGBABytes": 825024,
+          "decodedBytes": 621184,
+          "jsHeapBytes": 19650468
+        },
+        {
+          "label": "tavern",
+          "p50": 0.40000003576278687,
+          "p95": 0.5,
+          "max": 0.699999988079071,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 7,
+          "liveCacheCanvases": 95,
+          "canvasRGBABytes": 901824,
+          "decodedBytes": 636544,
+          "jsHeapBytes": 19671548
+        },
+        {
+          "label": "throne",
+          "p50": 0.5,
+          "p95": 0.6000000238418579,
+          "max": 0.699999988079071,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 50,
+          "liveCacheCanvases": 116,
+          "canvasRGBABytes": 1000128,
+          "decodedBytes": 652928,
+          "jsHeapBytes": 19764280
+        },
+        {
+          "label": "dragon",
+          "p50": 0.40000003576278687,
+          "p95": 0.5,
+          "max": 0.6000000238418579,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 100,
+          "liveCacheCanvases": 117,
+          "canvasRGBABytes": 1010368,
+          "decodedBytes": 663168,
+          "jsHeapBytes": 19815732
+        }
+      ],
+      "plateau": {
+        "before": 117,
+        "after": 117
+      },
+      "scaleStress": {
+        "addedFirst": 4,
+        "addedSecond": 0
+      },
+      "animation": {
+        "paints": 48,
+        "spanMs": 2096.599999964237,
+        "fps": 22.41724697166923,
+        "motionSeconds": 2.0998700000000006
+      }
+    },
+    {
+      "variant": "candidate",
+      "trial": 1,
+      "launchMs": 120.11075000000073,
+      "initialScriptMs": 31.987000000000002,
+      "constructorCompileMs": 54,
+      "sourceBytes": {
+        "index.html": 10745,
+        "style.css": 13293,
+        "js/game.js": 170975,
+        "js/sprites.js": 346723,
+        "js/art-runtime.js": 11299262
+      },
+      "scenes": [
+        {
+          "label": "town",
+          "p50": 0.19999998807907104,
+          "p95": 0.3999999761581421,
+          "max": 2.300000011920929,
+          "tiles": 216,
+          "player": [
+            38,
+            26
+          ],
+          "depth": 1,
+          "liveCacheCanvases": 14,
+          "canvasRGBABytes": 381984,
+          "decodedBytes": 504864,
+          "jsHeapBytes": 19376372
+        },
+        {
+          "label": "crypt",
+          "p50": 0.40000003576278687,
+          "p95": 0.6000000238418579,
+          "max": 0.800000011920929,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 1,
+          "liveCacheCanvases": 41,
+          "canvasRGBABytes": 663904,
+          "decodedBytes": 611616,
+          "jsHeapBytes": 19555892
+        },
+        {
+          "label": "cavern",
+          "p50": 0.40000003576278687,
+          "p95": 0.5,
+          "max": 0.6000000238418579,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 2,
+          "liveCacheCanvases": 62,
+          "canvasRGBABytes": 755392,
+          "decodedBytes": 621184,
+          "jsHeapBytes": 19596444
+        },
+        {
+          "label": "kitchen",
+          "p50": 0.3999999761581421,
+          "p95": 0.5,
+          "max": 0.5,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 3,
+          "liveCacheCanvases": 79,
+          "canvasRGBABytes": 825024,
+          "decodedBytes": 621184,
+          "jsHeapBytes": 19650512
+        },
+        {
+          "label": "tavern",
+          "p50": 0.40000003576278687,
+          "p95": 0.5,
+          "max": 0.6000000238418579,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 7,
+          "liveCacheCanvases": 95,
+          "canvasRGBABytes": 901824,
+          "decodedBytes": 636544,
+          "jsHeapBytes": 19671616
+        },
+        {
+          "label": "throne",
+          "p50": 0.5,
+          "p95": 0.6000000238418579,
+          "max": 0.699999988079071,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 50,
+          "liveCacheCanvases": 116,
+          "canvasRGBABytes": 1000128,
+          "decodedBytes": 652928,
+          "jsHeapBytes": 19764168
+        },
+        {
+          "label": "dragon",
+          "p50": 0.40000003576278687,
+          "p95": 0.5,
+          "max": 0.6000000238418579,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 100,
+          "liveCacheCanvases": 117,
+          "canvasRGBABytes": 1010368,
+          "decodedBytes": 663168,
+          "jsHeapBytes": 19815732
+        }
+      ],
+      "plateau": {
+        "before": 117,
+        "after": 117
+      },
+      "scaleStress": {
+        "addedFirst": 4,
+        "addedSecond": 0
+      },
+      "animation": null
+    },
+    {
+      "variant": "baseline",
+      "trial": 1,
+      "launchMs": 57.05904200000077,
+      "initialScriptMs": 30.082,
+      "constructorCompileMs": 1.899999976158142,
+      "sourceBytes": {
+        "index.html": 10703,
+        "style.css": 13293,
+        "js/game.js": 164062,
+        "js/sprites.js": 319348
+      },
+      "scenes": [
+        {
+          "label": "town",
+          "p50": 0.19999998807907104,
+          "p95": 0.30000001192092896,
+          "max": 2.099999964237213,
+          "tiles": 216,
+          "player": [
+            38,
+            26
+          ],
+          "depth": 1,
+          "liveCacheCanvases": 226,
+          "canvasRGBABytes": 1024336,
+          "decodedBytes": 0,
+          "jsHeapBytes": 3381292
+        },
+        {
+          "label": "crypt",
+          "p50": 0.3999999761581421,
+          "p95": 0.5,
+          "max": 0.5999999642372131,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 1,
+          "liveCacheCanvases": 450,
+          "canvasRGBABytes": 2034320,
+          "decodedBytes": 0,
+          "jsHeapBytes": 3599132
+        },
+        {
+          "label": "cavern",
+          "p50": 0.3999999761581421,
+          "p95": 0.5,
+          "max": 0.6000000238418579,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 2,
+          "liveCacheCanvases": 667,
+          "canvasRGBABytes": 2928272,
+          "decodedBytes": 0,
+          "jsHeapBytes": 3681344
+        },
+        {
+          "label": "kitchen",
+          "p50": 0.3999999761581421,
+          "p95": 0.5,
+          "max": 0.5,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 3,
+          "liveCacheCanvases": 883,
+          "canvasRGBABytes": 3813008,
+          "decodedBytes": 0,
+          "jsHeapBytes": 3751132
+        },
+        {
+          "label": "tavern",
+          "p50": 0.3999999761581421,
+          "p95": 0.5,
+          "max": 0.5,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 7,
+          "liveCacheCanvases": 1100,
+          "canvasRGBABytes": 4710032,
+          "decodedBytes": 0,
+          "jsHeapBytes": 3849236
+        },
+        {
+          "label": "throne",
+          "p50": 0.40000003576278687,
+          "p95": 0.6000000238418579,
+          "max": 0.6000000238418579,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 50,
+          "liveCacheCanvases": 1317,
+          "canvasRGBABytes": 5596688,
+          "decodedBytes": 0,
+          "jsHeapBytes": 3946252
+        },
+        {
+          "label": "dragon",
+          "p50": 0.3999999761581421,
+          "p95": 0.5,
+          "max": 0.5,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 100,
+          "liveCacheCanvases": 1391,
+          "canvasRGBABytes": 5905296,
+          "decodedBytes": 0,
+          "jsHeapBytes": 4025188
+        }
+      ],
+      "plateau": {
+        "before": 1391,
+        "after": 1391
+      },
+      "scaleStress": {
+        "addedFirst": 4,
+        "addedSecond": 0
+      },
+      "animation": null
+    },
+    {
+      "variant": "baseline",
+      "trial": 2,
+      "launchMs": 56.97758299999987,
+      "initialScriptMs": 29.987,
+      "constructorCompileMs": 1.899999976158142,
+      "sourceBytes": {
+        "index.html": 10703,
+        "style.css": 13293,
+        "js/game.js": 164062,
+        "js/sprites.js": 319348
+      },
+      "scenes": [
+        {
+          "label": "town",
+          "p50": 0.19999998807907104,
+          "p95": 0.3999999761581421,
+          "max": 2.100000023841858,
+          "tiles": 216,
+          "player": [
+            38,
+            26
+          ],
+          "depth": 1,
+          "liveCacheCanvases": 226,
+          "canvasRGBABytes": 1024336,
+          "decodedBytes": 0,
+          "jsHeapBytes": 3381268
+        },
+        {
+          "label": "crypt",
+          "p50": 0.3999999761581421,
+          "p95": 0.5,
+          "max": 0.6000000238418579,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 1,
+          "liveCacheCanvases": 450,
+          "canvasRGBABytes": 2034320,
+          "decodedBytes": 0,
+          "jsHeapBytes": 3594244
+        },
+        {
+          "label": "cavern",
+          "p50": 0.3999999761581421,
+          "p95": 0.5,
+          "max": 0.5,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 2,
+          "liveCacheCanvases": 667,
+          "canvasRGBABytes": 2928272,
+          "decodedBytes": 0,
+          "jsHeapBytes": 3677536
+        },
+        {
+          "label": "kitchen",
+          "p50": 0.3999999761581421,
+          "p95": 0.5999999642372131,
+          "max": 0.8999999761581421,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 3,
+          "liveCacheCanvases": 883,
+          "canvasRGBABytes": 3813008,
+          "decodedBytes": 0,
+          "jsHeapBytes": 3746452
+        },
+        {
+          "label": "tavern",
+          "p50": 0.3999999761581421,
+          "p95": 0.6000000238418579,
+          "max": 0.6000000238418579,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 7,
+          "liveCacheCanvases": 1100,
+          "canvasRGBABytes": 4710032,
+          "decodedBytes": 0,
+          "jsHeapBytes": 3844520
+        },
+        {
+          "label": "throne",
+          "p50": 0.40000003576278687,
+          "p95": 0.5999999642372131,
+          "max": 0.6000000238418579,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 50,
+          "liveCacheCanvases": 1317,
+          "canvasRGBABytes": 5596688,
+          "decodedBytes": 0,
+          "jsHeapBytes": 3941420
+        },
+        {
+          "label": "dragon",
+          "p50": 0.3999999761581421,
+          "p95": 0.5,
+          "max": 0.6000000238418579,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 100,
+          "liveCacheCanvases": 1391,
+          "canvasRGBABytes": 5905296,
+          "decodedBytes": 0,
+          "jsHeapBytes": 4020352
+        }
+      ],
+      "plateau": {
+        "before": 1391,
+        "after": 1391
+      },
+      "scaleStress": {
+        "addedFirst": 4,
+        "addedSecond": 0
+      },
+      "animation": null
+    },
+    {
+      "variant": "candidate",
+      "trial": 2,
+      "launchMs": 124.27850000000035,
+      "initialScriptMs": 32.351,
+      "constructorCompileMs": 52.200000047683716,
+      "sourceBytes": {
+        "index.html": 10745,
+        "style.css": 13293,
+        "js/game.js": 170975,
+        "js/sprites.js": 346723,
+        "js/art-runtime.js": 11299262
+      },
+      "scenes": [
+        {
+          "label": "town",
+          "p50": 0.19999998807907104,
+          "p95": 0.30000001192092896,
+          "max": 2.900000035762787,
+          "tiles": 216,
+          "player": [
+            38,
+            26
+          ],
+          "depth": 1,
+          "liveCacheCanvases": 14,
+          "canvasRGBABytes": 381984,
+          "decodedBytes": 504864,
+          "jsHeapBytes": 19376396
+        },
+        {
+          "label": "crypt",
+          "p50": 0.40000003576278687,
+          "p95": 0.5,
+          "max": 0.6000000238418579,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 1,
+          "liveCacheCanvases": 41,
+          "canvasRGBABytes": 663904,
+          "decodedBytes": 611616,
+          "jsHeapBytes": 19555552
+        },
+        {
+          "label": "cavern",
+          "p50": 0.40000003576278687,
+          "p95": 0.5999999642372131,
+          "max": 0.6000000238418579,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 2,
+          "liveCacheCanvases": 62,
+          "canvasRGBABytes": 755392,
+          "decodedBytes": 621184,
+          "jsHeapBytes": 19596344
+        },
+        {
+          "label": "kitchen",
+          "p50": 0.3999999761581421,
+          "p95": 0.5,
+          "max": 0.5999999642372131,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 3,
+          "liveCacheCanvases": 79,
+          "canvasRGBABytes": 825024,
+          "decodedBytes": 621184,
+          "jsHeapBytes": 19650764
+        },
+        {
+          "label": "tavern",
+          "p50": 0.40000003576278687,
+          "p95": 0.5,
+          "max": 0.5,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 7,
+          "liveCacheCanvases": 95,
+          "canvasRGBABytes": 901824,
+          "decodedBytes": 636544,
+          "jsHeapBytes": 19671424
+        },
+        {
+          "label": "throne",
+          "p50": 0.5,
+          "p95": 0.6000000238418579,
+          "max": 0.7000000476837158,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 50,
+          "liveCacheCanvases": 116,
+          "canvasRGBABytes": 1000128,
+          "decodedBytes": 652928,
+          "jsHeapBytes": 19763464
+        },
+        {
+          "label": "dragon",
+          "p50": 0.40000003576278687,
+          "p95": 0.5,
+          "max": 0.6000000238418579,
+          "tiles": 216,
+          "player": [
+            6,
+            5
+          ],
+          "depth": 100,
+          "liveCacheCanvases": 117,
+          "canvasRGBABytes": 1010368,
+          "decodedBytes": 663168,
+          "jsHeapBytes": 19815576
+        }
+      ],
+      "plateau": {
+        "before": 117,
+        "after": 117
+      },
+      "scaleStress": {
+        "addedFirst": 4,
+        "addedSecond": 0
+      },
+      "animation": null
+    }
+  ],
+  "errors": [],
+  "remote": []
+}

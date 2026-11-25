@@ -1,0 +1,49 @@
+{
+  "id": "townGate",
+  "kind": "sprite",
+  "group": "town",
+  "maxVisible": [
+    72,
+    68
+  ],
+  "columns": 1,
+  "parts": [
+    "sprite"
+  ],
+  "file": "environment-v1/townGate/atlas.png",
+  "size": [
+    88,
+    84
+  ],
+  "records": [
+    {
+      "name": "sprite",
+      "crop": [
+        0,
+        0,
+        88,
+        84
+      ],
+      "bounds": {
+        "x": 8,
+        "y": 40,
+        "width": 72,
+        "height": 36
+      },
+      "anchor": [
+        44,
+        76
+      ],
+      "sourceBounds": {
+        "x": 181,
+        "y": 217,
+        "width": 1172,
+        "height": 578
+      },
+      "scale": 0.06143344709897611
+    }
+  ],
+  "sha256": "78441f7c8392676b7dd6eb3769bf84a63f6d982b22552a3d6f11f4d3c5951c41",
+  "sourceSHA256": "781ca83765174cbce821ddcf0c599608dd71a13ebe8cf9ff9eaf5a1f0e242398",
+  "scope": "standalone review; runtime unchanged"
+}

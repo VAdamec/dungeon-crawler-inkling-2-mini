@@ -1,0 +1,9 @@
+SPRITES loaded: 76
+PALETTES loaded: 76
+state exists: true depth: 1 monsters: 0 rooms: 0
+after keys: px= 38 py= 27 hp= 60 log= No need to retreat while you are in town.
+
+Nothing to interact with here.
+
+You arrive in the village. Rest at the Inn, visit the Store, or enter the dungeon.
+SMOKE_OK

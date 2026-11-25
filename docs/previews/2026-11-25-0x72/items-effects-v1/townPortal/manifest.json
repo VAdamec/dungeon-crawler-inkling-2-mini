@@ -1,0 +1,141 @@
+{
+  "id": "townPortal",
+  "name": "townPortal",
+  "description": "Open purple blue magical portal ARCH with transparent opening and fine glowing rim, ground ring, no solid fill or scenery",
+  "group": "travel",
+  "sourceFrames": 4,
+  "columns": 2,
+  "maxVisible": [
+    40,
+    50
+  ],
+  "cell": 128,
+  "states": "four subtle looping phases of the same fully open portal arch; NEVER closed or filled opening",
+  "sheet": "items-effects-v1/townPortal/sheet.png",
+  "anchor": [
+    64,
+    64
+  ],
+  "screenScale": 2,
+  "alphaCutoff": 64,
+  "sharedScale": 0.09291521486643438,
+  "nativeDirection": null,
+  "source": "generated-source.png",
+  "frames": [
+    {
+      "index": 0,
+      "label": "closed",
+      "empty": true,
+      "file": "frames/0.png",
+      "crop": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "bounds": null,
+      "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+    },
+    {
+      "index": 1,
+      "label": "four subtle looping phases of the same fully open portal arch",
+      "empty": false,
+      "file": "frames/1.png",
+      "crop": [
+        128,
+        0,
+        128,
+        128
+      ],
+      "bounds": {
+        "x": 47,
+        "y": 46,
+        "width": 37,
+        "height": 39
+      },
+      "sourceCell": [
+        0,
+        0,
+        631,
+        624
+      ],
+      "sha256": "730e18a11fac0e94b24f83b05f14124f4eb92e7eaffffb946f5c2e1b71afca45"
+    },
+    {
+      "index": 2,
+      "label": "NEVER closed or filled opening",
+      "empty": false,
+      "file": "frames/2.png",
+      "crop": [
+        256,
+        0,
+        128,
+        128
+      ],
+      "bounds": {
+        "x": 44,
+        "y": 45,
+        "width": 38,
+        "height": 39
+      },
+      "sourceCell": [
+        631,
+        0,
+        630,
+        624
+      ],
+      "sha256": "0642822b3b2fc49561b9745b630afcebd78a26b9dd02f9c81d910350776be9c0"
+    },
+    {
+      "index": 3,
+      "label": "phase 2",
+      "empty": false,
+      "file": "frames/3.png",
+      "crop": [
+        384,
+        0,
+        128,
+        128
+      ],
+      "bounds": {
+        "x": 47,
+        "y": 44,
+        "width": 36,
+        "height": 39
+      },
+      "sourceCell": [
+        0,
+        624,
+        631,
+        623
+      ],
+      "sha256": "0a432d391ce4678a290b5e2d6718461c53cbf209086c091f9f73efd61d38d910"
+    },
+    {
+      "index": 4,
+      "label": "phase 3",
+      "empty": false,
+      "file": "frames/4.png",
+      "crop": [
+        512,
+        0,
+        128,
+        128
+      ],
+      "bounds": {
+        "x": 45,
+        "y": 44,
+        "width": 36,
+        "height": 38
+      },
+      "sourceCell": [
+        631,
+        624,
+        630,
+        623
+      ],
+      "sha256": "b18c4309d5d8f5b91cada56172a3410c922b52c8130485146cb75ec3bdb0a565"
+    }
+  ],
+  "scope": "preview only; awaiting review"
+}

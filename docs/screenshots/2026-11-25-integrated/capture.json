@@ -1,0 +1,504 @@
+{
+  "date": "2026-11-25",
+  "version": "2.0.0",
+  "source": "actual index.html + art-runtime/sprites/game over normal file:// Chrome",
+  "viewport": [
+    1800,
+    1200
+  ],
+  "mobile": [
+    390,
+    844
+  ],
+  "seed": 20261125,
+  "clock": "periodic AI disabled; cinematic/motion callbacks queued for reproducible stills",
+  "encounters": {
+    "depth": 6,
+    "biome": "cavern",
+    "hero": [
+      58,
+      7
+    ],
+    "monsters": [
+      {
+        "name": "Wasp",
+        "x": 56,
+        "y": 5
+      },
+      {
+        "name": "Mage",
+        "x": 60,
+        "y": 6
+      },
+      {
+        "name": "Healer",
+        "x": 56,
+        "y": 9
+      },
+      {
+        "name": "Orc",
+        "x": 60,
+        "y": 9
+      }
+    ],
+    "staged": true
+  },
+  "figures": [
+    {
+      "file": "monsters/slime.png",
+      "role": "slime",
+      "frame": 0,
+      "direction": "front",
+      "scale": 4
+    },
+    {
+      "file": "monsters/bat.png",
+      "role": "bat",
+      "frame": 0,
+      "direction": "front",
+      "scale": 4
+    },
+    {
+      "file": "monsters/goblin.png",
+      "role": "goblin",
+      "frame": 0,
+      "direction": "front",
+      "scale": 4
+    },
+    {
+      "file": "monsters/skeleton.png",
+      "role": "skeleton",
+      "frame": 0,
+      "direction": "front",
+      "scale": 4
+    },
+    {
+      "file": "monsters/orc.png",
+      "role": "orc",
+      "frame": 0,
+      "direction": "front",
+      "scale": 4
+    },
+    {
+      "file": "monsters/wasp.png",
+      "role": "wasp",
+      "frame": 0,
+      "direction": "front",
+      "scale": 4
+    },
+    {
+      "file": "monsters/mage.png",
+      "role": "mage",
+      "frame": 0,
+      "direction": "front",
+      "scale": 4
+    },
+    {
+      "file": "monsters/healer.png",
+      "role": "healer",
+      "frame": 0,
+      "direction": "front",
+      "scale": 4
+    },
+    {
+      "file": "monsters/marmalade.png",
+      "role": "catCompanion",
+      "frame": 0,
+      "direction": "front",
+      "scale": 4
+    },
+    {
+      "file": "monsters/mimic.png",
+      "role": "mimic",
+      "frame": 2,
+      "direction": "front",
+      "scale": 3.6056338028169015
+    },
+    {
+      "file": "monsters/hydra.png",
+      "role": "hydra",
+      "frame": 0,
+      "direction": "front",
+      "scale": 2.392523364485981
+    },
+    {
+      "file": "monsters/wild-boar.png",
+      "role": "boar",
+      "frame": 0,
+      "direction": "front",
+      "scale": 3.282051282051282
+    },
+    {
+      "file": "monsters/medusa.png",
+      "role": "medusa",
+      "frame": 0,
+      "direction": "front",
+      "scale": 2.6666666666666665
+    },
+    {
+      "file": "monsters/dark-wizard.png",
+      "role": "darkWizard",
+      "frame": 0,
+      "direction": "front",
+      "scale": 2.6666666666666665
+    },
+    {
+      "file": "monsters/skeleton-king.png",
+      "role": "skeletonKing",
+      "frame": 0,
+      "direction": "front",
+      "scale": 2.5098039215686274
+    },
+    {
+      "file": "monsters/dragon.png",
+      "role": "dragonBoss",
+      "frame": 0,
+      "direction": "front",
+      "scale": 2.1333333333333333
+    },
+    {
+      "file": "monsters/cook.png",
+      "role": "cook",
+      "frame": 0,
+      "direction": "front",
+      "scale": 3.878787878787879
+    },
+    {
+      "file": "monsters/bartender.png",
+      "role": "bartender",
+      "frame": 0,
+      "direction": "front",
+      "scale": 4
+    }
+  ],
+  "stats": {
+    "ordinary": [
+      {
+        "name": "Slime",
+        "sprite": "slime",
+        "hp": 14,
+        "atk": 5,
+        "def": 0,
+        "xp": 10
+      },
+      {
+        "name": "Bat",
+        "sprite": "bat",
+        "hp": 10,
+        "atk": 7,
+        "def": 1,
+        "xp": 14
+      },
+      {
+        "name": "Goblin",
+        "sprite": "goblin",
+        "hp": 22,
+        "atk": 9,
+        "def": 2,
+        "xp": 22
+      },
+      {
+        "name": "Skeleton",
+        "sprite": "skeleton",
+        "hp": 28,
+        "atk": 12,
+        "def": 4,
+        "xp": 32
+      },
+      {
+        "name": "Orc",
+        "sprite": "orc",
+        "hp": 40,
+        "atk": 16,
+        "def": 5,
+        "xp": 50
+      },
+      {
+        "name": "Wasp",
+        "sprite": "wasp",
+        "hp": 18,
+        "atk": 8,
+        "def": 1,
+        "xp": 20,
+        "minDepth": 2,
+        "range": 3,
+        "ranged": true,
+        "projectile": "stinger"
+      },
+      {
+        "name": "Mage",
+        "sprite": "mage",
+        "hp": 25,
+        "atk": 10,
+        "def": 2,
+        "xp": 28,
+        "minDepth": 4,
+        "magic": true,
+        "magicType": "attack",
+        "magicRange": 4
+      },
+      {
+        "name": "Healer",
+        "sprite": "healer",
+        "hp": 30,
+        "atk": 6,
+        "def": 3,
+        "xp": 35,
+        "minDepth": 5,
+        "magic": true,
+        "magicType": "heal",
+        "magicRange": 3
+      }
+    ],
+    "bosses": [
+      {
+        "depth": 5,
+        "name": "Mimic",
+        "sprite": "mimic",
+        "minDepth": 5,
+        "hp": 118,
+        "atk": 30,
+        "def": 4,
+        "xp": 240,
+        "gold": 160,
+        "magic": false,
+        "ranged": false,
+        "throne": false,
+        "summons": false,
+        "dragon": false
+      },
+      {
+        "depth": 10,
+        "name": "Hydra",
+        "sprite": "hydra",
+        "minDepth": 10,
+        "hp": 229,
+        "atk": 49,
+        "def": 5,
+        "xp": 488,
+        "gold": 325,
+        "magic": false,
+        "ranged": false,
+        "throne": false,
+        "summons": false,
+        "dragon": false
+      },
+      {
+        "depth": 20,
+        "name": "Wild Boar",
+        "sprite": "boar",
+        "minDepth": 20,
+        "hp": 426,
+        "atk": 89,
+        "def": 8,
+        "xp": 978,
+        "gold": 661,
+        "magic": false,
+        "ranged": false,
+        "throne": false,
+        "summons": false,
+        "dragon": false
+      },
+      {
+        "depth": 30,
+        "name": "Medusa",
+        "sprite": "medusa",
+        "minDepth": 30,
+        "hp": 515,
+        "atk": 118,
+        "def": 9,
+        "xp": 1444,
+        "gold": 990,
+        "magic": true,
+        "magicType": "attack",
+        "magicRange": 4,
+        "ranged": false,
+        "throne": false,
+        "summons": false,
+        "dragon": false
+      },
+      {
+        "depth": 40,
+        "name": "Dark Wizard",
+        "sprite": "darkWizard",
+        "minDepth": 40,
+        "hp": 682,
+        "atk": 167,
+        "def": 11,
+        "xp": 1989,
+        "gold": 1398,
+        "magic": true,
+        "magicType": "attack",
+        "magicRange": 5,
+        "ranged": false,
+        "throne": false,
+        "summons": false,
+        "dragon": false
+      },
+      {
+        "depth": 50,
+        "name": "Skeleton King",
+        "sprite": "skeletonKing",
+        "minDepth": 50,
+        "hp": 1032,
+        "atk": 212,
+        "def": 15,
+        "xp": 3339,
+        "gold": 2385,
+        "magic": false,
+        "ranged": true,
+        "range": 6,
+        "projectile": "bone",
+        "throne": true,
+        "summons": true,
+        "dragon": false
+      },
+      {
+        "depth": 60,
+        "name": "Hydra",
+        "sprite": "hydra",
+        "minDepth": 60,
+        "hp": 929,
+        "atk": 219,
+        "def": 16,
+        "xp": 3071,
+        "gold": 2205,
+        "magic": false,
+        "ranged": false,
+        "throne": false,
+        "summons": false,
+        "dragon": false
+      },
+      {
+        "depth": 70,
+        "name": "Wild Boar",
+        "sprite": "boar",
+        "minDepth": 70,
+        "hp": 1299,
+        "atk": 277,
+        "def": 19,
+        "xp": 3833,
+        "gold": 2738,
+        "magic": false,
+        "ranged": false,
+        "throne": false,
+        "summons": false,
+        "dragon": false
+      },
+      {
+        "depth": 80,
+        "name": "Medusa",
+        "sprite": "medusa",
+        "minDepth": 80,
+        "hp": 1310,
+        "atk": 300,
+        "def": 20,
+        "xp": 4565,
+        "gold": 3320,
+        "magic": true,
+        "magicType": "attack",
+        "magicRange": 4,
+        "ranged": false,
+        "throne": false,
+        "summons": false,
+        "dragon": false
+      },
+      {
+        "depth": 90,
+        "name": "Dark Wizard",
+        "sprite": "darkWizard",
+        "minDepth": 90,
+        "hp": 1518,
+        "atk": 381,
+        "def": 22,
+        "xp": 5348,
+        "gold": 3953,
+        "magic": true,
+        "magicType": "attack",
+        "magicRange": 5,
+        "ranged": false,
+        "throne": false,
+        "summons": false,
+        "dragon": false
+      },
+      {
+        "depth": 100,
+        "name": "Dragon",
+        "sprite": "dragon",
+        "minDepth": 100,
+        "hp": 2061,
+        "atk": 438,
+        "def": 24,
+        "xp": 6438,
+        "gold": 5150,
+        "magic": false,
+        "ranged": false,
+        "throne": false,
+        "summons": false,
+        "dragon": true
+      }
+    ],
+    "spells": {
+      "fireball": {
+        "name": "Fireball",
+        "cost": 8,
+        "cooldown": 1.5,
+        "key": "F"
+      },
+      "heal": {
+        "name": "Heal",
+        "cost": 12,
+        "cooldown": 2,
+        "key": "G"
+      },
+      "frostbolt": {
+        "name": "Frostbolt",
+        "cost": 10,
+        "cooldown": 3,
+        "key": "V"
+      },
+      "greaterHeal": {
+        "name": "Greater Heal",
+        "cost": 18,
+        "cooldown": 6,
+        "key": "B"
+      },
+      "magicBarrier": {
+        "name": "Magic Barrier",
+        "cost": 14,
+        "cooldown": 4,
+        "key": "Z"
+      }
+    },
+    "themed": [
+      {
+        "depth": 3,
+        "name": "Cook",
+        "hp": 140,
+        "atk": 26,
+        "def": 6,
+        "xp": 255,
+        "gold": 170
+      },
+      {
+        "depth": 7,
+        "name": "Bartender",
+        "hp": 220,
+        "atk": 38,
+        "def": 7,
+        "xp": 465,
+        "gold": 310
+      }
+    ]
+  },
+  "notes": [
+    "Gameplay captures crop to #gameLayout; launch/desktop Help use the viewport; mobile Help is 390x844.",
+    "Town uses actual generated map with prepared hero positions; companion speech is hidden for an unobscured still while its journal entry remains.",
+    "Dungeon is a staged depth-6 encounter with prepared stats/equipment/spells/actors; not natural spawn or campaign balance evidence.",
+    "Throne room uses a real fresh depth-50 arena, prepared exploration/camera, existing summons and inherited staged hero stats; not a progression example.",
+    "Individual figures and boss contact sheet use runtime drawCinematicActor at documented normalized display scales; they are documentation illustrations, not in-world size comparisons.",
+    "No native hidden-tab verification performed. GR-09 remains unverified for that specific observation."
+  ],
+  "errors": [],
+  "remote": []
+}

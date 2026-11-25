@@ -1,0 +1,13 @@
+{
+  "directions": 4,
+  "framesPerDirection": 4,
+  "all16PosesSelectable": true,
+  "playAdvances": true,
+  "pauseFreezes": true,
+  "hiddenGuardFreezes": true,
+  "defaultIsPaused": true,
+  "standardFileProtocol": true,
+  "canvasCount": 60,
+  "errors": [],
+  "remote": []
+}

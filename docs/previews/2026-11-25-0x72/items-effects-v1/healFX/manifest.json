@@ -1,0 +1,127 @@
+{
+  "id": "healFX",
+  "name": "healFX",
+  "description": "Modest green and gold healing motes rising from a small ground ring; no character",
+  "group": "spells",
+  "sourceFrames": 4,
+  "columns": 2,
+  "maxVisible": [
+    36,
+    30
+  ],
+  "cell": 128,
+  "states": "small ring; rising green motes; brighter green gold ring; fading motes",
+  "sheet": "items-effects-v1/healFX/sheet.png",
+  "anchor": [
+    64,
+    64
+  ],
+  "screenScale": 2,
+  "alphaCutoff": 64,
+  "sharedScale": 0.11428571428571428,
+  "nativeDirection": null,
+  "source": "generated-source.png",
+  "frames": [
+    {
+      "index": 0,
+      "label": "small ring",
+      "empty": false,
+      "file": "frames/0.png",
+      "crop": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "bounds": {
+        "x": 51,
+        "y": 70,
+        "width": 29,
+        "height": 9
+      },
+      "sourceCell": [
+        0,
+        0,
+        631,
+        624
+      ],
+      "sha256": "4b3a0e402f2b61122539be877f672957a958ee3b4a1510e6ffefe8d633b16a09"
+    },
+    {
+      "index": 1,
+      "label": "rising green motes",
+      "empty": false,
+      "file": "frames/1.png",
+      "crop": [
+        128,
+        0,
+        128,
+        128
+      ],
+      "bounds": {
+        "x": 48,
+        "y": 53,
+        "width": 29,
+        "height": 26
+      },
+      "sourceCell": [
+        631,
+        0,
+        630,
+        624
+      ],
+      "sha256": "c1e11bb750ed13665f6902053143025b871796d0608113a041f9c0cc3f51ac26"
+    },
+    {
+      "index": 2,
+      "label": "brighter green gold ring",
+      "empty": false,
+      "file": "frames/2.png",
+      "crop": [
+        256,
+        0,
+        128,
+        128
+      ],
+      "bounds": {
+        "x": 50,
+        "y": 49,
+        "width": 30,
+        "height": 29
+      },
+      "sourceCell": [
+        0,
+        624,
+        631,
+        623
+      ],
+      "sha256": "1f703f049eaa6b326e6cfa22a6f93e75c2618b63bb7d2357e6bf741002b5547e"
+    },
+    {
+      "index": 3,
+      "label": "fading motes",
+      "empty": false,
+      "file": "frames/3.png",
+      "crop": [
+        384,
+        0,
+        128,
+        128
+      ],
+      "bounds": {
+        "x": 48,
+        "y": 54,
+        "width": 29,
+        "height": 24
+      },
+      "sourceCell": [
+        631,
+        624,
+        630,
+        623
+      ],
+      "sha256": "6847be48e1630fac42f9eb2c58d4a645ad1775ee9b1bf29623f46554d0a89d7a"
+    }
+  ],
+  "scope": "preview only; awaiting review"
+}

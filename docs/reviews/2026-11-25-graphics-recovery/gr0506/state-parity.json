@@ -1,0 +1,40 @@
+{
+  "seed": 20261125,
+  "scenarios": [
+    "initial town",
+    "ten town patrol ticks",
+    "generated floor 1",
+    "generated floor 2",
+    "generated floor 3",
+    "generated floor 7",
+    "generated floor 50",
+    "generated floor 100",
+    "return to saved town"
+  ],
+  "worldAndProgressionEqual": true,
+  "compared": [
+    "maps",
+    "rooms",
+    "props",
+    "visited",
+    "player",
+    "inventory",
+    "gold",
+    "keys",
+    "loot",
+    "traps",
+    "obstacles",
+    "monsters",
+    "stairs",
+    "NPCs",
+    "town patrols"
+  ],
+  "before": {
+    "game": "53b549fbd05927b9a83c64cc3d4edea40df77ad2d6a73d808e21c14fcf6f6655",
+    "sprites": "b010421e24393957e482c566f273707fa2ad80f1f7edc21dfe2014ef282c4747"
+  },
+  "after": {
+    "game": "387b6a72a3a5776c5350efba378dd92d01367a60e5b928ad10340002dbc94ccc",
+    "sprites": "aa6d783860f90eaab8204e459314c2d338e11af2c263bbc7337bdbb7ebd41be7"
+  }
+}

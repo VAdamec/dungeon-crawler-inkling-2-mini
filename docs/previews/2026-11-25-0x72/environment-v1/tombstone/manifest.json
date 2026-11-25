@@ -1,0 +1,49 @@
+{
+  "id": "tombstone",
+  "kind": "sprite",
+  "group": "crypt",
+  "maxVisible": [
+    28,
+    32
+  ],
+  "columns": 1,
+  "parts": [
+    "sprite"
+  ],
+  "file": "environment-v1/tombstone/atlas.png",
+  "size": [
+    44,
+    48
+  ],
+  "records": [
+    {
+      "name": "sprite",
+      "crop": [
+        0,
+        0,
+        44,
+        48
+      ],
+      "bounds": {
+        "x": 11,
+        "y": 8,
+        "width": 22,
+        "height": 32
+      },
+      "anchor": [
+        22,
+        40
+      ],
+      "sourceBounds": {
+        "x": 374,
+        "y": 236,
+        "width": 503,
+        "height": 746
+      },
+      "scale": 0.04289544235924933
+    }
+  ],
+  "sha256": "36da0278d1033cb57200802533fa0a9eed8812d861b3ba276f10e75b2f28a867",
+  "sourceSHA256": "d1e45da08d8691c08383f46441bf5302614e651bafc5362c11f4c2901647e559",
+  "scope": "standalone review; runtime unchanged"
+}

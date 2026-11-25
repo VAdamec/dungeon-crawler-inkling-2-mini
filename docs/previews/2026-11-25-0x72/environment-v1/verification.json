@@ -1,0 +1,17 @@
+{
+  "date": "2026-11-25",
+  "previewTests": 27,
+  "protectedFiles": 749,
+  "changedProtectedFiles": [],
+  "runtimeChanged": false,
+  "version": "1.0.1",
+  "environmentFamilies": 24,
+  "currentRuntimeRolesMapped": 76,
+  "sourceRevisions": "six quieter material atlases; prior variants retained",
+  "browser": "review/browser.json",
+  "limitations": [
+    "final visual acceptance pending",
+    "runtime/cinematic/offline-performance integration not performed",
+    "illustrative fog and staged art-review encounter placements are not game behavior verification"
+  ]
+}

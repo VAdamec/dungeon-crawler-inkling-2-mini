@@ -1,0 +1,26 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>0x72 asset inspection</title>
+<style>
+body{background:#191512;color:#e8dcc4;font:12px monospace;margin:20px}
+h1,h2{font:18px Georgia,serif;color:#e8c68d} img{image-rendering:pixelated;display:block;background:#1d1815}
+.canvas{display:inline-block;vertical-align:top;margin:0 24px 24px 0;padding:8px;border:1px solid #5b4636;background:#120f0d}
+canvas{image-rendering:pixelated;display:block}.label{margin-top:6px;color:#b8a482}
+</style></head><body>
+<h1>0x72 source atlas inspection</h1>
+<p>Nearest-neighbor enlarged source, no recolor or substitution.</p>
+<div id="out"></div>
+<script>
+(async()=>{
+ const imgs={main:'assets/atlas.png',low:'assets/walls-low.png',floor:'assets/floors.png'};
+ const out=document.getElementById('out');
+ for(const [name,src] of Object.entries(imgs)){
+   const im=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=src});
+   const scale=name==='main'?4:10;
+   const cv=document.createElement('canvas');cv.width=im.width*scale;cv.height=im.height*scale;
+   const c=cv.getContext('2d');c.imageSmoothingEnabled=false;c.drawImage(im,0,0,cv.width,cv.height);
+   if(name!=='main'){c.strokeStyle='rgba(232,198,141,.35)';c.lineWidth=1;const t=16*scale;for(let x=0;x<=im.width/16;x++){c.beginPath();c.moveTo(x*t,0);c.lineTo(x*t,cv.height);c.stroke()}for(let y=0;y<=im.height/16;y++){c.beginPath();c.moveTo(0,y*t);c.lineTo(cv.width,y*t);c.stroke()}}
+   const wrap=document.createElement('div');wrap.className='canvas';wrap.append(cv);
+   const lab=document.createElement('div');lab.className='label';lab.textContent=`${name} ${im.width}x${im.height} @ ${scale}x`;wrap.append(lab);out.append(wrap);
+ }
+})();
+</script></body></html>

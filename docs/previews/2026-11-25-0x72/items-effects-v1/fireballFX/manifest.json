@@ -1,0 +1,127 @@
+{
+  "id": "fireballFX",
+  "name": "fireballFX",
+  "description": "Rightward orange fireball, bright head RIGHT, tapered flame trail LEFT",
+  "group": "projectiles",
+  "sourceFrames": 4,
+  "columns": 2,
+  "maxVisible": [
+    32,
+    18
+  ],
+  "cell": 64,
+  "states": "four looping flame shapes, all RIGHTWARD, same head position",
+  "sheet": "items-effects-v1/fireballFX/sheet.png",
+  "anchor": [
+    32,
+    32
+  ],
+  "screenScale": 2,
+  "alphaCutoff": 64,
+  "sharedScale": 0.07960199004975124,
+  "nativeDirection": "right",
+  "source": "generated-source.png",
+  "frames": [
+    {
+      "index": 0,
+      "label": "four looping flame shapes, all RIGHTWARD, same head position",
+      "empty": false,
+      "file": "frames/0.png",
+      "crop": [
+        0,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 21,
+        "y": 28,
+        "width": 26,
+        "height": 11
+      },
+      "sourceCell": [
+        0,
+        0,
+        634,
+        621
+      ],
+      "sha256": "66206122d2204538c5194f826fa79371cacab826a03debc3e6d22f695616d602"
+    },
+    {
+      "index": 1,
+      "label": "phase 1",
+      "empty": false,
+      "file": "frames/1.png",
+      "crop": [
+        64,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 17,
+        "y": 27,
+        "width": 30,
+        "height": 13
+      },
+      "sourceCell": [
+        634,
+        0,
+        634,
+        621
+      ],
+      "sha256": "f619bf0d8eed21cc342b493985b3defe6b5a5befba57ea8ec7c2ddb4f0cdbe63"
+    },
+    {
+      "index": 2,
+      "label": "phase 2",
+      "empty": false,
+      "file": "frames/2.png",
+      "crop": [
+        128,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 17,
+        "y": 23,
+        "width": 31,
+        "height": 16
+      },
+      "sourceCell": [
+        0,
+        621,
+        634,
+        620
+      ],
+      "sha256": "3d6777101bb83427a435efeeb7a48175db914dd1bdb7aa9544c37e64bc64ad8a"
+    },
+    {
+      "index": 3,
+      "label": "phase 3",
+      "empty": false,
+      "file": "frames/3.png",
+      "crop": [
+        192,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 16,
+        "y": 26,
+        "width": 31,
+        "height": 12
+      },
+      "sourceCell": [
+        634,
+        621,
+        634,
+        620
+      ],
+      "sha256": "4d7268fccbc128f9e68f6e9650ed7848cdac873ff5c8e7b5a9df640ab70ace32"
+    }
+  ],
+  "scope": "preview only; awaiting review"
+}

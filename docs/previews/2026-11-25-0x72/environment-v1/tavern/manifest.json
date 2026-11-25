@@ -1,0 +1,86 @@
+{
+  "id": "tavern",
+  "kind": "material",
+  "group": "biome",
+  "maxVisible": [
+    32,
+    32
+  ],
+  "columns": 2,
+  "parts": [
+    "floor",
+    "top",
+    "face",
+    "accent"
+  ],
+  "file": "environment-v1/tavern/atlas.png",
+  "size": [
+    64,
+    64
+  ],
+  "records": [
+    {
+      "name": "floor",
+      "crop": [
+        0,
+        0,
+        32,
+        32
+      ],
+      "sourceCell": [
+        0,
+        0,
+        627,
+        627
+      ]
+    },
+    {
+      "name": "top",
+      "crop": [
+        32,
+        0,
+        32,
+        32
+      ],
+      "sourceCell": [
+        627,
+        0,
+        627,
+        627
+      ]
+    },
+    {
+      "name": "face",
+      "crop": [
+        0,
+        32,
+        32,
+        32
+      ],
+      "sourceCell": [
+        0,
+        627,
+        627,
+        627
+      ]
+    },
+    {
+      "name": "accent",
+      "crop": [
+        32,
+        32,
+        32,
+        32
+      ],
+      "sourceCell": [
+        627,
+        627,
+        627,
+        627
+      ]
+    }
+  ],
+  "sha256": "1139b4210cd61a3ac981b17eac96dba4cdb68406d6854980e040ff99b7adfafe",
+  "sourceSHA256": "afaaaeeee75c6dd92ce174ea6cbc198d6ce680c7ec9a564b2df9dd55cc15a87e",
+  "scope": "standalone review; runtime unchanged"
+}

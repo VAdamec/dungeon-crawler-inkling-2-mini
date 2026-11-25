@@ -1,0 +1,785 @@
+{
+  "date": "2026-11-25",
+  "release": "2.0.0",
+  "scope": "GR-10 documentation only; GR-09 native background-tab check remains unverified",
+  "runtime": [
+    {
+      "path": "index.html",
+      "bytes": 9728,
+      "sha256": "bb1ac3db88f335494c83c55093b223e8793990917e25e8c1ba24b154252b3fd6",
+      "gitTracked": true
+    },
+    {
+      "path": "style.css",
+      "bytes": 13293,
+      "sha256": "ef69e6affa88543a029cb380eb4c2a547d37231396091cbaa144f3eee0e8f459",
+      "gitTracked": true
+    },
+    {
+      "path": "js/art-runtime.js",
+      "bytes": 11299262,
+      "sha256": "ac12a9d1d03226eb16473922efc189ed0b601a784d5051be9d9587c9621d0ae9",
+      "gitTracked": true
+    },
+    {
+      "path": "js/sprites.js",
+      "bytes": 346723,
+      "sha256": "bb693477e29d08341bd8bc96692e6b577a88fbc39cb537cbb0ccd313c15e0ced",
+      "gitTracked": true
+    },
+    {
+      "path": "js/game.js",
+      "bytes": 170975,
+      "sha256": "901957ca9f22c9ccd62e92c9eba0aee077e6c742547fbd73c46d7f93c8a87720",
+      "gitTracked": true
+    }
+  ],
+  "scriptLoadOrder": [
+    "js/art-runtime.js",
+    "js/sprites.js",
+    "js/game.js"
+  ],
+  "runtimeBytes": 11839981,
+  "requiredGeneratedArtifact": {
+    "path": "js/art-runtime.js",
+    "present": true,
+    "gitTracked": true,
+    "deliveryPolicy": "Required in every distribution and explicitly included in the user-requested release 2.0.0 commit.",
+    "nonWritingCheck": "node docs/previews/2026-11-25-0x72/bake-runtime.cjs --check",
+    "reproduce": "node docs/previews/2026-11-25-0x72/bake-runtime.cjs --out /tmp/dungeon-art-runtime.js",
+    "comparison": "cmp js/art-runtime.js /tmp/dungeon-art-runtime.js",
+    "reproducedByteIdentical": true
+  },
+  "bakeSourceInputs": [
+    {
+      "path": "docs/previews/2026-11-25-0x72/bake-runtime.cjs",
+      "bytes": 17182,
+      "sha256": "d90e8fa0ca799e87cfa680a38db3ecdce05d798168feabe780730a5270447c51",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/characters-v1/bartender/walk-sheet.png",
+      "bytes": 73075,
+      "sha256": "1bf784bec35d4156b1e2b296c3f5e8d953bd54bbbaf797fbd8a5e10da4feb13f",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/characters-v1/bat/walk-sheet.png",
+      "bytes": 26907,
+      "sha256": "eef30c3268024348a87fcba430ae96e7742bbfa445334bb683c7b344cd86e429",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/characters-v1/boar/walk-sheet.png",
+      "bytes": 129216,
+      "sha256": "d0a731c4946db96d46930a311f5b668f773afb8da18b6545f56ca5b7a371e310",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/characters-v1/cat/walk-sheet.png",
+      "bytes": 8902,
+      "sha256": "6e3d6764baea25b4decab5980300ccde7b304535daff19103af3b5f261b50bd0",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/characters-v1/catCompanion/walk-sheet.png",
+      "bytes": 17718,
+      "sha256": "20122e0e46cd13e6a3902c2324c703c34ffca526b2eb661703e4b7317d58d4e0",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/characters-v1/chicken/walk-sheet.png",
+      "bytes": 17138,
+      "sha256": "afbfabfc4284bd94407571a064bde1f41da23b3610fcfdf1d3aa541a363f955b",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/characters-v1/cook/walk-sheet.png",
+      "bytes": 117806,
+      "sha256": "6c5da3b8a35bdaa936ae65764614ef4b5deaa73327517a89da2628f02ac95230",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/characters-v1/darkWizard/walk-sheet.png",
+      "bytes": 213871,
+      "sha256": "5f81260a2ae4f7cd89453de3ae72b76f9765347114d7ec5159f76d1b3fda477b",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/characters-v1/dog/walk-sheet.png",
+      "bytes": 22448,
+      "sha256": "5aaea9a34eb6217b45bdd6cf63b3035d8cf0520618d50d93a93ba52e4e67b5ea",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/characters-v1/dragonBoss/walk-sheet.png",
+      "bytes": 330843,
+      "sha256": "8a886857a9faa1d6d567196c1a7bb8d29fa54a6081d5c490fc88f1b17203c59c",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/characters-v1/goblin/walk-sheet.png",
+      "bytes": 31599,
+      "sha256": "38203d2ee859be7b3d669a2fe4d1760b8c5cfb39148e58b2ee317a4da5764740",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/characters-v1/healer/walk-sheet.png",
+      "bytes": 44657,
+      "sha256": "c4aa4926880b9e068a40de1031bb2b505e223f64a3c081d683e1f1ed01ae0f08",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/characters-v1/hydra/walk-sheet.png",
+      "bytes": 247530,
+      "sha256": "b97cfff65fe7f8c614ce6044940b332db11fbe0a08d50bab6efafa22a4e0612f",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/characters-v1/mage/walk-sheet.png",
+      "bytes": 47548,
+      "sha256": "b0bbc4155145d84808124d19bf97e067b98841327b431f179b5719cc15198a41",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/characters-v1/manifest.json",
+      "bytes": 308727,
+      "sha256": "3bc4d17c36ff61e722bf6d604dbfd83b4ed9df98d598c925aa2641101ef648d9",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/characters-v1/medusa/walk-sheet.png",
+      "bytes": 186806,
+      "sha256": "8360ca3be2bc4dfc3881465a845a2a152d30166b861f59fb713a2e8fd9a8108f",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/characters-v1/merchant/walk-sheet.png",
+      "bytes": 40212,
+      "sha256": "192839a8624fad4bf825a3b66792c1bee359874edf9d30f6db4ddf1cd9fafc92",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/characters-v1/mimic/walk-sheet.png",
+      "bytes": 119913,
+      "sha256": "e4cfbc9d01aaafb0ae2302f5839781b3609579ec8e4767b093a88e61c0c8a5f6",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/characters-v1/orc/walk-sheet.png",
+      "bytes": 59794,
+      "sha256": "7c4ea264b7b682d21f1a168ae60ea5787df28a3b40729bf07ade862ac7298666",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/characters-v1/princess/walk-sheet.png",
+      "bytes": 49188,
+      "sha256": "5488bdfd87ee89583d3733019d661fdd164535af9ddaed68c5e8073f767dfe76",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/characters-v1/prisoner/walk-sheet.png",
+      "bytes": 33761,
+      "sha256": "f972844276f167f329a56dcf7cd0a82dbd879e3b81792249c6f7db7fa9e457b8",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/characters-v1/skeleton/walk-sheet.png",
+      "bytes": 38477,
+      "sha256": "4783e05ca0da5c38147b3b9f933f51e69ab81520cd8365f876e81bc8e7a054a6",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/characters-v1/skeletonKing/walk-sheet.png",
+      "bytes": 266127,
+      "sha256": "7c92d17c773234f5c0ea8cd7e4ff223b65a43bc863d20b1dd3092c1b45177fc7",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/characters-v1/slime/walk-sheet.png",
+      "bytes": 22623,
+      "sha256": "9a11f3fd5ad91bbc737f7ec4e7e39b93ee8961a9c597091a0b719d5d31350613",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/characters-v1/villager/walk-sheet.png",
+      "bytes": 33993,
+      "sha256": "83c34f62f1b2ab650d031342599739dc18341b19d43900cab5798b5e07ba90cb",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/characters-v1/wasp/walk-sheet.png",
+      "bytes": 24337,
+      "sha256": "832f8debb90adfcd59309c8a04ffe0166162c960f6fd953dceae682fced0eb15",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/environment-v1/banner/atlas.png",
+      "bytes": 1365,
+      "sha256": "7264c1defc7ff20b4bccb3b4864141fe4616a5a51296ada490e0cb694a68f550",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/environment-v1/barCounter/atlas.png",
+      "bytes": 4947,
+      "sha256": "4d42ca5ed301cdc41796e4453a88178a5522536a608c26d3124b8ca6e649f2b5",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/environment-v1/barrel/atlas.png",
+      "bytes": 2105,
+      "sha256": "e9ac6df867a3d74b6ac07754589cd1172721deb7825773837685d79cb84d7106",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/environment-v1/bridge/atlas.png",
+      "bytes": 5024,
+      "sha256": "8c0af83f06a229980248423e9499372dfd7f3f0ae76e27cb7be8c37069397539",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/environment-v1/cavern/atlas.png",
+      "bytes": 6991,
+      "sha256": "3173e20f6bfab88c289f56f18b97665ad1189a1d0022df60de6f52e85850424c",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/environment-v1/cookingPot/atlas.png",
+      "bytes": 2382,
+      "sha256": "b735f8e8a0ce03ab639bfe595456bed4e49118d7f3a4652554ac3dffe21f8941",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/environment-v1/crate/atlas.png",
+      "bytes": 2147,
+      "sha256": "d73a8e161d5d4748446dc2f62d15e72340829c49bdc8176cc3f9b7bf273c06eb",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/environment-v1/crypt/atlas.png",
+      "bytes": 8332,
+      "sha256": "6ba30bea4ab8d27c3e2b0efbc7c086cdeeda515fc88c185ad823d86f6bc1bb4d",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/environment-v1/crystal/atlas.png",
+      "bytes": 2353,
+      "sha256": "fc1f23b810b02a22cd11d04e4953bb4f2f90cf7597d05a93fbc0116d79e1f2ae",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/environment-v1/dais/atlas.png",
+      "bytes": 19316,
+      "sha256": "63b44881b2d40084733c8dcc6d32a7785ae01c424f840b6817afd884413bac8f",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/environment-v1/doorstep/atlas.png",
+      "bytes": 1025,
+      "sha256": "4f6d9a89426f4c237deb2339a438a550f5ae6798c754fe1fc92e6f8f8c3255ea",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/environment-v1/final-coverage.json",
+      "bytes": 29587,
+      "sha256": "ca0bcb0c056f2c4f75f3371f4f1935f3fe014f71e2e2dc95be2f5c2c2620107b",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/environment-v1/hut/atlas.png",
+      "bytes": 32346,
+      "sha256": "bb7536f7f1bcd55a49bb5990c5178b0e568ec5ed7c6b4dae43b7bfd549e25df7",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/environment-v1/inn/atlas.png",
+      "bytes": 57483,
+      "sha256": "d646fd1ec9411a6280d29e62127cacc9df84925bb7e50fc74b1c4a6877fe6321",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/environment-v1/kitchen/atlas.png",
+      "bytes": 8643,
+      "sha256": "d2ee3a87922272c645cf73525f13a813795b3c3af7ef79e2adee8d763e865891",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/environment-v1/manifest.json",
+      "bytes": 28730,
+      "sha256": "b8ded8d68626f961086b6d8a8704e1cda0f09e5f60d6c2ec3a6a3bf0a9c3b142",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/environment-v1/pillar/atlas.png",
+      "bytes": 2642,
+      "sha256": "c27a9b5c571a485d81e2e0d3907bc0c6d919c73770e57c1966c674865480e6a3",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/environment-v1/pine/atlas.png",
+      "bytes": 3890,
+      "sha256": "20aea86a6f2ac42e0fc026006e93480f3f2a55734126256d398646996853e233",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/environment-v1/rock/atlas.png",
+      "bytes": 1810,
+      "sha256": "25cf948fc95037df67da24f815033b64990160039653d5be5391bf33e3396ee4",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/environment-v1/store/atlas.png",
+      "bytes": 48524,
+      "sha256": "6fd9b07521bc9c9fe7aed2868fa5f41a95905aa8e276b2b1b994aaac6f90f364",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/environment-v1/tavern/atlas.png",
+      "bytes": 8097,
+      "sha256": "1139b4210cd61a3ac981b17eac96dba4cdb68406d6854980e040ff99b7adfafe",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/environment-v1/throne/atlas.png",
+      "bytes": 8844,
+      "sha256": "0f4ccb8785f2934a243e8e7955f270339b447e61184824be66c3c8f10e6dfd7e",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/environment-v1/tombstone/atlas.png",
+      "bytes": 2064,
+      "sha256": "36da0278d1033cb57200802533fa0a9eed8812d861b3ba276f10e75b2f28a867",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/environment-v1/town/atlas.png",
+      "bytes": 6485,
+      "sha256": "99880c9b616b1508fa9af183bc2424ed8f392167ab05409d7e628fe197be72a1",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/environment-v1/townGate/atlas.png",
+      "bytes": 5656,
+      "sha256": "78441f7c8392676b7dd6eb3769bf84a63f6d982b22552a3d6f11f4d3c5951c41",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/environment-v1/tree/atlas.png",
+      "bytes": 3254,
+      "sha256": "ae80c92d66826b120852b0d95dd57e8bdcd88c53e7fbeba71970023e3710ba4a",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/armor/sheet.png",
+      "bytes": 1822,
+      "sha256": "7f5ec847e54ef4f337b5e661c738d6f5d4ff2883eac67cfcfe2f1bb4f3d317e1",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/arrowFX/sheet.png",
+      "bytes": 532,
+      "sha256": "ce587aabe2e995750d21811bc32c8342a243c11bcab1818e7927ef3441c1003c",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/barrierTome/sheet.png",
+      "bytes": 1436,
+      "sha256": "777b202c79a4bf2e21027ff8afe9e96322a4e0ab579988d0ef138bf58549ee9b",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/beerFX/sheet.png",
+      "bytes": 808,
+      "sha256": "aa4476a1d0fea0203866d531d00b4f98cc07e48b785792e7780a4aeefbdbcdc0",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/boneFX/sheet.png",
+      "bytes": 334,
+      "sha256": "edbf6636231f2f5e54ef09f3651b37c9be997d27b4b06ed5b1600e73fda129d4",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/bow/sheet.png",
+      "bytes": 544,
+      "sha256": "69b044aeaee24127db0b7eba7ce4d7ea86d3fdc17f9e87cc911c343eac5f40b9",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/chest/sheet.png",
+      "bytes": 5833,
+      "sha256": "9e3e92abb77b79578194691f73d890be44db21794f308f188544a052d7ee3828",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/elixir/sheet.png",
+      "bytes": 979,
+      "sha256": "5ad593a56f53d171880c2cd2c19436c32f442d0e02bccd354035fcb3c959daca",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/fireVent/sheet.png",
+      "bytes": 4880,
+      "sha256": "a427ff11de49ab1ce8e4687c042121e5aea6f0107cb8817a549114a5273a3663",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/fireballFX/sheet.png",
+      "bytes": 3388,
+      "sha256": "131505427d73a5597bfe6644959f561483c4727712af289b88aa92f930a69875",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/frostboltFX/sheet.png",
+      "bytes": 2076,
+      "sha256": "6597415f7d1e3de2f67a896dd93083b7635f44717200a133241ab6a2348abd20",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/frostboltTome/sheet.png",
+      "bytes": 1529,
+      "sha256": "4b413a66361c37b50397738f63a4c82e16cf1f6c9350a70d09d4953a785a24d2",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/greaterHealFX/sheet.png",
+      "bytes": 9113,
+      "sha256": "1b4047abbb4feee2df6a374723262cdf59adb7aae495467cfac690546411d652",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/greaterHealTome/sheet.png",
+      "bytes": 1532,
+      "sha256": "449df2d1ebdde806ff75888315d6f4b2dc7b4482f5b2efe2341c66fe27715b20",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/healFX/sheet.png",
+      "bytes": 3967,
+      "sha256": "b4acbe4ff71f9688eeb86759660d7d449caf77d36d523287a5639f946d6ee59b",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/helmet/sheet.png",
+      "bytes": 1486,
+      "sha256": "c1687171fd92b3236950406a742d3bddb8167fb4f0cb186b8292a2807d04b15d",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/key/sheet.png",
+      "bytes": 845,
+      "sha256": "d75666d8b38822cb6c249768c6062b51cd808594fc8dbbfa86d07ea32b33870f",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/magicBarrierFX/sheet.png",
+      "bytes": 5109,
+      "sha256": "2d0e65f590d0e182fd73e811347c8d59907d9a715b43e340aeb97397d029ec02",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/manifest.json",
+      "bytes": 62189,
+      "sha256": "9871d25dc697fe6c448e2e18a67d4ef87652d90806a26fedc122ddd7f08a761e",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/potion/sheet.png",
+      "bytes": 1103,
+      "sha256": "83e7ee59a7677921f4a0735e722006478ba6680e64f58083578f894c009e9f8e",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/ring/sheet.png",
+      "bytes": 960,
+      "sha256": "cb2dbea0edaf4f46dac94739503297d03e7fea11a9ec459462d8916e4857e635",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/rockCrack/sheet.png",
+      "bytes": 1105,
+      "sha256": "d58939eccb3857503ff27f74931deefd283757799c7151d7e0c78d2aabbbe025",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/rockSpent/sheet.png",
+      "bytes": 3400,
+      "sha256": "546bd8078fce5874390dd13c86b218e9d9927de7c854cf81f6fa06313f9faf21",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/shield/sheet.png",
+      "bytes": 1891,
+      "sha256": "205efac3d1144eba26c734fae5438ffcb58ba7e1fdb1959058b3a0c126daf4a9",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/spellbook/sheet.png",
+      "bytes": 1500,
+      "sha256": "6d4d7a37d7337b0aadf5da67addd97b57bd5753928854aaa93393a748a7ab241",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/spikes/sheet.png",
+      "bytes": 1839,
+      "sha256": "7ea3148e283b5e82a2564a543f3c5fc0e29d2b4753befa27f3b4e75e334b3a11",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/stairs/sheet.png",
+      "bytes": 9901,
+      "sha256": "f81951c85fba4bff32b3638073720de0273e3d198a5679afab6d7bdc299ffae8",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/stingerFX/sheet.png",
+      "bytes": 260,
+      "sha256": "317df440049cd7ddbc9a66d7eadab5dff99c7b36599ee3dd57f2abaf4b8ad37e",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/sword/sheet.png",
+      "bytes": 728,
+      "sha256": "91cc0a2bf63661ac5e98a12fd96f78f906c1e53b699432973fd07d1608c1220f",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/torch/sheet.png",
+      "bytes": 1915,
+      "sha256": "198800a80bacfe78a693ba45d3c36865f4446ef6351fe56c9568401c3f372a1a",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/townPortal/sheet.png",
+      "bytes": 10528,
+      "sha256": "66e0aa1d2c6b2d9bf6f873b347a6803cd79a7b1c30fa4672d6f95d9375ed564a",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/townScroll/sheet.png",
+      "bytes": 763,
+      "sha256": "6525087e912e519631b048d47f0e1dcdf7d6f5b1d601ea18ff0ead3f3e9a1f55",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/knight-reference-v1/manifest.json",
+      "bytes": 9805,
+      "sha256": "949969481c0c62f0a5bfd7e0062d3c1427fba790d49e620b75c38ad0f4edb107",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/knight-reference-v1/walk-sheet.png",
+      "bytes": 41655,
+      "sha256": "2c2eaed10dfda13fd485e6f24185a7bd1cc60dc9e72650d3d2f7c7efa95e1764",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/prepare-knight.cjs",
+      "bytes": 5330,
+      "sha256": "021fc70d0d02fcdef9275775c68571dd43e0afe12d26186852a12c297266ec83",
+      "gitTracked": true
+    }
+  ],
+  "sourceCollectionManifests": [
+    {
+      "path": "docs/previews/2026-11-25-0x72/knight-reference-v1/manifest.json",
+      "bytes": 9805,
+      "sha256": "949969481c0c62f0a5bfd7e0062d3c1427fba790d49e620b75c38ad0f4edb107",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/characters-v1/manifest.json",
+      "bytes": 308727,
+      "sha256": "3bc4d17c36ff61e722bf6d604dbfd83b4ed9df98d598c925aa2641101ef648d9",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/items-effects-v1/manifest.json",
+      "bytes": 62189,
+      "sha256": "9871d25dc697fe6c448e2e18a67d4ef87652d90806a26fedc122ddd7f08a761e",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/previews/2026-11-25-0x72/environment-v1/manifest.json",
+      "bytes": 28730,
+      "sha256": "b8ded8d68626f961086b6d8a8704e1cda0f09e5f60d6c2ec3a6a3bf0a9c3b142",
+      "gitTracked": true
+    }
+  ],
+  "provenance": "Keep selected generated-source PNGs, prompts/corrections/revisions, user references and dated previews with the source archive. These are separate from optional CC0 pack comparison copies and are not runtime fetches.",
+  "documentationScreenshots": [
+    {
+      "path": "docs/screenshots/2026-11-25-integrated/boss-intro.png",
+      "bytes": 350287,
+      "sha256": "2287b772d6eb80e38ff0fab224737ac73baf2cd725ee6fe9f0c823bd9697cda6",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/screenshots/2026-11-25-integrated/bosses.png",
+      "bytes": 141237,
+      "sha256": "e1f533e0af7e45454ea6fc0dd276c864e933e6b4495b4e67106716babd1c74dd",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/screenshots/2026-11-25-integrated/capture.json",
+      "bytes": 10778,
+      "sha256": "7a41efa4d03a6af2b9e4d74172887499eccc54aa162d7884a2a677fbe03a30b1",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/screenshots/2026-11-25-integrated/dungeon.png",
+      "bytes": 324900,
+      "sha256": "7e1af1ff80c0fa9d24401482db78232fb086cf338f2f46ff9da8f5503be50a55",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/screenshots/2026-11-25-integrated/help.png",
+      "bytes": 232299,
+      "sha256": "31f745c44bdc14614fdd79a5bcf073d05b47ba60e45ef875d98c85309c40fd54",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/screenshots/2026-11-25-integrated/launch.png",
+      "bytes": 519978,
+      "sha256": "68b990ad2a2beb19a7f1d5ef7310593a86c2f5b0d65b36dbca31df23140ee5a6",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/screenshots/2026-11-25-integrated/marmalade.png",
+      "bytes": 322861,
+      "sha256": "a43d9a5bb6ac3d7c8c448ac55d0d5d913cd8c67992df298edeee93322589b31f",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/screenshots/2026-11-25-integrated/mobile-help.png",
+      "bytes": 67673,
+      "sha256": "c4d02edc3838be8a8fed3aac6b22177475dd91d96a8872efdad7c96b6ce9a13e",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/screenshots/2026-11-25-integrated/skeleton-king.png",
+      "bytes": 272158,
+      "sha256": "79b23f6bd863d5d83a4186412f2dc48063c46cfbc91e99d57714572f9c98a8d9",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/screenshots/2026-11-25-integrated/town.png",
+      "bytes": 305221,
+      "sha256": "56ba792511770b0aba3588df4b98b39d4f608dc9334d0afa6552df8ede7c3951",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/screenshots/2026-11-25-integrated/monsters/bartender.png",
+      "bytes": 7142,
+      "sha256": "ddaae2e82df9a6829c35c73344ba87c853c55dfaa5640447eaf6b1f4fb62e817",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/screenshots/2026-11-25-integrated/monsters/bat.png",
+      "bytes": 3656,
+      "sha256": "063e4d67cf64fb71663ba1b06dfb2a1cc31fbee060ffdbbe31d2e4dfe9568c54",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/screenshots/2026-11-25-integrated/monsters/cook.png",
+      "bytes": 10906,
+      "sha256": "41648357fdb16f5f2f3f9b1928d7fb7e023b6d67539cfb7182af5e00f6765435",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/screenshots/2026-11-25-integrated/monsters/dark-wizard.png",
+      "bytes": 16687,
+      "sha256": "424b8eca1e77a13b7bad8e3f78519f98da4d5672c612db6ddc1d74116be7fd32",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/screenshots/2026-11-25-integrated/monsters/dragon.png",
+      "bytes": 21227,
+      "sha256": "7175ad0d24d400bfb30987d7e03ef571da5a4d69bf707a1001f974db0968ef95",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/screenshots/2026-11-25-integrated/monsters/goblin.png",
+      "bytes": 4322,
+      "sha256": "e387b2451cb27b3d8b641c9947287136b36869476aab232d8a09e95402ce1c73",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/screenshots/2026-11-25-integrated/monsters/healer.png",
+      "bytes": 5112,
+      "sha256": "3b2eeab04d0af16b02edd35260c0039fbbbb367882b71d0f0363450642e2d9d0",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/screenshots/2026-11-25-integrated/monsters/hydra.png",
+      "bytes": 18462,
+      "sha256": "3d5c2f1d1a7220e9cd46f931b2e9deb1a7149dbd8e3c48e7142395734082e71e",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/screenshots/2026-11-25-integrated/monsters/mage.png",
+      "bytes": 5306,
+      "sha256": "c9366c7ce7a7ef1101f69185ffb1f6d203294ce8574fd0f30e3ad4eedaae69df",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/screenshots/2026-11-25-integrated/monsters/marmalade.png",
+      "bytes": 2778,
+      "sha256": "59299d370ac53c6816311ecc8ed987fa925f4178382110648d74e1bd45c4cc04",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/screenshots/2026-11-25-integrated/monsters/medusa.png",
+      "bytes": 14776,
+      "sha256": "a81074846318056e9b12fc73be3ebce19b2f99e9488ae7db3ba1df331a8c2a53",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/screenshots/2026-11-25-integrated/monsters/mimic.png",
+      "bytes": 11082,
+      "sha256": "dc1848863c9ad2364f20eaab4ecb88a301322bd64167575e6337bb2459e695ec",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/screenshots/2026-11-25-integrated/monsters/orc.png",
+      "bytes": 6670,
+      "sha256": "796b93dbc87be209f886492854cb5b6e862076dd1e569355ec1c8fd826222e75",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/screenshots/2026-11-25-integrated/monsters/skeleton-king.png",
+      "bytes": 20369,
+      "sha256": "ce630aef9e20d6716aa9fc34cfa83f4554b165c3a0b7dce68c4bb9ef9ec613ec",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/screenshots/2026-11-25-integrated/monsters/skeleton.png",
+      "bytes": 4677,
+      "sha256": "3a71b9b31f03c774823f6a2f34e4e2aa1b3b65dcb7a648eea75c77b7c85db02a",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/screenshots/2026-11-25-integrated/monsters/slime.png",
+      "bytes": 3220,
+      "sha256": "b60d8aa143827a19a6d1a286d90fd09c02f8c99b56b4db761077d1f8449d6e66",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/screenshots/2026-11-25-integrated/monsters/wasp.png",
+      "bytes": 3236,
+      "sha256": "b76c8984c8d6d9a0d6c4655e040fdd775bdba2754eb68f72215ee4c40ea85fcd",
+      "gitTracked": true
+    },
+    {
+      "path": "docs/screenshots/2026-11-25-integrated/monsters/wild-boar.png",
+      "bytes": 10035,
+      "sha256": "873c6c9ec7dd6784da5b9d37a6a3b22353a6cff5d4c768e4ce9f92d2c06fdbd0",
+      "gitTracked": true
+    }
+  ],
+  "remaining": [
+    "GR-09 native background-tab/minimize observation is unverified. Explicit handler fixture is not native proof.",
+    "Final human visual decisions/full human campaign/subjective audio playtest are not inferred."
+  ],
+  "releaseAuthorized": true
+}

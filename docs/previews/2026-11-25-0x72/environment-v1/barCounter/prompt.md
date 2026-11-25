@@ -1,0 +1,4 @@
+Use case: stylized-concept. Asset type: one transparent game environment sprite.
+Primary request: Short horizontal chunky dark wooden tavern counter, plank top with two tiny tankards, sturdy barrel-like base, no stools, no person or floor.
+Input 1 is the user's TOWN STYLE reference only. Match its detailed medieval classic JRPG pixel art, dark outlines, muted earthy materials and hand-placed crisp pixel clusters.
+Composition: ONE isolated object centered with generous transparent margin, orthographic front-facing JRPG three-quarter overhead view, roof/top visible, front horizontal edges level and verticals upright, fitted to a SQUARE GRID (not an isometric diamond). No background, no other buildings, no characters, no floor plane, no labels, no text, no watermark. True RGBA transparency. Preserve readable silhouette when reduced to game scale. Entire subject and base visible, nothing clipped.

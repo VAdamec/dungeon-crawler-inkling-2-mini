@@ -1,0 +1,1299 @@
+{
+  "date": "2026-11-25",
+  "runtimeNames": 76,
+  "gameplay": "unchanged 1.0.1",
+  "sources": [
+    {
+      "runtime": "knight",
+      "kind": "hero",
+      "selectedId": "knight",
+      "source": "knight-reference-v1/walk-sheet.png",
+      "poses": 16,
+      "baselineWorld": [
+        32,
+        44
+      ],
+      "baselineScreen": [
+        64,
+        88
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "slime",
+      "kind": "character",
+      "selectedId": "slime",
+      "source": "characters-v1/slime/walk-sheet.png",
+      "poses": 16,
+      "baselineWorld": [
+        44,
+        28
+      ],
+      "baselineScreen": [
+        88,
+        56
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "bat",
+      "kind": "character",
+      "selectedId": "bat",
+      "source": "characters-v1/bat/walk-sheet.png",
+      "poses": 16,
+      "baselineWorld": [
+        64,
+        40
+      ],
+      "baselineScreen": [
+        128,
+        80
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "goblin",
+      "kind": "character",
+      "selectedId": "goblin",
+      "source": "characters-v1/goblin/walk-sheet.png",
+      "poses": 16,
+      "baselineWorld": [
+        40,
+        44
+      ],
+      "baselineScreen": [
+        80,
+        88
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "skeleton",
+      "kind": "character",
+      "selectedId": "skeleton",
+      "source": "characters-v1/skeleton/walk-sheet.png",
+      "poses": 16,
+      "baselineWorld": [
+        32,
+        40
+      ],
+      "baselineScreen": [
+        64,
+        80
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "orc",
+      "kind": "character",
+      "selectedId": "orc",
+      "source": "characters-v1/orc/walk-sheet.png",
+      "poses": 16,
+      "baselineWorld": [
+        64,
+        56
+      ],
+      "baselineScreen": [
+        128,
+        112
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "wasp",
+      "kind": "character",
+      "selectedId": "wasp",
+      "source": "characters-v1/wasp/walk-sheet.png",
+      "poses": 16,
+      "baselineWorld": [
+        52,
+        48
+      ],
+      "baselineScreen": [
+        104,
+        96
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "mage",
+      "kind": "character",
+      "selectedId": "mage",
+      "source": "characters-v1/mage/walk-sheet.png",
+      "poses": 16,
+      "baselineWorld": [
+        40,
+        44
+      ],
+      "baselineScreen": [
+        80,
+        88
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "healer",
+      "kind": "character",
+      "selectedId": "healer",
+      "source": "characters-v1/healer/walk-sheet.png",
+      "poses": 16,
+      "baselineWorld": [
+        40,
+        44
+      ],
+      "baselineScreen": [
+        80,
+        88
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "mimic",
+      "kind": "character",
+      "selectedId": "mimic",
+      "source": "characters-v1/mimic/walk-sheet.png",
+      "poses": 16,
+      "baselineWorld": [
+        64,
+        44
+      ],
+      "baselineScreen": [
+        128,
+        88
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "hydra",
+      "kind": "character",
+      "selectedId": "hydra",
+      "source": "characters-v1/hydra/walk-sheet.png",
+      "poses": 16,
+      "baselineWorld": [
+        72,
+        64
+      ],
+      "baselineScreen": [
+        144,
+        128
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "boar",
+      "kind": "character",
+      "selectedId": "boar",
+      "source": "characters-v1/boar/walk-sheet.png",
+      "poses": 16,
+      "baselineWorld": [
+        72,
+        48
+      ],
+      "baselineScreen": [
+        144,
+        96
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "medusa",
+      "kind": "character",
+      "selectedId": "medusa",
+      "source": "characters-v1/medusa/walk-sheet.png",
+      "poses": 16,
+      "baselineWorld": [
+        64,
+        64
+      ],
+      "baselineScreen": [
+        128,
+        128
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "darkWizard",
+      "kind": "character",
+      "selectedId": "darkWizard",
+      "source": "characters-v1/darkWizard/walk-sheet.png",
+      "poses": 16,
+      "baselineWorld": [
+        64,
+        64
+      ],
+      "baselineScreen": [
+        128,
+        128
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "skeletonKing",
+      "kind": "character",
+      "selectedId": "skeletonKing",
+      "source": "characters-v1/skeletonKing/walk-sheet.png",
+      "poses": 16,
+      "baselineWorld": [
+        64,
+        72
+      ],
+      "baselineScreen": [
+        128,
+        144
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "dragonBoss",
+      "kind": "character",
+      "selectedId": "dragonBoss",
+      "source": "characters-v1/dragonBoss/walk-sheet.png",
+      "poses": 16,
+      "baselineWorld": [
+        80,
+        72
+      ],
+      "baselineScreen": [
+        160,
+        144
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "cook",
+      "kind": "character",
+      "selectedId": "cook",
+      "source": "characters-v1/cook/walk-sheet.png",
+      "poses": 16,
+      "baselineWorld": [
+        36,
+        44
+      ],
+      "baselineScreen": [
+        72,
+        88
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "bartender",
+      "kind": "character",
+      "selectedId": "bartender",
+      "source": "characters-v1/bartender/walk-sheet.png",
+      "poses": 16,
+      "baselineWorld": [
+        24,
+        30
+      ],
+      "baselineScreen": [
+        48,
+        60
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "merchant",
+      "kind": "character",
+      "selectedId": "merchant",
+      "source": "characters-v1/merchant/walk-sheet.png",
+      "poses": 16,
+      "baselineWorld": [
+        32,
+        40
+      ],
+      "baselineScreen": [
+        64,
+        80
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "prisoner",
+      "kind": "character",
+      "selectedId": "prisoner",
+      "source": "characters-v1/prisoner/walk-sheet.png",
+      "poses": 16,
+      "baselineWorld": [
+        32,
+        40
+      ],
+      "baselineScreen": [
+        64,
+        80
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "princess",
+      "kind": "character",
+      "selectedId": "princess",
+      "source": "characters-v1/princess/walk-sheet.png",
+      "poses": 16,
+      "baselineWorld": [
+        32,
+        50
+      ],
+      "baselineScreen": [
+        64,
+        100
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "villager",
+      "kind": "character",
+      "selectedId": "villager",
+      "source": "characters-v1/villager/walk-sheet.png",
+      "poses": 16,
+      "baselineWorld": [
+        32,
+        40
+      ],
+      "baselineScreen": [
+        64,
+        80
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "catCompanion",
+      "kind": "character",
+      "selectedId": "catCompanion",
+      "source": "characters-v1/catCompanion/walk-sheet.png",
+      "poses": 16,
+      "baselineWorld": [
+        40,
+        24
+      ],
+      "baselineScreen": [
+        80,
+        48
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "cat",
+      "kind": "character",
+      "selectedId": "cat",
+      "source": "characters-v1/cat/walk-sheet.png",
+      "poses": 16,
+      "baselineWorld": [
+        26,
+        18
+      ],
+      "baselineScreen": [
+        52,
+        36
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "dog",
+      "kind": "character",
+      "selectedId": "dog",
+      "source": "characters-v1/dog/walk-sheet.png",
+      "poses": 16,
+      "baselineWorld": [
+        38,
+        28
+      ],
+      "baselineScreen": [
+        76,
+        56
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "chicken",
+      "kind": "character",
+      "selectedId": "chicken",
+      "source": "characters-v1/chicken/walk-sheet.png",
+      "poses": 16,
+      "baselineWorld": [
+        28,
+        28
+      ],
+      "baselineScreen": [
+        56,
+        56
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "sword",
+      "kind": "item/effect",
+      "selectedId": "sword",
+      "source": "items-effects-v1/sword/sheet.png",
+      "poses": 1,
+      "baselineWorld": [
+        32,
+        40
+      ],
+      "baselineScreen": [
+        64,
+        80
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "bow",
+      "kind": "item/effect",
+      "selectedId": "bow",
+      "source": "items-effects-v1/bow/sheet.png",
+      "poses": 1,
+      "baselineWorld": [
+        48,
+        40
+      ],
+      "baselineScreen": [
+        96,
+        80
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "armor",
+      "kind": "item/effect",
+      "selectedId": "armor",
+      "source": "items-effects-v1/armor/sheet.png",
+      "poses": 1,
+      "baselineWorld": [
+        32,
+        40
+      ],
+      "baselineScreen": [
+        64,
+        80
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "helmet",
+      "kind": "item/effect",
+      "selectedId": "helmet",
+      "source": "items-effects-v1/helmet/sheet.png",
+      "poses": 1,
+      "baselineWorld": [
+        32,
+        40
+      ],
+      "baselineScreen": [
+        64,
+        80
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "shield",
+      "kind": "item/effect",
+      "selectedId": "shield",
+      "source": "items-effects-v1/shield/sheet.png",
+      "poses": 1,
+      "baselineWorld": [
+        32,
+        40
+      ],
+      "baselineScreen": [
+        64,
+        80
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "ring",
+      "kind": "item/effect",
+      "selectedId": "ring",
+      "source": "items-effects-v1/ring/sheet.png",
+      "poses": 1,
+      "baselineWorld": [
+        32,
+        36
+      ],
+      "baselineScreen": [
+        64,
+        72
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "elixir",
+      "kind": "item/effect",
+      "selectedId": "elixir",
+      "source": "items-effects-v1/elixir/sheet.png",
+      "poses": 1,
+      "baselineWorld": [
+        24,
+        36
+      ],
+      "baselineScreen": [
+        48,
+        72
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "potion",
+      "kind": "item/effect",
+      "selectedId": "potion",
+      "source": "items-effects-v1/potion/sheet.png",
+      "poses": 1,
+      "baselineWorld": [
+        20,
+        24
+      ],
+      "baselineScreen": [
+        40,
+        48
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "chest",
+      "kind": "item/effect",
+      "selectedId": "chest",
+      "source": "items-effects-v1/chest/sheet.png",
+      "poses": 4,
+      "baselineWorld": [
+        32,
+        28
+      ],
+      "baselineScreen": [
+        64,
+        56
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "key",
+      "kind": "item/effect",
+      "selectedId": "key",
+      "source": "items-effects-v1/key/sheet.png",
+      "poses": 1,
+      "baselineWorld": [
+        40,
+        36
+      ],
+      "baselineScreen": [
+        80,
+        72
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "townScroll",
+      "kind": "item/effect",
+      "selectedId": "townScroll",
+      "source": "items-effects-v1/townScroll/sheet.png",
+      "poses": 1,
+      "baselineWorld": [
+        32,
+        36
+      ],
+      "baselineScreen": [
+        64,
+        72
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "townPortal",
+      "kind": "item/effect",
+      "selectedId": "townPortal",
+      "source": "items-effects-v1/townPortal/sheet.png",
+      "poses": 5,
+      "baselineWorld": [
+        48,
+        56
+      ],
+      "baselineScreen": [
+        96,
+        112
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "spellbook",
+      "kind": "item/effect",
+      "selectedId": "spellbook",
+      "source": "items-effects-v1/spellbook/sheet.png",
+      "poses": 1,
+      "baselineWorld": [
+        32,
+        32
+      ],
+      "baselineScreen": [
+        64,
+        64
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "frostboltTome",
+      "kind": "item/effect",
+      "selectedId": "frostboltTome",
+      "source": "items-effects-v1/frostboltTome/sheet.png",
+      "poses": 1,
+      "baselineWorld": [
+        32,
+        32
+      ],
+      "baselineScreen": [
+        64,
+        64
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "greaterHealTome",
+      "kind": "item/effect",
+      "selectedId": "greaterHealTome",
+      "source": "items-effects-v1/greaterHealTome/sheet.png",
+      "poses": 1,
+      "baselineWorld": [
+        32,
+        32
+      ],
+      "baselineScreen": [
+        64,
+        64
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "barrierTome",
+      "kind": "item/effect",
+      "selectedId": "barrierTome",
+      "source": "items-effects-v1/barrierTome/sheet.png",
+      "poses": 1,
+      "baselineWorld": [
+        32,
+        32
+      ],
+      "baselineScreen": [
+        64,
+        64
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "stairsUp",
+      "kind": "item/effect",
+      "selectedId": "stairs",
+      "source": "items-effects-v1/stairs/sheet.png",
+      "poses": 4,
+      "baselineWorld": [
+        32,
+        32
+      ],
+      "baselineScreen": [
+        64,
+        64
+      ],
+      "note": "Fixed state alias {\"id\":\"stairs\",\"frame\":0}",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "stairsDown",
+      "kind": "item/effect",
+      "selectedId": "stairs",
+      "source": "items-effects-v1/stairs/sheet.png",
+      "poses": 4,
+      "baselineWorld": [
+        32,
+        32
+      ],
+      "baselineScreen": [
+        64,
+        64
+      ],
+      "note": "Fixed state alias {\"id\":\"stairs\",\"frame\":1}",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "torch",
+      "kind": "item/effect",
+      "selectedId": "torch",
+      "source": "items-effects-v1/torch/sheet.png",
+      "poses": 4,
+      "baselineWorld": [
+        24,
+        40
+      ],
+      "baselineScreen": [
+        48,
+        80
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "flameOff",
+      "kind": "item/effect",
+      "selectedId": "fireVent",
+      "source": "items-effects-v1/fireVent/sheet.png",
+      "poses": 4,
+      "baselineWorld": [
+        32,
+        40
+      ],
+      "baselineScreen": [
+        64,
+        80
+      ],
+      "note": "Fixed state alias {\"id\":\"fireVent\",\"frame\":0}",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "flameOn",
+      "kind": "item/effect",
+      "selectedId": "fireVent",
+      "source": "items-effects-v1/fireVent/sheet.png",
+      "poses": 4,
+      "baselineWorld": [
+        32,
+        40
+      ],
+      "baselineScreen": [
+        64,
+        80
+      ],
+      "note": "Fixed state alias {\"id\":\"fireVent\",\"frame\":2}",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "spikes",
+      "kind": "item/effect",
+      "selectedId": "spikes",
+      "source": "items-effects-v1/spikes/sheet.png",
+      "poses": 5,
+      "baselineWorld": [
+        32,
+        32
+      ],
+      "baselineScreen": [
+        64,
+        64
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "rockCrack",
+      "kind": "item/effect",
+      "selectedId": "rockCrack",
+      "source": "items-effects-v1/rockCrack/sheet.png",
+      "poses": 4,
+      "baselineWorld": [
+        32,
+        32
+      ],
+      "baselineScreen": [
+        64,
+        64
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "rockSpent",
+      "kind": "item/effect",
+      "selectedId": "rockSpent",
+      "source": "items-effects-v1/rockSpent/sheet.png",
+      "poses": 4,
+      "baselineWorld": [
+        40,
+        32
+      ],
+      "baselineScreen": [
+        80,
+        64
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "rubble",
+      "kind": "environment",
+      "selectedId": "rock",
+      "source": "environment-v1/rock/atlas.png",
+      "poses": 1,
+      "baselineWorld": [
+        40,
+        24
+      ],
+      "baselineScreen": [
+        80,
+        48
+      ],
+      "note": "Reuse boulder/settled-rock role without changing obstacle collision",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "pillar",
+      "kind": "environment",
+      "selectedId": "pillar",
+      "source": "environment-v1/pillar/atlas.png",
+      "poses": 1,
+      "baselineWorld": [
+        32,
+        56
+      ],
+      "baselineScreen": [
+        64,
+        112
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "tombstone",
+      "kind": "environment",
+      "selectedId": "tombstone",
+      "source": "environment-v1/tombstone/atlas.png",
+      "poses": 1,
+      "baselineWorld": [
+        32,
+        36
+      ],
+      "baselineScreen": [
+        64,
+        72
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "crystal",
+      "kind": "environment",
+      "selectedId": "crystal",
+      "source": "environment-v1/crystal/atlas.png",
+      "poses": 1,
+      "baselineWorld": [
+        48,
+        48
+      ],
+      "baselineScreen": [
+        96,
+        96
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "cookingPot",
+      "kind": "environment",
+      "selectedId": "cookingPot",
+      "source": "environment-v1/cookingPot/atlas.png",
+      "poses": 1,
+      "baselineWorld": [
+        40,
+        48
+      ],
+      "baselineScreen": [
+        80,
+        96
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "barCounter",
+      "kind": "environment",
+      "selectedId": "barCounter",
+      "source": "environment-v1/barCounter/atlas.png",
+      "poses": 1,
+      "baselineWorld": [
+        64,
+        48
+      ],
+      "baselineScreen": [
+        128,
+        96
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "banner",
+      "kind": "environment",
+      "selectedId": "banner",
+      "source": "environment-v1/banner/atlas.png",
+      "poses": 1,
+      "baselineWorld": [
+        40,
+        60
+      ],
+      "baselineScreen": [
+        80,
+        120
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "throne",
+      "kind": "environment",
+      "selectedId": "dais",
+      "source": "environment-v1/dais/atlas.png",
+      "poses": 1,
+      "baselineWorld": [
+        64,
+        84
+      ],
+      "baselineScreen": [
+        128,
+        168
+      ],
+      "note": "Saved throne-room dais role",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "inn",
+      "kind": "environment",
+      "selectedId": "inn",
+      "source": "environment-v1/inn/atlas.png",
+      "poses": 1,
+      "baselineWorld": [
+        128,
+        112
+      ],
+      "baselineScreen": [
+        256,
+        224
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "store",
+      "kind": "environment",
+      "selectedId": "store",
+      "source": "environment-v1/store/atlas.png",
+      "poses": 1,
+      "baselineWorld": [
+        112,
+        112
+      ],
+      "baselineScreen": [
+        224,
+        224
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "hut",
+      "kind": "environment",
+      "selectedId": "hut",
+      "source": "environment-v1/hut/atlas.png",
+      "poses": 1,
+      "baselineWorld": [
+        128,
+        120
+      ],
+      "baselineScreen": [
+        256,
+        240
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "tree",
+      "kind": "environment",
+      "selectedId": "tree",
+      "source": "environment-v1/tree/atlas.png",
+      "poses": 1,
+      "baselineWorld": [
+        80,
+        80
+      ],
+      "baselineScreen": [
+        160,
+        160
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "bridge",
+      "kind": "environment",
+      "selectedId": "bridge",
+      "source": "environment-v1/bridge/atlas.png",
+      "poses": 1,
+      "baselineWorld": [
+        64,
+        48
+      ],
+      "baselineScreen": [
+        128,
+        96
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "water",
+      "kind": "environment",
+      "selectedId": "town",
+      "source": "environment-v1/town/atlas.png",
+      "poses": 4,
+      "baselineWorld": [
+        32,
+        32
+      ],
+      "baselineScreen": [
+        64,
+        64
+      ],
+      "note": "Use town material water crop",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "townGate",
+      "kind": "environment",
+      "selectedId": "townGate",
+      "source": "environment-v1/townGate/atlas.png",
+      "poses": 1,
+      "baselineWorld": [
+        48,
+        64
+      ],
+      "baselineScreen": [
+        96,
+        128
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "doorstep",
+      "kind": "environment",
+      "selectedId": "doorstep",
+      "source": "environment-v1/doorstep/atlas.png",
+      "poses": 1,
+      "baselineWorld": [
+        32,
+        16
+      ],
+      "baselineScreen": [
+        64,
+        32
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "dragon",
+      "kind": "character",
+      "selectedId": "dragonBoss",
+      "source": "characters-v1/dragonBoss/walk-sheet.png",
+      "poses": 16,
+      "baselineWorld": [
+        80,
+        72
+      ],
+      "baselineScreen": [
+        160,
+        144
+      ],
+      "note": "Legacy alias to dragonBoss",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "arrowFX",
+      "kind": "item/effect",
+      "selectedId": "arrowFX",
+      "source": "items-effects-v1/arrowFX/sheet.png",
+      "poses": 1,
+      "baselineWorld": [
+        48,
+        48
+      ],
+      "baselineScreen": [
+        96,
+        96
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "stingerFX",
+      "kind": "item/effect",
+      "selectedId": "stingerFX",
+      "source": "items-effects-v1/stingerFX/sheet.png",
+      "poses": 1,
+      "baselineWorld": [
+        48,
+        48
+      ],
+      "baselineScreen": [
+        96,
+        96
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "boneFX",
+      "kind": "item/effect",
+      "selectedId": "boneFX",
+      "source": "items-effects-v1/boneFX/sheet.png",
+      "poses": 1,
+      "baselineWorld": [
+        48,
+        48
+      ],
+      "baselineScreen": [
+        96,
+        96
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "beerFX",
+      "kind": "item/effect",
+      "selectedId": "beerFX",
+      "source": "items-effects-v1/beerFX/sheet.png",
+      "poses": 1,
+      "baselineWorld": [
+        48,
+        48
+      ],
+      "baselineScreen": [
+        96,
+        96
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "fireballFX",
+      "kind": "item/effect",
+      "selectedId": "fireballFX",
+      "source": "items-effects-v1/fireballFX/sheet.png",
+      "poses": 4,
+      "baselineWorld": [
+        48,
+        48
+      ],
+      "baselineScreen": [
+        96,
+        96
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "frostboltFX",
+      "kind": "item/effect",
+      "selectedId": "frostboltFX",
+      "source": "items-effects-v1/frostboltFX/sheet.png",
+      "poses": 4,
+      "baselineWorld": [
+        48,
+        48
+      ],
+      "baselineScreen": [
+        96,
+        96
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "healFX",
+      "kind": "item/effect",
+      "selectedId": "healFX",
+      "source": "items-effects-v1/healFX/sheet.png",
+      "poses": 4,
+      "baselineWorld": [
+        48,
+        48
+      ],
+      "baselineScreen": [
+        96,
+        96
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "greaterHealFX",
+      "kind": "item/effect",
+      "selectedId": "greaterHealFX",
+      "source": "items-effects-v1/greaterHealFX/sheet.png",
+      "poses": 4,
+      "baselineWorld": [
+        48,
+        48
+      ],
+      "baselineScreen": [
+        96,
+        96
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    },
+    {
+      "runtime": "magicBarrierFX",
+      "kind": "item/effect",
+      "selectedId": "magicBarrierFX",
+      "source": "items-effects-v1/magicBarrierFX/sheet.png",
+      "poses": 4,
+      "baselineWorld": [
+        48,
+        48
+      ],
+      "baselineScreen": [
+        96,
+        96
+      ],
+      "note": "",
+      "status": "prepared; final visual acceptance and runtime bake pending"
+    }
+  ]
+}

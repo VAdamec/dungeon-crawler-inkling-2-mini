@@ -1,0 +1,14 @@
+{
+  "version": "2.0.0",
+  "source": "extracted five-file release ZIP over normal file:// Chrome",
+  "launchVersion": true,
+  "helpWords": 111,
+  "playerOnlyHelp": true,
+  "helpFocusAndClose": true,
+  "soundControlVisible": true,
+  "mobileFits": true,
+  "restartLaunchHidden": true,
+  "errors": [],
+  "remote": [],
+  "nativeBackgroundTab": "UNVERIFIED — not exercised; existing GR-09 limitation retained"
+}

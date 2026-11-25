@@ -1,0 +1,52 @@
+{
+  "seed": 20261125,
+  "scenarios": [
+    "initial town",
+    "ten town patrol ticks",
+    "generated floor 1",
+    "generated floor 2",
+    "generated floor 3",
+    "generated floor 7",
+    "generated floor 50",
+    "generated floor 100",
+    "return to saved town",
+    "cast heal",
+    "cast greaterHeal",
+    "cast frostbolt",
+    "cast fireball",
+    "cast magicBarrier",
+    "spikes one-shot",
+    "rock warning and impact",
+    "fire damage cadence"
+  ],
+  "worldAndProgressionEqual": true,
+  "compared": [
+    "maps",
+    "rooms",
+    "props",
+    "visited",
+    "player",
+    "inventory",
+    "gold",
+    "keys",
+    "loot",
+    "traps",
+    "obstacles",
+    "monsters",
+    "stairs",
+    "NPCs",
+    "town patrols",
+    "active time",
+    "spell cooldowns",
+    "turns",
+    "retreat cooldown"
+  ],
+  "before": {
+    "game": "387b6a72a3a5776c5350efba378dd92d01367a60e5b928ad10340002dbc94ccc",
+    "sprites": "aa6d783860f90eaab8204e459314c2d338e11af2c263bbc7337bdbb7ebd41be7"
+  },
+  "after": {
+    "game": "11b1506aa92fffe23699552d1472f52f78a8a16e5552aefdeef06c2bfef80aff",
+    "sprites": "50a6c05b5bddc06764934c0e8614a4948499b2e389172f3d1e4b191ee3db9c49"
+  }
+}

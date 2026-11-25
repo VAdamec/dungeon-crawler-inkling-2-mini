@@ -1,0 +1,49 @@
+{
+  "id": "rock",
+  "kind": "sprite",
+  "group": "prop",
+  "maxVisible": [
+    30,
+    28
+  ],
+  "columns": 1,
+  "parts": [
+    "sprite"
+  ],
+  "file": "environment-v1/rock/atlas.png",
+  "size": [
+    46,
+    44
+  ],
+  "records": [
+    {
+      "name": "sprite",
+      "crop": [
+        0,
+        0,
+        46,
+        44
+      ],
+      "bounds": {
+        "x": 8,
+        "y": 12,
+        "width": 30,
+        "height": 24
+      },
+      "anchor": [
+        23,
+        36
+      ],
+      "sourceBounds": {
+        "x": 191,
+        "y": 277,
+        "width": 865,
+        "height": 691
+      },
+      "scale": 0.03468208092485549
+    }
+  ],
+  "sha256": "25cf948fc95037df67da24f815033b64990160039653d5be5391bf33e3396ee4",
+  "sourceSHA256": "5346bfc838348bf8f418af9b0a49a1d7da2d2aca7d3de546e8396ca894d79bc6",
+  "scope": "standalone review; runtime unchanged"
+}

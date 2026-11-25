@@ -1,0 +1,49 @@
+{
+  "id": "bridge",
+  "kind": "sprite",
+  "group": "town",
+  "maxVisible": [
+    64,
+    32
+  ],
+  "columns": 1,
+  "parts": [
+    "sprite"
+  ],
+  "file": "environment-v1/bridge/atlas.png",
+  "size": [
+    80,
+    48
+  ],
+  "records": [
+    {
+      "name": "sprite",
+      "crop": [
+        0,
+        0,
+        80,
+        48
+      ],
+      "bounds": {
+        "x": 12,
+        "y": 8,
+        "width": 56,
+        "height": 32
+      },
+      "anchor": [
+        40,
+        40
+      ],
+      "sourceBounds": {
+        "x": 238,
+        "y": 225,
+        "width": 1052,
+        "height": 598
+      },
+      "scale": 0.05351170568561873
+    }
+  ],
+  "sha256": "8c0af83f06a229980248423e9499372dfd7f3f0ae76e27cb7be8c37069397539",
+  "sourceSHA256": "ccef45d0025ff3b8a22fc7997d902475584a11a90e0639293b4b748e325be3b9",
+  "scope": "standalone review; runtime unchanged"
+}

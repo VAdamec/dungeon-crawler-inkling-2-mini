@@ -1,0 +1,81 @@
+{
+  "wallMasks": 1280,
+  "approvedWallPixelParity": true,
+  "wallComparisons": {
+    "crypt": {
+      "differentChannels": 102731,
+      "maxRGB": 1,
+      "maxAlpha": 0
+    },
+    "cavern": {
+      "differentChannels": 164512,
+      "maxRGB": 1,
+      "maxAlpha": 0
+    },
+    "kitchen": {
+      "differentChannels": 147392,
+      "maxRGB": 1,
+      "maxAlpha": 0
+    },
+    "tavern": {
+      "differentChannels": 195424,
+      "maxRGB": 1,
+      "maxAlpha": 0
+    },
+    "throne": {
+      "differentChannels": 101600,
+      "maxRGB": 1,
+      "maxAlpha": 0
+    }
+  },
+  "rgbTolerance": 1,
+  "outsideTileAlphaZero": true,
+  "materialProbe": {
+    "matches": 48,
+    "distinct": 24
+  },
+  "bridge": {
+    "left": 1535.7142857142858,
+    "right": 1599.7142857142858,
+    "deck": 960,
+    "expectedDeck": 960,
+    "waterRows": [
+      [
+        28,
+        true,
+        true
+      ],
+      [
+        29,
+        true,
+        true
+      ],
+      [
+        30,
+        true,
+        true
+      ]
+    ]
+  },
+  "bridgeKeyboardCrossing": true,
+  "riverCollision": true,
+  "inn": true,
+  "store": true,
+  "gate": true,
+  "scrollPortalExactReturn": true,
+  "townMapPropsLandmarksUnchanged": true,
+  "torch": {
+    "mount": true,
+    "changing": true
+  },
+  "groundItems": {
+    "left": 328,
+    "right": 344,
+    "top": 328,
+    "bottom": 352
+  },
+  "mobile": true,
+  "protocol": "file://, ordinary Chrome; no relaxed flags",
+  "errors": [],
+  "remote": []
+}

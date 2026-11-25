@@ -1,0 +1,46 @@
+{
+  "task": "GR-09",
+  "status": "partial",
+  "remaining": [
+    "Native background-tab/minimize visibility transition not observable in this automation environment; handler fixture passes separately."
+  ],
+  "gameTests": {
+    "passed": 181,
+    "failed": 0,
+    "skipped": 0,
+    "durationMs": 111398.688833
+  },
+  "previewTests": {
+    "passed": 27,
+    "failed": 0,
+    "skipped": 0
+  },
+  "focused": {
+    "passed": 11,
+    "failed": 0
+  },
+  "newRegressionTests": 2,
+  "externalSmoke": "SMOKE_OK",
+  "seededCommittedBaselineScenarios": 33,
+  "visualPairs": 8,
+  "baselineCommit": "0f093cd",
+  "protectedFiles": 823,
+  "protectedChanges": [],
+  "sourceHashes": {
+    "baseline": {
+      "index.html": "45c5cbdfa1198afbbacb802fb84c451c769a17c328fb6eb4281352c2e5967e86",
+      "style.css": "ef69e6affa88543a029cb380eb4c2a547d37231396091cbaa144f3eee0e8f459",
+      "js/game.js": "123588e74e60a28bb28c4d3131e7883a9f3c4e9c2d0463362bfe705b663dbe72",
+      "js/sprites.js": "aff4c0fa9cbe722a74829eb44b95584b7a363312ead8decf87707112baea1a8c"
+    },
+    "candidate": {
+      "index.html": "eba78fe7b2950a9118aee8c9a202a89a68c1c374b86ab5880c533dd40704eda2",
+      "style.css": "ef69e6affa88543a029cb380eb4c2a547d37231396091cbaa144f3eee0e8f459",
+      "js/art-runtime.js": "ac12a9d1d03226eb16473922efc189ed0b601a784d5051be9d9587c9621d0ae9",
+      "js/game.js": "d5f620e0760e73a812fb9b0f1ea4656f5437923f7fe11570937b3ab2162e7323",
+      "js/sprites.js": "bb693477e29d08341bd8bc96692e6b577a88fbc39cb537cbb0ccd313c15e0ced"
+    }
+  },
+  "release": "1.0.1",
+  "commitPerformed": false
+}

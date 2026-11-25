@@ -1,0 +1,49 @@
+{
+  "id": "inn",
+  "kind": "sprite",
+  "group": "town",
+  "maxVisible": [
+    192,
+    160
+  ],
+  "columns": 1,
+  "parts": [
+    "sprite"
+  ],
+  "file": "environment-v1/inn/atlas.png",
+  "size": [
+    208,
+    176
+  ],
+  "records": [
+    {
+      "name": "sprite",
+      "crop": [
+        0,
+        0,
+        208,
+        176
+      ],
+      "bounds": {
+        "x": 30,
+        "y": 8,
+        "width": 148,
+        "height": 160
+      },
+      "anchor": [
+        104,
+        168
+      ],
+      "sourceBounds": {
+        "x": 132,
+        "y": 72,
+        "width": 990,
+        "height": 1069
+      },
+      "scale": 0.14967259120673526
+    }
+  ],
+  "sha256": "d646fd1ec9411a6280d29e62127cacc9df84925bb7e50fc74b1c4a6877fe6321",
+  "sourceSHA256": "cbfc656c60959bfbc8e16d5f2f1642fb1b1db2eededfc6f75119c7d36cee323e",
+  "scope": "standalone review; runtime unchanged"
+}

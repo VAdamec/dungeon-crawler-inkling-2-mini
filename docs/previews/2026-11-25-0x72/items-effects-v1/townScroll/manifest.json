@@ -1,0 +1,52 @@
+{
+  "id": "townScroll",
+  "name": "townScroll",
+  "description": "Rolled parchment bound with red ribbon",
+  "group": "loot",
+  "sourceFrames": 1,
+  "columns": 1,
+  "maxVisible": [
+    28,
+    18
+  ],
+  "cell": 64,
+  "states": "static",
+  "sheet": "items-effects-v1/townScroll/sheet.png",
+  "anchor": [
+    32,
+    32
+  ],
+  "screenScale": 2,
+  "alphaCutoff": 64,
+  "sharedScale": 0.02903225806451613,
+  "nativeDirection": null,
+  "source": "generated-source.png",
+  "frames": [
+    {
+      "index": 0,
+      "label": "static",
+      "empty": false,
+      "file": "frames/0.png",
+      "crop": [
+        0,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 23,
+        "y": 23,
+        "width": 18,
+        "height": 18
+      },
+      "sourceCell": [
+        0,
+        0,
+        1536,
+        1024
+      ],
+      "sha256": "2aad22d09d88f8c1a3f16e7f5e3d20f579fbd079a00d59f9f4d042bf0393ecfe"
+    }
+  ],
+  "scope": "preview only; awaiting review"
+}

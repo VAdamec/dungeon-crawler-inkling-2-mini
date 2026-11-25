@@ -1,0 +1,26 @@
+{
+  "task": "GR-08",
+  "gameTests": {
+    "passed": 179,
+    "failed": 0,
+    "skipped": 0,
+    "durationMs": 107565.452375
+  },
+  "previewTests": {
+    "passed": 27,
+    "failed": 0,
+    "skipped": 0
+  },
+  "newRegressionTests": 8,
+  "focused": {
+    "passed": 8,
+    "failed": 0
+  },
+  "seededGameplayScenarios": 33,
+  "protectedFiles": 824,
+  "protectedChanges": [],
+  "runtimeArtUnchanged": true,
+  "intentionalGameplayFix": "Summoned guards die in the Skeleton King collapse, without XP/gold/kills. Separately verified, not excluded as visual-only drift.",
+  "release": "1.0.1",
+  "commitPerformed": false
+}

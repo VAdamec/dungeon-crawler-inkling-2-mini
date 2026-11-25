@@ -1,0 +1,436 @@
+[
+  {
+    "id": "sword",
+    "name": "sword",
+    "description": "Silver sword with brown grip",
+    "group": "equipment",
+    "sourceFrames": 1,
+    "columns": 1,
+    "maxVisible": [
+      24,
+      32
+    ],
+    "cell": 64,
+    "states": "static"
+  },
+  {
+    "id": "bow",
+    "name": "bow",
+    "description": "Curved wooden bow with bowstring",
+    "group": "equipment",
+    "sourceFrames": 1,
+    "columns": 1,
+    "maxVisible": [
+      18,
+      32
+    ],
+    "cell": 64,
+    "states": "static"
+  },
+  {
+    "id": "armor",
+    "name": "armor",
+    "description": "Brown leather and chainmail torso armor ONLY; no mannequin, stand, pedestal or person",
+    "group": "equipment",
+    "sourceFrames": 1,
+    "columns": 1,
+    "maxVisible": [
+      28,
+      30
+    ],
+    "cell": 64,
+    "states": "static"
+  },
+  {
+    "id": "helmet",
+    "name": "helmet",
+    "description": "Steel closed knight helmet with dark visor",
+    "group": "equipment",
+    "sourceFrames": 1,
+    "columns": 1,
+    "maxVisible": [
+      26,
+      26
+    ],
+    "cell": 64,
+    "states": "static"
+  },
+  {
+    "id": "shield",
+    "name": "shield",
+    "description": "Steel pointed shield with pale heraldic lion",
+    "group": "equipment",
+    "sourceFrames": 1,
+    "columns": 1,
+    "maxVisible": [
+      24,
+      30
+    ],
+    "cell": 64,
+    "states": "static"
+  },
+  {
+    "id": "ring",
+    "name": "ring",
+    "description": "Gold ring with dark blue gem",
+    "group": "equipment",
+    "sourceFrames": 1,
+    "columns": 1,
+    "maxVisible": [
+      24,
+      18
+    ],
+    "cell": 64,
+    "states": "static"
+  },
+  {
+    "id": "potion",
+    "name": "potion",
+    "description": "Red health potion in stoppered glass bottle",
+    "group": "loot",
+    "sourceFrames": 1,
+    "columns": 1,
+    "maxVisible": [
+      18,
+      24
+    ],
+    "cell": 64,
+    "states": "static"
+  },
+  {
+    "id": "elixir",
+    "name": "elixir",
+    "description": "Blue violet elixir in distinctive angular glass bottle",
+    "group": "loot",
+    "sourceFrames": 1,
+    "columns": 1,
+    "maxVisible": [
+      18,
+      24
+    ],
+    "cell": 64,
+    "states": "static"
+  },
+  {
+    "id": "townScroll",
+    "name": "townScroll",
+    "description": "Rolled parchment bound with red ribbon",
+    "group": "loot",
+    "sourceFrames": 1,
+    "columns": 1,
+    "maxVisible": [
+      28,
+      18
+    ],
+    "cell": 64,
+    "states": "static"
+  },
+  {
+    "id": "key",
+    "name": "key",
+    "description": "Old bronze dungeon key",
+    "group": "loot",
+    "sourceFrames": 1,
+    "columns": 1,
+    "maxVisible": [
+      22,
+      28
+    ],
+    "cell": 64,
+    "states": "static"
+  },
+  {
+    "id": "chest",
+    "name": "chest",
+    "description": "Wood and gold ordinary treasure chest, NEVER eyes, teeth, tongue or limbs",
+    "group": "loot",
+    "sourceFrames": 4,
+    "columns": 2,
+    "maxVisible": [
+      32,
+      28
+    ],
+    "cell": 64,
+    "states": "closed; lid opening; fully open full of gold; fully open empty"
+  },
+  {
+    "id": "spellbook",
+    "name": "spellbook",
+    "description": "Brown leather generic spellbook with gold rune",
+    "group": "books",
+    "sourceFrames": 1,
+    "columns": 1,
+    "maxVisible": [
+      28,
+      24
+    ],
+    "cell": 64,
+    "states": "static"
+  },
+  {
+    "id": "frostboltTome",
+    "name": "frostboltTome",
+    "description": "Icy blue spellbook with snowflake emblem",
+    "group": "books",
+    "sourceFrames": 1,
+    "columns": 1,
+    "maxVisible": [
+      28,
+      24
+    ],
+    "cell": 64,
+    "states": "static"
+  },
+  {
+    "id": "greaterHealTome",
+    "name": "greaterHealTome",
+    "description": "Ivory spellbook with gold healing sun emblem",
+    "group": "books",
+    "sourceFrames": 1,
+    "columns": 1,
+    "maxVisible": [
+      28,
+      24
+    ],
+    "cell": 64,
+    "states": "static"
+  },
+  {
+    "id": "barrierTome",
+    "name": "barrierTome",
+    "description": "Purple spellbook with geometric violet rune",
+    "group": "books",
+    "sourceFrames": 1,
+    "columns": 1,
+    "maxVisible": [
+      28,
+      24
+    ],
+    "cell": 64,
+    "states": "static"
+  },
+  {
+    "id": "arrowFX",
+    "name": "arrowFX",
+    "description": "Single small wooden arrow pointing RIGHT, steel tip at right, feathers left",
+    "group": "projectiles",
+    "sourceFrames": 1,
+    "columns": 1,
+    "maxVisible": [
+      28,
+      8
+    ],
+    "cell": 64,
+    "states": "static"
+  },
+  {
+    "id": "stingerFX",
+    "name": "stingerFX",
+    "description": "Single tiny wasp venom dart/barb pointing RIGHT, pointed dark amber tip at right, subtle green venom. A dart only, NEVER a whole wasp, wings, legs, insect or face",
+    "group": "projectiles",
+    "sourceFrames": 1,
+    "columns": 1,
+    "maxVisible": [
+      14,
+      6
+    ],
+    "cell": 64,
+    "states": "static"
+  },
+  {
+    "id": "boneFX",
+    "name": "boneFX",
+    "description": "Single thrown ivory bone, no skeleton or hand",
+    "group": "projectiles",
+    "sourceFrames": 1,
+    "columns": 1,
+    "maxVisible": [
+      22,
+      12
+    ],
+    "cell": 64,
+    "states": "static"
+  },
+  {
+    "id": "beerFX",
+    "name": "beerFX",
+    "description": "Single small wooden foaming beer tankard in flight, no person or hand",
+    "group": "projectiles",
+    "sourceFrames": 1,
+    "columns": 1,
+    "maxVisible": [
+      18,
+      22
+    ],
+    "cell": 64,
+    "states": "static"
+  },
+  {
+    "id": "fireballFX",
+    "name": "fireballFX",
+    "description": "Rightward orange fireball, bright head RIGHT, tapered flame trail LEFT",
+    "group": "projectiles",
+    "sourceFrames": 4,
+    "columns": 2,
+    "maxVisible": [
+      32,
+      18
+    ],
+    "cell": 64,
+    "states": "four looping flame shapes, all RIGHTWARD, same head position"
+  },
+  {
+    "id": "frostboltFX",
+    "name": "frostboltFX",
+    "description": "Rightward icy blue magical dart, sharp bright head RIGHT and tapered cold trail LEFT",
+    "group": "projectiles",
+    "sourceFrames": 4,
+    "columns": 2,
+    "maxVisible": [
+      32,
+      16
+    ],
+    "cell": 64,
+    "states": "four looping ice shimmer shapes, all RIGHTWARD, same head position"
+  },
+  {
+    "id": "healFX",
+    "name": "healFX",
+    "description": "Modest green and gold healing motes rising from a small ground ring; no character",
+    "group": "spells",
+    "sourceFrames": 4,
+    "columns": 2,
+    "maxVisible": [
+      36,
+      30
+    ],
+    "cell": 128,
+    "states": "small ring; rising green motes; brighter green gold ring; fading motes"
+  },
+  {
+    "id": "greaterHealFX",
+    "name": "greaterHealFX",
+    "description": "Strong radiant golden healing starburst above ground ring with many bright motes, visibly stronger and larger than basic heal; no character",
+    "group": "spells",
+    "sourceFrames": 4,
+    "columns": 2,
+    "maxVisible": [
+      52,
+      48
+    ],
+    "cell": 128,
+    "states": "small golden star; expanding bright starburst; strongest golden starburst and motes; fading gold sparks"
+  },
+  {
+    "id": "magicBarrierFX",
+    "name": "magicBarrierFX",
+    "description": "Instant directional telekinetic PUSH pulse travelling RIGHT: curved aqua violet shockwave and impact sparks, never a shield bubble, dome, protective aura or person",
+    "group": "spells",
+    "sourceFrames": 4,
+    "columns": 2,
+    "maxVisible": [
+      48,
+      36
+    ],
+    "cell": 128,
+    "states": "small initial rightward pulse; expanding curved push wave; bright rightward impact; dissipating sparks"
+  },
+  {
+    "id": "townPortal",
+    "name": "townPortal",
+    "description": "Open purple blue magical portal ARCH with transparent opening and fine glowing rim, ground ring, no solid fill or scenery",
+    "group": "travel",
+    "sourceFrames": 4,
+    "columns": 2,
+    "maxVisible": [
+      40,
+      50
+    ],
+    "cell": 128,
+    "states": "four subtle looping phases of the same fully open portal arch; NEVER closed or filled opening"
+  },
+  {
+    "id": "torch",
+    "name": "torch",
+    "description": "Wall mounted wooden torch WITH black iron wall bracket and burning flame, no wall background",
+    "group": "hazards",
+    "sourceFrames": 4,
+    "columns": 2,
+    "maxVisible": [
+      14,
+      32
+    ],
+    "cell": 64,
+    "states": "four flame flicker phases, same bracket and wood base position"
+  },
+  {
+    "id": "fireVent",
+    "name": "fireVent",
+    "description": "Square dark iron floor fire vent grate, fire vertically rising from it; consistent same grate in each cell",
+    "group": "hazards",
+    "sourceFrames": 4,
+    "columns": 2,
+    "maxVisible": [
+      30,
+      32
+    ],
+    "cell": 64,
+    "states": "inactive grate without fire; ignition small flames; tall active flames; cooling embers without tall fire"
+  },
+  {
+    "id": "spikes",
+    "name": "spikes",
+    "description": "Cluster of steel floor spikes rising from tiny floor slots, no surrounding floor tile, no grate, no baked background",
+    "group": "hazards",
+    "sourceFrames": 4,
+    "columns": 2,
+    "maxVisible": [
+      28,
+      22
+    ],
+    "cell": 64,
+    "states": "just emerging small tips; half raised; fully raised; retracting short tips. All four cells visible phases; the completely hidden zero-alpha phase will be added separately by exporter"
+  },
+  {
+    "id": "rockCrack",
+    "name": "rockCrack",
+    "description": "Cracked floor WARNING decal only: dark jagged cracks, transparent between cracks; no triangle, exclamation mark, rubble, floor texture or UI",
+    "group": "hazards",
+    "sourceFrames": 4,
+    "columns": 2,
+    "maxVisible": [
+      30,
+      20
+    ],
+    "cell": 64,
+    "states": "hairline cracks; widening cracks; branching cracks; strongest cracks"
+  },
+  {
+    "id": "rockSpent",
+    "name": "rockSpent",
+    "description": "Falling rocks impact then settling brown gray rubble and dust, no floor tile",
+    "group": "hazards",
+    "sourceFrames": 4,
+    "columns": 2,
+    "maxVisible": [
+      32,
+      28
+    ],
+    "cell": 64,
+    "states": "impact stone fragments and dust; falling dust over rocks; dust clearing; settled rubble without dust"
+  },
+  {
+    "id": "stairs",
+    "name": "stairs",
+    "description": "Clear gray stone staircase in a square dungeon opening. Steps must read as stairs, never a person, knight, ladder or platform",
+    "group": "stairs",
+    "sourceFrames": 4,
+    "columns": 2,
+    "maxVisible": [
+      32,
+      32
+    ],
+    "cell": 64,
+    "states": "ascending stairs climbing away upward; descending stairs receding downward into dark opening; ascending stairs same as first; descending stairs same as second"
+  }
+]

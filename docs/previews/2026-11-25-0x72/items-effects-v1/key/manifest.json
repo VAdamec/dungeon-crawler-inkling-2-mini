@@ -1,0 +1,52 @@
+{
+  "id": "key",
+  "name": "key",
+  "description": "Old bronze dungeon key",
+  "group": "loot",
+  "sourceFrames": 1,
+  "columns": 1,
+  "maxVisible": [
+    22,
+    28
+  ],
+  "cell": 64,
+  "states": "static",
+  "sheet": "items-effects-v1/key/sheet.png",
+  "anchor": [
+    32,
+    32
+  ],
+  "screenScale": 2,
+  "alphaCutoff": 64,
+  "sharedScale": 0.03666666666666667,
+  "nativeDirection": null,
+  "source": "generated-source.png",
+  "frames": [
+    {
+      "index": 0,
+      "label": "static",
+      "empty": false,
+      "file": "frames/0.png",
+      "crop": [
+        0,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 21,
+        "y": 20,
+        "width": 22,
+        "height": 24
+      },
+      "sourceCell": [
+        0,
+        0,
+        1536,
+        1024
+      ],
+      "sha256": "79e47233bb527c5dadf423ca6bc172ef4f6a5f2133cfd4de2baea8502f6095d9"
+    }
+  ],
+  "scope": "preview only; awaiting review"
+}

@@ -1,0 +1,77 @@
+{
+  "facts": {
+    "materialCacheKeys": [
+      "mat:32:32:0:0:0"
+    ],
+    "materialNames": [
+      "crypt.floor",
+      "crypt.top",
+      "crypt.face",
+      "cavern.floor",
+      "throne.floor"
+    ],
+    "sameCachedSurface": [
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "sameSourcePixels": [
+      true,
+      false,
+      false,
+      false,
+      false
+    ],
+    "bridge": {
+      "w": 80,
+      "h": 48,
+      "anchor": [
+        40,
+        40
+      ],
+      "bounds": {
+        "x": 12,
+        "y": 8,
+        "width": 56,
+        "height": 32
+      }
+    },
+    "water": {
+      "w": 32,
+      "h": 32,
+      "anchor": [
+        16,
+        16
+      ],
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 32,
+        "height": 32
+      },
+      "dimensions": {
+        "width": 16,
+        "height": 16,
+        "cellW": 16,
+        "cellH": 16,
+        "anchorX": 8,
+        "anchorY": 16,
+        "unionX": 0,
+        "unionY": 0,
+        "art": true,
+        "material": true,
+        "kind": "material",
+        "target": "town"
+      }
+    },
+    "dais": true,
+    "duplicateArtHas": false
+  },
+  "tileProbe": {
+    "floorAfterWallEqualsFloor": false,
+    "floorAfterWallEqualsTop": true
+  },
+  "errors": []
+}

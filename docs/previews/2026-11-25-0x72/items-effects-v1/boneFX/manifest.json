@@ -1,0 +1,52 @@
+{
+  "id": "boneFX",
+  "name": "boneFX",
+  "description": "Single thrown ivory bone, no skeleton or hand",
+  "group": "projectiles",
+  "sourceFrames": 1,
+  "columns": 1,
+  "maxVisible": [
+    22,
+    12
+  ],
+  "cell": 64,
+  "states": "static",
+  "sheet": "items-effects-v1/boneFX/sheet.png",
+  "anchor": [
+    32,
+    32
+  ],
+  "screenScale": 2,
+  "alphaCutoff": 64,
+  "sharedScale": 0.022018348623853212,
+  "nativeDirection": "right",
+  "source": "generated-source.png",
+  "frames": [
+    {
+      "index": 0,
+      "label": "static",
+      "empty": false,
+      "file": "frames/0.png",
+      "crop": [
+        0,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 26,
+        "y": 26,
+        "width": 12,
+        "height": 12
+      },
+      "sourceCell": [
+        0,
+        0,
+        1536,
+        1024
+      ],
+      "sha256": "c6ee7362db302d3b5a4b85b69199f63f7000527a8b1b6007370d91ccd94ca187"
+    }
+  ],
+  "scope": "preview only; awaiting review"
+}

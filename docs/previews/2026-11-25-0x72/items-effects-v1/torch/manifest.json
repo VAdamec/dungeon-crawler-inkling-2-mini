@@ -1,0 +1,127 @@
+{
+  "id": "torch",
+  "name": "torch",
+  "description": "Wall mounted wooden torch WITH black iron wall bracket and burning flame, no wall background",
+  "group": "hazards",
+  "sourceFrames": 4,
+  "columns": 2,
+  "maxVisible": [
+    14,
+    32
+  ],
+  "cell": 64,
+  "states": "four flame flicker phases, same bracket and wood base position",
+  "sheet": "items-effects-v1/torch/sheet.png",
+  "anchor": [
+    32,
+    32
+  ],
+  "screenScale": 2,
+  "alphaCutoff": 64,
+  "sharedScale": 0.0462046204620462,
+  "nativeDirection": null,
+  "source": "generated-source.png",
+  "frames": [
+    {
+      "index": 0,
+      "label": "four flame flicker phases, same bracket and wood base position",
+      "empty": false,
+      "file": "frames/0.png",
+      "crop": [
+        0,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 29,
+        "y": 23,
+        "width": 10,
+        "height": 20
+      },
+      "sourceCell": [
+        0,
+        0,
+        639,
+        615
+      ],
+      "sha256": "ad08040ee951c51e2ed13205491ea06ec83020c8a639dabaf3ba55184244dfed"
+    },
+    {
+      "index": 1,
+      "label": "phase 1",
+      "empty": false,
+      "file": "frames/1.png",
+      "crop": [
+        64,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 25,
+        "y": 21,
+        "width": 11,
+        "height": 22
+      },
+      "sourceCell": [
+        639,
+        0,
+        639,
+        615
+      ],
+      "sha256": "6d50a258a4b67c1d91bfb73e3116bf4ca10534c6317aa3f4dead47ddb529fc3c"
+    },
+    {
+      "index": 2,
+      "label": "phase 2",
+      "empty": false,
+      "file": "frames/2.png",
+      "crop": [
+        128,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 29,
+        "y": 23,
+        "width": 10,
+        "height": 19
+      },
+      "sourceCell": [
+        0,
+        615,
+        639,
+        615
+      ],
+      "sha256": "774f80a20f3148918b10d8d6f3bf3af13597fe46b8caa19241b3d65a1cf7c8a5"
+    },
+    {
+      "index": 3,
+      "label": "phase 3",
+      "empty": false,
+      "file": "frames/3.png",
+      "crop": [
+        192,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 26,
+        "y": 25,
+        "width": 10,
+        "height": 17
+      },
+      "sourceCell": [
+        639,
+        615,
+        639,
+        615
+      ],
+      "sha256": "1eaf137ef105c043d3431e2b099a8eacb02d08c42294c0c46931ab60a9d6ba82"
+    }
+  ],
+  "scope": "preview only; awaiting review"
+}

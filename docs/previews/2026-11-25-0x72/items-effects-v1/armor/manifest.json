@@ -1,0 +1,52 @@
+{
+  "id": "armor",
+  "name": "armor",
+  "description": "Brown leather and chainmail torso armor ONLY; no mannequin, stand, pedestal or person",
+  "group": "equipment",
+  "sourceFrames": 1,
+  "columns": 1,
+  "maxVisible": [
+    28,
+    30
+  ],
+  "cell": 64,
+  "states": "static",
+  "sheet": "items-effects-v1/armor/sheet.png",
+  "anchor": [
+    32,
+    32
+  ],
+  "screenScale": 2,
+  "alphaCutoff": 64,
+  "sharedScale": 0.03416856492027335,
+  "nativeDirection": null,
+  "source": "generated-source.png",
+  "frames": [
+    {
+      "index": 0,
+      "label": "static",
+      "empty": false,
+      "file": "frames/0.png",
+      "crop": [
+        0,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 20,
+        "y": 17,
+        "width": 24,
+        "height": 30
+      },
+      "sourceCell": [
+        0,
+        0,
+        1312,
+        1199
+      ],
+      "sha256": "38c4331d76775db5073da7f421ac96fe537c8507163eab3dc12106362cfae821"
+    }
+  ],
+  "scope": "preview only; awaiting review"
+}

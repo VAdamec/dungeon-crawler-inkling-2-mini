@@ -1,0 +1,49 @@
+{
+  "id": "barCounter",
+  "kind": "sprite",
+  "group": "tavern",
+  "maxVisible": [
+    64,
+    32
+  ],
+  "columns": 1,
+  "parts": [
+    "sprite"
+  ],
+  "file": "environment-v1/barCounter/atlas.png",
+  "size": [
+    80,
+    48
+  ],
+  "records": [
+    {
+      "name": "sprite",
+      "crop": [
+        0,
+        0,
+        80,
+        48
+      ],
+      "bounds": {
+        "x": 10,
+        "y": 8,
+        "width": 60,
+        "height": 32
+      },
+      "anchor": [
+        40,
+        40
+      ],
+      "sourceBounds": {
+        "x": 372,
+        "y": 302,
+        "width": 785,
+        "height": 416
+      },
+      "scale": 0.07692307692307693
+    }
+  ],
+  "sha256": "4d42ca5ed301cdc41796e4453a88178a5522536a608c26d3124b8ca6e649f2b5",
+  "sourceSHA256": "d577176ee7cc1ca410873f37042310dec632cddd0304dc81ee36547c264a8c14",
+  "scope": "standalone review; runtime unchanged"
+}

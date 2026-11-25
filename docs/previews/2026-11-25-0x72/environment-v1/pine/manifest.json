@@ -1,0 +1,49 @@
+{
+  "id": "pine",
+  "kind": "sprite",
+  "group": "town",
+  "maxVisible": [
+    40,
+    64
+  ],
+  "columns": 1,
+  "parts": [
+    "sprite"
+  ],
+  "file": "environment-v1/pine/atlas.png",
+  "size": [
+    56,
+    80
+  ],
+  "records": [
+    {
+      "name": "sprite",
+      "crop": [
+        0,
+        0,
+        56,
+        80
+      ],
+      "bounds": {
+        "x": 10,
+        "y": 8,
+        "width": 36,
+        "height": 64
+      },
+      "anchor": [
+        28,
+        72
+      ],
+      "sourceBounds": {
+        "x": 318,
+        "y": 81,
+        "width": 592,
+        "height": 1071
+      },
+      "scale": 0.059757236227824466
+    }
+  ],
+  "sha256": "20aea86a6f2ac42e0fc026006e93480f3f2a55734126256d398646996853e233",
+  "sourceSHA256": "c15ae0ffad0683bb92436557739776ba4bc01a781c7833e95b5afe58bcfcd9a5",
+  "scope": "standalone review; runtime unchanged"
+}

@@ -1,0 +1,86 @@
+{
+  "id": "kitchen",
+  "kind": "material",
+  "group": "biome",
+  "maxVisible": [
+    32,
+    32
+  ],
+  "columns": 2,
+  "parts": [
+    "floor",
+    "top",
+    "face",
+    "accent"
+  ],
+  "file": "environment-v1/kitchen/atlas.png",
+  "size": [
+    64,
+    64
+  ],
+  "records": [
+    {
+      "name": "floor",
+      "crop": [
+        0,
+        0,
+        32,
+        32
+      ],
+      "sourceCell": [
+        0,
+        0,
+        627,
+        627
+      ]
+    },
+    {
+      "name": "top",
+      "crop": [
+        32,
+        0,
+        32,
+        32
+      ],
+      "sourceCell": [
+        627,
+        0,
+        627,
+        627
+      ]
+    },
+    {
+      "name": "face",
+      "crop": [
+        0,
+        32,
+        32,
+        32
+      ],
+      "sourceCell": [
+        0,
+        627,
+        627,
+        627
+      ]
+    },
+    {
+      "name": "accent",
+      "crop": [
+        32,
+        32,
+        32,
+        32
+      ],
+      "sourceCell": [
+        627,
+        627,
+        627,
+        627
+      ]
+    }
+  ],
+  "sha256": "d2ee3a87922272c645cf73525f13a813795b3c3af7ef79e2adee8d763e865891",
+  "sourceSHA256": "41598062a49167ea661531d33fa942f541e8efd57467f05937ee06b0a922877c",
+  "scope": "standalone review; runtime unchanged"
+}

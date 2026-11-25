@@ -1,0 +1,23 @@
+{
+  "characterSheets": 25,
+  "transparentFrames": 400,
+  "groupCounts": {
+    "all": 25,
+    "monster": 8,
+    "boss": 9,
+    "npc": 4,
+    "companion": 1,
+    "animal": 3
+  },
+  "directions": 4,
+  "poseSelection": "all four frames in every direction",
+  "playPause": true,
+  "hiddenGuard": true,
+  "dragonAlias": true,
+  "missingRoleThrows": true,
+  "mainPreview": "renders all new scene actors and NPCs",
+  "gameBootstrapped": false,
+  "protocol": "file://, no relaxed access flags",
+  "errors": [],
+  "remote": []
+}

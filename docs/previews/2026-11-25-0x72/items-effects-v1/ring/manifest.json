@@ -1,0 +1,52 @@
+{
+  "id": "ring",
+  "name": "ring",
+  "description": "Gold ring with dark blue gem",
+  "group": "equipment",
+  "sourceFrames": 1,
+  "columns": 1,
+  "maxVisible": [
+    24,
+    18
+  ],
+  "cell": 64,
+  "states": "static",
+  "sheet": "items-effects-v1/ring/sheet.png",
+  "anchor": [
+    32,
+    32
+  ],
+  "screenScale": 2,
+  "alphaCutoff": 64,
+  "sharedScale": 0.0391304347826087,
+  "nativeDirection": null,
+  "source": "generated-source.png",
+  "frames": [
+    {
+      "index": 0,
+      "label": "static",
+      "empty": false,
+      "file": "frames/0.png",
+      "crop": [
+        0,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 22,
+        "y": 23,
+        "width": 20,
+        "height": 18
+      },
+      "sourceCell": [
+        0,
+        0,
+        1536,
+        1024
+      ],
+      "sha256": "671959b337b779ae3735f9ca32989786a89089133ea9d8d9dbe47489ea460901"
+    }
+  ],
+  "scope": "preview only; awaiting review"
+}

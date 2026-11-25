@@ -1,0 +1,18 @@
+{
+  "date": "2026-11-25",
+  "release": "2.0.0",
+  "markdownFiles": 16,
+  "localLinks": 219,
+  "brokenLinks": [],
+  "pngFiles": 27,
+  "ordinaryStatRows": 8,
+  "bossAndThemedStatRows": 13,
+  "protectedFiles": 966,
+  "authorizedRuntimeChanges": [
+    "index.html",
+    "js/game.js"
+  ],
+  "gameChangeOnlyVersion": true,
+  "playerReadmeWords": 328,
+  "nativeVisibility": "UNVERIFIED; GR-09 remains open"
+}

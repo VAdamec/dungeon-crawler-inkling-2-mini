@@ -86,7 +86,7 @@ const BOSSES = {
   90: { name: 'Dark Wizard', sprite: 'darkWizard', hp: 130, atk: 25, def: 6, xp: 230, gold: 170, magic: true, magicType: 'attack', magicRange: 5 },
   100: { name: 'Dragon', sprite: 'dragon', hp: 160, atk: 26, def: 6, xp: 250, gold: 200, dragon: true },
 };
-const GAME_VERSION = '1.0.1';
+const GAME_VERSION = '2.0.0';
 // Brief quotations from Monty Python and the Holy Grail; official sources in README.
 const MONSTER_QUOTES = ['Ni!', 'None shall pass!', "'Tis but a scratch.", 'Run away!'];
 const MONSTER_SPEECH_DURATION = 5, MONSTER_SPEECH_INTERVAL = 5;
@@ -289,7 +289,7 @@ function drawCompanion() {
   const position = actorRenderPosition(companion);
   const cx = position.x * TILE + TILE / 2, cy = worldSpriteCenterY(sprite,position.y,scale);
   drawActorSprite(sprite, cx, cy, scale, companion);
-  if (!state.companionSpeech) return;
+  if (!state.companionSpeech || bossCinematicActive()) return;
   const text = state.companionSpeech.text;
   ctx.font = '10px monospace';
   const width = ctx.measureText(text).width + 10;
@@ -1094,6 +1094,7 @@ function projectileVisible(projectile) {
 }
 
 function motionNeeded() {
+  if (state.area === 'town' && state.townPortalOpen && state.townGate && inArtCamera('townPortal',state.townGate.x,state.townGate.y)) return true;
   if (state.motion.projectiles.some(projectileVisible)) return true;
   if (actorIsMoving(state.player)) return true;
   if(state.area==='town' && state.town && [...state.town.npcs,...state.town.animals].some(a=>!a.hidden&&actorIsMoving(a)&&inArtCamera(a.sprite,a.x,a.y,a.scale||1.5)))return true;
@@ -1427,6 +1428,7 @@ function castSpell(spellName) {
     if (!target) log('Magic Barrier flares and fades.');
     else {
       spawnProjectile('bolt', p, target, 0.3);
+      const barrier = state.motion.projectiles[state.motion.projectiles.length - 1];
       const horizontal = Math.abs(target.x - p.x) >= Math.abs(target.y - p.y);
       const sx = horizontal ? Math.sign(target.x - p.x) : 0;
       const sy = horizontal ? 0 : Math.sign(target.y - p.y);
@@ -1436,6 +1438,7 @@ function castSpell(spellName) {
         if (!state.map[ny] || state.map[ny][nx] !== 0 || monsterAt(nx, ny) || (nx === p.x && ny === p.y)) { impact = true; break; }
         x = nx; y = ny; pushed++;
       }
+      barrier.impact = impact || !pushed;
       if (pushed) moveActorTo(target, x, y);
       const damage = Math.max(2, Math.round(effectiveAtk() * 1.4) - Math.floor(target.def / 2));
       if (impact || !pushed) {
@@ -1445,7 +1448,7 @@ function castSpell(spellName) {
       if (target.hp > 0) enemyAttack(target);
     }
   } else {
-    spawnProjectile('heal', p, p, 0.6);
+    spawnProjectile(spellName === 'greaterHeal' ? 'greaterHeal' : 'heal', p, p, 0.6);
     const fraction = spellName === 'greaterHeal' ? 0.55 : 0.3;
     const amount = Math.max(1, Math.round(p.maxHp * fraction));
     p.hp = Math.min(p.maxHp, p.hp + amount);
@@ -1543,9 +1546,8 @@ function monsterSpeechLayout() {
   ctx.save(); ctx.font = '12px monospace';
   const width = ctx.measureText(speech.text).width + 20;
   ctx.restore();
-  const position = actorRenderPosition(monster);
-  const height = 28, anchorX = position.x * TILE + TILE / 2;
   const visual = monsterVisual(monster);
+  const height = 28, anchorX = visual.x;
   const camera = renderCamera();
   const viewportLeft = camera.x * TILE, viewportTop = camera.y * TILE;
   const x = Math.max(viewportLeft + 6, Math.min(viewportLeft + VIEW_W * TILE - width - 6, anchorX - width / 2));
@@ -1555,15 +1557,25 @@ function monsterSpeechLayout() {
     tipY: Math.max(viewportTop + 3, Math.min(viewportTop + VIEW_H * TILE - 3, below ? visual.bottom + 3 : visual.top - 3)) };
 }
 
+function actorDrawScale(name, fallback=2) {
+  const rt = typeof artRuntime === 'function' ? artRuntime() : null;
+  if (rt && rt.characters && rt.characters[name] && rt.characters[name].worldScale) return rt.characters[name].worldScale;
+  return fallback;
+}
 function monsterVisual(monster) {
-  const sprite = monster.isDragon ? 'dragonBoss' : monster.isThemed ? (monster.themedType==='kitchen'?'cook':'bartender') : monster.sprite;
-  const scale = monster.isBoss ? 3 : 2;
+  const sprite = monster.isDragon ? 'dragonBoss' : monster.isThemed ? (monster.themedType === 'kitchen' ? 'cook' : 'bartender') : monster.sprite;
+  const scale = monster.isBoss ? (actorDrawScale(sprite, 3)) : 2;
   const size = spriteDimensions(sprite);
-  const width = size.width * scale, height = size.height * scale;
   const position = actorRenderPosition(monster);
-  const x = position.x * TILE + TILE / 2;
-  const y = (position.y + 1) * TILE - height / 2;
-  return { sprite, scale, x, y, width, height, left: x - width / 2, right: x + width / 2, top: y - height / 2, bottom: y + height / 2 };
+  const footX = position.x * TILE + TILE / 2;
+  const footY = (position.y + 1) * TILE;
+  const ax = (size.anchorX != null ? size.anchorX : size.width / 2) * scale;
+  const ay = (size.anchorY != null ? size.anchorY : size.height) * scale;
+  const left = footX - ax + (size.unionX || 0) * scale;
+  const top = footY - ay + (size.unionY || 0) * scale;
+  const width = size.width * scale, height = size.height * scale;
+  const x = left + width / 2, y = top + height / 2;
+  return { sprite, scale, x, y, footX, footY, width, height, left, right: left + width, top, bottom: top + height, cellW: (size.cellW || size.width) * scale, cellH: (size.cellH || size.height) * scale };
 }
 
 function drawMonsterSpeech() {
@@ -1799,18 +1811,25 @@ function startBossDefeat(m) {
   const isDragon = !!m.isDragon;
   const kind = bossKind(m), meta = BOSS_ANIMATIONS[kind];
   const visual = monsterVisual(m);
+  const direction = state.motion.directions[actorMotionKey(m)] || 'front';
+  const frame = actorAnimationPose(visual.sprite,m).frame;
+  const guards = m.isThroneBoss ? state.monsters.filter(g => g.isGuard && g.hp > 0).map(g => {
+    const v = monsterVisual(g);
+    return { dx:v.footX-visual.footX, dy:v.footY-visual.footY, sprite:v.sprite, scale:v.scale, frame:actorAnimationPose(v.sprite,g).frame, direction:state.motion.directions[actorMotionKey(g)] || 'front' };
+  }) : [];
   clearBossIntro();
   clearMovementAnimation();
   state.bossDefeat = {
     kind, label: m.name, elapsed: 0, phase: isDragon ? 'roar' : meta.phases[0][1], completed: false,
     duration: meta.defeat,
     frameId: null, lastTimestamp: null, events: new Set(),
-    visual: { sprite: visual.sprite, scale: visual.scale, x: visual.x, y: visual.y,
+    visual: { sprite: visual.sprite, scale: visual.scale, direction, frame, x: visual.x, y: visual.y, footX:visual.footX, footY:visual.footY,
       width: visual.width, height: visual.height, left: visual.left, right: visual.right,
       top: visual.top, bottom: visual.bottom, tileX: m.x, tileY: m.y },
-    guards: m.isThroneBoss ? state.monsters.filter(g => g.isGuard && g.hp > 0)
-      .map(g => ({ dx: (g.x - m.x) * TILE, dy: (g.y - m.y) * TILE })) : [],
+    guards,
   };
+  // The captured guard art falls once; live guards cannot survive that collapse.
+  if (m.isThroneBoss) for (const guard of state.monsters) if (guard.isGuard) guard.hp = 0;
   clearMonsterSpeech();
   playBossDefeatSound(kind);
   draw();
@@ -2504,13 +2523,33 @@ function enemyTick() {
 function worldSpriteCenterY(name, tileY, scale = 2) {
   return (tileY + 1) * TILE - spriteDimensions(name).height * scale / 2;
 }
+function worldSpriteFootY(name, tileY) { return (tileY + 1) * TILE; }
+function worldSpritePoint(size, x, y, scale) {
+  let px=(x+.5)*TILE, py=(y+1)*TILE;
+  // Item sheets use icon-center anchors. In the world, their visible union
+  // rests on the floor; keep that ground point fixed through animated states.
+  if(size.art && size.kind==='item') {
+    px+=(size.anchorX-size.unionX-size.width/2)*scale;
+    py+=(size.anchorY-size.unionY-size.height)*scale;
+  }
+  return {x:px,y:py};
+}
 function inArtCamera(name, x, y, scale = 2) {
-  const camera = renderCamera(), size = spriteDimensions(name), foot=(y+1)*TILE, cx=(x+.5)*TILE;
-  return cx+size.width*scale/2>=camera.x*TILE && cx-size.width*scale/2<=(camera.x+VIEW_W)*TILE &&
-    foot>=camera.y*TILE && foot-size.height*scale<=(camera.y+VIEW_H)*TILE;
+  const camera = renderCamera(), size = spriteDimensions(name), point=worldSpritePoint(size,x,y,scale), foot=point.y, cx=point.x;
+  const w = (size.cellW || size.width) * scale, h = (size.cellH || size.height) * scale;
+  const ax = size.anchorX != null ? size.anchorX * scale : w / 2;
+  const ay = size.anchorY != null ? size.anchorY * scale : h;
+  const left = cx - ax, top = foot - ay;
+  return left + w >= camera.x * TILE && left <= (camera.x + VIEW_W) * TILE && top + h >= camera.y * TILE && top <= (camera.y + VIEW_H) * TILE;
 }
 function drawWorldSprite(name, x, y, scale = 2, frame = 0) {
-  drawSprite(name, x*TILE+TILE/2, worldSpriteCenterY(name,y,scale), scale, frame);
+  const size = spriteDimensions(name);
+  const point=worldSpritePoint(size,x,y,scale), footX=point.x, footY=point.y;
+  if (size.art && typeof drawSpriteAnchored === 'function') {
+    drawSpriteAnchored(name, footX, footY, scale, frame);
+  } else {
+    drawSprite(name, footX, worldSpriteCenterY(name, y, scale), scale, frame);
+  }
 }
 function faceActor(actor, dx, dy) {
   const key=actorMotionKey(actor);
@@ -2545,10 +2584,63 @@ function townSceneryTiles() {
   }
   art.townTerrain={map:state.map,tiles};return tiles;
 }
+// Disposable cosmetic paths/river coverage. The saved map and props are read-only.
+function townMaterialLayout() {
+  const art = graphicsCache();
+  if (art.townMaterials && art.townMaterials.map === state.map && art.townMaterials.props === state.props) return art.townMaterials;
+  const water = new Set(), roads = new Set();
+  for (const p of state.props) {
+    if (p.sprite === 'water') water.add(`${p.x},${p.y}`);
+    if (p.sprite === 'bridge') for (let x=p.x; x<p.x+2; x++) water.add(`${x},${p.y}`);
+  }
+  for (let y=0; y<H; y++) for (let x=0; x<W; x++) {
+    if (state.map[y][x] === 0 && ((y>=28 && y<=30) || (x>=37 && x<=40))) roads.add(`${x},${y}`);
+  }
+  for (const door of state.props.filter(p=>p.sprite === 'doorstep')) {
+    const start = `${door.x},${door.y}`, queue = [{x:door.x,y:door.y}], previous = new Map([[start,null]]);
+    let end = null;
+    for (let i=0; i<queue.length; i++) {
+      const at = queue[i], key = `${at.x},${at.y}`;
+      if (roads.has(key)) { end=key; break; }
+      for (const [dx,dy] of [[0,1],[1,0],[-1,0],[0,-1]]) {
+        const x=at.x+dx, y=at.y+dy, next=`${x},${y}`;
+        if (state.map[y] && state.map[y][x]===0 && !previous.has(next)) { previous.set(next,key); queue.push({x,y}); }
+      }
+    }
+    while (end) { roads.add(end); end=previous.get(end); }
+  }
+  return art.townMaterials = {map:state.map,props:state.props,water,roads};
+}
+
+// Source coordinates identify facade doors/deck rather than transparent cell centers.
+const TOWN_DOOR_SOURCE_X = {inn:114, store:90, hut:55};
+function townBuildingVisual(prop) {
+  const b=townBuildingBounds(prop), dec=artDecoded(prop.sprite), width=(b.x1-b.x0+1)*TILE;
+  const pixelScale=width/dec.bounds.width, foot=(b.y1+1)*TILE;
+  const door=state.props.find(p=>p.sprite==='doorstep' && p.y===b.y1+1 && p.x>=b.x0 && p.x<=b.x1);
+  const targetX=door ? (door.x+.5)*TILE : (b.x0+b.x1+1)*TILE/2;
+  const sourceX=TOWN_DOOR_SOURCE_X[prop.sprite] || dec.anchor[0];
+  const left=targetX-sourceX*pixelScale, top=foot-dec.anchor[1]*pixelScale;
+  return {left,top,right:left+dec.w*pixelScale,bottom:top+dec.h*pixelScale,
+    cx:left+dec.w*pixelScale/2,cy:top+dec.h*pixelScale/2,scale:pixelScale*ART_DENSITY,doorX:targetX,foot};
+}
+function townBridgeVisual(prop) {
+  const dec=artDecoded('bridge'), pixelScale=2*TILE/dec.bounds.width;
+  // In this authored source, the walking deck ends at source row 28;
+  // the arch projects below it over water. Align that deck edge to hero feet.
+  const left=prop.x*TILE-dec.bounds.x*pixelScale, deckY=(prop.y+1)*TILE;
+  const top=deckY-28*pixelScale;
+  return {left,top,right:left+dec.w*pixelScale,bottom:top+dec.h*pixelScale,
+    cx:left+dec.w*pixelScale/2,cy:top+dec.h*pixelScale/2,scale:pixelScale*ART_DENSITY,
+    bankLeft:prop.x*TILE,bankRight:(prop.x+2)*TILE,deckY};
+}
+function inWorldArtBounds(b) {
+  const c=renderCamera();
+  return b.right>=c.x*TILE && b.left<=(c.x+VIEW_W)*TILE && b.bottom>=c.y*TILE && b.top<=(c.y+VIEW_H)*TILE;
+}
 function drawTownBuilding(prop) {
-  const b=townBuildingBounds(prop),camera=renderCamera(),width=(b.x1-b.x0+1)*TILE,size=spriteDimensions(prop.sprite),scale=width/size.width,foot=(b.y1+1)*TILE;
-  if((b.x1+1)*TILE<camera.x*TILE || b.x0*TILE>(camera.x+VIEW_W)*TILE || foot<camera.y*TILE || foot-size.height*scale>(camera.y+VIEW_H)*TILE)return;
-  drawSprite(prop.sprite,(b.x0+b.x1+1)*TILE/2,foot-size.height*scale/2,scale);
+  const v=townBuildingVisual(prop);
+  if (inWorldArtBounds(v)) drawSprite(prop.sprite,v.cx,v.cy,v.scale);
 }
 
 function drawFloorDetails() {
@@ -2562,25 +2654,30 @@ function drawFloorDetails() {
   }
   for (const prop of [...state.props].sort((a,b)=>a.y-b.y)) {
     if(state.area==='town' && ['inn','store','hut'].includes(prop.sprite)){drawTownBuilding(prop);continue;}
+    // Water is already painted tile-aligned, including beneath the bridge.
+    if(state.area==='town' && prop.sprite==='water') continue;
+    if(prop.sprite==='bridge'){
+      const v=townBridgeVisual(prop);
+      if(inWorldArtBounds(v)) drawSprite('bridge',v.cx,v.cy,v.scale);
+      continue;
+    }
+    if(state.area==='town' && prop.sprite==='townGate' && state.townGate){
+      const gate=state.townGate;
+      if(inArtCamera('townGate',gate.x,gate.y,prop.scale||2)) drawSpriteAnchored('townGate',(gate.x+.5)*TILE,(gate.y+1)*TILE,prop.scale||2);
+      continue;
+    }
     const sprite=prop.sprite==='tombstone'&&artBiomeAt(prop.x,prop.y)==='throne'?'pillar':prop.sprite;
     const scale=sprite==='water'?2:prop.scale||2;
     if (!inArtCamera(sprite,prop.x,prop.y,scale)) continue;
     if (state.area !== 'town' && !state.visited.has(`${prop.x},${prop.y}`)) continue;
-    if(prop.sprite==='bridge'){
-      ctx.save();ctx.translate((prop.x+1)*TILE,(prop.y+.5)*TILE);ctx.scale(1,2/3);drawSprite('bridge',0,0,2);ctx.restore();
-    }else if(prop.sprite==='doorstep'){
+    if(prop.sprite==='doorstep'){
       drawSprite('doorstep',(prop.x+.5)*TILE,prop.y*TILE+spriteDimensions('doorstep').height*scale/2,scale);
     }else{
       drawWorldSprite(sprite,prop.x,prop.y,scale);
-      if(state.area==='town'&&prop.sprite==='water'){
-        ctx.fillStyle='#b1a47a';
-        if(state.map[prop.y][prop.x-1]===0)ctx.fillRect(prop.x*TILE,prop.y*TILE,2,TILE);
-        if(state.map[prop.y][prop.x+1]===0)ctx.fillRect((prop.x+1)*TILE-2,prop.y*TILE,2,TILE);
-      }
     }
   }
   if (state.area === 'town' && state.townPortalOpen && state.townGate && inRenderCamera(state.townGate.x, state.townGate.y)) {
-    drawWorldSprite('townPortal', state.townGate.x, state.townGate.y, 2);
+    drawWorldSprite('townPortal', state.townGate.x, state.townGate.y, 2, 1 + (environmentAnimationFrame(state.townGate.x, state.townGate.y) % 4));
   }
   for (const obstacle of state.obstacles) {
     if (!inArtCamera(obstacle.type,obstacle.x,obstacle.y) || !state.visited.has(`${obstacle.x},${obstacle.y}`)) continue;
@@ -2589,9 +2686,22 @@ function drawFloorDetails() {
   for (const hazard of state.hazards) {
     if (!hazard.revealed || !inRenderCamera(hazard.x, hazard.y) || !state.visited.has(`${hazard.x},${hazard.y}`)) continue;
     const x = hazard.x * TILE, y = hazard.y * TILE;
-    const sprite = hazard.type === 'flame' ? (flameActive(hazard) ? 'flameOn' : 'flameOff')
-      : hazard.type === 'rocks' ? (hazard.stage === 'spent' ? 'rockSpent' : 'rockCrack') : 'spikes';
-    drawWorldSprite(sprite, hazard.x, hazard.y, 2, sprite === 'flameOn' ? environmentAnimationFrame(hazard.x, hazard.y) : 0);
+    let sprite, frame = 0;
+    if (hazard.type === 'flame') {
+      const phase = (state.hazardTime + hazard.offset) % 6;
+      sprite = 'fireVent'; frame = phase < .4 ? 1 : phase < 2.6 ? 2 : phase < 3 ? 3 : 0;
+    }
+    else if (hazard.type === 'rocks') {
+      if (hazard.stage !== 'warning' && hazard.stage !== 'spent') continue;
+      const elapsed = hazard.stage === 'warning' ? state.hazardTime - (hazard.impactAt - 1.2) : state.hazardTime - hazard.impactAt;
+      sprite = hazard.stage === 'spent' ? 'rockSpent' : 'rockCrack';
+      frame = Math.min(3, Math.max(0, Math.floor(elapsed / (hazard.stage === 'warning' ? .3 : .15))));
+    } else {
+      // Spikes are a one-shot trap: never animate hidden/armed cells into view.
+      if (!hazard.triggered) continue;
+      sprite = 'spikes'; frame = 4;
+    }
+    drawWorldSprite(sprite, hazard.x, hazard.y, 2, frame);
     if (hazard.type === 'rocks' && hazard.stage === 'warning') {
       const fall = Math.max(0, Math.min(1, 1 - (hazard.impactAt - state.hazardTime) / 1.2));
       ctx.fillStyle = '#ac9981'; ctx.fillRect(x + 6, y - 10 + Math.round(fall * 20), 7, 6); ctx.fillRect(x + 22, y - 8 + Math.round(fall * 20), 5, 5);
@@ -2613,14 +2723,21 @@ function drawHazardWarnings() {
   }
 }
 
+function drawCinematicActor(name, x, y, scale, frame = 0, direction = 'front') {
+  const size = spriteDimensions(name);
+  const ax = x + (size.anchorX - size.unionX - size.width / 2) * scale;
+  const ay = y + (size.anchorY - size.unionY - size.height / 2) * scale;
+  drawSpriteAnchored(name, ax, ay, scale, frame, direction);
+}
+
 function drawMimicDefeat(scene) {
   const visual = state.bossDefeat.visual;
-  if (!inRenderCamera(visual.tileX, visual.tileY)) return;
+  if (!inWorldArtBounds(visual)) return;
   ctx.save();
   ctx.globalAlpha = scene.alpha;
-  ctx.translate(visual.x + scene.shake, visual.y + scene.rise);
+  ctx.translate(visual.footX + scene.shake, visual.footY + scene.rise);
   ctx.scale(1 + scene.squash * 0.25, 1 - scene.squash);
-  drawSprite(visual.sprite, 0, 0, visual.scale);
+  drawSpriteAnchored(visual.sprite, 0, 0, visual.scale, visual.frame, visual.direction);
   ctx.restore();
   ctx.save();
   ctx.globalAlpha = scene.alpha;
@@ -2649,7 +2766,7 @@ function drawDragonDefeatDragon(scene) {
   ctx.globalAlpha = scene.alpha;
   ctx.translate(576 + scene.shake, scene.dragonY);
   ctx.scale(1,1-Math.min(0.12,scene.wing/1000));
-  drawSprite('dragonBoss', 0, 0, 4, scene.wing>15?1:0);
+  drawCinematicActor('dragonBoss', 0, 0, 4, Math.floor(scene.t * 8) % 4);
   ctx.restore();
 }
 
@@ -2685,12 +2802,12 @@ function drawDragonDefeat(scene) {
 function drawBossDefeat(scene) {
   const anim = state.bossDefeat;
   const visual = anim.visual;
-  if (!inRenderCamera(visual.tileX, visual.tileY)) return;
+  if (!inWorldArtBounds(visual)) return;
   ctx.save();
   ctx.globalAlpha = scene.alpha;
-  ctx.translate(visual.x + scene.shake, visual.y + scene.rise);
+  ctx.translate(visual.footX + scene.shake, visual.footY + scene.rise);
   ctx.scale(1 + scene.squash * 0.22, 1 - scene.squash);
-  drawSprite(visual.sprite, 0, 0, visual.scale);
+  drawSpriteAnchored(visual.sprite, 0, 0, visual.scale, visual.frame, visual.direction);
   ctx.restore();
   ctx.save();
   ctx.globalAlpha = scene.alpha;
@@ -2747,9 +2864,8 @@ function drawBossDefeat(scene) {
     const fall = defeatClamp((scene.t - 0.7) / 1.2);
     for (const guard of scene.guards || []) {
       ctx.globalAlpha = scene.alpha;
-      ctx.save(); ctx.translate(guard.dx, guard.dy + fall * 10); ctx.rotate(fall * (guard.dx > 0 ? 1.1 : -1.1));
-      ctx.fillStyle = '#d8d3c1'; ctx.fillRect(-5, -18, 10, 14); ctx.fillRect(-8, -4, 16, 4);
-      ctx.fillStyle = '#131b26'; ctx.fillRect(-3, -14, 2, 3); ctx.fillRect(1, -14, 2, 3);
+      ctx.save(); ctx.translate(visual.footX - visual.x + guard.dx, visual.footY - visual.y + guard.dy + fall * 10); ctx.rotate(fall * (guard.dx > 0 ? 1.1 : -1.1));
+      drawSpriteAnchored(guard.sprite, 0, 0, guard.scale, guard.frame, guard.direction);
       ctx.restore();
     }
   }
@@ -2787,7 +2903,9 @@ function drawBossIntro(scene) {
   ctx.save();
   ctx.translate(576 + scene.shake, 336);
   ctx.scale(scene.zoom, scene.zoom);
-  drawSprite(scene.sprite, 0, 0, scene.scale, Math.floor(scene.t * 8 || 0) % 4);
+  const portrait = spriteDimensions(scene.sprite);
+  const portraitScale = 260 / Math.max(portrait.width, portrait.height);
+  drawCinematicActor(scene.sprite, 0, 0, portraitScale, Math.floor(scene.t * 8 || 0) % 4);
   ctx.restore();
   ctx.globalAlpha = scene.bannerAlpha;
   ctx.fillStyle = '#0a0c13'; ctx.fillRect(176, 600, 800, 112);
@@ -2809,17 +2927,17 @@ function drawProjectiles() {
   for (const projectile of state.motion.projectiles) {
     if (!projectileVisible(projectile)) continue;
     const point = projectilePoint(projectile);
+    if (fogLevel(Math.floor(point.x / TILE), Math.floor(point.y / TILE)) >= 3) continue;
     const angle = Math.atan2(projectile.toY - projectile.fromY, projectile.toX - projectile.fromX);
     ctx.save();
     ctx.translate(point.x, point.y);
-    const effect={arrow:'arrowFX',stinger:'stingerFX',bone:'boneFX',beer:'beerFX',fireball:'fireballFX',frost:'frostboltFX',heal:'healFX',bolt:'magicBarrierFX'}[projectile.kind]||'magicBarrierFX';
-    if(['arrow','stinger','bone','fireball','frost'].includes(projectile.kind))ctx.rotate(angle);
-    if(projectile.kind==='heal'){
-      ctx.translate(0,-point.t*18);
-      ctx.fillStyle='#afc897';
-      for(let i=0;i<4;i++){const a=i*Math.PI/2+point.t*3;ctx.fillRect(Math.cos(a)*8-1,Math.sin(a)*8,3,3);}
-    }
-    drawSprite(effect,0,-4,1);
+    const effect={arrow:'arrowFX',stinger:'stingerFX',bone:'boneFX',beer:'beerFX',fireball:'fireballFX',frost:'frostboltFX',heal:'healFX',greaterHeal:'greaterHealFX',bolt:'magicBarrierFX'}[projectile.kind]||'magicBarrierFX';
+    const phase = Math.min(3, Math.floor(point.t * 4));
+    let frame = ['fireball','frost','heal','greaterHeal','bolt'].includes(projectile.kind) ? phase : 0;
+    if (projectile.kind === 'bolt' && !projectile.impact && frame === 2) frame = 1;
+    if (['arrow','stinger','bone','beer','fireball','frost','bolt'].includes(projectile.kind)) ctx.rotate(angle);
+    if (projectile.kind === 'heal' || projectile.kind === 'greaterHeal') ctx.translate(0,-point.t*18);
+    drawSprite(effect,0,-4,1,frame);
     ctx.restore();
   }
 }
@@ -2870,10 +2988,11 @@ function draw() {
   }
   if (inTown) drawTownNpcs();
   for (const m of state.monsters) {
-    if (m.hp <= 0 || !inArtCamera(monsterVisual(m).sprite,m.x,m.y,m.isBoss?3:2)) continue;
-    if (fogLevel(m.x, m.y) >= 3) continue;
+    if (m.hp <= 0) continue;
     const visual = monsterVisual(m);
-    drawActorSprite(visual.sprite, visual.x, visual.y, visual.scale, m);
+    if (!inArtCamera(visual.sprite, m.x, m.y, visual.scale)) continue;
+    if (fogLevel(m.x, m.y) >= 3) continue;
+    drawActorSprite(visual.sprite, visual.footX, visual.footY - spriteDimensions(visual.sprite).height * visual.scale / 2, visual.scale, m);
   }
   if (!inTown) {
     for (let y = view.y0; y < view.y1; y++) {
@@ -2895,9 +3014,10 @@ function draw() {
   if (inTown) drawTownSpeech();
   // Keep visible actors' health bars readable above the terrain fog.
   for (const m of state.monsters) {
-    if (m.hp <= 0 || !inArtCamera(monsterVisual(m).sprite,m.x,m.y,m.isBoss?3:2) || fogLevel(m.x, m.y) >= 3) continue;
+    if (m.hp <= 0) continue;
     const visual = monsterVisual(m);
-    const barWidth = m.isBoss ? visual.width - 12 : 24;
+    if (!inArtCamera(visual.sprite, m.x, m.y, visual.scale) || fogLevel(m.x, m.y) >= 3) continue;
+    const barWidth = m.isBoss ? Math.max(24, visual.width - 12) : 24;
     ctx.fillStyle = '#333'; ctx.fillRect(visual.x - barWidth / 2, visual.top - 7, barWidth, 4);
     ctx.fillStyle = '#ff3d3d'; ctx.fillRect(visual.x - barWidth / 2, visual.top - 7, barWidth * (m.hp / m.maxHp), 4);
   }
@@ -3046,7 +3166,7 @@ function endingScene() {
     hero: { x: t < 8 ? 230 : 460 + 116 * walk, y: t < 8 ? 505 : 585 - 137 * walk,
       scale: t < 8 ? 4 : 4.2 - 2.4 * walk, crying: t >= 8 },
     princess: { x: t < 5 ? 520 + 285 * run : dragonX + 5,
-      y: t < 5 ? 500 - (run > 0 && run < 1 ? Math.abs(Math.sin(t * 18)) * 5 : 0) : dragonY - 68 },
+      y: t < 5 ? 500 : dragonY - 68 },
     dragon: { x: dragonX, y: dragonY, health: Math.max(0, Math.min(1, (t - 3.6) / 1.4)) } };
 }
 
@@ -3061,28 +3181,26 @@ function drawEndingHeart(x, y, size) {
 function drawEndingDragon(x, y, time, health, flying) {
   ctx.save();
   ctx.globalAlpha = 0.5 + health * 0.5;
-  drawSprite('dragonBoss',x,y+(flying?Math.sin(time*10)*4:0),3,flying?Math.floor(time*8)%4:0);
+  drawCinematicActor('dragonBoss',x,y+(flying?Math.sin(time*10)*4:0),3,flying?Math.floor(time*8)%4:0,'right');
   ctx.restore();
 }
 
 function drawEndingHero(hero, time) {
-  const stride = Math.sin(time * 9);
   const moving = hero.crying && state.ending.phase !== 'done';
-  const bob = moving ? Math.abs(stride) * hero.scale * 0.7 : 0;
-  ctx.save(); ctx.translate(hero.x, hero.y - bob);
+  const headY = -spriteDimensions('knight').height * hero.scale * .32;
+  ctx.save(); ctx.translate(hero.x, hero.y);
   if (hero.crying) ctx.rotate(0.15);
-  drawSprite('knight',0,0,hero.scale,moving?Math.floor(time*12)%4:0,hero.crying?'right':'front');
+  drawCinematicActor('knight',0,0,hero.scale,moving?Math.floor(time*12)%4:0,hero.crying?'back':'front');
   if (hero.crying) {
-    ctx.fillStyle = '#262a34'; ctx.fillRect(-3 * hero.scale, -4.5 * hero.scale, 6 * hero.scale, 2 * hero.scale);
     ctx.fillStyle = '#8ae2ff';
-    ctx.fillRect(2 * hero.scale, -3 * hero.scale, hero.scale, 3 * hero.scale);
+    ctx.fillRect(2 * hero.scale, headY, hero.scale, 3 * hero.scale);
   }
   ctx.restore();
   if (hero.crying) for (let i = 0; i < 9; i++) {
     const age = (time * 1.7 + i * 0.23) % 2;
     ctx.fillStyle = `rgba(125, 216, 255, ${0.85 * (1 - age / 2)})`;
     const size = Math.max(2, hero.scale * 0.8);
-    ctx.fillRect(hero.x + 2 * hero.scale - age * 20, hero.y - 3 * hero.scale + age * 24, size, size * 1.5);
+    ctx.fillRect(hero.x + 2 * hero.scale - age * 20, hero.y + headY + age * 24, size, size * 1.5);
   }
 }
 
@@ -3141,7 +3259,9 @@ function drawEnding() {
       ctx.fillRect(720, 330, 310, 310);
     }
     drawEndingDragon(scene.dragon.x, scene.dragon.y, scene.time, scene.dragon.health, scene.time >= 5);
-    drawSprite('princess', scene.princess.x, scene.princess.y, 4);
+    if (scene.time >= 3.6 && scene.time < 5) drawCinematicActor('greaterHealFX',scene.dragon.x,scene.dragon.y-30,2,Math.min(3,Math.floor((scene.time-3.6)/1.4*4)));
+    const running = scene.time >= 2 && scene.time < 3.6;
+    drawCinematicActor('princess', scene.princess.x, scene.princess.y, 4, running ? Math.floor(scene.time * 12) % 4 : 0, scene.time < 2 ? 'front' : 'right');
     if (scene.time < 2) drawEndingBubble('At last!', 230, 425);
     else if (scene.time < 3.6) drawEndingBubble('I love him!', scene.princess.x, 425);
     else if (scene.time < 5) {

@@ -1,0 +1,571 @@
+{
+  "id": "bartender",
+  "name": "Bartender",
+  "group": "boss",
+  "w": 56,
+  "h": 60,
+  "desc": "The Bartender, an ivory SKELETON PUBKEEPER boss: grinning skull, rolled ivory shirt sleeves, brown waistcoat, burgundy bow tie, dark trousers and boots, holding a small wooden ale tankard with a pale foam top. Bone hands, visible skull and bony legs; no bar counter.",
+  "motion": "walking, alternating boots and careful tankard swing; no spilling particle effects",
+  "scope": "standalone preview only",
+  "generator": "Built-in image_gen; prompt.md retains exact request",
+  "sourceSHA256": "dda1ed1039d00b3b4db1d56c4caaea1beaca62e620b31fa04a31b3f596cec80d",
+  "sourceSize": [
+    1254,
+    1254
+  ],
+  "sheet": "characters-v1/bartender/walk-sheet.png",
+  "sheetSize": [
+    512,
+    512
+  ],
+  "cellSize": [
+    128,
+    128
+  ],
+  "directions": [
+    "front",
+    "back",
+    "left",
+    "right"
+  ],
+  "framesPerDirection": 4,
+  "frames": [
+    {
+      "direction": "front",
+      "frame": 0,
+      "crop": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "anchor": [
+        64,
+        116
+      ],
+      "bounds": {
+        "x": 44,
+        "y": 56,
+        "width": 39,
+        "height": 60
+      },
+      "sha256": "ed62d5d0c6fd59928903d12d97246cd029bb76af421edda2ea07a8391cfab262",
+      "sourceCell": [
+        0,
+        0,
+        314,
+        314
+      ],
+      "sourceBounds": {
+        "x": 71,
+        "y": 37,
+        "width": 167,
+        "height": 258
+      }
+    },
+    {
+      "direction": "front",
+      "frame": 1,
+      "crop": [
+        128,
+        0,
+        128,
+        128
+      ],
+      "anchor": [
+        64,
+        116
+      ],
+      "bounds": {
+        "x": 44,
+        "y": 57,
+        "width": 37,
+        "height": 59
+      },
+      "sha256": "e21827043e28c0680fe40144980848839fb7509a3693628c985ad9793999fdf5",
+      "sourceCell": [
+        314,
+        0,
+        313,
+        314
+      ],
+      "sourceBounds": {
+        "x": 71,
+        "y": 38,
+        "width": 160,
+        "height": 253
+      }
+    },
+    {
+      "direction": "front",
+      "frame": 2,
+      "crop": [
+        256,
+        0,
+        128,
+        128
+      ],
+      "anchor": [
+        64,
+        116
+      ],
+      "bounds": {
+        "x": 43,
+        "y": 57,
+        "width": 38,
+        "height": 59
+      },
+      "sha256": "d7e1e869601fc9666953391b52d3a4bc1842a5508ea9790a6f9a61b53c004a83",
+      "sourceCell": [
+        627,
+        0,
+        314,
+        314
+      ],
+      "sourceBounds": {
+        "x": 66,
+        "y": 39,
+        "width": 164,
+        "height": 256
+      }
+    },
+    {
+      "direction": "front",
+      "frame": 3,
+      "crop": [
+        384,
+        0,
+        128,
+        128
+      ],
+      "anchor": [
+        64,
+        116
+      ],
+      "bounds": {
+        "x": 43,
+        "y": 57,
+        "width": 38,
+        "height": 59
+      },
+      "sha256": "395d847c97873301c5f715c08ec8c04df6415b2673e91cbaa8a6f9c2e700bc8e",
+      "sourceCell": [
+        941,
+        0,
+        313,
+        314
+      ],
+      "sourceBounds": {
+        "x": 66,
+        "y": 41,
+        "width": 164,
+        "height": 254
+      }
+    },
+    {
+      "direction": "back",
+      "frame": 0,
+      "crop": [
+        0,
+        128,
+        128,
+        128
+      ],
+      "anchor": [
+        64,
+        116
+      ],
+      "bounds": {
+        "x": 48,
+        "y": 57,
+        "width": 36,
+        "height": 59
+      },
+      "sha256": "d448aff492b078a9b5b76da5b35203c1c65bd3f1a2453b6a5547b50e5a1441fb",
+      "sourceCell": [
+        0,
+        314,
+        314,
+        313
+      ],
+      "sourceBounds": {
+        "x": 89,
+        "y": 40,
+        "width": 155,
+        "height": 255
+      }
+    },
+    {
+      "direction": "back",
+      "frame": 1,
+      "crop": [
+        128,
+        128,
+        128,
+        128
+      ],
+      "anchor": [
+        64,
+        116
+      ],
+      "bounds": {
+        "x": 48,
+        "y": 58,
+        "width": 35,
+        "height": 58
+      },
+      "sha256": "da6ea65a5703d07f6f3034fd4f78936103e6bd72d8f3f2660b8b0f670d97fda8",
+      "sourceCell": [
+        314,
+        314,
+        313,
+        313
+      ],
+      "sourceBounds": {
+        "x": 88,
+        "y": 41,
+        "width": 151,
+        "height": 252
+      }
+    },
+    {
+      "direction": "back",
+      "frame": 2,
+      "crop": [
+        256,
+        128,
+        128,
+        128
+      ],
+      "anchor": [
+        64,
+        116
+      ],
+      "bounds": {
+        "x": 47,
+        "y": 57,
+        "width": 35,
+        "height": 59
+      },
+      "sha256": "3113f3828ab413dab35d394c486614e5b94e472a78e20515431c4e650a6de58f",
+      "sourceCell": [
+        627,
+        314,
+        314,
+        313
+      ],
+      "sourceBounds": {
+        "x": 84,
+        "y": 39,
+        "width": 152,
+        "height": 256
+      }
+    },
+    {
+      "direction": "back",
+      "frame": 3,
+      "crop": [
+        384,
+        128,
+        128,
+        128
+      ],
+      "anchor": [
+        64,
+        116
+      ],
+      "bounds": {
+        "x": 46,
+        "y": 57,
+        "width": 36,
+        "height": 59
+      },
+      "sha256": "0d06c9e1d36c046cad3f2c3bb71803b2edb200ed93e9754e04baf8e6de295179",
+      "sourceCell": [
+        941,
+        314,
+        313,
+        313
+      ],
+      "sourceBounds": {
+        "x": 80,
+        "y": 41,
+        "width": 154,
+        "height": 254
+      }
+    },
+    {
+      "direction": "left",
+      "frame": 0,
+      "crop": [
+        0,
+        256,
+        128,
+        128
+      ],
+      "anchor": [
+        64,
+        116
+      ],
+      "bounds": {
+        "x": 43,
+        "y": 56,
+        "width": 39,
+        "height": 60
+      },
+      "sha256": "9e30375054de7215d555157ca22d77c4598442de16e01a227ed1e613f5358dd4",
+      "sourceCell": [
+        0,
+        627,
+        314,
+        314
+      ],
+      "sourceBounds": {
+        "x": 65,
+        "y": 37,
+        "width": 168,
+        "height": 257
+      }
+    },
+    {
+      "direction": "left",
+      "frame": 1,
+      "crop": [
+        128,
+        256,
+        128,
+        128
+      ],
+      "anchor": [
+        64,
+        116
+      ],
+      "bounds": {
+        "x": 43,
+        "y": 56,
+        "width": 33,
+        "height": 60
+      },
+      "sha256": "0817b10ed1be7847af6be83e0d88dd89d8e9b49eb1bcde8d9079490c8156036d",
+      "sourceCell": [
+        314,
+        627,
+        313,
+        314
+      ],
+      "sourceBounds": {
+        "x": 67,
+        "y": 35,
+        "width": 141,
+        "height": 259
+      }
+    },
+    {
+      "direction": "left",
+      "frame": 2,
+      "crop": [
+        256,
+        256,
+        128,
+        128
+      ],
+      "anchor": [
+        64,
+        116
+      ],
+      "bounds": {
+        "x": 41,
+        "y": 56,
+        "width": 38,
+        "height": 60
+      },
+      "sha256": "223f3acea79c58125e7731214cb259a6e3daf856734cb27304faba4c2b500880",
+      "sourceCell": [
+        627,
+        627,
+        314,
+        314
+      ],
+      "sourceBounds": {
+        "x": 58,
+        "y": 36,
+        "width": 165,
+        "height": 258
+      }
+    },
+    {
+      "direction": "left",
+      "frame": 3,
+      "crop": [
+        384,
+        256,
+        128,
+        128
+      ],
+      "anchor": [
+        64,
+        116
+      ],
+      "bounds": {
+        "x": 42,
+        "y": 56,
+        "width": 34,
+        "height": 60
+      },
+      "sha256": "ad242fa64f54f78d20cd30eac1f476ab1ccdedcfbe30c49fff9e3dc05a7d6f8f",
+      "sourceCell": [
+        941,
+        627,
+        313,
+        314
+      ],
+      "sourceBounds": {
+        "x": 60,
+        "y": 36,
+        "width": 148,
+        "height": 258
+      }
+    },
+    {
+      "direction": "right",
+      "frame": 0,
+      "crop": [
+        0,
+        384,
+        128,
+        128
+      ],
+      "anchor": [
+        64,
+        116
+      ],
+      "bounds": {
+        "x": 48,
+        "y": 58,
+        "width": 39,
+        "height": 58
+      },
+      "sha256": "48955148ae2d846b02d428a0d9abff94a5c727fffe555d4ddce9ba3479cbdcb1",
+      "sourceCell": [
+        0,
+        941,
+        314,
+        313
+      ],
+      "sourceBounds": {
+        "x": 86,
+        "y": 36,
+        "width": 169,
+        "height": 249
+      }
+    },
+    {
+      "direction": "right",
+      "frame": 1,
+      "crop": [
+        128,
+        384,
+        128,
+        128
+      ],
+      "anchor": [
+        64,
+        116
+      ],
+      "bounds": {
+        "x": 52,
+        "y": 58,
+        "width": 32,
+        "height": 58
+      },
+      "sha256": "bdbf0831f570512cacc248711976616d2f837ed465e20b82923ccf3dcceeb40d",
+      "sourceCell": [
+        314,
+        941,
+        313,
+        313
+      ],
+      "sourceBounds": {
+        "x": 105,
+        "y": 35,
+        "width": 136,
+        "height": 251
+      }
+    },
+    {
+      "direction": "right",
+      "frame": 2,
+      "crop": [
+        256,
+        384,
+        128,
+        128
+      ],
+      "anchor": [
+        64,
+        116
+      ],
+      "bounds": {
+        "x": 48,
+        "y": 58,
+        "width": 37,
+        "height": 58
+      },
+      "sha256": "88ee5885a268eb71ab0ceec319181a4d0690c488c24747e133365e2fddc6d603",
+      "sourceCell": [
+        627,
+        941,
+        314,
+        313
+      ],
+      "sourceBounds": {
+        "x": 89,
+        "y": 36,
+        "width": 158,
+        "height": 250
+      }
+    },
+    {
+      "direction": "right",
+      "frame": 3,
+      "crop": [
+        384,
+        384,
+        128,
+        128
+      ],
+      "anchor": [
+        64,
+        116
+      ],
+      "bounds": {
+        "x": 51,
+        "y": 58,
+        "width": 32,
+        "height": 58
+      },
+      "sha256": "c49c07e2856fc4017b2a2bd9537b34f79a228d00840c1a91985a5de1bcdec81b",
+      "sourceCell": [
+        941,
+        941,
+        313,
+        313
+      ],
+      "sourceBounds": {
+        "x": 102,
+        "y": 36,
+        "width": 137,
+        "height": 250
+      }
+    }
+  ],
+  "anchor": [
+    64,
+    116
+  ],
+  "anchorMode": "feet",
+  "screenScale": 2,
+  "sharedResampleScale": 0.23166023166023167,
+  "alphaCutoff": 64,
+  "reference": "approved knight style"
+}

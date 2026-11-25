@@ -1,0 +1,127 @@
+{
+  "id": "rockCrack",
+  "name": "rockCrack",
+  "description": "Cracked floor WARNING decal only: dark jagged cracks, transparent between cracks; no triangle, exclamation mark, rubble, floor texture or UI",
+  "group": "hazards",
+  "sourceFrames": 4,
+  "columns": 2,
+  "maxVisible": [
+    30,
+    20
+  ],
+  "cell": 64,
+  "states": "hairline cracks; widening cracks; branching cracks; strongest cracks",
+  "sheet": "items-effects-v1/rockCrack/sheet.png",
+  "anchor": [
+    32,
+    32
+  ],
+  "screenScale": 2,
+  "alphaCutoff": 64,
+  "sharedScale": 0.0635593220338983,
+  "nativeDirection": null,
+  "source": "generated-source.png",
+  "frames": [
+    {
+      "index": 0,
+      "label": "hairline cracks",
+      "empty": false,
+      "file": "frames/0.png",
+      "crop": [
+        0,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 26,
+        "y": 30,
+        "width": 13,
+        "height": 8
+      },
+      "sourceCell": [
+        0,
+        0,
+        631,
+        624
+      ],
+      "sha256": "d4733d407846b9f0e337ae93f5117ef7d5f3e6b1fba249e30a0c38dfe46bee3d"
+    },
+    {
+      "index": 1,
+      "label": "widening cracks",
+      "empty": false,
+      "file": "frames/1.png",
+      "crop": [
+        64,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 22,
+        "y": 28,
+        "width": 18,
+        "height": 11
+      },
+      "sourceCell": [
+        631,
+        0,
+        630,
+        624
+      ],
+      "sha256": "ad628a17ff3d1aa48f6eab37eba20d7abde1dbbaab2fd82aed64278a4ac70055"
+    },
+    {
+      "index": 2,
+      "label": "branching cracks",
+      "empty": false,
+      "file": "frames/2.png",
+      "crop": [
+        128,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 22,
+        "y": 25,
+        "width": 24,
+        "height": 14
+      },
+      "sourceCell": [
+        0,
+        624,
+        631,
+        623
+      ],
+      "sha256": "881d212a1794af793241dd4add358ac5c984aea1633b0d7ecdf69a450c9d885c"
+    },
+    {
+      "index": 3,
+      "label": "strongest cracks",
+      "empty": false,
+      "file": "frames/3.png",
+      "crop": [
+        192,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 20,
+        "y": 23,
+        "width": 25,
+        "height": 17
+      },
+      "sourceCell": [
+        631,
+        624,
+        630,
+        623
+      ],
+      "sha256": "cbdfee04cb6fb9d2b3a0fcd7f9db414f1fee4d0324d07cda1c56ea04e61fa6ce"
+    }
+  ],
+  "scope": "preview only; awaiting review"
+}

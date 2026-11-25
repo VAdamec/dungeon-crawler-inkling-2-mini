@@ -1,0 +1,127 @@
+{
+  "id": "rockSpent",
+  "name": "rockSpent",
+  "description": "Falling rocks impact then settling brown gray rubble and dust, no floor tile",
+  "group": "hazards",
+  "sourceFrames": 4,
+  "columns": 2,
+  "maxVisible": [
+    32,
+    28
+  ],
+  "cell": 64,
+  "states": "impact stone fragments and dust; falling dust over rocks; dust clearing; settled rubble without dust",
+  "sheet": "items-effects-v1/rockSpent/sheet.png",
+  "anchor": [
+    32,
+    32
+  ],
+  "screenScale": 2,
+  "alphaCutoff": 64,
+  "sharedScale": 0.059813084112149535,
+  "nativeDirection": null,
+  "source": "generated-source.png",
+  "frames": [
+    {
+      "index": 0,
+      "label": "impact stone fragments and dust",
+      "empty": false,
+      "file": "frames/0.png",
+      "crop": [
+        0,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 17,
+        "y": 22,
+        "width": 31,
+        "height": 20
+      },
+      "sourceCell": [
+        0,
+        0,
+        887,
+        444
+      ],
+      "sha256": "9c16708d9193aea5f5b7dd462a16299b36cc6c5881180cd1eeebfcb3e150ac86"
+    },
+    {
+      "index": 1,
+      "label": "falling dust over rocks",
+      "empty": false,
+      "file": "frames/1.png",
+      "crop": [
+        64,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 16,
+        "y": 24,
+        "width": 30,
+        "height": 18
+      },
+      "sourceCell": [
+        887,
+        0,
+        887,
+        444
+      ],
+      "sha256": "c02110062947290c4ec66acea17c0ff3c4159333c5c62e7b844d86019c19c7bc"
+    },
+    {
+      "index": 2,
+      "label": "dust clearing",
+      "empty": false,
+      "file": "frames/2.png",
+      "crop": [
+        128,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 19,
+        "y": 31,
+        "width": 26,
+        "height": 11
+      },
+      "sourceCell": [
+        0,
+        444,
+        887,
+        443
+      ],
+      "sha256": "698de7f618d043d169065696a88d78e13ad752298266d5e2907d189ce36b72e7"
+    },
+    {
+      "index": 3,
+      "label": "settled rubble without dust",
+      "empty": false,
+      "file": "frames/3.png",
+      "crop": [
+        192,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 21,
+        "y": 32,
+        "width": 21,
+        "height": 10
+      },
+      "sourceCell": [
+        887,
+        444,
+        887,
+        443
+      ],
+      "sha256": "2e9f09286507543e57eac68cab7d45dfc45c6b8a8d5e8d8f4f05e6fab5374cd6"
+    }
+  ],
+  "scope": "preview only; awaiting review"
+}

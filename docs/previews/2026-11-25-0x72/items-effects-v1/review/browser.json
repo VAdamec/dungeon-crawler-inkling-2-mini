@@ -1,0 +1,23 @@
+{
+  "families": 31,
+  "groups": {
+    "equipment": 6,
+    "loot": 5,
+    "books": 4,
+    "projectiles": 6,
+    "spells": 3,
+    "travel": 1,
+    "hazards": 5,
+    "stairs": 1
+  },
+  "hiddenSpikesPixelIdentical": true,
+  "allFivePhases": true,
+  "playPause": true,
+  "hiddenTabFreeze": true,
+  "protocol": "file://, no relaxed flags",
+  "gameLoaded": false,
+  "overviewExport": true,
+  "dungeonPreview": true,
+  "errors": [],
+  "remote": []
+}

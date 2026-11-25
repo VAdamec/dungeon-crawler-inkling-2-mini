@@ -1,0 +1,30 @@
+{
+  "protocol": "normal file:// Chrome, real key handlers; intervals stopped after launch/audio checks for deterministic fixtures",
+  "headed": true,
+  "checks": {
+    "launchFrozen": true,
+    "soundAfterInteraction": true,
+    "sliders": true,
+    "catAndGate": true,
+    "keyStairsLootPersistence": true,
+    "depthOneAscent": true,
+    "console": true,
+    "corridorCollision": true,
+    "scrolling": true,
+    "gearIconsAndRing": true,
+    "helpOverHealth": true,
+    "storedPotion": true,
+    "retreatExactReturnAndCooldown": true,
+    "visibility": {
+      "frozen": true,
+      "resumeTimestampReset": true,
+      "nativeBackgroundObserved": false,
+      "nativeAttempt": "native minimized window",
+      "handlerFixture": "explicit document.hidden + real visibilitychange handler; not a native-tab claim"
+    },
+    "mobileHelp": true,
+    "restartWithoutLaunch": true
+  },
+  "errors": [],
+  "remote": []
+}

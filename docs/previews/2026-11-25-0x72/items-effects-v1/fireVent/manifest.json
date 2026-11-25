@@ -1,0 +1,127 @@
+{
+  "id": "fireVent",
+  "name": "fireVent",
+  "description": "Square dark iron floor fire vent grate, fire vertically rising from it; consistent same grate in each cell",
+  "group": "hazards",
+  "sourceFrames": 4,
+  "columns": 2,
+  "maxVisible": [
+    30,
+    32
+  ],
+  "cell": 64,
+  "states": "inactive grate without fire; ignition small flames; tall active flames; cooling embers without tall fire",
+  "sheet": "items-effects-v1/fireVent/sheet.png",
+  "anchor": [
+    32,
+    32
+  ],
+  "screenScale": 2,
+  "alphaCutoff": 64,
+  "sharedScale": 0.0761904761904762,
+  "nativeDirection": null,
+  "source": "generated-source.png",
+  "frames": [
+    {
+      "index": 0,
+      "label": "inactive grate without fire",
+      "empty": false,
+      "file": "frames/0.png",
+      "crop": [
+        0,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 24,
+        "y": 32,
+        "width": 21,
+        "height": 15
+      },
+      "sourceCell": [
+        0,
+        0,
+        637,
+        618
+      ],
+      "sha256": "e78b94d9abe1dcc12e4d74c82dbe84a3fa6023776bff5835a45a18e1da84db6c"
+    },
+    {
+      "index": 1,
+      "label": "ignition small flames",
+      "empty": false,
+      "file": "frames/1.png",
+      "crop": [
+        64,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 19,
+        "y": 28,
+        "width": 21,
+        "height": 19
+      },
+      "sourceCell": [
+        637,
+        0,
+        637,
+        618
+      ],
+      "sha256": "cea7604eaee735ebf347b0ac83d64a75c0b9e103c1049f04829dd6c4db5fab1f"
+    },
+    {
+      "index": 2,
+      "label": "tall active flames",
+      "empty": false,
+      "file": "frames/2.png",
+      "crop": [
+        128,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 24,
+        "y": 16,
+        "width": 21,
+        "height": 32
+      },
+      "sourceCell": [
+        0,
+        618,
+        637,
+        617
+      ],
+      "sha256": "011eb77439e6cb6cf23e0b93cea414809b2527b02ae05a0bfb73aefd01faecc3"
+    },
+    {
+      "index": 3,
+      "label": "cooling embers without tall fire",
+      "empty": false,
+      "file": "frames/3.png",
+      "crop": [
+        192,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 19,
+        "y": 26,
+        "width": 21,
+        "height": 22
+      },
+      "sourceCell": [
+        637,
+        618,
+        637,
+        617
+      ],
+      "sha256": "aaa92100a1ef9d4552137977d6fa8dd82f114269cf97597fda7f1b70bcca211c"
+    }
+  ],
+  "scope": "preview only; awaiting review"
+}

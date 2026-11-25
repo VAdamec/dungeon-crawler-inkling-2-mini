@@ -1,0 +1,28 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>0x72 named tiles</title>
+<style>
+body{background:#191512;color:#e8dcc4;font:11px monospace;margin:16px}
+h1{font:18px Georgia,serif;color:#e8c68d}h2{font:16px Georgia,serif;color:#d8b981;margin:18px 0 8px}
+.row{display:flex;gap:8px;flex-wrap:wrap}.tile{padding:4px;border:1px solid #5b4636;background:#120f0d;width:112px}
+canvas{image-rendering:pixelated;display:block;margin:auto}.lab{margin-top:3px;color:#d6bd91;text-align:center;font-size:9px;line-height:1.2;word-break:break-word}
+</style></head><body>
+<h1>0x72 named wall/floor/prop crops</h1><p>Actual 16px crops from the full atlas, 6x nearest neighbor.</p><div id="out"></div>
+<script>
+(async()=>{
+ const rows=(await (await fetch('assets/tile_list_v1.7')).text()).trim().split(/\n/).map(l=>{const [name,x,y,w,h]=l.trim().split(/\s+/);return{name,x:+x,y:+y,w:+w,h:+h}});
+ const im=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src='assets/atlas.png'});
+ const groups={
+  'Wall blocks':rows.filter(t=>/^wall_(top|mid|left|right|outer|edge)/.test(t.name)),
+  'Doors / columns':rows.filter(t=>/^(doors_|column)/.test(t.name)),
+  'Floors/stairs/hazards':rows.filter(t=>/^(floor_|hole|edge_down)/.test(t.name)),
+  'Props':rows.filter(t=>/^(crate|skull|wall_banner|wall_hole|wall_goo)/.test(t.name)),
+ };
+ const out=document.getElementById('out');
+ for(const [g,items] of Object.entries(groups)){
+  const h=document.createElement('h2');h.textContent=g;out.append(h);
+  const row=document.createElement('div');row.className='row';
+  for(const t of items){const d=document.createElement('div');d.className='tile';const cv=document.createElement('canvas');cv.width=t.w*6;cv.height=t.h*6;const c=cv.getContext('2d');c.imageSmoothingEnabled=false;c.drawImage(im,t.x,t.y,t.w,t.h,0,0,cv.width,cv.height);const l=document.createElement('div');l.className='lab';l.textContent=t.name;d.append(cv,l);row.append(d)}
+  out.append(row);
+ }
+})();
+</script></body></html>

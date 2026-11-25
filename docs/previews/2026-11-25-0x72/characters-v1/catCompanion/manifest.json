@@ -1,0 +1,571 @@
+{
+  "id": "catCompanion",
+  "name": "Marmalade",
+  "group": "companion",
+  "w": 40,
+  "h": 28,
+  "desc": "User-selected charcoal-gray cat with pale yellow-green eyes, upright curled tail, brown leather crossing harness and travel satchel, per the separate cat reference.",
+  "motion": "quadruped walking",
+  "scope": "standalone preview only",
+  "generator": "Built-in image_gen; prompt.md retains exact request",
+  "sourceSHA256": "afbd9a9b300381f8d5981aedfe7ae28226eb72955e4232dd18f1fdc7c7a2910b",
+  "sourceSize": [
+    1254,
+    1254
+  ],
+  "sheet": "characters-v1/catCompanion/walk-sheet.png",
+  "sheetSize": [
+    256,
+    256
+  ],
+  "cellSize": [
+    64,
+    64
+  ],
+  "directions": [
+    "front",
+    "back",
+    "left",
+    "right"
+  ],
+  "framesPerDirection": 4,
+  "frames": [
+    {
+      "direction": "front",
+      "frame": 0,
+      "crop": [
+        0,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "bounds": {
+        "x": 26,
+        "y": 28,
+        "width": 15,
+        "height": 28
+      },
+      "sha256": "093ff22d5367ea39bdcc45f1a182e5c3d08e9ff36dbf34c80b560ca5a7a4967c",
+      "sourceCell": [
+        0,
+        0,
+        314,
+        314
+      ],
+      "sourceBounds": {
+        "x": 98,
+        "y": 28,
+        "width": 145,
+        "height": 271
+      }
+    },
+    {
+      "direction": "front",
+      "frame": 1,
+      "crop": [
+        64,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "bounds": {
+        "x": 25,
+        "y": 28,
+        "width": 15,
+        "height": 28
+      },
+      "sha256": "e8827688ef045a4bc136ea994ca270d04606e7ac78f6c458659a901ad11c5459",
+      "sourceCell": [
+        314,
+        0,
+        313,
+        314
+      ],
+      "sourceBounds": {
+        "x": 92,
+        "y": 21,
+        "width": 143,
+        "height": 272
+      }
+    },
+    {
+      "direction": "front",
+      "frame": 2,
+      "crop": [
+        128,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "bounds": {
+        "x": 25,
+        "y": 28,
+        "width": 15,
+        "height": 28
+      },
+      "sha256": "5e0dc52613f1a6a707b9b2442156252be0b7c5efb70eb1b15782e700970690c4",
+      "sourceCell": [
+        627,
+        0,
+        314,
+        314
+      ],
+      "sourceBounds": {
+        "x": 91,
+        "y": 24,
+        "width": 143,
+        "height": 274
+      }
+    },
+    {
+      "direction": "front",
+      "frame": 3,
+      "crop": [
+        192,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "bounds": {
+        "x": 25,
+        "y": 28,
+        "width": 15,
+        "height": 28
+      },
+      "sha256": "ed413a7230b3a119e232015ffcf55c0adc8bee0e8f7f96a708383a6014d133da",
+      "sourceCell": [
+        941,
+        0,
+        313,
+        314
+      ],
+      "sourceBounds": {
+        "x": 88,
+        "y": 24,
+        "width": 142,
+        "height": 274
+      }
+    },
+    {
+      "direction": "back",
+      "frame": 0,
+      "crop": [
+        0,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "bounds": {
+        "x": 25,
+        "y": 30,
+        "width": 16,
+        "height": 26
+      },
+      "sha256": "d42bcaf45d501983abe25eb1bfa762cd51d412609c73e39b21fd71cb78f421ac",
+      "sourceCell": [
+        0,
+        314,
+        314,
+        313
+      ],
+      "sourceBounds": {
+        "x": 93,
+        "y": 36,
+        "width": 149,
+        "height": 254
+      }
+    },
+    {
+      "direction": "back",
+      "frame": 1,
+      "crop": [
+        64,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "bounds": {
+        "x": 25,
+        "y": 31,
+        "width": 15,
+        "height": 25
+      },
+      "sha256": "e3f3a3644399f3e0f362c566955935209b89bfc19364b0c49bc99ece7663c95b",
+      "sourceCell": [
+        314,
+        314,
+        313,
+        313
+      ],
+      "sourceBounds": {
+        "x": 87,
+        "y": 33,
+        "width": 148,
+        "height": 247
+      }
+    },
+    {
+      "direction": "back",
+      "frame": 2,
+      "crop": [
+        128,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "bounds": {
+        "x": 25,
+        "y": 30,
+        "width": 15,
+        "height": 26
+      },
+      "sha256": "1c1d9b545a90e5e00671435845b0b76d62eaf808b08f211ad164529a4a599a65",
+      "sourceCell": [
+        627,
+        314,
+        314,
+        313
+      ],
+      "sourceBounds": {
+        "x": 84,
+        "y": 36,
+        "width": 147,
+        "height": 255
+      }
+    },
+    {
+      "direction": "back",
+      "frame": 3,
+      "crop": [
+        192,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "bounds": {
+        "x": 24,
+        "y": 30,
+        "width": 15,
+        "height": 26
+      },
+      "sha256": "c86924f8779eb18af5593c07a31dea072863d07d3aea85cf6a3d0292d9df5b32",
+      "sourceCell": [
+        941,
+        314,
+        313,
+        313
+      ],
+      "sourceBounds": {
+        "x": 79,
+        "y": 33,
+        "width": 148,
+        "height": 259
+      }
+    },
+    {
+      "direction": "left",
+      "frame": 0,
+      "crop": [
+        0,
+        128,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "bounds": {
+        "x": 20,
+        "y": 32,
+        "width": 25,
+        "height": 24
+      },
+      "sha256": "74a19ac314b66719831e8931ff82f506d5df0258c1217a97524ff8c06d916fe3",
+      "sourceCell": [
+        0,
+        627,
+        314,
+        314
+      ],
+      "sourceBounds": {
+        "x": 39,
+        "y": 35,
+        "width": 244,
+        "height": 235
+      }
+    },
+    {
+      "direction": "left",
+      "frame": 1,
+      "crop": [
+        64,
+        128,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "bounds": {
+        "x": 19,
+        "y": 32,
+        "width": 26,
+        "height": 24
+      },
+      "sha256": "473c21a8d35f289582584bb470eae009b8b9f9b07496c0dc991032d24982e9b9",
+      "sourceCell": [
+        314,
+        627,
+        313,
+        314
+      ],
+      "sourceBounds": {
+        "x": 33,
+        "y": 39,
+        "width": 246,
+        "height": 233
+      }
+    },
+    {
+      "direction": "left",
+      "frame": 2,
+      "crop": [
+        128,
+        128,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "bounds": {
+        "x": 19,
+        "y": 32,
+        "width": 25,
+        "height": 24
+      },
+      "sha256": "002be5041684f28a1f39e4c20c41bb4c6c27037aab215583c1490c4ed9e216a0",
+      "sourceCell": [
+        627,
+        627,
+        314,
+        314
+      ],
+      "sourceBounds": {
+        "x": 28,
+        "y": 37,
+        "width": 249,
+        "height": 236
+      }
+    },
+    {
+      "direction": "left",
+      "frame": 3,
+      "crop": [
+        192,
+        128,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "bounds": {
+        "x": 18,
+        "y": 32,
+        "width": 26,
+        "height": 24
+      },
+      "sha256": "e959527333c56954486310e922e3f2ec25303577f9e50b366dba1389fdea240e",
+      "sourceCell": [
+        941,
+        627,
+        313,
+        314
+      ],
+      "sourceBounds": {
+        "x": 23,
+        "y": 40,
+        "width": 253,
+        "height": 234
+      }
+    },
+    {
+      "direction": "right",
+      "frame": 0,
+      "crop": [
+        0,
+        192,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "bounds": {
+        "x": 20,
+        "y": 32,
+        "width": 25,
+        "height": 24
+      },
+      "sha256": "0238e158915418d27a81ac66028d983e8ef9f94246bf00d208288b09c3068b80",
+      "sourceCell": [
+        0,
+        941,
+        314,
+        313
+      ],
+      "sourceBounds": {
+        "x": 44,
+        "y": 37,
+        "width": 241,
+        "height": 235
+      }
+    },
+    {
+      "direction": "right",
+      "frame": 1,
+      "crop": [
+        64,
+        192,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "bounds": {
+        "x": 20,
+        "y": 32,
+        "width": 25,
+        "height": 24
+      },
+      "sha256": "80fed307d9329ad74f5bb22331a61e39bbc6d0d5fe8c8646e90bcb5bb8d91e15",
+      "sourceCell": [
+        314,
+        941,
+        313,
+        313
+      ],
+      "sourceBounds": {
+        "x": 38,
+        "y": 37,
+        "width": 244,
+        "height": 235
+      }
+    },
+    {
+      "direction": "right",
+      "frame": 2,
+      "crop": [
+        128,
+        192,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "bounds": {
+        "x": 19,
+        "y": 32,
+        "width": 26,
+        "height": 24
+      },
+      "sha256": "b9a92f1e0dda052cd5209d3eb79807850d82afde1fabeb645afad5e68b6b9c0a",
+      "sourceCell": [
+        627,
+        941,
+        314,
+        313
+      ],
+      "sourceBounds": {
+        "x": 31,
+        "y": 36,
+        "width": 252,
+        "height": 236
+      }
+    },
+    {
+      "direction": "right",
+      "frame": 3,
+      "crop": [
+        192,
+        192,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "bounds": {
+        "x": 19,
+        "y": 32,
+        "width": 26,
+        "height": 24
+      },
+      "sha256": "3aae90ffc1d367bea50da12a2a991c740b3ae4b02aadbdeba7b6be4a7b889680",
+      "sourceCell": [
+        941,
+        941,
+        313,
+        313
+      ],
+      "sourceBounds": {
+        "x": 31,
+        "y": 39,
+        "width": 250,
+        "height": 230
+      }
+    }
+  ],
+  "anchor": [
+    32,
+    56
+  ],
+  "anchorMode": "feet",
+  "screenScale": 2,
+  "sharedResampleScale": 0.10218978102189781,
+  "alphaCutoff": 64,
+  "reference": "user-marmalade-reference.png"
+}

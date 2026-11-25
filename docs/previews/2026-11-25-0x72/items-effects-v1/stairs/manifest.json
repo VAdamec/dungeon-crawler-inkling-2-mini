@@ -1,0 +1,127 @@
+{
+  "id": "stairs",
+  "name": "stairs",
+  "description": "Clear gray stone staircase in a square dungeon opening. Steps must read as stairs, never a person, knight, ladder or platform",
+  "group": "stairs",
+  "sourceFrames": 4,
+  "columns": 2,
+  "maxVisible": [
+    32,
+    32
+  ],
+  "cell": 64,
+  "states": "ascending stairs climbing away upward; descending stairs receding downward into dark opening; ascending stairs same as first; descending stairs same as second",
+  "sheet": "items-effects-v1/stairs/sheet.png",
+  "anchor": [
+    32,
+    32
+  ],
+  "screenScale": 2,
+  "alphaCutoff": 64,
+  "sharedScale": 0.06926406926406926,
+  "nativeDirection": null,
+  "source": "generated-source.png",
+  "frames": [
+    {
+      "index": 0,
+      "label": "ascending stairs climbing away upward",
+      "empty": false,
+      "file": "frames/0.png",
+      "crop": [
+        0,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 20,
+        "y": 19,
+        "width": 28,
+        "height": 29
+      },
+      "sourceCell": [
+        0,
+        0,
+        631,
+        623
+      ],
+      "sha256": "e00fd23d0abcdccd26233f8c2d1f2842ad87a9b3f826aade529916408756f4ba"
+    },
+    {
+      "index": 1,
+      "label": "descending stairs receding downward into dark opening",
+      "empty": false,
+      "file": "frames/1.png",
+      "crop": [
+        64,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 16,
+        "y": 19,
+        "width": 28,
+        "height": 29
+      },
+      "sourceCell": [
+        631,
+        0,
+        631,
+        623
+      ],
+      "sha256": "619a63100b650da5b8383529ef2a50fc6859c5e3122c7433f4ca242ec6dfdb6a"
+    },
+    {
+      "index": 2,
+      "label": "ascending stairs same as first",
+      "empty": false,
+      "file": "frames/2.png",
+      "crop": [
+        128,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 20,
+        "y": 16,
+        "width": 28,
+        "height": 29
+      },
+      "sourceCell": [
+        0,
+        623,
+        631,
+        623
+      ],
+      "sha256": "fc5defe9264f0b33f8569bd4d2ef238b5790f1ef140450c7c96eb70a21942348"
+    },
+    {
+      "index": 3,
+      "label": "descending stairs same as second",
+      "empty": false,
+      "file": "frames/3.png",
+      "crop": [
+        192,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 16,
+        "y": 16,
+        "width": 28,
+        "height": 29
+      },
+      "sourceCell": [
+        631,
+        623,
+        631,
+        623
+      ],
+      "sha256": "f66516910e4971a9f0e83d470cce25091bfe24749f32577f60e15abc1fc0a340"
+    }
+  ],
+  "scope": "preview only; awaiting review"
+}

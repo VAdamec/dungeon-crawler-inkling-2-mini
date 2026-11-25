@@ -1,0 +1,49 @@
+{
+  "id": "store",
+  "kind": "sprite",
+  "group": "town",
+  "maxVisible": [
+    160,
+    160
+  ],
+  "columns": 1,
+  "parts": [
+    "sprite"
+  ],
+  "file": "environment-v1/store/atlas.png",
+  "size": [
+    176,
+    176
+  ],
+  "records": [
+    {
+      "name": "sprite",
+      "crop": [
+        0,
+        0,
+        176,
+        176
+      ],
+      "bounds": {
+        "x": 17,
+        "y": 8,
+        "width": 142,
+        "height": 160
+      },
+      "anchor": [
+        88,
+        168
+      ],
+      "sourceBounds": {
+        "x": 172,
+        "y": 89,
+        "width": 911,
+        "height": 1027
+      },
+      "scale": 0.15579357351509251
+    }
+  ],
+  "sha256": "6fd9b07521bc9c9fe7aed2868fa5f41a95905aa8e276b2b1b994aaac6f90f364",
+  "sourceSHA256": "a5c15cae4d1a9181d4fefacaea662d27a0377d184a62753c8572712ef9842811",
+  "scope": "standalone review; runtime unchanged"
+}

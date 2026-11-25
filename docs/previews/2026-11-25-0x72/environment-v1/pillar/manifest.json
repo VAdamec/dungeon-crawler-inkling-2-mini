@@ -1,0 +1,49 @@
+{
+  "id": "pillar",
+  "kind": "sprite",
+  "group": "throne",
+  "maxVisible": [
+    30,
+    54
+  ],
+  "columns": 1,
+  "parts": [
+    "sprite"
+  ],
+  "file": "environment-v1/pillar/atlas.png",
+  "size": [
+    46,
+    70
+  ],
+  "records": [
+    {
+      "name": "sprite",
+      "crop": [
+        0,
+        0,
+        46,
+        70
+      ],
+      "bounds": {
+        "x": 14,
+        "y": 8,
+        "width": 18,
+        "height": 54
+      },
+      "anchor": [
+        23,
+        62
+      ],
+      "sourceBounds": {
+        "x": 445,
+        "y": 75,
+        "width": 364,
+        "height": 1095
+      },
+      "scale": 0.049315068493150684
+    }
+  ],
+  "sha256": "c27a9b5c571a485d81e2e0d3907bc0c6d919c73770e57c1966c674865480e6a3",
+  "sourceSHA256": "cccbac9048dbe138e9b7e193e8561fe3e64444813490c24de37c9987796ab5f3",
+  "scope": "standalone review; runtime unchanged"
+}

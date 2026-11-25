@@ -1,0 +1,227 @@
+[
+  {
+    "id": "goblin",
+    "name": "Goblin",
+    "group": "monster",
+    "w": 32,
+    "h": 36,
+    "desc": "SMALL GREEN GOBLIN from the supplied monster sheet: pointy ears, sly tusked face, brown ragged leather tunic, short silver knife. Smaller and leaner than the orc.",
+    "motion": "walking"
+  },
+  {
+    "id": "orc",
+    "name": "Orc",
+    "group": "monster",
+    "w": 48,
+    "h": 48,
+    "desc": "GREEN ORC from the supplied monster sheet: broad muscular green body, huge lower tusks, spiked brown leather shoulder guards, diagonal leather chest strap, brown belt/loincloth and boots, a heavy single-bladed silver axe. Keep his squat strong silhouette, not a goblin.",
+    "motion": "heavy walking"
+  },
+  {
+    "id": "slime",
+    "name": "Slime / blob",
+    "group": "monster",
+    "w": 40,
+    "h": 24,
+    "desc": "PALE BLUE-GRAY BLOB from the supplied sheet: translucent-looking icy blue rounded gelatinous mound, two tiny dark friendly eyes, dark inner core and bright cyan edge highlights. No limbs, weapons, clothes or snail shell.",
+    "motion": "squash-and-stretch hopping, four genuinely different compression/extension phases, never add legs"
+  },
+  {
+    "id": "bat",
+    "name": "Bat",
+    "group": "monster",
+    "w": 48,
+    "h": 28,
+    "desc": "Small charcoal-brown dungeon bat with big pointed ears, tiny red eyes and two leathery muted purple-brown wings. Compact furry body, not a dragon or humanoid.",
+    "motion": "flying wingbeat: wings raised, spread, lowered, recovering; keep body center steady"
+  },
+  {
+    "id": "skeleton",
+    "name": "Skeleton",
+    "group": "monster",
+    "w": 32,
+    "h": 44,
+    "desc": "Ordinary ivory-bone skeleton warrior, dark eye sockets, small cracked steel helmet, brown worn belt, short rusty sword and a small battered round shield. Thin exposed ribs and leg bones, clearly ordinary and smaller than a king.",
+    "motion": "walking"
+  },
+  {
+    "id": "wasp",
+    "name": "Wasp",
+    "group": "monster",
+    "w": 40,
+    "h": 32,
+    "desc": "Giant fantasy wasp with amber yellow and charcoal stripes, dark head, two antennae, four translucent pale-blue insect wings, six small jointed legs and a prominent pointed abdomen stinger. Recognizable insect, no humanoid clothes.",
+    "motion": "hovering wingbeat: raised, spread, downstroke, recovery, legs tucked; stable body center"
+  },
+  {
+    "id": "mage",
+    "name": "Mage",
+    "group": "monster",
+    "w": 32,
+    "h": 46,
+    "desc": "Hostile ordinary human mage in deep cobalt-blue hooded robes and brown belt/boots, silver-trim hood with a shaded human face and small wooden staff topped with a blue crystal. No crown, not the dark wizard boss. No surrounding magic glow.",
+    "motion": "walking with visible alternating boots and moving robe hem"
+  },
+  {
+    "id": "healer",
+    "name": "Healer",
+    "group": "monster",
+    "w": 32,
+    "h": 46,
+    "desc": "Ordinary human healer in ivory/cream and sage-green hooded robes, brown belt and boots, small green crystal-tipped staff and a leather medicine satchel. Face visible, calm expression, clearly distinct from the blue mage. No giant glow.",
+    "motion": "walking with visible alternating boots and robe hem"
+  },
+  {
+    "id": "mimic",
+    "name": "Mimic",
+    "group": "boss",
+    "w": 96,
+    "h": 66,
+    "desc": "MIMIC from the separate supplied chest reference: curved-lid dark brown wooden treasure chest with thick gold/brass bands and a central keyhole; hidden single eye in the lid, huge ivory teeth around the opening, long fleshy tongue and small clawed arms/legs. Preserve the same chest body across all states.",
+    "motion": "reveal/hop: column 1 convincingly closed innocent chest, column 2 lid slightly open with eye peeking, column 3 open toothed mouth with tongue, column 4 clawed-limb stepping/hopping open-mouth pose. The rear views show chest back, not a front face pasted on its back"
+  },
+  {
+    "id": "hydra",
+    "name": "Hydra",
+    "group": "boss",
+    "w": 108,
+    "h": 96,
+    "desc": "Large swamp-green THREE-HEADED hydra boss with exactly three long serpent necks/heads, a bulky scaled quadruped body, four clawed legs, long tail and gold-olive belly. Three heads recognizable in each view, no wings. More massive than the knight, not three separate monsters.",
+    "motion": "ponderous four-legged walking with three necks swaying and alternating feet"
+  },
+  {
+    "id": "boar",
+    "name": "Wild Boar",
+    "group": "boss",
+    "w": 108,
+    "h": 72,
+    "desc": "WILD BOAR from the supplied sheet: large stocky brown boar with coarse russet mane, bristly darker spine, heavy low snout, two curved ivory tusks, four sturdy black-hoofed legs, tiny curled tail and fierce eyes. Natural quadruped, no saddle or armor.",
+    "motion": "four-legged walking/trotting, alternate diagonal leg pairs; do not duplicate standing poses"
+  },
+  {
+    "id": "medusa",
+    "name": "Medusa",
+    "group": "boss",
+    "w": 96,
+    "h": 96,
+    "desc": "Medusa boss: adult woman with olive/gray-green skin, a crown of visible green snakes for hair, purple and aged-gold fitted upper tunic/armor, long green serpent lower body and curling tail instead of legs, and a modest curved gold bow. Recognizable snake-haired gorgon, no wings or crown.",
+    "motion": "four flowing slither phases with tail S-curve changing and snake hair swaying; never add human legs"
+  },
+  {
+    "id": "darkWizard",
+    "name": "Dark Wizard",
+    "group": "boss",
+    "w": 96,
+    "h": 96,
+    "desc": "Dark Wizard boss: imposing elderly human sorcerer in blackened-violet layered robes with silver trim, deep hood, pale bearded face, dark boots and a tall gnarled staff with an amethyst orb. More elaborate and larger than ordinary mage, no crown or giant aura.",
+    "motion": "slow walking with alternating boots, robe hem and staff movement"
+  },
+  {
+    "id": "skeletonKing",
+    "name": "Skeleton King",
+    "group": "boss",
+    "w": 96,
+    "h": 108,
+    "desc": "Skeleton King boss: tall imposing ivory-bone monarch with a gold jagged crown, exposed ribcage, tarnished steel armor, rich dark crimson royal cape, black-gold belt, a long engraved bone/steel sword and weathered royal shield. Crown and royal silhouette visible from all directions. No throne or floor.",
+    "motion": "regal heavy walking, alternating leg bones and boots, cape following each step"
+  },
+  {
+    "id": "dragonBoss",
+    "name": "Dragon",
+    "group": "boss",
+    "w": 120,
+    "h": 108,
+    "desc": "RED AND GREEN DRAGON from the supplied sheet: large red-scaled western dragon with emerald-green segmented belly and wing membranes, two swept ivory horns, red spines, long red tail, four clawed legs and two distinct large wings. Preserve red/green identity and long angular muzzle. No rider and no baked-in flame or smoke.",
+    "motion": "four-legged walking with restrained wing flex/wingbeats and tail counter-sway, four unique phases. Four legs PLUS two wings; full wings and tail never clipped"
+  },
+  {
+    "id": "cook",
+    "name": "Cook",
+    "group": "boss",
+    "w": 64,
+    "h": 66,
+    "desc": "The Cook, a large green ORC CHEF boss related to the reference orc: muscular green tusked orc, tall white chef toque, stained cream apron over brown leather clothing and boots, heavy broad kitchen cleaver and an iron frying pan. Strong readable comedic cook identity, no kitchen background.",
+    "motion": "heavy walking with alternating boots and subtle cleaver/pan swing"
+  },
+  {
+    "id": "bartender",
+    "name": "Bartender",
+    "group": "boss",
+    "w": 56,
+    "h": 60,
+    "desc": "The Bartender, an ivory SKELETON PUBKEEPER boss: grinning skull, rolled ivory shirt sleeves, brown waistcoat, burgundy bow tie, dark trousers and boots, holding a small wooden ale tankard with a pale foam top. Bone hands, visible skull and bony legs; no bar counter.",
+    "motion": "walking, alternating boots and careful tankard swing; no spilling particle effects"
+  },
+  {
+    "id": "merchant",
+    "name": "Merchant",
+    "group": "npc",
+    "w": 36,
+    "h": 44,
+    "desc": "Friendly middle-aged human merchant with short brown beard, muted teal hood and brown leather jerkin, cream shirt, dark trousers/boots, a large leather coin pouch at belt and small rolled goods pack. Recognizable shopkeeper, no staff, weapon, stall or background.",
+    "motion": "walking"
+  },
+  {
+    "id": "prisoner",
+    "name": "Prisoner",
+    "group": "npc",
+    "w": 30,
+    "h": 44,
+    "desc": "Rescuable adult human prisoner in worn gray-beige tunic and dark ragged trousers, scuffed brown shoes, short untidy dark hair and tired face; small loose broken iron wrist manacles attached to sleeves, hands free enough to walk. No cage, shackles attached to floor, weapons or background.",
+    "motion": "cautious walking with alternating feet; whole body visible"
+  },
+  {
+    "id": "princess",
+    "name": "Princess",
+    "group": "npc",
+    "w": 32,
+    "h": 48,
+    "desc": "Adult princess with long golden-blonde hair, small gold circlet/tiara, dusty rose and plum medieval dress with gold belt and trim, brown delicate shoes just visible under walking skirt. Warm confident face. No staff, weapons, hearts, prince or dragon included.",
+    "motion": "walking/running-ready four-step loop, skirt and hair swaying with alternate feet; no single static gown repeated"
+  },
+  {
+    "id": "villager",
+    "name": "Villager",
+    "group": "npc",
+    "w": 32,
+    "h": 44,
+    "desc": "Friendly adult human villager with chestnut hair, short green tunic over cream shirt, brown belt/trousers and boots, simple brown shoulder bag. Clear ordinary noncombatant, no armor, weapons, staff or hat resembling a wizard.",
+    "motion": "walking"
+  },
+  {
+    "id": "catCompanion",
+    "name": "Marmalade",
+    "group": "companion",
+    "w": 40,
+    "h": 28,
+    "desc": "User-selected charcoal-gray cat with pale yellow-green eyes, upright curled tail, brown leather crossing harness and travel satchel, per the separate cat reference.",
+    "motion": "quadruped walking"
+  },
+  {
+    "id": "cat",
+    "name": "Town cat",
+    "group": "animal",
+    "w": 28,
+    "h": 20,
+    "desc": "Small orange tabby street cat with striped ginger fur, cream muzzle/chest and green eyes, long tail. Natural four-legged cat, no satchel/harness/collar, distinguish from charcoal adventurer Marmalade.",
+    "motion": "quadruped walking with alternating paws and tail sway"
+  },
+  {
+    "id": "dog",
+    "name": "Pip / town dog",
+    "group": "animal",
+    "w": 38,
+    "h": 28,
+    "desc": "Friendly small scruffy brown-and-cream terrier dog, floppy triangular ears, bright dark eyes, black nose, short upright tail and a simple red-brown leather collar. Natural quadruped, no armor or bag.",
+    "motion": "four-legged walking/trotting with diagonal paw pairs"
+  },
+  {
+    "id": "chicken",
+    "name": "Chicken",
+    "group": "animal",
+    "w": 24,
+    "h": 26,
+    "desc": "Small plump white-and-tan farm chicken, red comb/wattle, yellow beak and two thin yellow-orange legs, short brown tail feathers. No clothes, no arms, not a duck.",
+    "motion": "walking with alternating bird feet and gentle head bob"
+  }
+]

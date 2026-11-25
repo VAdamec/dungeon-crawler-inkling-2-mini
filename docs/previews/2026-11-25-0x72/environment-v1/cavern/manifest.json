@@ -1,0 +1,86 @@
+{
+  "id": "cavern",
+  "kind": "material",
+  "group": "biome",
+  "maxVisible": [
+    32,
+    32
+  ],
+  "columns": 2,
+  "parts": [
+    "floor",
+    "top",
+    "face",
+    "accent"
+  ],
+  "file": "environment-v1/cavern/atlas.png",
+  "size": [
+    64,
+    64
+  ],
+  "records": [
+    {
+      "name": "floor",
+      "crop": [
+        0,
+        0,
+        32,
+        32
+      ],
+      "sourceCell": [
+        0,
+        0,
+        627,
+        627
+      ]
+    },
+    {
+      "name": "top",
+      "crop": [
+        32,
+        0,
+        32,
+        32
+      ],
+      "sourceCell": [
+        627,
+        0,
+        627,
+        627
+      ]
+    },
+    {
+      "name": "face",
+      "crop": [
+        0,
+        32,
+        32,
+        32
+      ],
+      "sourceCell": [
+        0,
+        627,
+        627,
+        627
+      ]
+    },
+    {
+      "name": "accent",
+      "crop": [
+        32,
+        32,
+        32,
+        32
+      ],
+      "sourceCell": [
+        627,
+        627,
+        627,
+        627
+      ]
+    }
+  ],
+  "sha256": "3173e20f6bfab88c289f56f18b97665ad1189a1d0022df60de6f52e85850424c",
+  "sourceSHA256": "74661e11f2d1188132983c033243a189a1b5ed192346ceeceb3381ecf43c4f4a",
+  "scope": "standalone review; runtime unchanged"
+}

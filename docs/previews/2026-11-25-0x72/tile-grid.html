@@ -1,0 +1,24 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>0x72 tile grid</title>
+<style>
+body{background:#191512;color:#e8dcc4;font:11px monospace;margin:16px}
+h1{font:18px Georgia,serif;color:#e8c68d}
+.row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}.tile{padding:4px;border:1px solid #5b4636;background:#120f0d}
+canvas{image-rendering:pixelated;display:block}.lab{margin-top:3px;color:#d6bd91;text-align:center}
+</style></head><body>
+<h1>0x72 low-wall and floor atlas tiles</h1>
+<div id="out"></div>
+<script>
+(async()=>{
+ async function load(src){return await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=src})}
+ const out=document.getElementById('out');
+ async function sheet(name,src,scale){
+   const im=await load(src); const h=document.createElement('h2');h.textContent=`${name} ${im.width}x${im.height}`;out.append(h);
+   for(let y=0;y<im.height;y+=16){const row=document.createElement('div');row.className='row';
+     for(let x=0;x<im.width;x+=16){const d=document.createElement('div');d.className='tile';const cv=document.createElement('canvas');cv.width=16*scale;cv.height=16*scale;const c=cv.getContext('2d');c.imageSmoothingEnabled=false;c.drawImage(im,x,y,16,16,0,0,cv.width,cv.height);const l=document.createElement('div');l.className='lab';l.textContent=`${x},${y}`;d.append(cv,l);row.append(d)}
+     out.append(row)}
+ }
+ await sheet('low walls','assets/walls-low.png',7);
+ await sheet('floors','assets/floors.png',7);
+})();
+</script></body></html>

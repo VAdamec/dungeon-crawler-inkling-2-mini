@@ -1,0 +1,40 @@
+{
+  "protocol": "normal Chrome file://; no relaxed flags",
+  "secrecy": {
+    "hiddenSpikes": true,
+    "armedRocks": true,
+    "unknownLoot": true,
+    "minimapSecret": true
+  },
+  "transitions": {
+    "spikesOnce": true,
+    "warning": true,
+    "spent": true,
+    "fireOnce": true,
+    "distinctHeals": true,
+    "impact": true,
+    "kinds": [
+      "heal",
+      "greaterHeal",
+      "arrow",
+      "fireball",
+      "fireball",
+      "frost",
+      "bolt"
+    ]
+  },
+  "motion": {
+    "immediate": true,
+    "halfway": true,
+    "freeze": true,
+    "staleRejected": true
+  },
+  "pixels": {
+    "closedPortal": true,
+    "hiddenSpikes": true,
+    "healsDiffer": true
+  },
+  "portalLoops": true,
+  "errors": [],
+  "remote": []
+}

@@ -1,0 +1,86 @@
+{
+  "id": "throne",
+  "kind": "material",
+  "group": "biome",
+  "maxVisible": [
+    32,
+    32
+  ],
+  "columns": 2,
+  "parts": [
+    "floor",
+    "top",
+    "face",
+    "accent"
+  ],
+  "file": "environment-v1/throne/atlas.png",
+  "size": [
+    64,
+    64
+  ],
+  "records": [
+    {
+      "name": "floor",
+      "crop": [
+        0,
+        0,
+        32,
+        32
+      ],
+      "sourceCell": [
+        0,
+        0,
+        627,
+        627
+      ]
+    },
+    {
+      "name": "top",
+      "crop": [
+        32,
+        0,
+        32,
+        32
+      ],
+      "sourceCell": [
+        627,
+        0,
+        627,
+        627
+      ]
+    },
+    {
+      "name": "face",
+      "crop": [
+        0,
+        32,
+        32,
+        32
+      ],
+      "sourceCell": [
+        0,
+        627,
+        627,
+        627
+      ]
+    },
+    {
+      "name": "accent",
+      "crop": [
+        32,
+        32,
+        32,
+        32
+      ],
+      "sourceCell": [
+        627,
+        627,
+        627,
+        627
+      ]
+    }
+  ],
+  "sha256": "0f4ccb8785f2934a243e8e7955f270339b447e61184824be66c3c8f10e6dfd7e",
+  "sourceSHA256": "7744af8b38b6a1b6adc58c7406b1917dc9f2a1988b961e6c7128cac915aeb9a8",
+  "scope": "standalone review; runtime unchanged"
+}

@@ -1,0 +1,49 @@
+{
+  "id": "dais",
+  "kind": "sprite",
+  "group": "throne",
+  "maxVisible": [
+    128,
+    64
+  ],
+  "columns": 1,
+  "parts": [
+    "sprite"
+  ],
+  "file": "environment-v1/dais/atlas.png",
+  "size": [
+    144,
+    80
+  ],
+  "records": [
+    {
+      "name": "sprite",
+      "crop": [
+        0,
+        0,
+        144,
+        80
+      ],
+      "bounds": {
+        "x": 8,
+        "y": 15,
+        "width": 128,
+        "height": 57
+      },
+      "anchor": [
+        72,
+        72
+      ],
+      "sourceBounds": {
+        "x": 146,
+        "y": 239,
+        "width": 1246,
+        "height": 559
+      },
+      "scale": 0.10272873194221509
+    }
+  ],
+  "sha256": "63b44881b2d40084733c8dcc6d32a7785ae01c424f840b6817afd884413bac8f",
+  "sourceSHA256": "a6490726cae9f9d117363003bbf516e36ffda3a1a3e8fba8c795cce21ba22c65",
+  "scope": "standalone review; runtime unchanged"
+}

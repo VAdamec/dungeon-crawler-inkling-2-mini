@@ -1,0 +1,38 @@
+{
+  "date": "2026-11-25",
+  "freshPageToLaunchVisibleMs": 70.25012500000003,
+  "startupNote": "Fresh page/context, warm filesystem/browser executable; not a cold-machine benchmark.",
+  "sourceBytes": {
+    "index.html": 10703,
+    "style.css": 13293,
+    "js/game.js": 164062,
+    "js/sprites.js": 319348
+  },
+  "metrics": {
+    "seed": 713,
+    "depth": 1,
+    "player": [
+      6,
+      5
+    ],
+    "viewport": [
+      1450,
+      1100
+    ],
+    "canvas": [
+      1152,
+      768
+    ],
+    "dpr": 1,
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/158.0.0.0 Safari/537.36",
+    "mode": "Static clock frozen with state.helpOpen; no world simulation. draw()+renderMinimap(), 20 warmups, 100 samples.",
+    "warmMedianMs": 0.4000000059604645,
+    "warmP95Ms": 0.5,
+    "minMs": 0.29999998211860657,
+    "maxMs": 0.5999999940395355,
+    "canvasCount": 448,
+    "cacheBytes": 2026640
+  },
+  "errors": [],
+  "remote": []
+}

@@ -1,0 +1,42 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>0x72 outer/edge/door tiles</title>
+<style>
+body{background:#15120f;color:#e8dcc4;font:11px monospace;margin:14px}
+h1{font:18px Georgia,serif;color:#e8c68d}
+.row{display:flex;flex-wrap:wrap;gap:12px;margin:10px 0 18px}
+.t{text-align:center}
+.chk{background:conic-gradient(#2a2a2a 25%,#1c1c1c 0 50%,#2a2a2a 0 75%,#1c1c1c 0) 0 0/16px 16px;border:1px solid #3a2e24;display:inline-block}
+canvas{image-rendering:pixelated;display:block}
+.lab{font-size:9px;color:#d6bd91;margin-top:3px;max-width:128px;word-break:break-word}
+</style></head><body>
+<h1>0x72 outer / edge / door / column tiles (8x)</h1>
+<div id="out"></div>
+<script>
+(async()=>{
+ const rows=(await (await fetch('assets/tile_list_v1.7')).text()).trim().split(/\n/).map(l=>{const [name,x,y,w,h]=l.trim().split(/\s+/);return{name,x:+x,y:+y,w:+w,h:+h}});
+ const im=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src='assets/atlas.png'});
+ const out=document.getElementById('out');
+ const groups=[
+  ['outer',/^wall_outer_/],
+  ['edge',/^wall_edge_/],
+  ['doors',/^doors_/],
+  ['columns',/^(column|column_wall)$/],
+  ['fountain',/^wall_fountain_/],
+  ['special',/^(hole|edge_down|floor_ladder|floor_stairs|floor_spikes_anim_f0)$/],
+ ];
+ for(const [g,re] of groups){
+  const h=document.createElement('h2');h.textContent=g;out.append(h);
+  const row=document.createElement('div');row.className='row';
+  for(const t of rows.filter(t=>re.test(t.name))){
+    const d=document.createElement('div');d.className='t';
+    const chk=document.createElement('div');chk.className='chk';
+    const cv=document.createElement('canvas');cv.width=t.w*8;cv.height=t.h*8;
+    const c=cv.getContext('2d');c.imageSmoothingEnabled=false;c.drawImage(im,t.x,t.y,t.w,t.h,0,0,cv.width,cv.height);
+    chk.append(cv);
+    const lab=document.createElement('div');lab.className='lab';lab.textContent=t.name;
+    d.append(chk,lab);row.append(d);
+  }
+  out.append(row);
+ }
+})();
+</script></body></html>

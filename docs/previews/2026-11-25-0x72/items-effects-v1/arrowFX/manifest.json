@@ -1,0 +1,52 @@
+{
+  "id": "arrowFX",
+  "name": "arrowFX",
+  "description": "Single small wooden arrow pointing RIGHT, steel tip at right, feathers left",
+  "group": "projectiles",
+  "sourceFrames": 1,
+  "columns": 1,
+  "maxVisible": [
+    28,
+    8
+  ],
+  "cell": 64,
+  "states": "static",
+  "sheet": "items-effects-v1/arrowFX/sheet.png",
+  "anchor": [
+    32,
+    32
+  ],
+  "screenScale": 2,
+  "alphaCutoff": 64,
+  "sharedScale": 0.037889039242219216,
+  "nativeDirection": "right",
+  "source": "generated-source.png",
+  "frames": [
+    {
+      "index": 0,
+      "label": "static",
+      "empty": false,
+      "file": "frames/0.png",
+      "crop": [
+        0,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 18,
+        "y": 29,
+        "width": 28,
+        "height": 6
+      },
+      "sourceCell": [
+        0,
+        0,
+        2172,
+        724
+      ],
+      "sha256": "9f408672053197fd50ed551a5f616f8536d8e8578265a9e756bed1f6da4c8153"
+    }
+  ],
+  "scope": "preview only; awaiting review"
+}

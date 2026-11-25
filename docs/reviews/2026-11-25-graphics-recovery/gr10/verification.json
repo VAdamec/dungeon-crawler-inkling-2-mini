@@ -1,0 +1,21 @@
+{
+  "date": "2026-11-25",
+  "release": "2.0.0",
+  "gameTests": {
+    "passed": 181,
+    "failed": 0,
+    "skipped": 0,
+    "durationMs": 108207.423208
+  },
+  "previewTests": {
+    "passed": 27,
+    "failed": 0,
+    "skipped": 0
+  },
+  "bake": "byte-identical; --check passes",
+  "externalSmoke": "SMOKE_OK",
+  "capture": "8 browser views, 18 transparent figures, nine-boss contact sheet; zero page/console errors or remote requests",
+  "releaseZip": "five required runtime files; extracted bytes equal source; actual file:// Chrome player Help/focus/mobile/version checks pass",
+  "nativeBackgroundTab": "UNVERIFIED \u2014 unchanged GR-09 exception",
+  "sourceArtAndGameplay": "unchanged in GR-10; only player Help copy and GAME_VERSION are authorized runtime edits"
+}

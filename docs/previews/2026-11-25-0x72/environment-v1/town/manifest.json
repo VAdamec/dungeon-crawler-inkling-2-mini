@@ -1,0 +1,86 @@
+{
+  "id": "town",
+  "kind": "material",
+  "group": "town",
+  "maxVisible": [
+    32,
+    32
+  ],
+  "columns": 2,
+  "parts": [
+    "grass",
+    "dirt",
+    "cobble",
+    "water"
+  ],
+  "file": "environment-v1/town/atlas.png",
+  "size": [
+    64,
+    64
+  ],
+  "records": [
+    {
+      "name": "grass",
+      "crop": [
+        0,
+        0,
+        32,
+        32
+      ],
+      "sourceCell": [
+        0,
+        0,
+        627,
+        627
+      ]
+    },
+    {
+      "name": "dirt",
+      "crop": [
+        32,
+        0,
+        32,
+        32
+      ],
+      "sourceCell": [
+        627,
+        0,
+        627,
+        627
+      ]
+    },
+    {
+      "name": "cobble",
+      "crop": [
+        0,
+        32,
+        32,
+        32
+      ],
+      "sourceCell": [
+        0,
+        627,
+        627,
+        627
+      ]
+    },
+    {
+      "name": "water",
+      "crop": [
+        32,
+        32,
+        32,
+        32
+      ],
+      "sourceCell": [
+        627,
+        627,
+        627,
+        627
+      ]
+    }
+  ],
+  "sha256": "99880c9b616b1508fa9af183bc2424ed8f392167ab05409d7e628fe197be72a1",
+  "sourceSHA256": "3f7e0a8267741ff7fbda8e9e22dd22f345a897138454c0bf5c8de8ed83f31561",
+  "scope": "standalone review; runtime unchanged"
+}

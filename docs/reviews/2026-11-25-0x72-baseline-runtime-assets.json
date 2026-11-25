@@ -1,0 +1,1586 @@
+{
+  "count": 76,
+  "uniqueFrames": 211,
+  "assets": [
+    {
+      "name": "knight",
+      "source": [
+        32,
+        44
+      ],
+      "logical": [
+        16,
+        22
+      ],
+      "directions": [
+        "front",
+        "back",
+        "left",
+        "right"
+      ],
+      "frameCounts": {
+        "front": 3,
+        "back": 3,
+        "left": 3,
+        "right": 3
+      },
+      "frames": 3,
+      "uniqueFrames": 12,
+      "alias": null
+    },
+    {
+      "name": "slime",
+      "source": [
+        44,
+        28
+      ],
+      "logical": [
+        22,
+        14
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 2
+      },
+      "frames": 2,
+      "uniqueFrames": 2,
+      "alias": null
+    },
+    {
+      "name": "bat",
+      "source": [
+        64,
+        40
+      ],
+      "logical": [
+        32,
+        20
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 2
+      },
+      "frames": 2,
+      "uniqueFrames": 2,
+      "alias": null
+    },
+    {
+      "name": "goblin",
+      "source": [
+        40,
+        44
+      ],
+      "logical": [
+        20,
+        22
+      ],
+      "directions": [
+        "front",
+        "back",
+        "left",
+        "right"
+      ],
+      "frameCounts": {
+        "front": 3,
+        "back": 3,
+        "left": 3,
+        "right": 3
+      },
+      "frames": 3,
+      "uniqueFrames": 12,
+      "alias": null
+    },
+    {
+      "name": "skeleton",
+      "source": [
+        32,
+        40
+      ],
+      "logical": [
+        16,
+        20
+      ],
+      "directions": [
+        "front",
+        "back",
+        "left",
+        "right"
+      ],
+      "frameCounts": {
+        "front": 3,
+        "back": 3,
+        "left": 3,
+        "right": 3
+      },
+      "frames": 3,
+      "uniqueFrames": 12,
+      "alias": null
+    },
+    {
+      "name": "orc",
+      "source": [
+        64,
+        56
+      ],
+      "logical": [
+        32,
+        28
+      ],
+      "directions": [
+        "front",
+        "back",
+        "left",
+        "right"
+      ],
+      "frameCounts": {
+        "front": 3,
+        "back": 3,
+        "left": 3,
+        "right": 3
+      },
+      "frames": 3,
+      "uniqueFrames": 12,
+      "alias": null
+    },
+    {
+      "name": "wasp",
+      "source": [
+        52,
+        48
+      ],
+      "logical": [
+        26,
+        24
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 2
+      },
+      "frames": 2,
+      "uniqueFrames": 2,
+      "alias": null
+    },
+    {
+      "name": "mage",
+      "source": [
+        40,
+        44
+      ],
+      "logical": [
+        20,
+        22
+      ],
+      "directions": [
+        "front",
+        "back",
+        "left",
+        "right"
+      ],
+      "frameCounts": {
+        "front": 3,
+        "back": 3,
+        "left": 3,
+        "right": 3
+      },
+      "frames": 3,
+      "uniqueFrames": 12,
+      "alias": null
+    },
+    {
+      "name": "healer",
+      "source": [
+        40,
+        44
+      ],
+      "logical": [
+        20,
+        22
+      ],
+      "directions": [
+        "front",
+        "back",
+        "left",
+        "right"
+      ],
+      "frameCounts": {
+        "front": 3,
+        "back": 3,
+        "left": 3,
+        "right": 3
+      },
+      "frames": 3,
+      "uniqueFrames": 12,
+      "alias": null
+    },
+    {
+      "name": "mimic",
+      "source": [
+        64,
+        44
+      ],
+      "logical": [
+        32,
+        22
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 2
+      },
+      "frames": 2,
+      "uniqueFrames": 2,
+      "alias": null
+    },
+    {
+      "name": "hydra",
+      "source": [
+        72,
+        64
+      ],
+      "logical": [
+        36,
+        32
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 2
+      },
+      "frames": 2,
+      "uniqueFrames": 2,
+      "alias": null
+    },
+    {
+      "name": "boar",
+      "source": [
+        72,
+        48
+      ],
+      "logical": [
+        36,
+        24
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 3
+      },
+      "frames": 3,
+      "uniqueFrames": 3,
+      "alias": null
+    },
+    {
+      "name": "medusa",
+      "source": [
+        64,
+        64
+      ],
+      "logical": [
+        32,
+        32
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 2
+      },
+      "frames": 2,
+      "uniqueFrames": 2,
+      "alias": null
+    },
+    {
+      "name": "darkWizard",
+      "source": [
+        64,
+        64
+      ],
+      "logical": [
+        32,
+        32
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 2
+      },
+      "frames": 2,
+      "uniqueFrames": 2,
+      "alias": null
+    },
+    {
+      "name": "skeletonKing",
+      "source": [
+        64,
+        72
+      ],
+      "logical": [
+        32,
+        36
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 2
+      },
+      "frames": 2,
+      "uniqueFrames": 2,
+      "alias": null
+    },
+    {
+      "name": "dragonBoss",
+      "source": [
+        80,
+        72
+      ],
+      "logical": [
+        40,
+        36
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 2
+      },
+      "frames": 2,
+      "uniqueFrames": 2,
+      "alias": null
+    },
+    {
+      "name": "cook",
+      "source": [
+        36,
+        44
+      ],
+      "logical": [
+        18,
+        22
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 3
+      },
+      "frames": 3,
+      "uniqueFrames": 3,
+      "alias": null
+    },
+    {
+      "name": "bartender",
+      "source": [
+        24,
+        30
+      ],
+      "logical": [
+        12,
+        15
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 3
+      },
+      "frames": 3,
+      "uniqueFrames": 3,
+      "alias": null
+    },
+    {
+      "name": "merchant",
+      "source": [
+        32,
+        40
+      ],
+      "logical": [
+        16,
+        20
+      ],
+      "directions": [
+        "front",
+        "back",
+        "left",
+        "right"
+      ],
+      "frameCounts": {
+        "front": 3,
+        "back": 3,
+        "left": 3,
+        "right": 3
+      },
+      "frames": 3,
+      "uniqueFrames": 12,
+      "alias": null
+    },
+    {
+      "name": "prisoner",
+      "source": [
+        32,
+        40
+      ],
+      "logical": [
+        16,
+        20
+      ],
+      "directions": [
+        "front",
+        "back",
+        "left",
+        "right"
+      ],
+      "frameCounts": {
+        "front": 3,
+        "back": 3,
+        "left": 3,
+        "right": 3
+      },
+      "frames": 3,
+      "uniqueFrames": 12,
+      "alias": null
+    },
+    {
+      "name": "princess",
+      "source": [
+        32,
+        50
+      ],
+      "logical": [
+        16,
+        25
+      ],
+      "directions": [
+        "front",
+        "back",
+        "left",
+        "right"
+      ],
+      "frameCounts": {
+        "front": 3,
+        "back": 3,
+        "left": 3,
+        "right": 3
+      },
+      "frames": 3,
+      "uniqueFrames": 12,
+      "alias": null
+    },
+    {
+      "name": "villager",
+      "source": [
+        32,
+        40
+      ],
+      "logical": [
+        16,
+        20
+      ],
+      "directions": [
+        "front",
+        "back",
+        "left",
+        "right"
+      ],
+      "frameCounts": {
+        "front": 3,
+        "back": 3,
+        "left": 3,
+        "right": 3
+      },
+      "frames": 3,
+      "uniqueFrames": 12,
+      "alias": null
+    },
+    {
+      "name": "catCompanion",
+      "source": [
+        40,
+        24
+      ],
+      "logical": [
+        20,
+        12
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 3
+      },
+      "frames": 3,
+      "uniqueFrames": 3,
+      "alias": null
+    },
+    {
+      "name": "cat",
+      "source": [
+        26,
+        18
+      ],
+      "logical": [
+        13,
+        9
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 3
+      },
+      "frames": 3,
+      "uniqueFrames": 3,
+      "alias": null
+    },
+    {
+      "name": "dog",
+      "source": [
+        38,
+        28
+      ],
+      "logical": [
+        19,
+        14
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 3
+      },
+      "frames": 3,
+      "uniqueFrames": 3,
+      "alias": null
+    },
+    {
+      "name": "chicken",
+      "source": [
+        28,
+        28
+      ],
+      "logical": [
+        14,
+        14
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 3
+      },
+      "frames": 3,
+      "uniqueFrames": 3,
+      "alias": null
+    },
+    {
+      "name": "sword",
+      "source": [
+        32,
+        40
+      ],
+      "logical": [
+        16,
+        20
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "bow",
+      "source": [
+        48,
+        40
+      ],
+      "logical": [
+        24,
+        20
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "armor",
+      "source": [
+        32,
+        40
+      ],
+      "logical": [
+        16,
+        20
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "helmet",
+      "source": [
+        32,
+        40
+      ],
+      "logical": [
+        16,
+        20
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "shield",
+      "source": [
+        32,
+        40
+      ],
+      "logical": [
+        16,
+        20
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "ring",
+      "source": [
+        32,
+        36
+      ],
+      "logical": [
+        16,
+        18
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "elixir",
+      "source": [
+        24,
+        36
+      ],
+      "logical": [
+        12,
+        18
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "potion",
+      "source": [
+        20,
+        24
+      ],
+      "logical": [
+        10,
+        12
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "chest",
+      "source": [
+        32,
+        28
+      ],
+      "logical": [
+        16,
+        14
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "key",
+      "source": [
+        40,
+        36
+      ],
+      "logical": [
+        20,
+        18
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "townScroll",
+      "source": [
+        32,
+        36
+      ],
+      "logical": [
+        16,
+        18
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "townPortal",
+      "source": [
+        48,
+        56
+      ],
+      "logical": [
+        24,
+        28
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "spellbook",
+      "source": [
+        32,
+        32
+      ],
+      "logical": [
+        16,
+        16
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "frostboltTome",
+      "source": [
+        32,
+        32
+      ],
+      "logical": [
+        16,
+        16
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "greaterHealTome",
+      "source": [
+        32,
+        32
+      ],
+      "logical": [
+        16,
+        16
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "barrierTome",
+      "source": [
+        32,
+        32
+      ],
+      "logical": [
+        16,
+        16
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "stairsUp",
+      "source": [
+        32,
+        32
+      ],
+      "logical": [
+        16,
+        16
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "stairsDown",
+      "source": [
+        32,
+        32
+      ],
+      "logical": [
+        16,
+        16
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "torch",
+      "source": [
+        24,
+        40
+      ],
+      "logical": [
+        12,
+        20
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 3
+      },
+      "frames": 3,
+      "uniqueFrames": 3,
+      "alias": null
+    },
+    {
+      "name": "flameOff",
+      "source": [
+        32,
+        40
+      ],
+      "logical": [
+        16,
+        20
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "flameOn",
+      "source": [
+        32,
+        40
+      ],
+      "logical": [
+        16,
+        20
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 3
+      },
+      "frames": 3,
+      "uniqueFrames": 3,
+      "alias": null
+    },
+    {
+      "name": "spikes",
+      "source": [
+        32,
+        32
+      ],
+      "logical": [
+        16,
+        16
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "rockCrack",
+      "source": [
+        32,
+        32
+      ],
+      "logical": [
+        16,
+        16
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "rockSpent",
+      "source": [
+        40,
+        32
+      ],
+      "logical": [
+        20,
+        16
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "rubble",
+      "source": [
+        40,
+        24
+      ],
+      "logical": [
+        20,
+        12
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "pillar",
+      "source": [
+        32,
+        56
+      ],
+      "logical": [
+        16,
+        28
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "tombstone",
+      "source": [
+        32,
+        36
+      ],
+      "logical": [
+        16,
+        18
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "crystal",
+      "source": [
+        48,
+        48
+      ],
+      "logical": [
+        24,
+        24
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "cookingPot",
+      "source": [
+        40,
+        48
+      ],
+      "logical": [
+        20,
+        24
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "barCounter",
+      "source": [
+        64,
+        48
+      ],
+      "logical": [
+        32,
+        24
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "banner",
+      "source": [
+        40,
+        60
+      ],
+      "logical": [
+        20,
+        30
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "throne",
+      "source": [
+        64,
+        84
+      ],
+      "logical": [
+        32,
+        42
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "inn",
+      "source": [
+        128,
+        112
+      ],
+      "logical": [
+        64,
+        56
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "store",
+      "source": [
+        112,
+        112
+      ],
+      "logical": [
+        56,
+        56
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "hut",
+      "source": [
+        128,
+        120
+      ],
+      "logical": [
+        64,
+        60
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "tree",
+      "source": [
+        80,
+        80
+      ],
+      "logical": [
+        40,
+        40
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "bridge",
+      "source": [
+        64,
+        48
+      ],
+      "logical": [
+        32,
+        24
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "water",
+      "source": [
+        32,
+        32
+      ],
+      "logical": [
+        16,
+        16
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "townGate",
+      "source": [
+        48,
+        64
+      ],
+      "logical": [
+        24,
+        32
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "doorstep",
+      "source": [
+        32,
+        16
+      ],
+      "logical": [
+        16,
+        8
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "dragon",
+      "source": [
+        80,
+        72
+      ],
+      "logical": [
+        40,
+        36
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 2
+      },
+      "frames": 2,
+      "uniqueFrames": 2,
+      "alias": "dragonBoss"
+    },
+    {
+      "name": "arrowFX",
+      "source": [
+        48,
+        48
+      ],
+      "logical": [
+        24,
+        24
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "stingerFX",
+      "source": [
+        48,
+        48
+      ],
+      "logical": [
+        24,
+        24
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "boneFX",
+      "source": [
+        48,
+        48
+      ],
+      "logical": [
+        24,
+        24
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "beerFX",
+      "source": [
+        48,
+        48
+      ],
+      "logical": [
+        24,
+        24
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "fireballFX",
+      "source": [
+        48,
+        48
+      ],
+      "logical": [
+        24,
+        24
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "frostboltFX",
+      "source": [
+        48,
+        48
+      ],
+      "logical": [
+        24,
+        24
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "healFX",
+      "source": [
+        48,
+        48
+      ],
+      "logical": [
+        24,
+        24
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "greaterHealFX",
+      "source": [
+        48,
+        48
+      ],
+      "logical": [
+        24,
+        24
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    },
+    {
+      "name": "magicBarrierFX",
+      "source": [
+        48,
+        48
+      ],
+      "logical": [
+        24,
+        24
+      ],
+      "directions": [
+        "front"
+      ],
+      "frameCounts": {
+        "front": 1
+      },
+      "frames": 1,
+      "uniqueFrames": 1,
+      "alias": null
+    }
+  ]
+}

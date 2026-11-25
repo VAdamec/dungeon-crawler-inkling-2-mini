@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dungeon Crawler — 0x72 design preview v2 (OX-02, proposal)</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#070b12;color:#c6d0d8;font:13px/1.55 'Courier New',monospace}
+  main{width:min(1240px,96vw);margin:24px auto 56px}
+  section{background:#0f1722;border:1px solid #2b3b4d;border-radius:10px;padding:22px;margin:0 0 20px}
+  h1{font:32px/1.1 Georgia,serif;color:#e8c68d;margin:0 0 8px;letter-spacing:.5px}
+  h2{font:21px Georgia,serif;color:#e8c68d;margin:0 0 6px}
+  h3{font:15px Georgia,serif;color:#d8c8a8;margin:18px 0 6px}
+  p{margin:0 0 8px}
+  .eyebrow{color:#8fb0aa;text-transform:uppercase;letter-spacing:3px;font-size:10px;margin:0 0 8px}
+  .note{color:#8d9faf;font-size:11.5px}
+  .muted{color:#738394}
+  .warn{display:inline-block;border:1px solid #a3703a;color:#e8b46b;border-radius:20px;padding:7px 13px;font-size:10px;letter-spacing:2px;white-space:nowrap}
+  .header{display:flex;justify-content:space-between;gap:24px;align-items:flex-start}
+  .rule{border-left:3px solid #6d8fb0;padding-left:12px;color:#b9c7d2;font-size:11.5px;margin-top:14px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .chip{border:1px solid #314153;border-radius:20px;padding:5px 11px;font-size:10.5px;letter-spacing:1px;color:#9fb0be}
+  .status-modified{color:#9fd0ff}.status-custom{color:#e8b46b}.status-gap{color:#ff9a8e}.status-alias{color:#8d9faf}
+  .shot{display:block;width:100%;height:auto;image-rendering:pixelated;border:1px solid #3c4f62;background:#0a0e16;border-radius:4px}
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .quad{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .trio{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  figure{margin:0}
+  figcaption{font-size:11.5px;color:#9fb0be;margin:7px 0 0}
+  .tag{display:inline-block;font-size:9.5px;letter-spacing:1.5px;text-transform:uppercase;color:#8fb0aa;border:1px solid #314153;border-radius:12px;padding:2px 8px;margin-right:6px}
+  .fixtures{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:8px}
+  .fixtures canvas{display:block;width:100%;height:auto;image-rendering:pixelated;border:1px solid #3c4f62;border-radius:4px;background:#0a0e16}
+  .fixtures .cap{font-size:11px;color:#b9c7d2;margin-top:6px}
+  .fixtures .sub{font-size:10px;color:#738394;margin-top:2px}
+  .strips{margin-top:6px}
+  .strip-row{display:grid;grid-template-columns:190px 1fr;gap:12px;align-items:start;padding:10px 0;border-top:1px solid #1e2c3b}
+  .strip-row:first-child{border-top:0}
+  .strip-label{color:#d8c8a8;font-size:11.5px;padding-top:8px}
+  .strip-images{display:flex;flex-wrap:wrap;gap:8px}
+  .strip-cell{background:#0a0e16;border:1px solid #314153;border-radius:4px;padding:5px}
+  .strip-cell canvas{display:block;image-rendering:pixelated}
+  .strip-cap{font-size:8.5px;color:#738394;text-align:center;margin-top:3px;max-width:92px;overflow-wrap:anywhere}
+  .tablewrap{max-height:520px;overflow:auto;border:1px solid #314153;border-radius:6px;margin-top:10px}
+  table{width:100%;border-collapse:collapse;font-size:11px}
+  th,td{border-bottom:1px solid #1e2c3b;padding:7px 8px;vertical-align:top;text-align:left}
+  th{position:sticky;top:0;background:#101b27;color:#e8c68d;z-index:1}
+  tr.status-modified td:nth-child(3){color:#9fd0ff}
+  tr.status-custom td:nth-child(3){color:#e8b46b}
+  tr.status-alias td:nth-child(3){color:#8d9faf}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin:12px 0 0;font-size:10.5px;color:#8d9faf}
+  .legend b{display:block;font-size:11px;margin-bottom:1px}
+  .error{color:#ff9a8e}
+  .kbd{border:1px solid #3c4f62;border-bottom-width:2px;border-radius:3px;padding:0 4px;color:#d8c8a8;font-size:10px}
+  a{color:#9fd0ff}
+  @media (max-width:900px){.pair,.quad,.trio,.fixtures{grid-template-columns:1fr}.strip-row{grid-template-columns:1fr}.header{flex-direction:column}}
+</style>
+</head>
+<body>
+<main>
+<p class="note">Superseded draft: <a href="design-v3.html">open corrected v3 walls and controlled comparison</a>.</p>
+  <section>
+    <div class="header">
+      <div>
+        <p class="eyebrow">Dungeon Crawler · 2026-11-25 · OX-02 standalone focus preview · design v2</p>
+        <h1>0x72 DungeonTileset II — rebuilt from the real pack</h1>
+        <p class="note">Standalone <code>file://</code> preview at the game's 1152×768 play size. Pack art is drawn at 4× screen (16px source tile → 64px world tile). The current 1.0.1 art is used only for the side-by-side comparison. No playable file is loaded or modified.</p>
+      </div>
+      <span class="warn">PROPOSAL — NOT APPROVED</span>
+    </div>
+    <div class="chips">
+      <span class="chip">real 0x72 v1.7 crops</span>
+      <span class="chip">1152 × 768</span>
+      <span class="chip">fog + revealed</span>
+      <span class="chip">color + grayscale</span>
+      <span class="chip">topology fixtures</span>
+      <span class="chip">hero scale review</span>
+    </div>
+    <div class="rule">What changed from the first preview: walls now use the pack's cap strips and brick faces instead of one repeated 16px block; doors are the real 2×2 leaf with its lintel; columns are the real 1×3 pieces; torches use the pack's animated red wall-torch family. Missing roles are listed in the coverage table, not stamped over the scene. The town panel is an honest stone-gate outpost made only from pack architecture; the pack has no grass, huts, trees, river or bridge.</div>
+  </section>
+
+  <section>
+    <p class="eyebrow">Focus 1 · the proposal</p>
+    <h2>Dungeon hero shot — fully revealed</h2>
+    <p class="note">Door, torch pairs, banners, wall fountain, columns, crates, chest, potion, sword, stairs, spikes, hero, companion, and eight monster families. Torch light is additive; the room carries a cool ambient tint and vignette so the materials read as a lit space rather than a flat tile sheet.</p>
+    <figure>
+      <canvas id="heroCanvas" class="shot" width="1152" height="768"></canvas>
+      <figcaption><span class="tag">After</span>0x72 architecture and actors at native 4× screen scale. The cat companion is custom art (the pack has no cat) and is listed as custom in the coverage table.</figcaption>
+    </figure>
+  </section>
+
+  <section id="compare">
+    <p class="eyebrow">Focus 2 · same fixture, same scale</p>
+    <h2>Current 1.0.1 art vs the 0x72 direction</h2>
+    <p class="note">Identical 18×12 layout, camera, prop positions and lighting intent. The comparison is about material response, wall readability, actor scale and silhouette, not about matching every prop one-for-one.</p>
+    <div class="pair">
+      <figure>
+        <canvas id="beforeCanvas" class="shot" width="1152" height="768"></canvas>
+        <figcaption><span class="tag">Before</span>Current wall painter, current sprites, current torch and prop sizes.</figcaption>
+      </figure>
+      <figure>
+        <canvas id="afterCanvas" class="shot" width="1152" height="768"></canvas>
+        <figcaption><span class="tag">After</span>0x72 crops with the same room. Note the clearer wall caps, floor variation and larger actor silhouettes.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">Focus 3 · review views</p>
+    <h2>Fog and grayscale</h2>
+    <p class="note">The fog view is an approximation of the existing radial fog, not a new visibility model. The grayscale pair checks value separation: wall cap, brick face, floor, actors and loot should remain distinguishable without hue.</p>
+    <div class="trio">
+      <figure><canvas id="fogCanvas" class="shot" width="1152" height="768"></canvas><figcaption>Color, normal fog around the hero.</figcaption></figure>
+      <figure><canvas id="grayCanvas" class="shot" width="1152" height="768" style="filter:grayscale(1)"></canvas><figcaption>Fully revealed, grayscale.</figcaption></figure>
+      <figure><canvas id="grayFogCanvas" class="shot" width="1152" height="768" style="filter:grayscale(1)"></canvas><figcaption>Fog, grayscale. Check that the fog edge and torch pools still read.</figcaption></figure>
+    </div>
+  </section>
+
+  <section id="topology">
+    <p class="eyebrow">Focus 4 · wall topology</p>
+    <h2>Do the wall rules survive real room shapes?</h2>
+    <p class="note">Six fixtures drawn with the same cap/face rules as the hero shot. Each is a separate 6×5-tile canvas. The cap only appears when a wall has a wall below it, so one-tile walls and the south border do not get a cap on the wrong side.</p>
+    <div class="fixtures">
+      <figure><canvas id="fixtureIsolated"></canvas><div class="cap">Isolated pillar</div><div class="sub">1×2 wall column, cap + face</div></figure>
+      <figure><canvas id="fixtureLine"></canvas><div class="cap">Thin wall run</div><div class="sub">1 tile thick; no south-facing cap</div></figure>
+      <figure><canvas id="fixtureThick"></canvas><div class="cap">Thick wall band</div><div class="sub">3 rows: cap over two face rows</div></figure>
+      <figure><canvas id="fixtureL"></canvas><div class="cap">L corner</div><div class="sub">Corner caps follow the open north edge</div></figure>
+      <figure><canvas id="fixtureT"></canvas><div class="cap">T junction</div><div class="sub">Stem, crossbar and caps</div></figure>
+      <figure><canvas id="fixtureInner"></canvas><div class="cap">Inner corner + corridor</div><div class="sub">Tight junction with a 1-tile lane</div></figure>
+    </div>
+  </section>
+
+  <section id="town">
+    <p class="eyebrow">Focus 5 · town direction</p>
+    <h2>Stone gate outpost — pack architecture only</h2>
+    <p class="note">This is not a grassy village mock-up. It is the stone gatehouse the pack can actually build: an open gate, jambs, torches, banners, a wall fountain and the pack's townsfolk. The current game's village, huts, trees, river, bridge and grass remain custom work; the pack offers none of them.</p>
+    <figure>
+      <canvas id="townCanvas" class="shot" width="1152" height="768"></canvas>
+      <figcaption><span class="tag">Concept</span>An outpost interior/terrace. A full town pass needs custom landscape and building art or an explicit decision to keep the current town art as interim.</figcaption>
+    </figure>
+  </section>
+
+  <section id="scale">
+    <p class="eyebrow">Focus 6 · proportions</p>
+    <h2>Hero and monster scale against the 64px tile</h2>
+    <p class="note">This is the size decision the design document asked to review before final render bounds. The native 0x72 hero is 64×112 screen; the 3× option is 48×84; the current hero is 64×88. The 0x72 monsters are 32–64px wide and read as room-scale threats rather than small tokens.</p>
+    <figure>
+      <canvas id="proportionCanvas" class="shot" width="1152" height="420"></canvas>
+      <figcaption>The grid is two 64px tiles wide and two tall. Feet sit on the same baseline.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <p class="eyebrow">Motion</p>
+    <h2>Actual source frames</h2>
+    <p class="note">Real crops from <code>tile_list_v1.7</code>. The preview does not invent directions or frames that the pack does not contain.</p>
+    <div id="strips" class="strips"></div>
+  </section>
+
+  <section id="roles">
+    <p class="eyebrow">Coverage</p>
+    <h2>OX-01 role inventory and gap map</h2>
+    <p id="summary" class="note">Loading…</p>
+    <div class="legend">
+      <div><b class="status-modified">modified</b>Pack crop used with a documented change (recolor, composite, scale or animation remap).</div>
+      <div><b class="status-custom">custom</b>No pack match; new art is required. Listed, never silently substituted.</div>
+      <div><b class="status-alias">alias</b>Role reuses another role's art by design.</div>
+    </div>
+    <div id="roleTable" class="tablewrap"></div>
+  </section>
+
+  <section>
+    <p class="eyebrow">Evidence</p>
+    <h2>Checks</h2>
+    <div id="checks" class="note">Rendering…</div>
+  </section>
+</main>
+<script src="before-sprites.js"></script>
+<script src="design-v2-data.js"></script>
+<script src="design-v2.js"></script>
+</body>
+</html>

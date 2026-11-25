@@ -1,0 +1,127 @@
+{
+  "id": "magicBarrierFX",
+  "name": "magicBarrierFX",
+  "description": "Instant directional telekinetic PUSH pulse travelling RIGHT: curved aqua violet shockwave and impact sparks, never a shield bubble, dome, protective aura or person",
+  "group": "spells",
+  "sourceFrames": 4,
+  "columns": 2,
+  "maxVisible": [
+    48,
+    36
+  ],
+  "cell": 128,
+  "states": "small initial rightward pulse; expanding curved push wave; bright rightward impact; dissipating sparks",
+  "sheet": "items-effects-v1/magicBarrierFX/sheet.png",
+  "anchor": [
+    64,
+    64
+  ],
+  "screenScale": 2,
+  "alphaCutoff": 64,
+  "sharedScale": 0.09944751381215469,
+  "nativeDirection": null,
+  "source": "generated-source.png",
+  "frames": [
+    {
+      "index": 0,
+      "label": "small initial rightward pulse",
+      "empty": false,
+      "file": "frames/0.png",
+      "crop": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "bounds": {
+        "x": 53,
+        "y": 58,
+        "width": 16,
+        "height": 17
+      },
+      "sourceCell": [
+        0,
+        0,
+        632,
+        623
+      ],
+      "sha256": "3c5eb6ec60ee1343a7ef1e8c27184c72e9a8771d09c6e216ce259ad8ea869463"
+    },
+    {
+      "index": 1,
+      "label": "expanding curved push wave",
+      "empty": false,
+      "file": "frames/1.png",
+      "crop": [
+        128,
+        0,
+        128,
+        128
+      ],
+      "bounds": {
+        "x": 47,
+        "y": 52,
+        "width": 26,
+        "height": 29
+      },
+      "sourceCell": [
+        632,
+        0,
+        631,
+        623
+      ],
+      "sha256": "107a14339420db12a6360537a2353a02aac8029819c98d304c1b6c416714d2eb"
+    },
+    {
+      "index": 2,
+      "label": "bright rightward impact",
+      "empty": false,
+      "file": "frames/2.png",
+      "crop": [
+        256,
+        0,
+        128,
+        128
+      ],
+      "bounds": {
+        "x": 46,
+        "y": 46,
+        "width": 36,
+        "height": 36
+      },
+      "sourceCell": [
+        0,
+        623,
+        632,
+        623
+      ],
+      "sha256": "4ca0fae55c11ea0cd86b44e717f702a0d3ac449002ec15340348b3a3a12f985a"
+    },
+    {
+      "index": 3,
+      "label": "dissipating sparks",
+      "empty": false,
+      "file": "frames/3.png",
+      "crop": [
+        384,
+        0,
+        128,
+        128
+      ],
+      "bounds": {
+        "x": 46,
+        "y": 47,
+        "width": 32,
+        "height": 32
+      },
+      "sourceCell": [
+        632,
+        623,
+        631,
+        623
+      ],
+      "sha256": "c3ff7fdcb0d53c897754f0cfc5ae3af098102d2089ffd06ddcaa6edd4844ed4e"
+    }
+  ],
+  "scope": "preview only; awaiting review"
+}

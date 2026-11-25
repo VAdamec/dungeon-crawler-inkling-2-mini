@@ -1,0 +1,127 @@
+{
+  "id": "chest",
+  "name": "chest",
+  "description": "Wood and gold ordinary treasure chest, NEVER eyes, teeth, tongue or limbs",
+  "group": "loot",
+  "sourceFrames": 4,
+  "columns": 2,
+  "maxVisible": [
+    32,
+    28
+  ],
+  "cell": 64,
+  "states": "closed; lid opening; fully open full of gold; fully open empty",
+  "sheet": "items-effects-v1/chest/sheet.png",
+  "anchor": [
+    32,
+    32
+  ],
+  "screenScale": 2,
+  "alphaCutoff": 64,
+  "sharedScale": 0.06862745098039216,
+  "nativeDirection": null,
+  "source": "generated-source.png",
+  "frames": [
+    {
+      "index": 0,
+      "label": "closed",
+      "empty": false,
+      "file": "frames/0.png",
+      "crop": [
+        0,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 22,
+        "y": 25,
+        "width": 21,
+        "height": 21
+      },
+      "sourceCell": [
+        0,
+        0,
+        639,
+        615
+      ],
+      "sha256": "953de3c5345e32c9eef38851d5ec1ad8d2f0def9c34208259edbbf9c313f26a8"
+    },
+    {
+      "index": 1,
+      "label": "lid opening",
+      "empty": false,
+      "file": "frames/1.png",
+      "crop": [
+        64,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 19,
+        "y": 23,
+        "width": 22,
+        "height": 23
+      },
+      "sourceCell": [
+        639,
+        0,
+        639,
+        615
+      ],
+      "sha256": "6eb04c34927d247aa51b12d6ad2f747f1ab16809fb590bc4c47d7470fc91d9dd"
+    },
+    {
+      "index": 2,
+      "label": "fully open full of gold",
+      "empty": false,
+      "file": "frames/2.png",
+      "crop": [
+        128,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 22,
+        "y": 18,
+        "width": 23,
+        "height": 26
+      },
+      "sourceCell": [
+        0,
+        615,
+        639,
+        615
+      ],
+      "sha256": "9cc031b084a7c5f7a28d6689e247f4cc044cb7d7107963a8a37830952976bb04"
+    },
+    {
+      "index": 3,
+      "label": "fully open empty",
+      "empty": false,
+      "file": "frames/3.png",
+      "crop": [
+        192,
+        0,
+        64,
+        64
+      ],
+      "bounds": {
+        "x": 19,
+        "y": 18,
+        "width": 23,
+        "height": 26
+      },
+      "sourceCell": [
+        639,
+        615,
+        639,
+        615
+      ],
+      "sha256": "fad578b71f22281758f18c62156591de2e048dae772ec9f4af81540fec5d469a"
+    }
+  ],
+  "scope": "preview only; awaiting review"
+}

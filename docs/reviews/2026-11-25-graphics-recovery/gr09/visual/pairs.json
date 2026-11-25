@@ -1,0 +1,245 @@
+{
+  "pairs": [
+    {
+      "id": "town",
+      "camera": {
+        "x": 23,
+        "y": 17
+      },
+      "hero": {
+        "x": 38,
+        "y": 26
+      },
+      "actors": [],
+      "mapEqual": true,
+      "frame": 0,
+      "fog": "Disabled for both staged review views; actual fog/secrecy tested separately"
+    },
+    {
+      "id": "gate",
+      "camera": {
+        "x": 43,
+        "y": 22
+      },
+      "hero": {
+        "x": 52,
+        "y": 29
+      },
+      "actors": [],
+      "mapEqual": true,
+      "frame": 0,
+      "fog": "Disabled for both staged review views; actual fog/secrecy tested separately"
+    },
+    {
+      "id": "crypt",
+      "camera": {
+        "x": 49,
+        "y": 1
+      },
+      "hero": {
+        "x": 53,
+        "y": 10
+      },
+      "actors": [
+        {
+          "sprite": "skeleton",
+          "x": 60,
+          "y": 7,
+          "direction": "left"
+        },
+        {
+          "sprite": "mage",
+          "x": 57,
+          "y": 5,
+          "direction": "right"
+        },
+        {
+          "sprite": "slime",
+          "x": 63,
+          "y": 9,
+          "direction": "left"
+        }
+      ],
+      "mapEqual": true,
+      "frame": 0,
+      "fog": "Disabled for both staged review views; actual fog/secrecy tested separately"
+    },
+    {
+      "id": "cavern",
+      "camera": {
+        "x": 2,
+        "y": 12
+      },
+      "hero": {
+        "x": 6,
+        "y": 21
+      },
+      "actors": [
+        {
+          "sprite": "orc",
+          "x": 13,
+          "y": 18,
+          "direction": "left"
+        },
+        {
+          "sprite": "bat",
+          "x": 10,
+          "y": 16,
+          "direction": "right"
+        },
+        {
+          "sprite": "slime",
+          "x": 15,
+          "y": 20,
+          "direction": "left"
+        }
+      ],
+      "mapEqual": true,
+      "frame": 0,
+      "fog": "Disabled for both staged review views; actual fog/secrecy tested separately"
+    },
+    {
+      "id": "kitchen",
+      "camera": {
+        "x": 75,
+        "y": 46
+      },
+      "hero": {
+        "x": 79,
+        "y": 55
+      },
+      "actors": [
+        {
+          "sprite": "cook",
+          "x": 86,
+          "y": 52,
+          "direction": "left"
+        },
+        {
+          "sprite": "orc",
+          "x": 83,
+          "y": 50,
+          "direction": "right"
+        },
+        {
+          "sprite": "wasp",
+          "x": 89,
+          "y": 55,
+          "direction": "left"
+        }
+      ],
+      "mapEqual": true,
+      "frame": 0,
+      "fog": "Disabled for both staged review views; actual fog/secrecy tested separately"
+    },
+    {
+      "id": "tavern",
+      "camera": {
+        "x": 75,
+        "y": 46
+      },
+      "hero": {
+        "x": 79,
+        "y": 55
+      },
+      "actors": [
+        {
+          "sprite": "bartender",
+          "x": 86,
+          "y": 52,
+          "direction": "left"
+        },
+        {
+          "sprite": "goblin",
+          "x": 83,
+          "y": 50,
+          "direction": "right"
+        },
+        {
+          "sprite": "healer",
+          "x": 89,
+          "y": 55,
+          "direction": "left"
+        }
+      ],
+      "mapEqual": true,
+      "frame": 0,
+      "fog": "Disabled for both staged review views; actual fog/secrecy tested separately"
+    },
+    {
+      "id": "throne",
+      "camera": {
+        "x": 72,
+        "y": 42
+      },
+      "hero": {
+        "x": 76,
+        "y": 51
+      },
+      "actors": [
+        {
+          "sprite": "skeletonKing",
+          "x": 83,
+          "y": 48,
+          "direction": "left"
+        },
+        {
+          "sprite": "skeleton",
+          "x": 80,
+          "y": 46,
+          "direction": "right"
+        },
+        {
+          "sprite": "mage",
+          "x": 86,
+          "y": 51,
+          "direction": "left"
+        }
+      ],
+      "mapEqual": true,
+      "frame": 0,
+      "fog": "Disabled for both staged review views; actual fog/secrecy tested separately"
+    },
+    {
+      "id": "dragon",
+      "camera": {
+        "x": 73,
+        "y": 42
+      },
+      "hero": {
+        "x": 77,
+        "y": 51
+      },
+      "actors": [
+        {
+          "sprite": "dragonBoss",
+          "x": 84,
+          "y": 48,
+          "direction": "left"
+        },
+        {
+          "sprite": "healer",
+          "x": 81,
+          "y": 46,
+          "direction": "right"
+        },
+        {
+          "sprite": "skeleton",
+          "x": 87,
+          "y": 51,
+          "direction": "left"
+        }
+      ],
+      "mapEqual": true,
+      "frame": 0,
+      "fog": "Disabled for both staged review views; actual fog/secrecy tested separately"
+    }
+  ],
+  "errors": [],
+  "remote": [],
+  "notes": [
+    "1152x768 play views only; the half-scale overview is a review-only composition, not a runtime camera.",
+    "Source art is identical; full-canvas pixel equality is not expected. Runtime retains actual actor sizes, HP bars, source anchors, torch rules and saved decorations. Preview includes extra staged props/labels/hover offsets and illustrative layering.",
+    "Town runtime facade doors/gate/bridge follow tested interactions, superseding centered decorative preview placements. Fog and automatic camera following disabled only inside this isolated review page to match the recorded review camera."
+  ]
+}

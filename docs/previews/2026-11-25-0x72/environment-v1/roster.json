@@ -1,0 +1,332 @@
+[
+  {
+    "id": "inn",
+    "kind": "sprite",
+    "group": "town",
+    "maxVisible": [
+      192,
+      160
+    ],
+    "columns": 1,
+    "parts": [
+      "sprite"
+    ]
+  },
+  {
+    "id": "store",
+    "kind": "sprite",
+    "group": "town",
+    "maxVisible": [
+      160,
+      160
+    ],
+    "columns": 1,
+    "parts": [
+      "sprite"
+    ]
+  },
+  {
+    "id": "hut",
+    "kind": "sprite",
+    "group": "town",
+    "maxVisible": [
+      128,
+      128
+    ],
+    "columns": 1,
+    "parts": [
+      "sprite"
+    ]
+  },
+  {
+    "id": "townGate",
+    "kind": "sprite",
+    "group": "town",
+    "maxVisible": [
+      72,
+      68
+    ],
+    "columns": 1,
+    "parts": [
+      "sprite"
+    ]
+  },
+  {
+    "id": "bridge",
+    "kind": "sprite",
+    "group": "town",
+    "maxVisible": [
+      64,
+      32
+    ],
+    "columns": 1,
+    "parts": [
+      "sprite"
+    ]
+  },
+  {
+    "id": "tree",
+    "kind": "sprite",
+    "group": "town",
+    "maxVisible": [
+      40,
+      60
+    ],
+    "columns": 1,
+    "parts": [
+      "sprite"
+    ]
+  },
+  {
+    "id": "pine",
+    "kind": "sprite",
+    "group": "town",
+    "maxVisible": [
+      40,
+      64
+    ],
+    "columns": 1,
+    "parts": [
+      "sprite"
+    ]
+  },
+  {
+    "id": "tombstone",
+    "kind": "sprite",
+    "group": "crypt",
+    "maxVisible": [
+      28,
+      32
+    ],
+    "columns": 1,
+    "parts": [
+      "sprite"
+    ]
+  },
+  {
+    "id": "crystal",
+    "kind": "sprite",
+    "group": "cavern",
+    "maxVisible": [
+      30,
+      36
+    ],
+    "columns": 1,
+    "parts": [
+      "sprite"
+    ]
+  },
+  {
+    "id": "cookingPot",
+    "kind": "sprite",
+    "group": "kitchen",
+    "maxVisible": [
+      32,
+      32
+    ],
+    "columns": 1,
+    "parts": [
+      "sprite"
+    ]
+  },
+  {
+    "id": "barCounter",
+    "kind": "sprite",
+    "group": "tavern",
+    "maxVisible": [
+      64,
+      32
+    ],
+    "columns": 1,
+    "parts": [
+      "sprite"
+    ]
+  },
+  {
+    "id": "banner",
+    "kind": "sprite",
+    "group": "throne",
+    "maxVisible": [
+      24,
+      48
+    ],
+    "columns": 1,
+    "parts": [
+      "sprite"
+    ]
+  },
+  {
+    "id": "pillar",
+    "kind": "sprite",
+    "group": "throne",
+    "maxVisible": [
+      30,
+      54
+    ],
+    "columns": 1,
+    "parts": [
+      "sprite"
+    ]
+  },
+  {
+    "id": "dais",
+    "kind": "sprite",
+    "group": "throne",
+    "maxVisible": [
+      128,
+      64
+    ],
+    "columns": 1,
+    "parts": [
+      "sprite"
+    ]
+  },
+  {
+    "id": "crate",
+    "kind": "sprite",
+    "group": "prop",
+    "maxVisible": [
+      28,
+      28
+    ],
+    "columns": 1,
+    "parts": [
+      "sprite"
+    ]
+  },
+  {
+    "id": "barrel",
+    "kind": "sprite",
+    "group": "prop",
+    "maxVisible": [
+      26,
+      32
+    ],
+    "columns": 1,
+    "parts": [
+      "sprite"
+    ]
+  },
+  {
+    "id": "rock",
+    "kind": "sprite",
+    "group": "prop",
+    "maxVisible": [
+      30,
+      28
+    ],
+    "columns": 1,
+    "parts": [
+      "sprite"
+    ]
+  },
+  {
+    "id": "doorstep",
+    "kind": "sprite",
+    "group": "town",
+    "maxVisible": [
+      30,
+      12
+    ],
+    "columns": 1,
+    "parts": [
+      "sprite"
+    ]
+  },
+  {
+    "id": "crypt",
+    "kind": "material",
+    "group": "biome",
+    "maxVisible": [
+      32,
+      32
+    ],
+    "columns": 2,
+    "parts": [
+      "floor",
+      "top",
+      "face",
+      "accent"
+    ]
+  },
+  {
+    "id": "cavern",
+    "kind": "material",
+    "group": "biome",
+    "maxVisible": [
+      32,
+      32
+    ],
+    "columns": 2,
+    "parts": [
+      "floor",
+      "top",
+      "face",
+      "accent"
+    ]
+  },
+  {
+    "id": "kitchen",
+    "kind": "material",
+    "group": "biome",
+    "maxVisible": [
+      32,
+      32
+    ],
+    "columns": 2,
+    "parts": [
+      "floor",
+      "top",
+      "face",
+      "accent"
+    ]
+  },
+  {
+    "id": "tavern",
+    "kind": "material",
+    "group": "biome",
+    "maxVisible": [
+      32,
+      32
+    ],
+    "columns": 2,
+    "parts": [
+      "floor",
+      "top",
+      "face",
+      "accent"
+    ]
+  },
+  {
+    "id": "throne",
+    "kind": "material",
+    "group": "biome",
+    "maxVisible": [
+      32,
+      32
+    ],
+    "columns": 2,
+    "parts": [
+      "floor",
+      "top",
+      "face",
+      "accent"
+    ]
+  },
+  {
+    "id": "town",
+    "kind": "material",
+    "group": "town",
+    "maxVisible": [
+      32,
+      32
+    ],
+    "columns": 2,
+    "parts": [
+      "grass",
+      "dirt",
+      "cobble",
+      "water"
+    ]
+  }
+]

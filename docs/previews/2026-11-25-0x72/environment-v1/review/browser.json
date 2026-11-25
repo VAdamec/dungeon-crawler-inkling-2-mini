@@ -1,0 +1,37 @@
+{
+  "scenes": 9,
+  "sceneNames": [
+    "town",
+    "gate",
+    "overview",
+    "crypt",
+    "cavern",
+    "kitchen",
+    "tavern",
+    "throne",
+    "dragon"
+  ],
+  "playSize": [
+    1152,
+    768
+  ],
+  "wholeVillage": [
+    1440,
+    1056
+  ],
+  "materials": 6,
+  "opaqueBoundedWallMasks": 1280,
+  "fixturesUnchanged": true,
+  "collisionGuide": true,
+  "illustrativeFog": true,
+  "portal": true,
+  "fourDirections": true,
+  "playPause": true,
+  "hiddenFreeze": true,
+  "pngExport": true,
+  "mobileFits": true,
+  "gameBootstrapped": false,
+  "protocol": "file://, no relaxed flags",
+  "errors": [],
+  "remote": []
+}

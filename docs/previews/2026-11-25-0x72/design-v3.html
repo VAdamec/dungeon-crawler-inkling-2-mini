@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dungeon Crawler — 0x72 design preview v2 (OX-02, proposal)</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#070b12;color:#c6d0d8;font:13px/1.55 'Courier New',monospace}
+  main{width:min(1240px,96vw);margin:24px auto 56px}
+  section{background:#0f1722;border:1px solid #2b3b4d;border-radius:10px;padding:22px;margin:0 0 20px}
+  h1{font:32px/1.1 Georgia,serif;color:#e8c68d;margin:0 0 8px;letter-spacing:.5px}
+  h2{font:21px Georgia,serif;color:#e8c68d;margin:0 0 6px}
+  h3{font:15px Georgia,serif;color:#d8c8a8;margin:18px 0 6px}
+  p{margin:0 0 8px}
+  .eyebrow{color:#8fb0aa;text-transform:uppercase;letter-spacing:3px;font-size:10px;margin:0 0 8px}
+  .note{color:#8d9faf;font-size:11.5px}
+  .muted{color:#738394}
+  .warn{display:inline-block;border:1px solid #a3703a;color:#e8b46b;border-radius:20px;padding:7px 13px;font-size:10px;letter-spacing:2px;white-space:nowrap}
+  .header{display:flex;justify-content:space-between;gap:24px;align-items:flex-start}
+  .rule{border-left:3px solid #6d8fb0;padding-left:12px;color:#b9c7d2;font-size:11.5px;margin-top:14px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .chip{border:1px solid #314153;border-radius:20px;padding:5px 11px;font-size:10.5px;letter-spacing:1px;color:#9fb0be}
+  .status-modified{color:#9fd0ff}.status-custom{color:#e8b46b}.status-gap{color:#ff9a8e}.status-alias{color:#8d9faf}
+  .shot{display:block;width:100%;height:auto;image-rendering:pixelated;border:1px solid #3c4f62;background:#0a0e16;border-radius:4px}
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .quad{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .trio{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  figure{margin:0}
+  figcaption{font-size:11.5px;color:#9fb0be;margin:7px 0 0}
+  .tag{display:inline-block;font-size:9.5px;letter-spacing:1.5px;text-transform:uppercase;color:#8fb0aa;border:1px solid #314153;border-radius:12px;padding:2px 8px;margin-right:6px}
+  .fixtures{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:8px}
+  .fixtures canvas{display:block;width:100%;height:auto;image-rendering:pixelated;border:1px solid #3c4f62;border-radius:4px;background:#0a0e16}
+  .fixtures .cap{font-size:11px;color:#b9c7d2;margin-top:6px}
+  .fixtures .sub{font-size:10px;color:#738394;margin-top:2px}
+  .strips{margin-top:6px}
+  .strip-row{display:grid;grid-template-columns:190px 1fr;gap:12px;align-items:start;padding:10px 0;border-top:1px solid #1e2c3b}
+  .strip-row:first-child{border-top:0}
+  .strip-label{color:#d8c8a8;font-size:11.5px;padding-top:8px}
+  .strip-images{display:flex;flex-wrap:wrap;gap:8px}
+  .strip-cell{background:#0a0e16;border:1px solid #314153;border-radius:4px;padding:5px}
+  .strip-cell canvas{display:block;image-rendering:pixelated}
+  .strip-cap{font-size:8.5px;color:#738394;text-align:center;margin-top:3px;max-width:92px;overflow-wrap:anywhere}
+  .tablewrap{max-height:520px;overflow:auto;border:1px solid #314153;border-radius:6px;margin-top:10px}
+  table{width:100%;border-collapse:collapse;font-size:11px}
+  th,td{border-bottom:1px solid #1e2c3b;padding:7px 8px;vertical-align:top;text-align:left}
+  th{position:sticky;top:0;background:#101b27;color:#e8c68d;z-index:1}
+  tr.status-modified td:nth-child(3){color:#9fd0ff}
+  tr.status-custom td:nth-child(3){color:#e8b46b}
+  tr.status-alias td:nth-child(3){color:#8d9faf}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin:12px 0 0;font-size:10.5px;color:#8d9faf}
+  .legend b{display:block;font-size:11px;margin-bottom:1px}
+  .error{color:#ff9a8e}
+  .kbd{border:1px solid #3c4f62;border-bottom-width:2px;border-radius:3px;padding:0 4px;color:#d8c8a8;font-size:10px}
+  a{color:#9fd0ff}
+  @media (max-width:900px){.pair,.quad,.trio,.fixtures{grid-template-columns:1fr}.strip-row{grid-template-columns:1fr}.header{flex-direction:column}}
+
+  canvas.shot{width:1152px;max-width:none;height:auto}
+  figure{overflow:auto}
+  .pair,.trio{display:grid;grid-template-columns:1fr}
+  .fixtures{grid-template-columns:repeat(auto-fit,minmax(322px,1fr))}
+  .fixtures canvas{width:320px;max-width:none;height:auto}
+  button{background:#233a44;color:#f1d5a4;border:1px solid #7b8d8b;padding:10px 16px;cursor:pointer}
+
+  .knight-directions{display:flex;flex-wrap:wrap;gap:16px;margin:16px 0}
+  .knight-directions canvas,.knight-sheet{image-rendering:pixelated;background:conic-gradient(#25323a 25%,#1d262c 0 50%,#25323a 0 75%,#1d262c 0) 0 0/16px 16px}
+  .knight-directions canvas{width:192px;height:192px}
+  select{padding:8px;background:#22323b;color:#f1d5a4;margin:0 12px}
+</style>
+</head>
+<body><p style="padding:12px 24px"><a href="final-preview.html">Final town and dungeon preview</a></p>
+<main>
+  <section>
+    <div class="header">
+      <div>
+        <p class="eyebrow">Dungeon Crawler · 2026-11-25 · OX-02 standalone focus preview · design v3</p>
+        <h1>0x72 DungeonTileset II — connected low walls</h1>
+        <p class="note">Standalone <code>file://</code> preview at the game's 1152×768 play size. Pack art is drawn at 4× screen (16px source tile → 64px world tile). The current 1.0.1 art is used only for the side-by-side comparison. No playable file is loaded or modified.</p>
+      </div>
+      <span class="warn">PROPOSAL — NOT APPROVED</span>
+    </div>
+    <div class="chips">
+      <span class="chip">real 0x72 v1.7 crops</span>
+      <span class="chip">1152 × 768</span>
+      <span class="chip">fog + revealed</span>
+      <span class="chip">color + grayscale</span>
+      <span class="chip">topology fixtures</span>
+      <span class="chip">hero scale review</span>
+    </div>
+    <div class="rule">Revision 3 fixes the blocked-floor illusion: every blocked cell is solid, edge strips join across tiles, and diagonal openings receive concave corner joints. Walls are a labeled derivative assembled from the pack's low-wall stone top, coping and brick-face crops; no high-wall overhang is used. Before/after use one shared map, semantic roles, positions, foot anchors, lighting, shadows and fog parameters. Native asset dimensions change explicitly in the ledger. The knight now follows the user-selected silver-helmet/navy-tabard reference, with four transparent directional walking loops. This is a generated adaptation, separate from the 0x72 pack. The monsters, bosses, NPCs and town companions now have their own <a href="characters.html">directional character gallery</a>; characters have been reviewed by the user. The <a href="items-effects.html">new item/effect collection</a> awaits review; runtime integration remains separate.</div>
+    <p class="note"><a href="#comparison">Controlled comparison</a> · <a href="#topology">Wall fixtures</a> · <a href="characters.html">Complete character gallery</a> · <a href="items-effects.html">Items and effects</a> · <a href="#knight">Directional knight</a> · <a href="#scale">Size ledger</a> · <a href="#coverage">Missing work</a></p>
+    <p><button id="toggleGrid" type="button" aria-pressed="false">Toggle collision grid in both views</button></p>
+  </section>
+
+  <section>
+    <p class="eyebrow">Focus 1 · the proposal</p>
+    <h2>Dungeon hero shot — fully revealed</h2>
+    <p class="note">Shared fixture: door panel, wall fires, banners, columns, chest, potions, sword, stairs, spikes, hero, custom cat and faithful ordinary-enemy candidates. The same restrained light and contact-shadow pass is applied to both styles. The closed door is mounted on blocked wall; it is not a promised walkable doorway.</p>
+    <figure>
+      <canvas id="heroCanvas" class="shot" width="1152" height="768"></canvas>
+      <figcaption><span class="tag">After</span>0x72 architecture and actors at native 4× screen scale. The cat companion is custom art (the pack has no cat) and is listed as custom in the coverage table.</figcaption>
+    </figure>
+  </section>
+
+  <section id="comparison">
+    <p class="eyebrow">Focus 2 · same fixture, same scale</p>
+    <h2>Current 1.0.1 art vs the 0x72 direction</h2>
+    <p class="note">Identical 18×12 layout, camera, prop positions and lighting intent. The comparison is about material response, wall readability, actor scale and silhouette, not about matching every prop one-for-one.</p>
+    <div class="pair">
+      <figure>
+        <canvas id="beforeCanvas" class="shot" width="1152" height="768"></canvas>
+        <figcaption><span class="tag">Before</span>Current 1.0.1 painter and normal actor/prop scales; direction and walk phase follow the shared knight controls. Common anchors/environment; native bounds are listed below.</figcaption>
+      </figure>
+      <figure>
+        <canvas id="afterCanvas" class="shot" width="1152" height="768"></canvas>
+        <figcaption><span class="tag">After</span>The identical fixture with pack-derived walls and source-native replacement artwork. Positions and environment are unchanged; bounds differences are explicit.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">Focus 3 · review views</p>
+    <h2>Fog and grayscale</h2>
+    <p class="note">The same illustrative radial mask is applied to both styles. This is a controlled visibility comparison, not a claim to reproduce live tile-based fog or to validate gameplay secrecy. Grayscale checks wall/floor separation without hue.</p>
+    <div class="trio">
+      <figure><canvas id="beforeFogCanvas" class="shot" width="1152" height="768"></canvas><figcaption>Before, identical illustrative fog mask.</figcaption></figure>
+      <figure><canvas id="beforeGrayCanvas" class="shot" width="1152" height="768" style="filter:grayscale(1)"></canvas><figcaption>Before, grayscale.</figcaption></figure>
+      <figure><canvas id="fogCanvas" class="shot" width="1152" height="768"></canvas><figcaption>After, identical illustrative fog mask.</figcaption></figure>
+      <figure><canvas id="grayCanvas" class="shot" width="1152" height="768" style="filter:grayscale(1)"></canvas><figcaption>Fully revealed, grayscale.</figcaption></figure>
+      <figure><canvas id="grayFogCanvas" class="shot" width="1152" height="768" style="filter:grayscale(1)"></canvas><figcaption>Fog, grayscale. Check that the fog edge and torch pools still read.</figcaption></figure>
+    </div>
+  </section>
+
+  <section id="knight">
+    <p class="eyebrow">Reference-derived player · preview only</p>
+    <h2>Silver knight — four directions and walking poses</h2>
+    <p class="note">Steel helmet and silver crest, navy tabard, chainmail, boots, sword and wooden gold-cross shield follow the supplied reference. Four generated views, four distinct walking frames each. Exports use one scale and foot anchor; no floor or shadow is baked into the PNGs. Dark checkerboard below is CSS, not part of the images. Play updates both comparison scenes with the same global direction/phase; legacy actors without a direction retain their existing front-view fallback; it never runs gameplay.</p>
+    <p style="margin:14px 0"><label>Direction <select id="knightDirection"><option value="front">Front / down</option><option value="back">Back / up</option><option value="left">Left</option><option value="right">Right</option></select></label>
+      <button id="knightPlay" type="button" aria-pressed="false">Play walking</button>
+      <label>Frame <input id="knightFrame" type="range" min="0" max="3" step="1" value="1"></label></p>
+    <p id="knightStatus" class="note"></p>
+    <div class="knight-directions">
+      <figure><canvas id="knight-front" width="192" height="192"></canvas><figcaption>Front</figcaption></figure>
+      <figure><canvas id="knight-back" width="192" height="192"></canvas><figcaption>Back</figcaption></figure>
+      <figure><canvas id="knight-left" width="192" height="192"></canvas><figcaption>Left</figcaption></figure>
+      <figure><canvas id="knight-right" width="192" height="192"></canvas><figcaption>Right</figcaption></figure>
+    </div>
+    <details><summary>All 16 transparent walking frames</summary>
+      <figure><img class="knight-sheet" src="knight-reference-v1/walk-sheet.png" width="768" height="768" alt="Four walking frames each for front, back, left and right"></figure>
+      <p class="note">Rows: front, back, left, right. Columns: four alternating stride/passing poses. <a href="knight-reference-v1/manifest.json">Frame manifest</a> · <a href="knight-reference-v1/prompts.md">Generation prompts</a> · <a href="knight-reference-v1/README.md">Export notes</a></p>
+    </details>
+  </section>
+
+  <section id="topology">
+    <p class="eyebrow">Focus 4 · wall topology</p>
+    <h2>Do the wall rules survive real room shapes?</h2>
+    <p class="note">Eleven fixtures use the same normalized eight-neighbor rule as the comparison. Outside the map is solid; an obstacle remains floor. Red overlay labels blocked tiles, including corner cases. Every wall layer is clipped to its 16px source / 64px screen tile.</p>
+    <div class="fixtures">
+<figure><canvas id="fixtureIsolated"></canvas><div class="cap">One blocked tile</div></figure>
+<figure><canvas id="fixtureLine"></canvas><div class="cap">Thin wall and ends</div></figure>
+<figure><canvas id="fixtureThick"></canvas><div class="cap">Solid block</div></figure>
+<figure><canvas id="fixtureL"></canvas><div class="cap">L corner</div></figure>
+<figure><canvas id="fixtureT"></canvas><div class="cap">T junction</div></figure>
+<figure><canvas id="fixtureInner"></canvas><div class="cap">Concave corner</div></figure>
+<figure><canvas id="fixtureCross"></canvas><div class="cap">Cross junction</div></figure>
+<figure><canvas id="fixtureDiagonal"></canvas><div class="cap">Diagonal contacts</div></figure>
+<figure><canvas id="fixtureBorder"></canvas><div class="cap">Solid map border</div></figure>
+<figure><canvas id="fixtureObstacle"></canvas><div class="cap">Obstacle on floor</div></figure>
+<figure><canvas id="fixtureCorridor"></canvas><div class="cap">One-tile lane</div></figure>
+    </div>
+  </section>
+
+  <section id="town">
+    <p class="eyebrow">Focus 5 · town direction</p>
+    <h2>Stone gate outpost — pack architecture only</h2>
+    <p class="note">This is not a grassy village mock-up. It is the stone gatehouse the pack can actually build: an open gate, jambs, torches, banners, a wall fountain and the pack's townsfolk. The current game's village, huts, trees, river, bridge and grass remain custom work; the pack offers none of them.</p>
+    <figure>
+      <canvas id="townCanvas" class="shot" width="1152" height="768"></canvas>
+      <figcaption><span class="tag">Concept</span>An outpost interior/terrace. The proposed merchant, villager, prisoner, princess, Pip and Marmalade now use matching custom sheets. Buildings and landscape remain separate unfinished work; this stone outpost is not a replacement for the saved village layout.</figcaption>
+    </figure>
+  </section>
+
+  <section id="scale">
+    <table id="sizeLedger"></table>
+    <p class="eyebrow">Focus 6 · proportions</p>
+    <h2>Hero and monster scale against the 64px tile</h2>
+    <p class="note">This is the size decision the design document asked to review before final render bounds. The reference-derived knight has a 64×64 transparent source cell and a maximum 48px visible body height, drawn at 2× screen scale. The current hero is 64×88 screen. The older 0x72 candidate is retained only as a size reference. The 0x72 monsters are 32–64px wide and read as room-scale threats rather than small tokens.</p>
+    <figure>
+      <canvas id="proportionCanvas" class="shot" width="1152" height="420"></canvas>
+      <figcaption>The grid is two 64px tiles wide and two tall. Feet sit on the same baseline.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <p class="eyebrow">Motion</p>
+    <h2>Original pack reference frames</h2>
+    <p class="note">The new character loops are in the <a href="characters.html">complete character gallery</a>. These older 0x72 crops are retained only as source-pack reference and are not the selected character artwork.</p>
+    <details><summary>Show original pack frame reference</summary><div id="strips" class="strips"></div></details>
+  </section>
+
+  <section id="roles">
+    <p class="eyebrow">Coverage</p>
+    <h2>OX-01 role inventory and gap map</h2>
+    <p id="summary" class="note">Loading…</p>
+    <div class="legend">
+      <div><b class="status-modified">modified</b>Pack crop used with a documented change (recolor, composite, scale or animation remap).</div>
+      <div><b class="status-custom">custom</b>No pack match; new art is required. Listed, never silently substituted.</div>
+      <div><b class="status-alias">alias</b>Role reuses another role's art by design.</div>
+    </div>
+    <div id="roleTable" class="tablewrap"></div>
+  </section>
+
+  <section>
+    <p class="eyebrow">Evidence</p>
+    <h2>Checks</h2>
+    <div id="checks" class="note">Rendering…</div>
+  </section>
+</main>
+<script src="before-sprites.js"></script>
+<script src="design-v2-data.js"></script>
+<script src="wall-topology.js"></script>
+<script src="knight-data.js"></script>
+<script src="characters-data.js"></script>
+<script src="character-art.js"></script>
+<script src="items-effects-data.js"></script>
+<script src="item-art.js"></script>
+<script src="design-v3.js"></script>
+</body>
+</html>

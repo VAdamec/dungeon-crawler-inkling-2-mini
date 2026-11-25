@@ -1,0 +1,5 @@
+Use case: stylized-concept. Asset type: transparent pixel-art dungeon sprite animation sheet.
+Primary request: Clear gray stone staircase in a square dungeon opening. Steps must read as stairs, never a person, knight, ladder or platform.
+Input image 1 is STYLE AND SUBJECT reference only; do not copy its background, captions, labels or collage. Match its detailed dark-outlined classic JRPG pixel clusters, muted medieval colors and readable small silhouettes.
+Composition: EXACT 2 by 2 equal-cell grid, four frames in reading order: ascending stairs climbing away upward; descending stairs receding downward into dark opening; ascending stairs same as first; descending stairs same as second. Each centered in its own cell, fixed scale and base position, generous transparent gutters, nothing crossing cells.
+Real transparent RGBA background, no checkerboard drawing, no scenery, no text, no labels, no borders, no watermark. Crisp pixel clusters, no soft photographic edges. Keep all content safely within cells.
