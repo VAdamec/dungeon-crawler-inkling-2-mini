@@ -1,0 +1,130 @@
+{
+  "runtimeAndTests": [
+    {
+      "file": "index.html",
+      "sha256": "5e8564a4454c94e211ad6ac729d5393be7d584a168623eec16bf72d365966649",
+      "matchesTaskStart": true,
+      "matchesM3": true
+    },
+    {
+      "file": "style.css",
+      "sha256": "295668ca48e608c71dee020030e3d2bedc3bc11b45c86de995a4af351ace2acb",
+      "matchesTaskStart": true,
+      "matchesM3": true
+    },
+    {
+      "file": "js/art-runtime.js",
+      "sha256": "ac12a9d1d03226eb16473922efc189ed0b601a784d5051be9d9587c9621d0ae9",
+      "matchesTaskStart": true,
+      "matchesM3": true
+    },
+    {
+      "file": "js/sprites.js",
+      "sha256": "0f9a18356afa369a1b2912caf80e589109a379fc3e019e32ee214e4b002301d2",
+      "matchesTaskStart": true,
+      "matchesM3": true
+    },
+    {
+      "file": "js/game.js",
+      "sha256": "6b9e865a1912f18e01bb666597f062624be360a4cfc9c2f1eaf674dee611f6b8",
+      "matchesTaskStart": true,
+      "matchesM3": true
+    },
+    {
+      "file": "tests/game.test.cjs",
+      "sha256": "f2c6956a672d04060f822a0ad4d6ac4a3b62b450968bf250c5d146a4b68b988e",
+      "matchesTaskStart": true,
+      "matchesM3": true
+    }
+  ],
+  "syntax": [
+    {
+      "file": "/Users/vadamec/workspace/ai_tmp/opencode_testing/js/art-runtime.js",
+      "exit": 0
+    },
+    {
+      "file": "/Users/vadamec/workspace/ai_tmp/opencode_testing/js/sprites.js",
+      "exit": 0
+    },
+    {
+      "file": "/Users/vadamec/workspace/ai_tmp/opencode_testing/js/game.js",
+      "exit": 0
+    },
+    {
+      "file": "/var/folders/lp/737kz569419gglsqmvs0x0200000gn/T/dungeon-release-readiness-_m45croa/clean runtime package/js/art-runtime.js",
+      "exit": 0
+    },
+    {
+      "file": "/var/folders/lp/737kz569419gglsqmvs0x0200000gn/T/dungeon-release-readiness-_m45croa/clean runtime package/js/sprites.js",
+      "exit": 0
+    },
+    {
+      "file": "/var/folders/lp/737kz569419gglsqmvs0x0200000gn/T/dungeon-release-readiness-_m45croa/clean runtime package/js/game.js",
+      "exit": 0
+    },
+    {
+      "file": "/var/folders/lp/737kz569419gglsqmvs0x0200000gn/T/dungeon-release-readiness-_m45croa/relocated unzipped game/js/art-runtime.js",
+      "exit": 0
+    },
+    {
+      "file": "/var/folders/lp/737kz569419gglsqmvs0x0200000gn/T/dungeon-release-readiness-_m45croa/relocated unzipped game/js/sprites.js",
+      "exit": 0
+    },
+    {
+      "file": "/var/folders/lp/737kz569419gglsqmvs0x0200000gn/T/dungeon-release-readiness-_m45croa/relocated unzipped game/js/game.js",
+      "exit": 0
+    },
+    {
+      "file": "tests/game.test.cjs",
+      "exit": 0
+    },
+    {
+      "file": "docs/reviews/2026-11-26-release-readiness/check-package.cjs",
+      "exit": 0
+    }
+  ],
+  "pythonSyntax": "pass (ast.parse; no output files)",
+  "archiveSha256": "a272a32116799f04302016e46f5020fd85ce993fc054b962faffce99137c33a0",
+  "archiveWhitelistCrcHashes": "pass",
+  "stagedDiffUnchanged": true,
+  "stagedDiffBytes": 0,
+  "diffCheck": 0,
+  "markdownFilesChecked": [
+    "tasks.md",
+    "handover.md",
+    "agents.md",
+    "DOCUMENTATION.md",
+    "docs/plans/2026-11-25-final-graphics-implementation-plan.md",
+    "docs/plans/2026-11-25-graphics-recovery-plan.md",
+    "docs/plans/2026-11-25-0x72-graphics-plan.md",
+    "docs/plans/implementation-plan.md",
+    "docs/plans/companion-selection-plan.md",
+    "docs/plans/teleportation-scenarios-plan.md",
+    "docs/plans/2026-11-26-market-transactions-design.md",
+    "docs/plans/2026-11-26-goldadd-plan.md",
+    "docs/plans/2026-11-26-save-load-plan.md",
+    "docs/plans/2026-11-26-save-load-design.md",
+    "docs/prompts/2026-11-25-graphics-recovery-local-llm.md",
+    "docs/prompts/2026-11-26-save-load-local-llm.md",
+    "docs/reviews/2026-11-26-release-readiness/README.md",
+    "docs/reviews/2026-11-26-release-readiness/manual-acceptance.md",
+    "docs/reviews/2026-11-26-release-readiness/screenshots/README.md"
+  ],
+  "localLinksChecked": 274,
+  "localMarkdownMissing": [],
+  "freshChecks": {
+    "previewTests": "27/27",
+    "nonWritingBake": "pass",
+    "extractedSmoke": "SMOKE_OK",
+    "packageBrowser": "PACKAGE_BROWSER_OK"
+  },
+  "reusedM3Evidence": {
+    "fullGame": "307/307; not rerun",
+    "focused": "87/87; not rerun",
+    "allRuntimeAndTestHashesMatch": true
+  },
+  "manualChecklistCheckedBoxes": 0,
+  "nativeGR09": "unverified",
+  "runtimeChangesThisReview": false,
+  "commitsOrPublishing": "none"
+}

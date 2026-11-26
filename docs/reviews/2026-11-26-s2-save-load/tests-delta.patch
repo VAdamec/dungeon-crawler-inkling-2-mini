@@ -1,0 +1,296 @@
+diff --git a/tmp/dungeon-s2-before/game.test.cjs b/tests/game.test.cjs
+index f53e295..9dc6b0f 100644
+--- a/tmp/dungeon-s2-before/game.test.cjs
++++ b/tests/game.test.cjs
+@@ -2615,7 +2615,7 @@ test('T2 addScrolls changes only the count in town or dungeon, including with an
+ // Exclude disposable rendering/UI state while retaining every gameplay field, Sets and nonfinite sentinels.
+ function goldSnapshot(g) {
+   return g.run(`JSON.stringify(state, (key,value) => {
+-    if (['art','motion','audio','consoleLines','consoleHistory','consoleHistoryIndex'].includes(key)) return undefined;
++    if (['art','motion','audio','consoleLines','consoleHistory','consoleHistoryIndex','loadSession'].includes(key)) return undefined;
+     if (value instanceof Set) return [...value];
+     if (typeof value==='number' && !Number.isFinite(value)) return String(value);
+     return value;
+@@ -4486,7 +4486,7 @@ test('S1 over-limit histories and inventory refuse losslessly rather than prunin
+ test('S1 keeps the S0 state inventory explicit and Unicode journal text lossless', () => {
+   const g=game(42,true,'town');
+   const classified=JSON.parse(fs.readFileSync(path.join(__dirname,'../docs/reviews/2026-11-26-s0-save-load/state-classification.json'),'utf8'));
+-  assert.deepEqual(g.json('Object.keys(state).sort()'),Object.keys(classified).sort());
++  assert.deepEqual(g.json('Object.keys(state).filter(k=>k!=="loadSession").sort()'),Object.keys(classified).sort());
+   g.run(`state.messages=['A dragon says: "[hello]" 🐉 é <script>plain text</script>'];`);
+   const dto=saveFixture(g);assert.deepEqual(saveParse(g,dto),dto);
+   assert.deepEqual(dto.run.messages,g.json('state.messages'));
+@@ -4495,3 +4495,273 @@ test('S1 keeps the S0 state inventory explicit and Unicode journal text lossless
+     v.run.messages[0]='changed';return d.run.messages[0]!==v.run.messages[0];})()`);
+   assert.equal(detached,true);
+ });
++
++function s2Snapshot(g) {
++  return g.run(`JSON.stringify(state,(key,value)=>{
++    if (['art','motion','audio','consoleLines','consoleHistory','consoleHistoryIndex','loadSession','lastTick','helpFocus'].includes(key)) return undefined;
++    return value instanceof Set?[...value]:value;
++  })`);
++}
++function s2InstallDto(g, dto) { g.run(`window.s2Dto=JSON.parse(${JSON.stringify(JSON.stringify(dto))})`); }
++function s2Load(g, dto) { s2InstallDto(g,dto); return g.run('commitSaveLoad(beginSaveLoad(),window.s2Dto)'); }
++function s2Aliases(g) {
++  return g.run(`(()=>{const t=state.town,f=state.floors[state.depth];return state.inn===t.landmarks.inn&&state.townGate===t.landmarks.gate
++    &&t.store===t.landmarks.store&&t.props.includes(t.landmarks.companionBoard)
++    &&t.visited instanceof Set&&Object.values(state.floors).every(f=>f.visited instanceof Set)
++    &&(state.area==='town'?state.map===t.map&&state.props===t.props&&state.visited===t.visited&&state.merchant===t.store
++      :FLOOR_FIELDS.every(k=>state[k]===f[k])&&(!state.boss||state.monsters.includes(state.boss)));})()`);
++}
++
++test('S2 detached hydration reconstructs every alias without touching source, live state or action helpers', () => {
++  for(const area of ['town','dungeon']) {
++    const g=game(713,true,area),dto=saveFixture(g);s2InstallDto(g,dto);
++    const before=s2Snapshot(g);
++    g.run(`Math.random=()=>{throw new Error('hydration RNG');};
++      for(const name of ['render','log','playSound','equipItem','activateCompanion','placeCompanionNearPlayer','revealAroundPlayer','saveTown','saveFloor','newGame','genLevel','genTown','enterFloor','recreateMonsters'])
++        globalThis[name]=()=>{throw new Error('hydration called '+name);};
++      window.s2Candidate=hydrateSaveData(window.s2Dto);`);
++    assert.equal(s2Snapshot(g),before);
++    assert.deepEqual(g.json('window.s2Dto'),dto);
++    assert.deepEqual(g.json(`captureSaveData(window.s2Candidate,${JSON.stringify(SAVE_TEST_CONTEXT)})`),dto);
++    assert.equal(g.run('window.s2Candidate.audio'),null);assert.equal(g.run('window.s2Candidate.art'),null);
++    assert.equal(g.run('window.s2Candidate.lastTick'),0);
++    assert.equal(g.run('Object.keys(window.s2Candidate).length===Object.keys(state).length'),true);
++    g.run('window.s2Candidate.player.hp=1;window.s2Candidate.town.store.stock.length=0');
++    assert.equal(s2Snapshot(g),before);assert.deepEqual(g.json('window.s2Dto'),dto);
++  }
++});
++
++test('S2 atomic load restores exact progression/world/deadlines and retains receiver audio/art', () => {
++  for(const area of ['town','dungeon']) {
++    const source=game(713,true,area);
++    source.run(`equipItem('ring',{...ITEM_TABLE[5]});state.player.hp=37;state.player.mp=7;
++      state.gold=293;state.activeTime=15.25;state.retreatReadyAt=72.5;state.warnedLow=true;
++      state.combatElapsed=3.5;state.healElapsed=1.25;state.spellReadyAt.fireball=17.75;
++      state.inventory=[{name:'Potion',kind:'heal',heal:.499}];state.townScrolls=3;
++      state.townExit={depth:1,x:0,y:0,reason:'cheat'};state.townPortalOpen=true;
++      state.messages=['Exact saved log','<plain text>'];`);
++    if(area==='dungeon')source.run('state.monsters[0].hp=4;state.monsters[0].nextAttackAt=17.5;state.potions=state.potions.slice(1);state.hazardTime=3.75');
++    const dto=saveFixture(source),g=game(42,true,'town');
++    s2InstallDto(g,dto);
++    g.run(`window.s2Audio=state.audio;window.s2Art=state.art;state.audio.enabled=false;state.audio.musicVolume=.19;state.audio.effectsVolume=.31;
++      state.consoleHistory=['old command'];state.godModeStats={hp:2};state.motion.time=123;
++      Math.random=()=>{throw new Error('load RNG');};
++      for(const name of ['log','playSound','equipItem','activateCompanion','placeCompanionNearPlayer','revealAroundPlayer','newGame','genLevel','genTown','enterFloor','recreateMonsters'])
++        globalThis[name]=()=>{throw new Error('load called '+name);};`);
++    assert.equal(g.run('commitSaveLoad(beginSaveLoad(),window.s2Dto)'),true);
++    assert.deepEqual(saveFixture(g),dto,area);
++    assert.equal(s2Aliases(g),true);
++    assert.equal(g.run('state.audio===window.s2Audio&&state.art===window.s2Art'),true);
++    assert.deepEqual(g.json('[state.audio.enabled,state.audio.musicVolume,state.audio.effectsVolume]'),[false,.19,.31]);
++    assert.equal(String(g.elements.hpText.textContent),'37/80');assert.equal(String(g.elements.gold.textContent),'293');
++    assert.equal(g.elements.log.textContent,'<plain text>\n\nExact saved log');
++    assert.equal(g.elements.launchScreen.hidden,true);assert.equal(g.elements.gameLayout.hidden,false);
++    assert.deepEqual(g.json('[state.godMode,state.godModeStats,state.helpOpen,state.consoleHistory,state.pause,state.ending,state.bossIntro,state.bossDefeat,state.loadSession]'),[false,null,false,[],null,null,null,null,null]);
++    assert.equal(g.run('state.lastTick>Date.now()-1000'),true);
++    assert.equal(g.run('state.motion.time'),0);
++    assert.deepEqual(g.json('state.motion.moves'),{});
++  }
++});
++
++test('S2 load is allowed from launch, Help, stable god mode and ordinary death with correct focus/overlays', () => {
++  const dto=saveFixture(game(713,true,'town'));
++  for(const origin of ['launch','help','god','death']) {
++    const g=game(42,origin!=='launch','town',true);s2InstallDto(g,dto);
++    if(origin==='help')g.run('openHelp()');
++    if(origin==='god')g.run('setGodMode("1")');
++    if(origin==='death')g.run('die()');
++    assert.equal(g.run('commitSaveLoad(beginSaveLoad(),window.s2Dto)'),true,origin);
++    assert.equal(g.run('state.started&&!state.gameOver&&!state.won&&!state.godMode'),true);
++    assert.equal(g.elements.helpOverlay.hidden,true);assert.equal(g.elements.devConsole.hidden,true);
++    assert.equal(g.elements.overlay.style.display,'none');assert.equal(g.elements.pauseOverlay.style.display,'none');
++    assert.equal(g.elements.gameLayout.inert,false);assert.equal(g.elements.launchScreen.inert,false);
++    assert.equal(g.run('document.activeElement===canvas'),true);
++    assert.deepEqual(saveFixture(g),dto);
++  }
++});
++
++test('S2 pending load freezes simulation, player actions and launch choices without charging time', () => {
++  for(const area of ['town','dungeon']) {
++    const g=game(42,true,area);g.run('window.s2Session=beginSaveLoad()');
++    const before=s2Snapshot(g);
++    g.run(`advanceActiveTime(20);enemyTick();townTick();companionTick();hazardTick();recoveryTick(20);regenMana();advanceMotion(20);
++      movePlayer(1,0);castSpell('heal');shootBow();drinkPotion();pickup();useTownScroll();descendStairs();ascendStairs();retreat();
++      openTrade();openCompanionBoard();openConsole();openHelp();buyFromMerchant();sellToMerchant();`);
++    g.key('ArrowRight');g.key('h');g.key('j');g.key('x');g.key('`');
++    assert.equal(s2Snapshot(g),before,area);
++    assert.throws(()=>saveFixture(g),/Invalid save:/,'cannot save an unconfirmed load session');
++    assert.equal(g.run('cancelSaveLoad(window.s2Session)'),true);
++    assert.equal(g.run('state.loadSession'),null);assert.equal(g.run('state.activeTime'),JSON.parse(before).activeTime);
++    assert.equal(g.run('state.lastTick>Date.now()-1000'),true);
++    g.run('beginSaveLoad();state.lastTick=1;cancelSaveLoad(state.loadSession,false)');
++    assert.equal(g.run('state.lastTick>Date.now()-1000'),true,'forced discard must not credit pending-load time');
++  }
++  const g=game(42,false,'town');g.run('beginSaveLoad();setCompanionChoice("pip");startGame()');
++  assert.equal(g.run('state.started'),false);assert.equal(g.run('state.companionChoice'),'marmalade');
++});
++
++test('S2 stale or cancelled confirmations cannot replace restart, travel, death or a newer session', () => {
++  const dto=saveFixture(game(713,true,'town'));
++  const transitions=['cancelSaveLoad()','newGame()','enterFloor(2,false,true)','enterTown()','loadLevel("3")',
++    'die()','startEnding()','closeHelp()','window.s2New=beginSaveLoad()'];
++  for(const transition of transitions) {
++    const g=game();s2InstallDto(g,dto);g.run(`window.s2Old=beginSaveLoad();${transition}`);
++    const before=s2Snapshot(g);
++    assert.equal(g.run('commitSaveLoad(window.s2Old,window.s2Dto)'),false,transition);
++    assert.equal(s2Snapshot(g),before,transition);
++    if(transition.includes('s2New')) {
++      assert.equal(g.run('cancelSaveLoad(window.s2Old)'),false);
++      assert.equal(g.run('state.loadSession===window.s2New'),true);
++      assert.equal(g.run('commitSaveLoad(window.s2New,window.s2Dto)'),true);
++    }
++  }
++  const g=game();s2InstallDto(g,dto);g.run('window.s2Token=beginSaveLoad()');
++  assert.equal(g.run('commitSaveLoad(window.s2Token,window.s2Dto)'),true);
++  const before=s2Snapshot(g);assert.equal(g.run('commitSaveLoad(window.s2Token,window.s2Dto)'),false);
++  assert.equal(s2Snapshot(g),before);
++});
++
++test('S2 conflicting load contexts and changed bindings reject without state or focus changes', () => {
++  const dto=saveFixture(game());
++  for(const setup of ['document.hidden=true','state.pause={kind:"health"}','state.pause={kind:"retreat"}',
++    'state.consoleOpen=true','state.trade={}','state.companionPicker={}',
++    'state.ending={completed:true}','state.bossIntro={completed:false}','state.bossDefeat={completed:false}',
++    'state.won=true','document.getElementById("tradeOverlay").hidden=false','document.getElementById("companionOverlay").hidden=false']) {
++    const g=game();g.run(setup);const before=s2Snapshot(g);
++    assert.equal(g.run('beginSaveLoad()'),null,setup);assert.equal(s2Snapshot(g),before);
++  }
++  for(const setup of ['document.hidden=true','state.pause={kind:"health"}','state.map=state.map.map(row=>row.slice())','state.depth=2']) {
++    const g=game();s2InstallDto(g,dto);g.run(`window.s2Token=beginSaveLoad();${setup}`);
++    const before=s2Snapshot(g);assert.equal(g.run('commitSaveLoad(window.s2Token,window.s2Dto)'),false,setup);
++    assert.equal(s2Snapshot(g),before);
++  }
++});
++
++test('S2 malformed or failed hydration preserves the exact old run and retryable session', () => {
++  const g=game(42,true,'town',true),dto=saveFixture(g);s2InstallDto(g,dto);
++  g.run('openHelp();window.s2Token=beginSaveLoad();window.s2OldState=state;window.s2Focus=document.activeElement');
++  const before=s2Snapshot(g);
++  assert.throws(()=>g.run('commitSaveLoad(window.s2Token,{})'),/Invalid save:/);
++  assert.equal(s2Snapshot(g),before);assert.equal(g.run('state===window.s2OldState&&state.loadSession===window.s2Token&&document.activeElement===window.s2Focus'),true);
++  g.run('window.s2Hydrate=hydrateSaveData;hydrateSaveData=()=>{throw new Error("hydrate allocation failure");}');
++  assert.throws(()=>g.run('commitSaveLoad(window.s2Token,window.s2Dto)'),/hydrate allocation failure/);
++  assert.equal(s2Snapshot(g),before);
++  g.run('hydrateSaveData=window.s2Hydrate');
++  assert.equal(g.run('commitSaveLoad(window.s2Token,window.s2Dto)'),true);
++});
++
++test('S2 failed commit presentation restores old state, HUD, Help and focus without replaying render', () => {
++  const g=game(42,true,'town',true),dto=saveFixture(game(713));s2InstallDto(g,dto);
++  g.run(`state.gold=42;render();openHelp();window.s2Token=beginSaveLoad();window.s2OldState=state;
++    window.s2Focus=document.activeElement;window.s2Render=render;
++    render=()=>{document.getElementById('gold').textContent='partly changed';throw new Error('paint failure');};`);
++  const before=s2Snapshot(g),gold=g.elements.gold.textContent;
++  assert.throws(()=>g.run('commitSaveLoad(window.s2Token,window.s2Dto)'),/paint failure/);
++  assert.equal(s2Snapshot(g),before);assert.equal(g.run('state===window.s2OldState'),true);
++  assert.equal(g.elements.gold.textContent,gold);assert.equal(g.elements.helpOverlay.hidden,false);
++  assert.equal(g.elements.gameLayout.inert,true);assert.equal(g.run('document.activeElement===window.s2Focus'),true);
++  assert.equal(g.run('state.loadSession'),null);assert.equal(g.run('commitSaveLoad(window.s2Token,window.s2Dto)'),false);
++  g.run('render=window.s2Render');assert.equal(g.run('commitSaveLoad(beginSaveLoad(),window.s2Dto)'),true);
++});
++
++test('S2 active encounter, guards and final dragon restore exactly while later revisits retain respawn rules', () => {
++  const source=game();source.run(`render=()=>{};playSound=()=>{};enterFloor(50,false,true);
++    state.activeTime=20;summonThroneGuards();state.monsters[0].hp=-7;state.monsters.find(m=>m.isGuard).hp=-13;
++    state.monsters[1].hp=4;state.monsters[1].nextAttackAt=21.5;state.bossIntroSeen=true;`);
++  const dto=saveFixture(source),g=game();assert.equal(s2Load(g,dto),true);
++  assert.deepEqual(saveFixture(g),dto);assert.equal(s2Aliases(g),true);
++  g.run('enterTown();enterFloor(50,false)');
++  assert.equal(g.run('state.monsters.some(m=>m.isGuard)'),false);
++  assert.equal(g.run('state.monsters.every(m=>m.hp===m.maxHp)'),true);
++  assert.equal(g.run('state.boss.hp'),g.run('state.boss.maxHp'));
++  source.run('enterFloor(100,false,true);damageMonster(state.boss,state.boss.hp+7);clearBossDefeat()');
++  const final=saveFixture(source),receiving=game();assert.equal(s2Load(receiving,final),true);
++  assert.deepEqual(saveFixture(receiving),final);const gold=receiving.run('state.gold'),kills=receiving.run('state.kills');
++  receiving.run('enterTown();enterFloor(100,false)');
++  assert.equal(receiving.run('state.boss'),null);assert.equal(receiving.run('state.princess.rescued'),false);
++  assert.equal(receiving.run('state.gold'),gold);assert.equal(receiving.run('state.kills'),kills);
++});
++
++test('S2 restored portal returns once and ring HP, stock, keys, loot and descent rewards stay once-only', () => {
++  const source=game();source.run(`equipItem('ring',{...ITEM_TABLE[5]});state.player.hp=37;state.player.mp=7;
++    state.potions=state.potions.slice(1);state.floorKey.dropped=true;state.floorKey.collected=true;state.floorKey.drop=null;
++    state.floors[1].descentRewarded=true;state.gold=123;state.townScrolls=3;useTownScroll();`);
++  const dto=saveFixture(source),g=game();assert.equal(s2Load(g,dto),true);
++  assert.equal(g.run('state.player.maxHp'),80);assert.equal(g.run('state.player.hp'),37);
++  const potionCount=g.run('state.floors[1].potions.length'),exit=g.json('state.townExit');
++  g.key('j');assert.equal(g.run('state.area'),'dungeon');assert.equal(g.run('state.townScrolls'),2);
++  assert.deepEqual(g.json('[state.player.x,state.player.y]'),[exit.x,exit.y]);
++  assert.equal(g.run('state.townPortalOpen'),false);assert.equal(g.run('state.townExit'),null);
++  assert.equal(g.run('state.potions.length'),potionCount);assert.equal(g.run('state.floorKey.collected'),true);
++  g.run('state.player.x=state.stairs.x;state.player.y=state.stairs.y;descendStairs()');
++  assert.equal(g.run('state.gold'),123,'descent reward must not duplicate');
++  assert.equal(s2Load(g,dto),true);assert.equal(g.run('state.player.maxHp'),80);assert.equal(g.run('state.player.hp'),37);
++});
++
++test('S2 stale motion/cinematic callbacks and reentrant reset cannot overwrite a loaded or newer run', () => {
++  const g=game(),dto=saveFixture(game(713,true,'town'));s2InstallDto(g,dto);
++  g.run(`window.s2OldMotion=state.motion;window.s2Intro={completed:false,frameId:31};
++    window.s2Defeat={completed:false,frameId:32};window.s2Ending={completed:false,frameId:33};
++    window.s2Cancelled=[];window.cancelAnimationFrame=id=>window.s2Cancelled.push(id);
++    state.bossIntro={completed:true,frameId:31};state.bossDefeat={completed:true,frameId:32};
++    window.s2Session=beginSaveLoad();`);
++  assert.equal(g.run('commitSaveLoad(window.s2Session,window.s2Dto)'),true);
++  const before=s2Snapshot(g);
++  g.run('motionFrame(99999,window.s2OldMotion);bossIntroFrame(99999,window.s2Intro);bossDefeatFrame(99999,window.s2Defeat);endingFrame(99999,window.s2Ending)');
++  assert.equal(s2Snapshot(g),before);assert.deepEqual(g.json('window.s2Cancelled'),[31,32]);
++  const other=game();s2InstallDto(other,dto);
++  other.run('window.s2Session=beginSaveLoad();window.s2OriginalHydrate=hydrateSaveData;hydrateSaveData=v=>{const c=window.s2OriginalHydrate(v);newGame();return c;}');
++  assert.equal(other.run('commitSaveLoad(window.s2Session,window.s2Dto)'),false);
++  assert.equal(other.run('state.depth'),1);assert.equal(other.run('state.gold'),0);
++});
++
++test('S2 all companions and high-level XP hydrate with exact positions, static roles and readiness', () => {
++  const source=game(713,true,'town'),g=game();
++  for(const [i,id] of ['marmalade','pip','mimic','hydra','boar','medusa','wizard','skeletonKing','dragon','cook','bartender'].entries()) {
++    source.run(`unlockCompanion('${id}');activateCompanion('${id}');state.companion.x=34;state.companion.y=27;
++      state.companionAttackAt=19.75;state.companionSpeechReadyAt=17.25;state.companionQuoteIndex=8;
++      state.player.lvl=${i%3===0?83:i%3===1?99:100};var s2Threshold=40;
++      for(let level=1;level<state.player.lvl;level++)s2Threshold=Math.round(s2Threshold*1.5);
++      state.player.xpNext=state.player.lvl===100?1:s2Threshold;state.player.xp=state.player.lvl===100?0:Math.floor(s2Threshold/2);`);
++    const dto=saveFixture(source);assert.equal(s2Load(g,dto),true,id);
++    assert.deepEqual(saveFixture(g),dto,id);assert.deepEqual(g.json('state.companion'),source.json('state.companion'));
++    assert.equal(g.run('state.companion.x'),34);assert.equal(g.run('state.companionAttackAt'),19.75);
++    assert.equal(s2Aliases(g),true);
++  }
++});
++
++test('S2 restored hazard warnings and cooldowns use saved active time without replay or catch-up', () => {
++  const source=game();source.run(`enterFloor(2,false,true);state.activeTime=10;state.retreatReadyAt=70;
++    state.hazardTime=4;const rock=state.hazards.find(h=>h.type==='rocks');rock.triggered=true;rock.stage='warning';rock.impactAt=4.5;
++    state.player.x=rock.x;state.player.y=rock.y;state.companion.x=rock.x;state.companion.y=rock.y;`);
++  const dto=saveFixture(source),g=game();assert.equal(s2Load(g,dto),true);
++  const hp=g.run('state.player.hp');assert.deepEqual(saveFixture(g),dto);
++  assert.equal(g.run('retreatRemaining()'),60);
++  g.run('advanceActiveTime(.4);hazardTick()');assert.equal(g.run('state.player.hp'),hp);
++  g.run('advanceActiveTime(.2);hazardTick()');assert.equal(g.run('state.player.hp'),hp-12);
++  g.run('hazardTick()');assert.equal(g.run('state.player.hp'),hp-12,'spent impact must not repeat');
++  assert.ok(Math.abs(g.run('retreatRemaining()')-59.4)<1e-8);
++});
++
++test('S2 presentation preparation errors and reentrant commits reject before touching the current run', () => {
++  const g=game(42,true,'town',true),dto=saveFixture(game());s2InstallDto(g,dto);
++  g.run('openHelp();window.s2Session=beginSaveLoad();window.s2Presentation=captureLoadPresentation;captureLoadPresentation=()=>{throw new Error("canvas read failure");}');
++  const before=s2Snapshot(g);
++  assert.throws(()=>g.run('commitSaveLoad(window.s2Session,window.s2Dto)'),/canvas read failure/);
++  assert.equal(s2Snapshot(g),before);assert.equal(g.run('state.loadSession===window.s2Session'),true);
++  g.run('captureLoadPresentation=()=>{const p=window.s2Presentation();newGame();return p;}');
++  assert.equal(g.run('commitSaveLoad(window.s2Session,window.s2Dto)'),false);
++  assert.equal(g.run('state.gold'),0);assert.equal(g.run('state.area'),'town');
++});
++
++test('S2 hydrates and atomically loads the final fully explored 100-floor DTO without mutation or RNG', () => {
++  const source=game(713,true,'town');source.run('render=()=>{};playSound=()=>{}');
++  for(let depth=1;depth<=100;depth++)source.run(`enterFloor(${depth},false);state.visited=new Set(Array.from({length:W*H},(_,i)=>(i%W)+','+Math.floor(i/W)));saveFloor()`);
++  const dto=saveFixture(source),g=game();s2InstallDto(g,dto);
++  g.run(`Math.random=()=>{throw new Error('large load RNG');};playSound=()=>{throw new Error('large load sound');};
++    window.s2Detached=hydrateSaveData(window.s2Dto);`);
++  assert.equal(g.run('Object.keys(window.s2Detached.floors).length'),100);
++  assert.equal(g.run('window.s2Detached.visited instanceof Set'),true);
++  assert.equal(g.run('commitSaveLoad(beginSaveLoad(),window.s2Dto)'),true);
++  assert.equal(s2Aliases(g),true);assert.deepEqual(saveFixture(g),dto);
++});

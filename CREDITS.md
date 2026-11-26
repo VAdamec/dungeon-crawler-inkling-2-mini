@@ -1,10 +1,10 @@
 # Credits and artwork provenance
 
-Updated 2026-11-25 for the integrated graphics worktree; release version is 2.0.0. This document records attribution and source boundaries, without changing the game's license or assigning a blanket license to reference images.
+Updated 2026-11-26 for release 2.1.0 (alpha); artwork/provenance boundaries are unchanged. This document records attribution and source boundaries, without changing the game's license or assigning a blanket license to reference images.
 
 ## Current custom artwork
 
-The knight, remaining characters, items/effects, town scenery and dungeon materials were prepared with the built-in OpenAI image generation tool, guided by the user's selected references and review feedback. Deterministic local exporters crop/align/scale the selected PNGs; the runtime bake preserves their selected source pixels. These are generated adaptations, **not sprites extracted from the supplied reference screenshots and not assets from the 0x72 pack**.
+The knight, remaining characters, items/effects, town scenery and dungeon materials were prepared with the Gemini generation tool, guided by the user's selected references and review feedback. Deterministic local exporters crop/align/scale the selected PNGs; the runtime bake preserves their selected source pixels. These are generated adaptations, **not sprites extracted from the supplied reference screenshots and not assets from the 0x72 pack**.
 
 | Collection | Source/provenance record | Runtime use |
 | --- | --- | --- |
@@ -28,4 +28,4 @@ Monster combat remarks include brief quotations attributed to *Monty Python and 
 
 Music and effects are synthesized locally through Web Audio. No recorded soundtrack, external sound library, remote font or audio service is required. Canvas/code supply the HUD, logo, fog, particles, warning badges, hearts, tears and sunset; character art is not substituted with an uncredited external sprite library.
 
-Documentation screenshots and bestiary figures are rendered from the current game. [Capture setup and source metadata](docs/screenshots/2026-11-25-integrated/README.md) distinguish staged encounters and normalized illustrations from natural gameplay or in-world size comparisons. Historical captures retain their dated directories.
+Documentation screenshots and bestiary figures are rendered from the current game. [Capture setup and source metadata](docs/screenshots/2026-11-25-integrated/README.md) distinguish staged encounters and normalized illustrations from natural gameplay or in-world size comparisons. Historical captures retain their dated directories. [Save/load UI captures](docs/screenshots/2026-11-26-save-load/README.md) show real local file controls with staged test progress; this update adds no artwork or external runtime dependencies.

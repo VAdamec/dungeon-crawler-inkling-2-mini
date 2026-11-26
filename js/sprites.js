@@ -654,19 +654,20 @@ function actorAnimationPose(name, actor) {
   if (!actor || typeof window.requestAnimationFrame !== 'function') return pose;
   const moving = actorIsMoving(actor), key = actorMotionKey(actor), time = state.motion.time;
   pose.facing = state.motion.facing[key] || 1;
+  const phase = Number.isFinite(actor.id) ? actor.id % 4 : 0;
   const role = artNormalizeRole(name);
   if (role.kind === 'character') {
     // Prepared poses already contain gait, hops and wing deformation.
-    if (['bat','wasp','dragonBoss'].includes(role.target)) pose.frame = Math.floor(time * 8 + (actor.id || 0) % 4) % 4;
-    else if (['mage','healer','hydra','medusa','darkWizard','skeletonKing'].includes(role.target)) pose.frame = Math.floor(time * 6 + (actor.id || 0) % 4) % 4;
+    if (['bat','wasp','dragonBoss'].includes(role.target)) pose.frame = Math.floor(time * 8 + phase) % 4;
+    else if (['mage','healer','hydra','medusa','darkWizard','skeletonKing'].includes(role.target)) pose.frame = Math.floor(time * 6 + phase) % 4;
     else if (moving) pose.frame = Math.floor(time * 12) % 4;
     return pose;
   }
   if (name === 'bat' || name === 'wasp' || name === 'dragonBoss') {
-    pose.frame = Math.floor(time * 8 + (actor.id || 0) % 4) % 4;
+    pose.frame = Math.floor(time * 8 + phase) % 4;
     if (name === 'bat' || name === 'wasp') pose.rise = Math.sin(time * 8) * 0.8;
   } else if (name === 'mage' || name === 'healer' || ['hydra', 'medusa', 'darkWizard', 'skeletonKing'].includes(name)) {
-    pose.frame = Math.floor(time * 6 + (actor.id || 0) % 4) % 4;
+    pose.frame = Math.floor(time * 6 + phase) % 4;
   } else if (moving && name === 'boar') {
     pose.sx = 1.08; pose.sy = 0.94; pose.rise = -Math.abs(Math.sin(time * Math.PI * 8)) * 3;
   } else if (moving && name === 'slime') {

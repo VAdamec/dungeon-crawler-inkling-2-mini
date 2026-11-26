@@ -1,0 +1,113 @@
+--- before/js/game.js
++++ after/js/game.js
+@@ -372,9 +372,13 @@
+   log(`${state.companion.name}: “${text}”`);
+ }
+ 
++function simulationBlocked() {
++  return !state.started || state.gameOver || state.helpOpen || state.consoleOpen || state.pause
++    || state.trade || state.companionPicker || document.hidden || state.ending || bossCinematicActive();
++}
++
+ function companionTick() {
+-  if (state.companionPicker) return;
+-  if (state.area === 'town') return;
++  if (state.area === 'town' || simulationBlocked()) return;
+   const companion = state.companion;
+   if (!companion || state.gameOver) return;
+   if (state.companionSpeech && state.activeTime >= state.companionSpeech.expiresAt) state.companionSpeech = null;
+@@ -1247,7 +1251,7 @@
+ }
+ 
+ function motionPlayable() {
+-  return state.started && !state.gameOver && !state.helpOpen && !state.consoleOpen && !state.companionPicker && !state.pause && !document.hidden && !bossCinematicActive();
++  return !simulationBlocked();
+ }
+ 
+ function actorIsMoving(actor) {
+@@ -1317,7 +1321,7 @@
+ 
+ function applyPlayerHazards() {
+   const companionOverlayOpen = typeof document !== 'undefined' && document.getElementById && document.getElementById('companionOverlay') && !document.getElementById('companionOverlay').hidden;
+-  if (!state.started || state.gameOver || state.helpOpen || state.trade || companionOverlayOpen || state.pause || document.hidden) return;
++  if (state.area === 'town' || simulationBlocked() || companionOverlayOpen) return;
+   const p = state.player;
+   const hazard = state.hazards.find(h => h.x === p.x && h.y === p.y);
+   if (!hazard) return;
+@@ -1339,9 +1343,7 @@
+ }
+ 
+ function hazardTick() {
+-  if (state.companionPicker) return;
+-  if (state.area === 'town') return;
+-  if (!state.started || state.gameOver || state.helpOpen || state.consoleOpen || state.pause || document.hidden) return;
++  if (state.area === 'town' || simulationBlocked()) return;
+   for (const hazard of state.hazards) {
+     if (hazard.type !== 'rocks' || hazard.stage !== 'warning' || state.hazardTime < hazard.impactAt) continue;
+     hazard.stage = 'spent';
+@@ -1631,8 +1633,7 @@
+ }
+ 
+ function regenMana() {
+-  if (state.companionPicker) return;
+-  if (state.area === 'town' || state.godMode) return;
++  if (state.area === 'town' || state.godMode || simulationBlocked()) return;
+   const p = state.player;
+   if (state.combatElapsed < 4) return;
+   if (state.monsters.some(m => m.hp > 0 && Math.max(Math.abs(m.x - p.x), Math.abs(m.y - p.y)) <= 3)) return;
+@@ -2662,14 +2663,14 @@
+ }
+ 
+ function advanceActiveTime(elapsed) {
+-  if (state.area === 'town') return;
+-  if (!state.started || state.gameOver || state.helpOpen || state.consoleOpen || state.trade || state.pause || document.hidden || bossCinematicActive()) return;
++  if (state.area === 'town' || simulationBlocked()) return;
+   state.activeTime += Math.max(0, elapsed);
+   state.hazardTime += Math.max(0, elapsed);
+   updateMonsterSpeech();
+ }
+ 
+ function retreat() {
++  if (!state.started || state.companionPicker || state.trade || state.consoleOpen || state.helpOpen || document.hidden || state.ending || bossCinematicActive()) return;
+   if (state.area === 'town') { log('No need to retreat while you are in town.'); render(); return; }
+   if (state.gameOver || state.helpOpen || (state.pause && state.pause.kind === 'retreat')) return;
+   if (retreatRemaining() > 0) { log(`Retreat recovers in ${Math.ceil(retreatRemaining())} active seconds.`); render(); return; }
+@@ -2705,9 +2706,7 @@
+ }
+ 
+ function recoveryTick(elapsed) {
+-  if (state.companionPicker) return;
+-  if (state.area === 'town') return;
+-  if (!state.started || state.gameOver || state.helpOpen || state.trade || state.pause) return;
++  if (state.area === 'town' || simulationBlocked()) return;
+   freezePlayerStats();
+   if (state.godMode) { state.combatElapsed += elapsed; return; }
+   const before = state.combatElapsed;
+@@ -2784,18 +2783,16 @@
+ }
+ 
+ function enemyTick() {
+-  if (state.companionPicker) { state.lastTick = Date.now(); return; }
+   const now = Date.now();
+   const elapsed = Math.min(0.5, Math.max(0, (now - state.lastTick) / 1000));
+   state.lastTick = now;
+   freezePlayerStats();
++  if (simulationBlocked()) return;
+   if (state.area === 'town') {
+-    if (!state.started || state.gameOver || state.helpOpen || state.consoleOpen || state.pause || document.hidden) return;
+     musicTick();
+     if (townTick()) render();
+     return;
+   }
+-  if (!state.started || state.gameOver || state.helpOpen || state.consoleOpen || state.trade || state.pause || document.hidden || bossCinematicActive()) return;
+   checkHealth();
+   if (state.pause) { render(); return; }
+   advanceActiveTime(elapsed);
+@@ -2808,6 +2805,7 @@
+   const p = state.player;
+   regenMana();
+   companionTick();
++  if (simulationBlocked()) { render(); return; }
+   if (state.bubble && state.bubble.ttl > 0) state.bubble.ttl--;
+   for (const m of state.monsters) {
+     if (m.hp <= 0) continue;

@@ -1,0 +1,14 @@
+--- before/DOCUMENTATION.md
++++ after/DOCUMENTATION.md
+@@ -80,3 +80,11 @@
+ Example: open the console, run `loadLevel 2`, `addScrolls 3`, then `teleportTown`. Close it and press J to return through the saved portal; Space at the town gate also returns. Debug travel consumes no scroll. A normal J cast in the dungeon still consumes one Town Scroll. Debug commands do not change the single-return-point rule or clear the existing retreat cooldown.
+ 
+ Implementation evidence: [T1 debug portal](docs/reviews/2026-11-26-t1-debug-portal/README.md) and [T2 scroll command](docs/reviews/2026-11-26-t2-add-scrolls/README.md). Their historical six-failure baseline is resolved by [C1 companion corrections](docs/reviews/2026-11-26-c1-companions/README.md); the native GR-09 check remains unverified.
++
++## Companion picker
++
++Choose Marmalade or Pip on launch; arrows change/focus the card without starting, Enter/Space starts. Space beside the selected starter recruits it; first descent still auto-recruits if needed. The wood companion post near the Inn supports Space or its nearby **Companions** button, including touch input. The fixed picker shows active/unlocked/locked entries; Tab stays inside, Up/Down/Home/End move focus, and native Enter/Space or click/tap selects. Cancel/Esc and Keep preserve the actor and attack/speech readiness. M or the dialog sound button toggles audio; R restarts without launch branding.
++
++`state.companionPicker` is a transient identity-bound session containing town/map/post identity, prior focus and inert flags. Row handlers capture their opening session and call `selectCompanion(id, session)`; a missing, closed, stale, distant or ineligible session cannot select. Open/close reset existing clocks and restore focus/inert state; forced travel/loadLevel/reset/death dismiss before context switches. No picker data enters floor/town saves. `companionPostTile` validates reachability and avoids actors/patrol tiles and other interaction landmarks; `drawCompanionPost` paints directly without a missing sprite or art bake.
++
++[C2 verification and screenshots](docs/reviews/2026-11-26-c2-picker/README.md) covers desktop and touch-emulated mobile interactions. C3's broader integration audit, market cart work and native GR-09 visibility verification remain separate.

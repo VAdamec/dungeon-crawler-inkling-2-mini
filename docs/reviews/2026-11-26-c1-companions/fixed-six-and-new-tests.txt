@@ -1,0 +1,22 @@
+✔ restart cancels the ending frame and rejects stale callbacks from an old ending (855.5355ms)
+✔ defeated bosses become tiny companions that chip in and comment ironically (397.251708ms)
+✔ C1 registry roles and string-ID actor poses resolve authored frames for every companion (203.890917ms)
+✔ C1 restart, death and ending reset companion run progress without reopening branding (746.513125ms)
+✔ C1 both starters join once across manual recruitment, first descent and town returns (1011.72ms)
+✔ C1 all nine boss species unlock once, adopt correct art and preserve rewards and defeated floors (1528.369ms)
+✔ C1 activation clears follower motion and restores town starter actors without moving their patrols (144.973917ms)
+✔ C1 invalid or locked selection cannot silently create Marmalade or unlock a boss (147.119ms)
+✔ C1 Marmalade may be reselected after retirement without repeating its once-only remark (405.406042ms)
+✔ C1 Pip uses sidekick remarks and nearest deterministic targeting while preserving three-second cadence (146.410042ms)
+✔ the first boss kill retires Marmalade once before the boss companion joins (284.949209ms)
+✔ GR-08 throne guards collapse using skeleton art and cannot attack or award extra rewards afterward (341.317542ms)
+✔ GR-08 every boss cinematic freezes and rejects stale callbacks after skip, travel and restart (6146.46525ms)
+✔ GR-08 ending milestones stay once-only with muted skip and no catch-up or stale resurrection (400.962042ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 12876.825083

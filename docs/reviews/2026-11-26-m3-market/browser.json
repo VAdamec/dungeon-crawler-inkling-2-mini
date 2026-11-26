@@ -1,0 +1,59 @@
+{
+  "results": [
+    {
+      "mobile": false,
+      "area": "town",
+      "layout": {
+        "fits": true,
+        "footer": true,
+        "widthOverflow": false,
+        "minButton": 44
+      },
+      "nativeSelectionUndoResetCancelConfirm": true,
+      "freeze520ms": true,
+      "revisit": true
+    },
+    {
+      "mobile": false,
+      "area": "dungeon",
+      "layout": {
+        "fits": true,
+        "footer": true,
+        "widthOverflow": false,
+        "minButton": 44
+      },
+      "nativeSelectionUndoResetCancelConfirm": true,
+      "freeze520ms": true,
+      "revisit": true
+    },
+    {
+      "mobile": true,
+      "area": "town",
+      "layout": {
+        "fits": true,
+        "footer": true,
+        "widthOverflow": false,
+        "minButton": 44
+      },
+      "nativeSelectionUndoResetCancelConfirm": true,
+      "freeze520ms": true,
+      "revisit": true
+    },
+    {
+      "mobile": true,
+      "area": "dungeon",
+      "layout": {
+        "fits": true,
+        "footer": true,
+        "widthOverflow": false,
+        "minButton": 44
+      },
+      "nativeSelectionUndoResetCancelConfirm": true,
+      "freeze520ms": true,
+      "revisit": true
+    }
+  ],
+  "errors": [],
+  "remote": [],
+  "note": "Actual file:// Chrome, desktop and touch emulation (tap on mobile), staged merchant/progression setup. M3 standard town/dungeon interaction baseline; native GR-09 remains unverified."
+}

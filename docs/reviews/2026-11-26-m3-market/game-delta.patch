@@ -1,0 +1,291 @@
+--- /tmp/dungeon-m3-before/game.js	2026-11-26 18:09:49
++++ js/game.js	2026-11-26 18:19:43
+@@ -316,6 +316,7 @@
+ function joinEntranceCat(auto) { return joinSelectedCompanion(auto); }
+ 
+ function talkToEntranceCat() {
++  if (state.trade) return;
+   if (!joinSelectedCompanion(false)) return false;
+   state.companionSpeechReadyAt = 0;
+   companionTalk('intro');
+@@ -1849,6 +1850,7 @@
+ }
+ 
+ function returnThroughTownPortal() {
++  if (state.trade) return false;
+   if (state.area !== 'town' || !state.townPortalOpen || !state.townExit) return false;
+   playSound('magic');
+   enterDungeonFromTown();
+@@ -1907,6 +1909,7 @@
+ }
+ 
+ function townEncounter() {
++  if (state.trade) return;
+   const town = state.town;
+   if (!town || town.tick < town.nextTalkAt) return;
+   const npc = town.npcs.find(n => nearbyTile(state.player.x, state.player.y, n));
+@@ -1916,6 +1919,7 @@
+ }
+ 
+ function townNpcTalk(npc) {
++  if (state.trade) return;
+   const town = state.town;
+   if (!town || !npc) return;
+   const line = TOWN_NPC_LINES[town.quoteIndex % TOWN_NPC_LINES.length];
+@@ -1925,6 +1929,7 @@
+ }
+ 
+ function townInteract() {
++  if (state.trade) return;
+   if (state.loadSession) return;
+   if (state.companionPicker) return;
+   if (state.area !== 'town') return false;
+@@ -1960,6 +1965,7 @@
+ }
+ 
+ function restAtInn() {
++  if (state.trade) return;
+   if (state.companionPicker) return;
+   if (state.area !== 'town') return;
+   state.player.hp = state.player.maxHp;
+@@ -2443,6 +2449,7 @@
+ }
+ 
+ function attackMonster(m) {
++  if (state.trade) return;
+   if (state.loadSession) return;
+   if (state.gameOver || state.helpOpen || state.pause) return;
+   markCombat();
+@@ -2495,6 +2502,7 @@
+ }
+ 
+ function shootBow() {
++  if (state.trade) return;
+   if (state.loadSession) return;
+   if (state.companionPicker) return;
+   if (state.area === 'town') return;
+@@ -2517,6 +2525,7 @@
+ }
+ 
+ function castSpell(spellName) {
++  if (state.trade) return;
+   if (state.loadSession) return;
+   if (state.companionPicker) return;
+   if (state.area === 'town') return;
+@@ -2600,6 +2609,7 @@
+ }
+ 
+ function enemyAttack(m) {
++  if (state.trade) return;
+   if (state.gameOver || state.helpOpen || state.pause || m.hp <= 0 || state.activeTime < (m.nextAttackAt || 0)) return;
+   m.nextAttackAt = state.activeTime + ENEMY_ATTACK_INTERVAL;
+   monsterTalk(m);
+@@ -3077,6 +3087,7 @@
+ }
+ 
+ function movePlayer(dx, dy) {
++  if (state.trade) return;
+   if (state.loadSession) return;
+   if (state.companionPicker) return;
+   if (state.gameOver || state.helpOpen || state.pause || bossCinematicActive()) return;
+@@ -3197,6 +3208,7 @@
+ }
+ 
+ function descendStairs() {
++  if (state.trade) return;
+   if (state.loadSession) return;
+   if (state.gameOver || state.helpOpen || state.pause) return;
+   const p = state.player;
+@@ -3221,6 +3233,7 @@
+ }
+ 
+ function ascendStairs() {
++  if (state.trade) return;
+   if (state.loadSession) return;
+   if (state.gameOver || state.helpOpen || state.pause) return;
+   const p = state.player;
+@@ -3538,28 +3551,39 @@
+   document.getElementById('tradeOverlay').hidden = false;
+   document.getElementById('gameLayout').inert = true;
+   document.getElementById('launchScreen').inert = true;
+-  resetHelpClock(); stopMotionAnimation(); renderTrade(session); render(true);
+-  const list=document.getElementById(mode === 'sell' ? 'tradeSellList' : 'tradeBuyList');
+-  ([...(list.querySelectorAll?.('button') || [])].find(button=>!button.disabled) || document.getElementById('closeTrade')).focus?.();
+-  return true;
++  resetHelpClock(); stopMotionAnimation();
++  try {
++    renderTrade(session); render(true);
++    const list=document.getElementById(mode === 'sell' ? 'tradeSellList' : 'tradeBuyList');
++    ([...(list.querySelectorAll?.('button') || [])].find(button=>!button.disabled) || document.getElementById('closeTrade')).focus?.();
++    return true;
++  } catch (error) {
++    dismissTrade(session,false);resumeAfterTrade(session);return false;
++  }
+ }
+ 
++function resumeAfterTrade(session) {
++  try { render(true); } catch (ignored) { /* A failed paint must not strand input in the closed dialog. */ }
++  try {
++    requestMotionFrame();
++    const focus=session.focus;
++    if (focus && focus.isConnected && !focus.disabled && !focus.hidden && !focus.closest?.('[inert], [hidden]')) focus.focus?.();
++    else canvas.focus?.();
++  } finally { resetHelpClock(); } // Painting/focus time must not become active gameplay time.
++}
++
+ function dismissTrade(session, resume = true) {
+   if (!session || state.trade !== session) return false;
++  if (session.rollback) session.rollback(); // Forced teardown during a helper must precede the new world/run.
+   state.trade = null;
+   document.getElementById('tradeOverlay').hidden = true;
+   // Release captured owner/cart references instead of retaining the previous run in hidden controls.
+-  for (const id of ['closeTrade','cancelTrade','confirmTrade','addTradePurchase','addTradeSale','undoTrade','resetTrade','tradeAudioToggle']) document.getElementById(id).onclick=null;
++  for (const id of ['tradeOverlay','closeTrade','cancelTrade','confirmTrade','addTradePurchase','addTradeSale','undoTrade','resetTrade','tradeAudioToggle']) document.getElementById(id).onclick=null;
+   for (const id of ['tradeBuyList','tradeSellList','tradeOrder']) document.getElementById(id).innerHTML='';
+   document.getElementById('gameLayout').inert = session.gameInert || false;
+   document.getElementById('launchScreen').inert = session.launchInert || false;
+   resetHelpClock();
+-  if (resume) {
+-    render(true); requestMotionFrame();
+-    const focus=session.focus;
+-    if (focus && focus.isConnected && !focus.disabled && !focus.hidden && !focus.closest?.('[inert], [hidden]')) focus.focus?.();
+-    else canvas.focus?.();
+-  }
++  if (resume) resumeAfterTrade(session);
+   return true;
+ }
+ 
+@@ -3608,6 +3632,7 @@
+ 
+ function renderTrade(session = state.trade) {
+   if (!session || state.trade !== session || !session.cart) return;
++  document.getElementById('tradeOverlay').onclick=e=>{if(e.target.id==='tradeOverlay')closeTrade(false,session);};
+   for (const id of ['closeTrade','cancelTrade']) document.getElementById(id).onclick=()=>closeTrade(false,session);
+   document.getElementById('confirmTrade').onclick=()=>confirmTrade(session);
+   document.getElementById('addTradePurchase').onclick=()=>tradeBuy(session.selectedBuy,session);
+@@ -3681,7 +3706,7 @@
+         : item.kind === 'elixir' ? ` +${item.gold} gold` : op.replaced ? ` (replaced ${op.replaced.name})` : '';
+       log(`Bought ${item.name}!${effect}`);
+     }
+-    playSound('pickup');
++    try { playSound('pickup'); } catch (ignored) { /* Optional audio cannot invalidate a committed trade. */ }
+   }
+ }
+ 
+@@ -3707,33 +3732,42 @@
+     floor:state.floors[state.depth], floorFields:state.floors[state.depth] ? {...state.floors[state.depth]} : null,
+     town:state.town, townFields:state.town ? {...state.town} : null };
+   session.committing=true;
++  session.rollback=()=>{
++    session.rollback=null;session.committing=false;
++    owner.gold=prior.gold;owner.inventory=prior.inventory;owner.townScrolls=prior.townScrolls;
++    Object.assign(equipment,prior.slots);player.hp=prior.hp;player.maxHp=prior.maxHp;player.spells=prior.spells;owner.spellReadyAt=prior.ready;actor.stock=prior.stock;
++    if (prior.floor) { for (const key of Object.keys(prior.floor)) if (!Object.hasOwn(prior.floorFields,key)) delete prior.floor[key];Object.assign(prior.floor,prior.floorFields);owner.floors[session.depth]=prior.floor; }
++    else delete owner.floors[session.depth];
++    if (prior.town) Object.assign(prior.town,prior.townFields);
++  };
+   try {
+-    for (const slot of ['weapon','armor','ring']) if (JSON.stringify(equipment[slot])!==JSON.stringify(draft.equipment[slot])) equipItem(slot,draft.equipment[slot] ? {...draft.equipment[slot]} : null);
++    for (const slot of ['weapon','armor','ring']) if (JSON.stringify(equipment[slot])!==JSON.stringify(draft.equipment[slot])) {
++      equipItem(slot,draft.equipment[slot] ? {...draft.equipment[slot]} : null);
++      tradeRequire(tradeSessionBound(session),'application context changed');
++    }
+     state.gold=draft.gold;state.inventory=draft.inventory.map(item=>({...item}));state.townScrolls=draft.townScrolls;
+     player.hp=draft.player.hp;player.maxHp=draft.player.maxHp;player.spells={...draft.player.spells};state.spellReadyAt={...draft.spellReadyAt};
+     actor.stock=draft.stock.map(row=>({...row.item}));freezePlayerStats();
++    tradeRequire(tradeSessionBound(session),'application context changed');
+     if (state.area === 'town') saveTown(); else saveFloor();
++    tradeRequire(tradeSessionBound(session),'save context changed');
+     render(true);
++    tradeRequire(tradeSessionBound(session),'presentation context changed');
+   } catch (error) {
+-    if (state === owner) {
+-      state.gold=prior.gold;state.inventory=prior.inventory;state.townScrolls=prior.townScrolls;
+-      Object.assign(equipment,prior.slots);player.hp=prior.hp;player.maxHp=prior.maxHp;player.spells=prior.spells;state.spellReadyAt=prior.ready;actor.stock=prior.stock;
+-      if (prior.floor) { for (const key of Object.keys(prior.floor)) if (!Object.hasOwn(prior.floorFields,key)) delete prior.floor[key];Object.assign(prior.floor,prior.floorFields);state.floors[session.depth]=prior.floor; }
+-      else delete state.floors[session.depth];
+-      if (prior.town) Object.assign(prior.town,prior.townFields);
++    if (state === owner && state.trade === session) {
++      session.rollback?.();
+       session.committing=false;session.invalid=true;session.message='Could not confirm trade. Your adventure is unchanged. Cancel and reopen to retry.';
+       try { render(true); } catch (ignored) { /* Preserve the model and error controls if painting still fails. */ }
+       renderTrade(session);document.getElementById('cancelTrade').focus?.();
+     }
+     return false;
+   }
++  session.rollback=null;
+   dismissTrade(session,false); // Consume identity before notices or any repeat activation.
+   tradeCommitNotices(draft.operations);
+   state.bubble={text:'Pleasure doing business!',ttl:90};
+   if (session.opening.stock.length && !actor.stock.length && draft.operations.some(op=>op.type==='buy')) companionTalk('merchant');
+-  render(true);requestMotionFrame();
+-  const focus=session.focus;
+-  if (focus && focus.isConnected && !focus.disabled && !focus.hidden && !focus.closest?.('[inert], [hidden]')) focus.focus?.();else canvas.focus?.();
++  resumeAfterTrade(session);
+   return true;
+ }
+ 
+@@ -3745,6 +3779,7 @@
+   return state.prisoner && state.prisoner.x === x && state.prisoner.y === y ? state.prisoner : null;
+ }
+ function rescuePrisoner() {
++  if (state.trade) return;
+   if (state.loadSession) return;
+   if (state.gameOver || state.helpOpen || state.pause) return;
+   const p = state.player;
+@@ -3766,6 +3801,7 @@
+   return state.princess && state.princess.x === x && state.princess.y === y ? state.princess : null;
+ }
+ function rescuePrincess() {
++  if (state.trade) return;
+   if (state.loadSession) return;
+   if (state.gameOver || state.helpOpen || state.pause) return;
+   const p = state.player;
+@@ -3786,6 +3822,7 @@
+ }
+ 
+ function pickup() {
++  if (state.trade) return;
+   if (state.loadSession) return;
+   if (state.companionPicker) return;
+   if (state.gameOver || state.helpOpen || state.pause) return;
+@@ -3872,6 +3909,7 @@
+ }
+ 
+ function hurtPlayer(damage, message) {
++  if (state.trade) return;
+   if (state.gameOver || state.helpOpen || state.pause) return;
+   if (state.godMode) {
+     markCombat();
+@@ -3904,6 +3942,7 @@
+ }
+ 
+ function continueGame() {
++  if (state.trade) return;
+   if (state.helpOpen || !state.pause || state.pause.kind !== 'health') return;
+   state.pause = null;
+   state.lastTick = Date.now();
+@@ -3932,6 +3971,7 @@
+ }
+ 
+ function cancelRetreat() {
++  if (state.trade) return;
+   if (state.helpOpen || !state.pause || state.pause.kind !== 'retreat') return;
+   state.pause = state.pause.previous;
+   state.lastTick = Date.now();
+@@ -3939,6 +3979,7 @@
+ }
+ 
+ function confirmRetreat() {
++  if (state.trade) return;
+   if (state.gameOver || state.helpOpen || !state.pause || state.pause.kind !== 'retreat' || retreatRemaining() > 0) return;
+   const exit = { depth: state.depth, x: state.player.x, y: state.player.y, reason: 'retreat' };
+   const portalClosed = state.townPortalOpen;
+@@ -5484,7 +5525,6 @@
+ document.getElementById('saveGameButton').addEventListener('click',saveGameFile);
+ document.getElementById('cancelSavePreparation').addEventListener('click',()=>cancelSaveLoad());
+ document.getElementById('saveLoadAudioToggle').addEventListener('click',()=>{ startAudio();toggleAudio(); });
+-document.getElementById('tradeOverlay').addEventListener('click', e => { if (e.target.id === 'tradeOverlay') closeTrade(false); });
+ document.getElementById('companionOverlay').addEventListener('click', e => { if (e.target.id === 'companionOverlay') closeCompanionBoard(); });
+ document.querySelectorAll?.('[data-companion-choice]')?.forEach?.(btn => btn.addEventListener('click', () => { setCompanionChoice(btn.dataset.companionChoice); }));
+ 

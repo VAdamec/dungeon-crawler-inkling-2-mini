@@ -1,0 +1,135 @@
+✖ restart cancels the ending frame and rejects stale callbacks from an old ending (448.918167ms)
+✖ defeated bosses become tiny companions that chip in and comment ironically (285.163167ms)
+✖ the first boss kill retires Marmalade once before the boss companion joins (247.871292ms)
+✖ GR-08 throne guards collapse using skeleton art and cannot attack or award extra rewards afterward (298.735875ms)
+✖ GR-08 every boss cinematic freezes and rejects stale callbacks after skip, travel and restart (1205.488ms)
+✖ GR-08 ending milestones stay once-only with muted skip and no catch-up or stale resurrection (329.202834ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 0
+ℹ fail 6
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2932.145416
+
+✖ failing tests:
+
+test at ../../../../../private/tmp/dungeon-c1-before/tests/game.test.cjs:937:1
+✖ restart cancels the ending frame and rejects stale callbacks from an old ending (448.918167ms)
+  evalmachine.<anonymous>:156
+    const clean = b64.replace(/[^A-Za-z0-9+/]/g, '');
+                      ^
+  
+  TypeError: Cannot read properties of undefined (reading 'replace')
+      at b64ToBytes (evalmachine.<anonymous>:156:21)
+      at decodeArtFrame (evalmachine.<anonymous>:172:15)
+      at artDecoded (evalmachine.<anonymous>:211:21)
+      at spriteAnchor (evalmachine.<anonymous>:690:19)
+      at drawActorSprite (evalmachine.<anonymous>:734:15)
+      at drawCompanion (evalmachine.<anonymous>:353:3)
+      at draw (evalmachine.<anonymous>:3244:3)
+      at startBossDefeat (evalmachine.<anonymous>:1926:3)
+      at damageMonster (evalmachine.<anonymous>:1380:7)
+      at evalmachine.<anonymous>:1:24
+
+test at ../../../../../private/tmp/dungeon-c1-before/tests/game.test.cjs:2001:1
+✖ defeated bosses become tiny companions that chip in and comment ironically (285.163167ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    [
+  +   'Mimic',
+  +   'mimic'
+  -   'Cook',
+  -   'orc'
+    ]
+  
+      at TestContext.<anonymous> (/private/tmp/dungeon-c1-before/tests/game.test.cjs:2008:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ 'Mimic', 'mimic' ],
+    expected: [ 'Cook', 'orc' ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at ../../../../../private/tmp/dungeon-c1-before/tests/game.test.cjs:2732:1
+✖ the first boss kill retires Marmalade once before the boss companion joins (247.871292ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  'Mimic' !== 'Cook'
+  
+      at TestContext.<anonymous> (/private/tmp/dungeon-c1-before/tests/game.test.cjs:2738:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at node:internal/test_runner/test:1305:31
+      at node:internal/process/task_queues:158:7
+      at AsyncResource.runInAsyncScope (node:async_hooks:226:14)
+      at AsyncResource.runMicrotask (node:internal/process/task_queues:155:8) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'Mimic',
+    expected: 'Cook',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at ../../../../../private/tmp/dungeon-c1-before/tests/game.test.cjs:3591:1
+✖ GR-08 throne guards collapse using skeleton art and cannot attack or award extra rewards afterward (298.735875ms)
+  evalmachine.<anonymous>:156
+    const clean = b64.replace(/[^A-Za-z0-9+/]/g, '');
+                      ^
+  
+  TypeError: Cannot read properties of undefined (reading 'replace')
+      at b64ToBytes (evalmachine.<anonymous>:156:21)
+      at decodeArtFrame (evalmachine.<anonymous>:172:15)
+      at artDecoded (evalmachine.<anonymous>:211:21)
+      at spriteAnchor (evalmachine.<anonymous>:690:19)
+      at drawActorSprite (evalmachine.<anonymous>:734:15)
+      at drawCompanion (evalmachine.<anonymous>:353:3)
+      at draw (evalmachine.<anonymous>:3244:3)
+      at startBossDefeat (evalmachine.<anonymous>:1926:3)
+      at damageMonster (evalmachine.<anonymous>:1380:7)
+      at evalmachine.<anonymous>:2:78
+
+test at ../../../../../private/tmp/dungeon-c1-before/tests/game.test.cjs:3614:1
+✖ GR-08 every boss cinematic freezes and rejects stale callbacks after skip, travel and restart (1205.488ms)
+  evalmachine.<anonymous>:156
+    const clean = b64.replace(/[^A-Za-z0-9+/]/g, '');
+                      ^
+  
+  TypeError: Cannot read properties of undefined (reading 'replace')
+      at b64ToBytes (evalmachine.<anonymous>:156:21)
+      at decodeArtFrame (evalmachine.<anonymous>:172:15)
+      at artDecoded (evalmachine.<anonymous>:211:21)
+      at spriteAnchor (evalmachine.<anonymous>:690:19)
+      at drawActorSprite (evalmachine.<anonymous>:734:15)
+      at drawCompanion (evalmachine.<anonymous>:353:3)
+      at draw (evalmachine.<anonymous>:3244:3)
+      at startBossDefeat (evalmachine.<anonymous>:1926:3)
+      at damageMonster (evalmachine.<anonymous>:1380:7)
+      at evalmachine.<anonymous>:1:1
+
+test at ../../../../../private/tmp/dungeon-c1-before/tests/game.test.cjs:3638:1
+✖ GR-08 ending milestones stay once-only with muted skip and no catch-up or stale resurrection (329.202834ms)
+  evalmachine.<anonymous>:156
+    const clean = b64.replace(/[^A-Za-z0-9+/]/g, '');
+                      ^
+  
+  TypeError: Cannot read properties of undefined (reading 'replace')
+      at b64ToBytes (evalmachine.<anonymous>:156:21)
+      at decodeArtFrame (evalmachine.<anonymous>:172:15)
+      at artDecoded (evalmachine.<anonymous>:211:21)
+      at spriteAnchor (evalmachine.<anonymous>:690:19)
+      at drawActorSprite (evalmachine.<anonymous>:734:15)
+      at drawCompanion (evalmachine.<anonymous>:353:3)
+      at draw (evalmachine.<anonymous>:3244:3)
+      at startBossDefeat (evalmachine.<anonymous>:1926:3)
+      at damageMonster (evalmachine.<anonymous>:1380:7)
+      at evalmachine.<anonymous>:1:24

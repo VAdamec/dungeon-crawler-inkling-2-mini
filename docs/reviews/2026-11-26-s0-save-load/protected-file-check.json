@@ -1,0 +1,61 @@
+{
+  "index.html": {
+    "before": "f1a34474040fe77b8e556cc123f9de4446985a6ab02dc5f0401168265194e5a6",
+    "after": "f1a34474040fe77b8e556cc123f9de4446985a6ab02dc5f0401168265194e5a6",
+    "unchanged": true,
+    "matchesC3": true
+  },
+  "style.css": {
+    "before": "c70de6c9b99e77cef1b68d6f759f1b027c4190369eb7ae1b9cf52f8edb7372b2",
+    "after": "c70de6c9b99e77cef1b68d6f759f1b027c4190369eb7ae1b9cf52f8edb7372b2",
+    "unchanged": true,
+    "matchesC3": true
+  },
+  "js/game.js": {
+    "before": "33e4c1cd117b2d1054f91d24361b23798f6b82f1d17e47f11f4d7dbf03550a82",
+    "after": "33e4c1cd117b2d1054f91d24361b23798f6b82f1d17e47f11f4d7dbf03550a82",
+    "unchanged": true,
+    "matchesC3": true
+  },
+  "js/sprites.js": {
+    "before": "0f9a18356afa369a1b2912caf80e589109a379fc3e019e32ee214e4b002301d2",
+    "after": "0f9a18356afa369a1b2912caf80e589109a379fc3e019e32ee214e4b002301d2",
+    "unchanged": true,
+    "matchesC3": true
+  },
+  "js/art-runtime.js": {
+    "before": "ac12a9d1d03226eb16473922efc189ed0b601a784d5051be9d9587c9621d0ae9",
+    "after": "ac12a9d1d03226eb16473922efc189ed0b601a784d5051be9d9587c9621d0ae9",
+    "unchanged": true,
+    "matchesC3": true
+  },
+  "tests/game.test.cjs": {
+    "before": "693170e3ce568b43c49afc75491671b94925ae0ffccfa37d1470fd3593bc7df0",
+    "after": "693170e3ce568b43c49afc75491671b94925ae0ffccfa37d1470fd3593bc7df0",
+    "unchanged": true,
+    "matchesC3": true
+  },
+  "DOCUMENTATION.md": {
+    "before": "9fd1d5cb6508c341eb26f0bb682de121f72625adbb125d8f99fcc65bee59ece4",
+    "after": "9fd1d5cb6508c341eb26f0bb682de121f72625adbb125d8f99fcc65bee59ece4",
+    "unchanged": true,
+    "matchesC3": true
+  },
+  "README.md": {
+    "before": "1669a8c1179fcaebd1350edd9f66fb0f6b85397181150b01c037a429a5b3e535",
+    "after": "1669a8c1179fcaebd1350edd9f66fb0f6b85397181150b01c037a429a5b3e535",
+    "unchanged": true,
+    "matchesC3": true
+  },
+  "CREDITS.md": {
+    "before": "7c4c22f30e289b84a15531d4421c3c76bcce9b9db2f5795b64c4a7f8f5149dba",
+    "after": "7c4c22f30e289b84a15531d4421c3c76bcce9b9db2f5795b64c4a7f8f5149dba",
+    "unchanged": true,
+    "matchesC3": true
+  },
+  "agents.md": {
+    "before": "4da7157235d625f6372417dcc396e92334fb233c4c9328837c1c6430a660505b",
+    "after": "4da7157235d625f6372417dcc396e92334fb233c4c9328837c1c6430a660505b",
+    "unchanged": true
+  }
+}

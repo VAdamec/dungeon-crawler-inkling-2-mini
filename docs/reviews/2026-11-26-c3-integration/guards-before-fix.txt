@@ -1,0 +1,130 @@
+✖ C3 simulation helpers independently freeze companion combat, hazards, recovery, mana and motion (293.404416ms)
+✖ C3 direct retreat cannot journal or stack a pause behind a companion picker (61.203333ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 0
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 463.136
+
+✖ failing tests:
+
+test at tests/game.test.cjs:2950:1
+✖ C3 simulation helpers independently freeze companion combat, hazards, recovery, mana and motion (293.404416ms)
+  AssertionError [ERR_ASSERTION]: state.started=false combat/hazards
+  + actual - expected
+  ... Skipped lines
+  
+    [
+      {
+        active: 20,
+        area: 'dungeon',
+        companion: {
+  ...
+          'You descend into the dungeon.',
+  +       'Marmalade: “A bat. Finally, payroll with wings.”'
+        ],
+        pause: null,
+        player: {
+          def: 3,
+          dex: 10,
+  ...
+            def: 0,
+  +         hp: 98,
+  -         hp: 100,
+            id: 1,
+            maxHp: 100,
+            name: 'Bat',
+            sprite: 'bat',
+            x: 7,
+  ...
+        ],
+  +     23,
+  +     {
+  +       expiresAt: 25,
+  +       text: 'A bat. Finally, payroll with wings.'
+  +     },
+  +     27,
+        0,
+  +     [
+  +       {
+  +         duration: 0.25,
+  +         elapsed: 0,
+  +         fromX: 208,
+  +         fromY: 176,
+  +         kind: 'bolt',
+  +         toX: 240,
+  +         toY: 176
+  +       }
+  +     ],
+  -     null,
+        0,
+  -     0,
+  -     [],
+  -     0
+      ]
+    ]
+  
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:2958:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: [ { area: 'dungeon', depth: 1, player: [Object], exit: null, portal: false, scrolls: 0, gold: 0, inventory: [], equipment: [Object], spells: [Object], companion: [Object], selected: 'marmalade', unlocked: [Array], floors: [Object], visited: [Array], map: [Array], hazards: [Array], active: 20, retreat: 0, recovery: [Array], pause: null, messages: [Array], kills: 0, turn: 0 }, [ [Array], 23, [Object], 27, 0, [Array], 0 ] ],
+    expected: [ { area: 'dungeon', depth: 1, player: [Object], exit: null, portal: false, scrolls: 0, gold: 0, inventory: [], equipment: [Object], spells: [Object], companion: [Object], selected: 'marmalade', unlocked: [Array], floors: [Object], visited: [Array], map: [Array], hazards: [Array], active: 20, retreat: 0, recovery: [Array], pause: null, messages: [Array], kills: 0, turn: 0 }, [ [Array], 0, null, 0, 0, [], 0 ] ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/game.test.cjs:2965:1
+✖ C3 direct retreat cannot journal or stack a pause behind a companion picker (61.203333ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  ... Skipped lines
+  
+    [
+      {
+        active: 0,
+        area: 'town',
+        companion: null,
+  ...
+          'You arrive in the village. Rest at the Inn, visit the Store, or enter the dungeon.',
+  +       'No need to retreat while you are in town.'
+        ],
+        pause: null,
+        player: {
+          def: 3,
+          dex: 10,
+  
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:2968:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [
+      { area: 'town', depth: 1, player: [Object], exit: null, portal: false, scrolls: 0, gold: 0, inventory: [], equipment: [Object], spells: [Object], companion: null, selected: 'marmalade', unlocked: [Array], floors: [Object], visited: [Array], map: [Array], hazards: [], active: 0, retreat: 0, recovery: [Array], pause: null, messages: [Array], kills: 0, turn: 0 },
+      [
+        [], 0, null,
+        0,  0, [],
+        0
+      ]
+    ],
+    expected: [
+      { area: 'town', depth: 1, player: [Object], exit: null, portal: false, scrolls: 0, gold: 0, inventory: [], equipment: [Object], spells: [Object], companion: null, selected: 'marmalade', unlocked: [Array], floors: [Object], visited: [Array], map: [Array], hazards: [], active: 0, retreat: 0, recovery: [Array], pause: null, messages: [Array], kills: 0, turn: 0 },
+      [
+        [], 0, null,
+        0,  0, [],
+        0
+      ]
+    ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }

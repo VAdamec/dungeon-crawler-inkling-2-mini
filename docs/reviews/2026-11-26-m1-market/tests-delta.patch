@@ -1,0 +1,157 @@
+--- /tmp/dungeon-m1-before/game.test.cjs	2026-11-26 17:37:11
++++ tests/game.test.cjs	2026-11-26 17:46:09
+@@ -5040,3 +5040,154 @@
+   g.run('state.inventory.push({name:"Potion",kind:"heal",heal:.5})');const before=s2Snapshot(g);
+   assert.throws(()=>saveFixture(g),/Invalid save:/);assert.equal(s2Snapshot(g),before);
+ });
++
++function m1Setup(g, stock = 'ITEM_TABLE') {
++  g.run(`state.gold=2000;state.activeTime=37.25;state.inventory=[{name:'Potion',kind:'heal',heal:.499}];
++    state.merchant.stock=${stock}.map((item,index)=>({...item,id:100+index}));`);
++}
++function m1Cart(g) { g.run('window.m1Cart=createTradeDraft(state,state.merchant)'); }
++function m1Stage(g, action) { g.run(`window.m1Cart=stageTradeAction(window.m1Cart,${JSON.stringify(action)})`); }
++
++test('M1 shared prices preserve every catalog item/depth including remembered town depth and reject unsafe money', () => {
++  const g=game(713,true,'town');
++  for(const depth of [1,2,50,100]) {
++    g.run(`state.depth=${depth}`);
++    assert.equal(g.run(`ITEM_TABLE.every(it=>buyPrice(it,${depth})===Math.round(it.gold*(1.5+(${depth}-1)*.03))
++      &&tradePrice(it)===buyPrice(it,${depth})&&sellPrice(it)===Math.round(it.gold*.5)&&tradeSellPrice(it)===sellPrice(it))`),true);
++  }
++  for(const expression of ['buyPrice({gold:NaN},1)','buyPrice({gold:-1},1)','buyPrice({gold:"15"},1)',
++    'buyPrice({gold:Number.MAX_SAFE_INTEGER},100)','sellPrice({gold:Infinity})','buyPrice(ITEM_TABLE[0],0)',
++    'buyPrice(ITEM_TABLE[0],101)','buyPrice(ITEM_TABLE[0],2.5)']) assert.throws(()=>g.run(expression),/Invalid trade:/,expression);
++});
++
++test('M1 opening snapshot and all pure cart operations stay detached from town/floor aliases and side effects', () => {
++  for(const area of ['town','dungeon']) {
++    const g=game(713,true,area);if(area==='dungeon')g.run('enterFloor(2,false,true)');m1Setup(g,'[ITEM_TABLE[0],ITEM_TABLE[8],ITEM_TABLE[5]]');
++    g.run(`equipItem('ring',{...ITEM_TABLE[5]});state.player.hp=75;
++      window.m1Stock=state.merchant.stock;window.m1Inventory=state.inventory;window.m1Spells=state.player.spells;
++      Math.random=()=>{throw new Error('draft RNG');};log=()=>{throw new Error('draft log');};
++      playSound=()=>{throw new Error('draft sound');};render=()=>{throw new Error('draft render');};`);
++    const before=s2Snapshot(g),dto=saveFixture(g);m1Cart(g);
++    for(const action of [{type:'buy',rowId:'stock:0'},{type:'buy',rowId:'stock:1'},{type:'sell',slot:'ring'}])m1Stage(g,action);
++    g.run('window.m1Cart=undoTradeAction(window.m1Cart);window.m1Cart=resetTradeDraft(window.m1Cart)');
++    assert.equal(s2Snapshot(g),before);assert.deepEqual(saveFixture(g),dto);
++    assert.equal(g.run(`state.merchant.stock===window.m1Stock&&state.inventory===window.m1Inventory&&state.player.spells===window.m1Spells
++      &&window.m1Cart.original.stock[0].item!==state.merchant.stock[0]&&window.m1Cart.original.inventory[0]!==state.inventory[0]
++      &&window.m1Cart.original.equipment.ring!==state.equipment.ring&&window.m1Cart.original.player.spells!==state.player.spells
++      &&window.m1Cart.original.spellReadyAt!==state.spellReadyAt&&Object.isFrozen(window.m1Cart.original.player.spells)
++      &&Object.isFrozen(window.m1Cart.original.stock[0].item)&&Object.isFrozen(window.m1Cart.rules)&&Object.isFrozen(window.m1Cart.history)
++      &&!Object.isFrozen(state.merchant.stock[0])&&!Object.isFrozen(state.inventory[0])`),true);
++    assert.throws(()=>g.run(`(()=>{'use strict';window.m1Cart.original.stock[0].item.gold=0;})()`),/read only/);
++    assert.equal(g.run('state.trade'),null);assert.equal(g.run('Object.keys(state).length'),83);
++  }
++});
++
++test('M1 second and last duplicate stock units use stable local row identities without source-ID writes', () => {
++  const g=game(713,true,'town');m1Setup(g,'[ITEM_TABLE[0],ITEM_TABLE[0],ITEM_TABLE[0]]');
++  g.run('state.merchant.stock.forEach(item=>item.id=100)');const before=s2Snapshot(g);m1Cart(g);
++  m1Stage(g,{type:'buy',rowId:'stock:1'});m1Stage(g,{type:'buy',rowId:'stock:2'});
++  assert.deepEqual(g.json('window.m1Cart.draft.stock.map(row=>row.rowId)'),['stock:0']);
++  assert.deepEqual(g.json('window.m1Cart.draft.operations.map(op=>op.rowId)'),['stock:1','stock:2']);
++  assert.equal(g.run('window.m1Cart.draft.gold'),1954);assert.equal(g.run('window.m1Cart.draft.inventory.length'),3);
++  const cart=g.json('window.m1Cart');assert.throws(()=>m1Stage(g,{type:'buy',rowId:'stock:1'}),/unavailable/);
++  assert.deepEqual(g.json('window.m1Cart'),cart);assert.equal(s2Snapshot(g),before);
++  assert.equal(g.run('state.merchant.stock.every(it=>it.id===100&&!Object.hasOwn(it,"rowId"))'),true);
++});
++
++test('M1 only selected gear is sold and draft proceeds fund later purchases without loans', () => {
++  const g=game(713,true,'town');m1Setup(g,'[ITEM_TABLE[1]]');
++  g.run(`state.gold=30;equipItem('weapon',{...ITEM_TABLE[1]});equipItem('armor',{...ITEM_TABLE[3]});equipItem('ring',{...ITEM_TABLE[5]})`);
++  const before=s2Snapshot(g);m1Cart(g);m1Stage(g,{type:'sell',slot:'weapon'});
++  assert.equal(g.run('window.m1Cart.draft.gold'),50);assert.equal(g.run('window.m1Cart.draft.equipment.weapon'),null);
++  assert.throws(()=>m1Stage(g,{type:'buy',rowId:'stock:0'}),/not enough/);
++  assert.equal(g.run('window.m1Cart.history.length'),1);
++  m1Stage(g,{type:'sell',slot:'armor'});m1Stage(g,{type:'buy',rowId:'stock:0'});
++  assert.equal(g.run('window.m1Cart.draft.gold'),13);assert.equal(g.run('window.m1Cart.draft.equipment.weapon.name'),'Sword');
++  assert.equal(g.run('window.m1Cart.draft.equipment.ring.name'),'Ring');assert.equal(s2Snapshot(g),before);
++  assert.throws(()=>m1Stage(g,{type:'sell',slot:'inventory'}),/sell slot/);
++});
++
++test('M1 potion, scroll, elixir and spell drafts match actual effects without learning or drinking live', () => {
++  const g=game(713,true,'town');m1Setup(g,'[...ITEM_TABLE,ITEM_TABLE[8]]');g.run('state.player.hp=23');
++  const before=s2Snapshot(g);m1Cart(g);
++  for(const index of [0,11,6,8])m1Stage(g,{type:'buy',rowId:'stock:'+index});
++  assert.equal(g.run('window.m1Cart.draft.player.hp'),23);assert.equal(g.run('window.m1Cart.draft.inventory.length'),2);
++  assert.equal(g.run('window.m1Cart.draft.inventory[1].heal'),.35);assert.equal(g.run('window.m1Cart.draft.townScrolls'),1);
++  assert.equal(g.run('window.m1Cart.draft.gold'),1759);assert.equal(g.run('window.m1Cart.draft.player.str'),12);
++  assert.equal(g.run('window.m1Cart.draft.player.dex'),10);assert.equal(g.run('window.m1Cart.draft.player.spells.frostbolt'),true);
++  assert.equal(g.run('window.m1Cart.draft.spellReadyAt.frostbolt'),37.25);
++  const staged=g.json('window.m1Cart');assert.throws(()=>m1Stage(g,{type:'buy',rowId:'stock:12'}),/already learned/);
++  assert.deepEqual(g.json('window.m1Cart'),staged);assert.equal(s2Snapshot(g),before);
++  g.run('window.m1Cart=resetTradeDraft(window.m1Cart)');assert.deepEqual(g.json('window.m1Cart.draft'),g.json('window.m1Cart.original'));
++  assert.equal(g.run('window.m1Cart.draft.operations.length'),0);
++});
++
++test('M1 path-correct ring HP and Undo preserve clipping, same-bonus replacement and level-derived health', () => {
++  for(const [maxHp,hp,afterSell,afterBuy]of [[80,75,60,80],[80,20,20,40],[140,139,120,140]]) {
++    const g=game(713,true,'town');m1Setup(g,'[ITEM_TABLE[5]]');
++    g.run(`equipItem('ring',{...ITEM_TABLE[5]});state.player.maxHp=${maxHp};state.player.hp=${hp}`);
++    const before=s2Snapshot(g);m1Cart(g);m1Stage(g,{type:'buy',rowId:'stock:0'});
++    assert.equal(g.run('window.m1Cart.draft.player.hp'),hp);assert.equal(g.run('window.m1Cart.draft.player.maxHp'),maxHp);
++    g.run('window.m1Cart=resetTradeDraft(window.m1Cart)');m1Stage(g,{type:'sell',slot:'ring'});
++    assert.equal(g.run('window.m1Cart.draft.player.hp'),afterSell);assert.equal(g.run('window.m1Cart.draft.player.maxHp'),maxHp-20);
++    m1Stage(g,{type:'buy',rowId:'stock:0'});assert.equal(g.run('window.m1Cart.draft.player.hp'),afterBuy);
++    assert.equal(g.run('window.m1Cart.draft.player.maxHp'),maxHp);
++    g.run('window.m1Cart=undoTradeAction(window.m1Cart)');assert.equal(g.run('window.m1Cart.draft.player.hp'),afterSell);
++    g.run('window.m1Cart=undoTradeAction(window.m1Cart)');assert.equal(g.run('window.m1Cart.draft.player.hp'),hp);
++    assert.equal(s2Snapshot(g),before);
++  }
++});
++
++test('M1 god-mode preview freezes hero fields while equipment-derived bonuses follow proposed gear', () => {
++  const g=game(713,true,'town');m1Setup(g,'[ITEM_TABLE[5],ITEM_TABLE[1]]');
++  g.run(`equipItem('ring',{...ITEM_TABLE[5]});state.player.hp=75;state.godMode=true;state.godModeStats=snapshotPlayerStats()`);
++  const before=s2Snapshot(g);m1Cart(g);m1Stage(g,{type:'sell',slot:'ring'});m1Stage(g,{type:'buy',rowId:'stock:1'});
++  assert.equal(g.run('GOD_STAT_FIELDS.every(key=>window.m1Cart.draft.player[key]===state.godModeStats[key])'),true);
++  assert.deepEqual(g.json('equipmentStatsFor(window.m1Cart.draft.player,window.m1Cart.draft.equipment)'),{hp:75,maxHp:80,str:14,dex:10,atk:20,def:5});
++  assert.equal(g.run('window.m1Cart.rules.godModeStats!==state.godModeStats'),true);assert.equal(s2Snapshot(g),before);
++  g.run(`equipItem('ring',null);equipItem('weapon',{...ITEM_TABLE[1]})`);
++  assert.deepEqual(g.json('equipmentStatsFor(window.m1Cart.draft.player,window.m1Cart.draft.equipment)'),g.json('({hp:state.player.hp,maxHp:state.player.maxHp,str:effectiveStr(),dex:effectiveDex(),atk:effectiveAtk(),def:effectiveDef()})'));
++});
++
++test('M1 Undo and Reset retain only accepted operations including buy-then-sell and replacement notices', () => {
++  const g=game(713,true,'town');m1Setup(g,'[ITEM_TABLE[1],ITEM_TABLE[5],ITEM_TABLE[8]]');
++  g.run(`equipItem('weapon',{...ITEM_TABLE[2]})`);const before=s2Snapshot(g);m1Cart(g);
++  m1Stage(g,{type:'buy',rowId:'stock:0'});assert.equal(g.run('window.m1Cart.draft.operations[0].replaced.name'),'Bow');
++  assert.equal(g.run('window.m1Cart.draft.gold'),1940,'replacement does not automatically sell Bow');
++  m1Stage(g,{type:'buy',rowId:'stock:1'});m1Stage(g,{type:'sell',slot:'ring'});
++  assert.deepEqual(g.json('window.m1Cart.draft.operations.map(op=>op.type+":"+op.item.name)'),['buy:Sword','buy:Ring','sell:Ring']);
++  g.run('window.m1Cart=undoTradeAction(window.m1Cart)');assert.equal(g.run('window.m1Cart.draft.equipment.ring.name'),'Ring');
++  g.run('window.m1Cart=undoTradeAction(window.m1Cart)');assert.equal(g.run('window.m1Cart.draft.operations.length'),1);
++  assert.deepEqual(g.json('window.m1Cart.draft.stock.map(row=>row.rowId)'),['stock:1','stock:2']);
++  m1Stage(g,{type:'buy',rowId:'stock:2'});g.run('window.m1Cart=resetTradeDraft(window.m1Cart)');
++  assert.equal(g.run('window.m1Cart.draft===window.m1Cart.original&&window.m1Cart.history.length===0'),true);
++  g.run('window.m1Same=window.m1Cart;window.m1Cart=undoTradeAction(window.m1Cart)');assert.equal(g.run('window.m1Same===window.m1Cart'),true);
++  assert.equal(s2Snapshot(g),before);
++});
++
++test('M1 rejects invalid source values and overflowing actions without altering source or accepted history', () => {
++  for(const setup of ['state.gold=-1','state.gold=NaN','state.gold=Number.MAX_SAFE_INTEGER+1','state.townScrolls=Infinity',
++    'state.player.hp=NaN','state.merchant.stock[0].gold=-1','state.merchant.stock[0].gold=NaN',
++    'state.merchant.stock[0].atk=Number.MAX_SAFE_INTEGER+1','state.merchant.stock[0].extra={nested:true}',
++    'state.inventory[0].extra={nested:true}','state.spellReadyAt.extra={}']) {
++    const g=game(713,true,'town');m1Setup(g);g.run(setup);const before=s2Snapshot(g);
++    assert.throws(()=>m1Cart(g),/Invalid trade:/,setup);assert.equal(s2Snapshot(g),before,setup);
++  }
++  for(const [setup,action]of [
++    ['state.gold=Number.MAX_SAFE_INTEGER;equipItem("ring",{...ITEM_TABLE[5]})',{type:'sell',slot:'ring'}],
++    ['state.townScrolls=Number.MAX_SAFE_INTEGER',{type:'buy',rowId:'stock:11'}],
++    ['state.player.str=Number.MAX_SAFE_INTEGER',{type:'buy',rowId:'stock:1'}],
++    ['',{type:'sell',slot:'__proto__'}],['',{type:'sell',slot:'ring'}],['',{type:'buy',rowId:-1}],['',{type:'confirm'}]]) {
++    const g=game(713,true,'town');m1Setup(g);g.run(setup);m1Cart(g);const before=s2Snapshot(g),cart=g.json('window.m1Cart');
++    assert.throws(()=>m1Stage(g,action),/Invalid trade:/);assert.deepEqual(g.json('window.m1Cart'),cart);assert.equal(s2Snapshot(g),before);
++  }
++});
++
++test('M1 immutable captured depth/time/stock/spells keep a draft independent of later live changes', () => {
++  const g=game(713,true,'town');m1Setup(g,'[ITEM_TABLE[8]]');g.run('state.depth=50');m1Cart(g);
++  g.run('state.depth=1;state.activeTime=99;state.gold=0;state.merchant.stock.length=0;state.player.spells.frostbolt=true');
++  const before=s2Snapshot(g);m1Stage(g,{type:'buy',rowId:'stock:0'});
++  assert.equal(g.run('window.m1Cart.draft.gold'),1792);assert.equal(g.run('window.m1Cart.draft.spellReadyAt.frostbolt'),37.25);
++  assert.equal(g.run('window.m1Cart.rules.pricingDepth'),50);assert.equal(s2Snapshot(g),before);
++  // M2 must reject committing this stale cart; M1 deliberately has no live commit API.
++});

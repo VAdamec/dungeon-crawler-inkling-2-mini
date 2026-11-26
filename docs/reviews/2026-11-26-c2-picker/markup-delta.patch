@@ -1,0 +1,53 @@
+--- before/index.html
++++ after/index.html
+@@ -27,7 +27,7 @@
+     </svg>
+     <h1 id="launchTitle"><span>Dungeon</span><span>Crawler</span></h1>
+     <p class="launch-tagline">A hundred floors. A legion of bosses. One princess to save.</p>
+-    <div id="companionChoice" aria-label="Choose starting companion">
++    <div id="companionChoice" role="group" aria-label="Choose starting companion">
+       <p class="companion-choice-title">Choose your companion</p>
+       <div class="companion-choice-cards">
+         <button type="button" class="companion-choice selected" data-companion-choice="marmalade" aria-pressed="true"><b>Marmalade</b><span>Gate cat. Prefers bats.</span></button>
+@@ -35,7 +35,7 @@
+       </div>
+     </div>
+     <button id="startGame" type="button">Enter the dungeon <span aria-hidden="true">◆</span></button>
+-    <p class="launch-hint">Press Enter to begin</p>
++    <p class="launch-hint">Arrow keys choose a companion · Enter starts</p>
+     <p id="launchVersion" class="launch-version"></p>
+   </div>
+ </section>
+@@ -58,6 +58,7 @@
+   <div class="stat">Retreat <b id="retreatStatus"></b></div>
+   <div class="stat" id="companionStat" hidden>Companion <b id="companionName"></b></div>
+   <div class="stat cheat" id="godModeStat" hidden>GOD</div>
++  <button id="companionPostAction" type="button" aria-controls="companionOverlay" aria-expanded="false" hidden>Companions</button>
+   <button id="helpToggle" type="button" aria-label="Help and settings (?)" aria-controls="helpOverlay" aria-expanded="false" title="Help and settings (?)">?</button>
+ </div>
+ <div id="objective" aria-live="polite"></div>
+@@ -133,10 +134,11 @@
+ 
+ </main>
+ 
+-<div id="companionOverlay" role="dialog" aria-modal="true" aria-labelledby="companionTitle" hidden>
+-  <section class="help-dialog trade-dialog">
+-    <header class="help-header"><div><h2 id="companionTitle">Companion board</h2><p>Choose an unlocked companion. Changes apply only in town.</p></div><button id="closeCompanionBoard" type="button">Close (Esc)</button></header>
+-    <div class="help-content"><div id="companionBoardList" class="trade-list"></div></div>
++<div id="companionOverlay" role="dialog" aria-modal="true" aria-labelledby="companionTitle" aria-describedby="companionHint" hidden>
++  <section class="help-dialog companion-dialog">
++    <header class="help-header"><div><h2 id="companionTitle">Companions</h2><p id="companionHint">Choose a companion for this adventure. Cancel keeps your current companion.</p></div><button id="closeCompanionBoard" type="button">Cancel (Esc)</button></header>
++    <div class="help-content"><div id="companionBoardList" class="companion-list"></div></div>
++    <footer class="companion-footer"><button id="companionAudioToggle" type="button">Sound: On (M)</button><span>Esc cancels · R starts a new adventure</span></footer>
+   </section>
+ </div>
+ <div id="tradeOverlay" role="dialog" aria-modal="true" aria-labelledby="tradeTitle" hidden>
+@@ -161,7 +163,7 @@
+   <p><strong>Supplies:</strong> H drinks a stored potion. E shoots your bow. X sells equipped gear at a merchant.</p>
+   <p><strong>Magic:</strong> F Fireball · G Heal · V Frostbolt · B Greater Heal · Z Magic Barrier. Learn spells from tomes.</p>
+   <p><strong>Travel:</strong> Q/Backspace goes up at ▲. J: Town Scroll / return portal. Enter requests retreat; Y confirms, Esc cancels.</p>
+-  <p><strong>Tips:</strong> Rest at the Inn. Recruit Marmalade by the gate. Collect a monster’s key before descending at ▼. Low health pauses the action; critical health offers retreat.</p>
++  <p><strong>Tips:</strong> Rest at the Inn. Recruit your starter with Space. Switch at the companion post near the Inn. Collect a monster’s key before descending at ▼. Low health pauses the action; critical health offers retreat.</p>
+   <p><strong>R</strong> starts a new adventure. <strong>Esc</strong> skips a boss scene or ending.</p>
+ </div>
+ <div id="audioControls">

@@ -1,0 +1,280 @@
+✖ S1 snapshot is detached, deterministic and pure in town/dungeon, overlaying stale caches (263.076458ms)
+✖ S1 XP round trips preserve levels 1 through 100 including unsafe integer thresholds (153.07925ms)
+✖ S1 current encounter keeps corpse order, dead guard history, boss links and negative HP (268.869625ms)
+✖ S1 all eleven companions, ring stats, portals and exact town patrol state round trip (154.927541ms)
+✖ S1 snapshot refuses conflicting contexts but allows own Help and leaves state unchanged (157.854ms)
+✖ S1 validator rejects malformed, unknown and cross-field data without mutating DTO or game (203.97825ms)
+✖ S1 parser bounds bytes and nesting, rejecting non-JSON object hazards without executing code (207.825459ms)
+✖ S1 valid revealed/spent hazards, key collection, rescue and final boss defeat retain once-only data (217.362ms)
+✖ S1 structural validator rejects null/wrong record types and hidden executable array properties (198.67175ms)
+✖ S1 actual DTO accepts a fully explored 100-floor content-retention fixture below format limits (2975.770958ms)
+✖ S1 over-limit histories and inventory refuse losslessly rather than pruning live data (240.260542ms)
+✖ S1 keeps the S0 state inventory explicit and Unicode journal text lossless (149.797334ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 0
+ℹ fail 12
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5311.345875
+
+✖ failing tests:
+
+test at ../../../../../private/tmp/dungeon-s1-before/tests/game.test.cjs:4255:1
+✖ S1 snapshot is detached, deterministic and pure in town/dungeon, overlaying stale caches (263.076458ms)
+  evalmachine.<anonymous>:1
+  JSON.stringify(captureSaveData(state,{"createdAt":"2026-11-26T12:00:00.000Z","hidden":false,"tradeOpen":false,"companionOpen":false}))
+       ^
+  
+  ReferenceError: captureSaveData is not defined
+      at evalmachine.<anonymous>:1:6
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.json (/private/tmp/dungeon-s1-before/tests/game.test.cjs:140:33)
+      at saveFixture (/private/tmp/dungeon-s1-before/tests/game.test.cjs:4247:36)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s1-before/tests/game.test.cjs:4268:15)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17)
+
+test at ../../../../../private/tmp/dungeon-s1-before/tests/game.test.cjs:4291:1
+✖ S1 XP round trips preserve levels 1 through 100 including unsafe integer thresholds (153.07925ms)
+  evalmachine.<anonymous>:1
+  JSON.stringify(captureSaveData(state,{"createdAt":"2026-11-26T12:00:00.000Z","hidden":false,"tradeOpen":false,"companionOpen":false}))
+       ^
+  
+  ReferenceError: captureSaveData is not defined
+      at evalmachine.<anonymous>:1:6
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.json (/private/tmp/dungeon-s1-before/tests/game.test.cjs:140:33)
+      at saveFixture (/private/tmp/dungeon-s1-before/tests/game.test.cjs:4247:36)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s1-before/tests/game.test.cjs:4297:15)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+
+test at ../../../../../private/tmp/dungeon-s1-before/tests/game.test.cjs:4305:1
+✖ S1 current encounter keeps corpse order, dead guard history, boss links and negative HP (268.869625ms)
+  evalmachine.<anonymous>:1
+  JSON.stringify(captureSaveData(state,{"createdAt":"2026-11-26T12:00:00.000Z","hidden":false,"tradeOpen":false,"companionOpen":false}))
+       ^
+  
+  ReferenceError: captureSaveData is not defined
+      at evalmachine.<anonymous>:1:6
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.json (/private/tmp/dungeon-s1-before/tests/game.test.cjs:140:33)
+      at saveFixture (/private/tmp/dungeon-s1-before/tests/game.test.cjs:4247:36)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s1-before/tests/game.test.cjs:4309:36)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+
+test at ../../../../../private/tmp/dungeon-s1-before/tests/game.test.cjs:4320:1
+✖ S1 all eleven companions, ring stats, portals and exact town patrol state round trip (154.927541ms)
+  evalmachine.<anonymous>:1
+  JSON.stringify(captureSaveData(state,{"createdAt":"2026-11-26T12:00:00.000Z","hidden":false,"tradeOpen":false,"companionOpen":false}))
+       ^
+  
+  ReferenceError: captureSaveData is not defined
+      at evalmachine.<anonymous>:1:6
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.json (/private/tmp/dungeon-s1-before/tests/game.test.cjs:140:33)
+      at saveFixture (/private/tmp/dungeon-s1-before/tests/game.test.cjs:4247:36)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s1-before/tests/game.test.cjs:4326:15)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+
+test at ../../../../../private/tmp/dungeon-s1-before/tests/game.test.cjs:4339:1
+✖ S1 snapshot refuses conflicting contexts but allows own Help and leaves state unchanged (157.854ms)
+  AssertionError [ERR_ASSERTION]: state.started=false
+      at TestContext.<anonymous> (/private/tmp/dungeon-s1-before/tests/game.test.cjs:4346:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: evalmachine.<anonymous>:1
+    JSON.stringify(captureSaveData(state,{"createdAt":"2026-11-26T12:00:00.000Z","hidden":false,"tradeOpen":false,"companionOpen":false}))
+         ^
+    
+    ReferenceError: captureSaveData is not defined
+        at evalmachine.<anonymous>:1:6
+        at Script.runInContext (node:vm:150:12)
+        at Object.runInContext (node:vm:302:6)
+        at Object.json (/private/tmp/dungeon-s1-before/tests/game.test.cjs:140:33)
+        at saveFixture (/private/tmp/dungeon-s1-before/tests/game.test.cjs:4247:36)
+        at /private/tmp/dungeon-s1-before/tests/game.test.cjs:4346:23
+        at getActual (node:assert:580:5)
+        at strict.throws (node:assert:728:24)
+        at TestContext.<anonymous> (/private/tmp/dungeon-s1-before/tests/game.test.cjs:4346:12)
+        at Test.runInAsyncScope (node:async_hooks:226:14),
+    expected: /Invalid save:/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at ../../../../../private/tmp/dungeon-s1-before/tests/game.test.cjs:4358:1
+✖ S1 validator rejects malformed, unknown and cross-field data without mutating DTO or game (203.97825ms)
+  evalmachine.<anonymous>:1
+  JSON.stringify(captureSaveData(state,{"createdAt":"2026-11-26T12:00:00.000Z","hidden":false,"tradeOpen":false,"companionOpen":false}))
+       ^
+  
+  ReferenceError: captureSaveData is not defined
+      at evalmachine.<anonymous>:1:6
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.json (/private/tmp/dungeon-s1-before/tests/game.test.cjs:140:33)
+      at saveFixture (/private/tmp/dungeon-s1-before/tests/game.test.cjs:4247:36)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s1-before/tests/game.test.cjs:4359:23)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+
+test at ../../../../../private/tmp/dungeon-s1-before/tests/game.test.cjs:4399:1
+✖ S1 parser bounds bytes and nesting, rejecting non-JSON object hazards without executing code (207.825459ms)
+  AssertionError [ERR_ASSERTION]: " ".repeat(SAVE_MAX_BYTES+1)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s1-before/tests/game.test.cjs:4405:13)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: evalmachine.<anonymous>:1
+    parseSaveData(" ".repeat(SAVE_MAX_BYTES+1))
+    ^
+    
+    ReferenceError: parseSaveData is not defined
+        at evalmachine.<anonymous>:1:1
+        at Script.runInContext (node:vm:150:12)
+        at Object.runInContext (node:vm:302:6)
+        at Object.run (/private/tmp/dungeon-s1-before/tests/game.test.cjs:139:21)
+        at /private/tmp/dungeon-s1-before/tests/game.test.cjs:4405:26
+        at getActual (node:assert:580:5)
+        at strict.throws (node:assert:728:24)
+        at TestContext.<anonymous> (/private/tmp/dungeon-s1-before/tests/game.test.cjs:4405:13)
+        at Test.runInAsyncScope (node:async_hooks:226:14)
+        at Test.run (node:internal/test_runner/test:1402:25),
+    expected: /Invalid save:/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at ../../../../../private/tmp/dungeon-s1-before/tests/game.test.cjs:4419:1
+✖ S1 valid revealed/spent hazards, key collection, rescue and final boss defeat retain once-only data (217.362ms)
+  evalmachine.<anonymous>:1
+  JSON.stringify(captureSaveData(state,{"createdAt":"2026-11-26T12:00:00.000Z","hidden":false,"tradeOpen":false,"companionOpen":false}))
+       ^
+  
+  ReferenceError: captureSaveData is not defined
+      at evalmachine.<anonymous>:1:6
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.json (/private/tmp/dungeon-s1-before/tests/game.test.cjs:140:33)
+      at saveFixture (/private/tmp/dungeon-s1-before/tests/game.test.cjs:4247:36)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s1-before/tests/game.test.cjs:4427:11)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+
+test at ../../../../../private/tmp/dungeon-s1-before/tests/game.test.cjs:4440:1
+✖ S1 structural validator rejects null/wrong record types and hidden executable array properties (198.67175ms)
+  evalmachine.<anonymous>:1
+  JSON.stringify(captureSaveData(state,{"createdAt":"2026-11-26T12:00:00.000Z","hidden":false,"tradeOpen":false,"companionOpen":false}))
+       ^
+  
+  ReferenceError: captureSaveData is not defined
+      at evalmachine.<anonymous>:1:6
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.json (/private/tmp/dungeon-s1-before/tests/game.test.cjs:140:33)
+      at saveFixture (/private/tmp/dungeon-s1-before/tests/game.test.cjs:4247:36)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s1-before/tests/game.test.cjs:4441:23)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+
+test at ../../../../../private/tmp/dungeon-s1-before/tests/game.test.cjs:4458:1
+✖ S1 actual DTO accepts a fully explored 100-floor content-retention fixture below format limits (2975.770958ms)
+  evalmachine.<anonymous>:3
+      window.s1Text=serializeSaveData(state,{"createdAt":"2026-11-26T12:00:00.000Z","hidden":false,"tradeOpen":false,"companionOpen":false});
+      ^
+  
+  ReferenceError: serializeSaveData is not defined
+      at evalmachine.<anonymous>:3:5
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/private/tmp/dungeon-s1-before/tests/game.test.cjs:139:21)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s1-before/tests/game.test.cjs:4462:5)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+
+test at ../../../../../private/tmp/dungeon-s1-before/tests/game.test.cjs:4474:1
+✖ S1 over-limit histories and inventory refuse losslessly rather than pruning live data (240.260542ms)
+  AssertionError [ERR_ASSERTION]: inventory
+      at TestContext.<anonymous> (/private/tmp/dungeon-s1-before/tests/game.test.cjs:4480:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: evalmachine.<anonymous>:1
+    JSON.stringify(captureSaveData(state,{"createdAt":"2026-11-26T12:00:00.000Z","hidden":false,"tradeOpen":false,"companionOpen":false}))
+         ^
+    
+    ReferenceError: captureSaveData is not defined
+        at evalmachine.<anonymous>:1:6
+        at Script.runInContext (node:vm:150:12)
+        at Object.runInContext (node:vm:302:6)
+        at Object.json (/private/tmp/dungeon-s1-before/tests/game.test.cjs:140:33)
+        at saveFixture (/private/tmp/dungeon-s1-before/tests/game.test.cjs:4247:36)
+        at /private/tmp/dungeon-s1-before/tests/game.test.cjs:4480:23
+        at getActual (node:assert:580:5)
+        at strict.throws (node:assert:728:24)
+        at TestContext.<anonymous> (/private/tmp/dungeon-s1-before/tests/game.test.cjs:4480:12)
+        at Test.runInAsyncScope (node:async_hooks:226:14),
+    expected: /Invalid save:/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at ../../../../../private/tmp/dungeon-s1-before/tests/game.test.cjs:4485:1
+✖ S1 keeps the S0 state inventory explicit and Unicode journal text lossless (149.797334ms)
+  evalmachine.<anonymous>:1
+  JSON.stringify(captureSaveData(state,{"createdAt":"2026-11-26T12:00:00.000Z","hidden":false,"tradeOpen":false,"companionOpen":false}))
+       ^
+  
+  ReferenceError: captureSaveData is not defined
+      at evalmachine.<anonymous>:1:6
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.json (/private/tmp/dungeon-s1-before/tests/game.test.cjs:140:33)
+      at saveFixture (/private/tmp/dungeon-s1-before/tests/game.test.cjs:4247:36)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s1-before/tests/game.test.cjs:4490:13)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)

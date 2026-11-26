@@ -1,0 +1,49 @@
+{
+  "date": "2026-11-26",
+  "phase": "S2",
+  "status": "complete",
+  "fullGameTests": 256,
+  "focusedTests": 15,
+  "newRegressionGroups": 15,
+  "previewTests": 27,
+  "originalRuntimeNewGroupsFailed": 15,
+  "syntax": [
+    "js/art-runtime.js",
+    "js/sprites.js",
+    "js/game.js",
+    "tests/game.test.cjs",
+    "docs/reviews/2026-11-26-s2-save-load/check-browser.cjs"
+  ],
+  "bake": "pass, non-writing --check",
+  "externalSmoke": "SMOKE_OK",
+  "stateKeys": 83,
+  "newTransientFields": [
+    "loadSession"
+  ],
+  "formatVersion": 1,
+  "currentEncounterAndLaterRevisitRules": "pass",
+  "complete100FloorDtoHydrationAndCommit": "pass in Node VM; not browser performance acceptance",
+  "allElevenCompanionsHighLevelXp": "pass",
+  "sourceAndDtoPurity": "pass",
+  "noRngOrActionReplay": "throw sentinels pass",
+  "receiverAudioArtIdentity": "pass",
+  "staleCancelLifecycleRepeatConfirmation": "pass",
+  "wallClockResetIncludingForcedDiscard": "pass",
+  "rollback": "same state object, DOM/HUD/Help/focus and actual browser canvas pixels",
+  "actualFileBrowser": [
+    "Chrome desktop 1440x1000",
+    "Chrome touch-emulated mobile 390x844"
+  ],
+  "nativeEscapeAndRestart": "pass",
+  "browserErrors": 0,
+  "remoteRequests": 0,
+  "fileUiDownloadsImportsImplemented": false,
+  "nativeFileDialogAcceptance": false,
+  "largeSaveBrowserPerformanceVerified": false,
+  "nativeBackgroundTabObserved": false,
+  "localMarkdownLinksChecked": 165,
+  "diffWhitespace": "pass",
+  "protectedFileHashesMatch": true,
+  "marketArtChanged": false,
+  "stagedCommittedReleased": false
+}

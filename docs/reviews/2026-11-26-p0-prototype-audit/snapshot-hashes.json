@@ -1,0 +1,8 @@
+{
+  "index.html": "6a411328a77d6f8178287c63014aeb27369bda06a802e14d11cbb7fdf53609a1",
+  "style.css": "a272598214df0c9dcdfab6bbf8cee2ff58ac7de0c3076da7eab680517bd880fb",
+  "js/game.js": "cdfb44403d65e010578920578a5a71320c90bdd59037960fe7764e788402f85e",
+  "js/sprites.js": "bb693477e29d08341bd8bc96692e6b577a88fbc39cb537cbb0ccd313c15e0ced",
+  "js/art-runtime.js": "ac12a9d1d03226eb16473922efc189ed0b601a784d5051be9d9587c9621d0ae9",
+  "tests/game.test.cjs": "52a8b4cf1eae17668374c438f27f82d0903606ef834de094d195b7dbfefbb91c"
+}

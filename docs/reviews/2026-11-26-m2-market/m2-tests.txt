@@ -1,0 +1,21 @@
+✔ M2 Space and X open Buy/Sell carts with nearby town and exact dungeon access, never an immediate trade (724.828166ms)
+✔ M2 selecting rows and staging purchases/sales/Undo/Reset/Cancel leaves live state, aliases, HUD and notices unchanged (74.032667ms)
+✔ M2 Confirm applies retained operations once, defers spell/purchase/sale notices and companion sold-out remarks (68.311875ms)
+✔ M2 committed ring/god-mode HP equals the path-dependent preview including same-bonus replacements (331.66025ms)
+✔ M2 known/unaffordable/pending rows remain visible and disabled; no invalid or empty sale enters the cart (68.40075ms)
+✔ M2 staged sales fund selected purchases and removed/undone operations emit no notices (71.4575ms)
+✔ M2 Confirm rejects changed context, source values and forged cart results without overwriting newer progress (857.369583ms)
+✔ M2 callbacks capture session identity so stale select/add/Confirm/Cancel cannot affect another shop (65.108709ms)
+✔ M2 failed equipment application or save restores exact scoped values and cached town/floor aliases before notices (498.640334ms)
+✔ M2 confirmed store/merchant stock, gear and spell knowledge persist across revisits and portable snapshots (231.221459ms)
+✔ M2 keyboard selection/shortcuts, trapped focus, audio, hidden retention and restart have guarded behavior (84.146334ms)
+✔ M2 forced travel, death and restart discard drafts without spell/HP/item/currency effects or stale commits (397.202125ms)
+✔ M2 item details warn about gear replacement, label elixir honestly and render names as plain text (61.322958ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3653.181834

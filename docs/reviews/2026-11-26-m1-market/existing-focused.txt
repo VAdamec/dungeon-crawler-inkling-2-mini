@@ -1,0 +1,36 @@
+✔ merchant purchases, sales, and rescues stay resolved on revisits (674.370542ms)
+✔ audio absence or initialization failure does not break input or rendering (244.882833ms)
+✔ ring pickup increases real HP, replacement does not stack, and selling removes only the gear health bonus (345.970417ms)
+✔ merchant ring purchase applies health and gear bonuses persist across floor changes (412.7865ms)
+✔ hazard clocks and warnings freeze during pauses, hidden tabs, launch, and absence from the floor (477.734583ms)
+✔ dungeon simulation and gameplay input freeze during the ending and its final hold (346.09275ms)
+✔ quote timers freeze during pauses and hidden tabs, independently of NPC dialogue (287.438ms)
+✔ visual animation freezes during help, health pauses, hidden tabs and cinematics without advancing game clocks or RNG (285.432542ms)
+✔ camera overscans only the entering tile strip during smooth steps and frame timing is capped (317.759042ms)
+✔ archery, fireball and healing use equipment, mana and visible targets (437.882875ms)
+✔ spellbook tomes have valid art and unlock by depth (197.768208ms)
+✔ spellbooks teach spells through treasures and merchants, and knowledge persists (339.869583ms)
+✔ merchant stock and prices scale with depth on every even non-boss floor (261.325042ms)
+✔ mana regenerates only outside recent combat and away from monsters (194.067458ms)
+✔ T2 addScrolls changes only the count in town or dungeon, including with an existing portal and god mode (528.965458ms)
+✔ G1 goldADD adds exactly once in town/dungeon and god mode, changing only gold (1385.358083ms)
+✔ G1 goldADD rejects invalid text, extra arguments and non-string helper inputs atomically (441.019042ms)
+✔ C1 registry roles and string-ID actor poses resolve authored frames for every companion (204.264167ms)
+✔ C3 simulation helpers independently freeze companion combat, hazards, recovery, mana and motion (2375.13175ms)
+✔ Space recruits the gate cat before entering the dungeon (205.096417ms)
+✔ throne rendering uses marble/carpet inside the saved arena without changing the floor biome or contents (299.171834ms)
+✔ frostbolt with no eligible target preserves existing mana, cooldown and empty-cast behavior (235.517875ms)
+✔ magicBarrier with no eligible target preserves existing mana, cooldown and empty-cast behavior (235.3555ms)
+✔ wall tile cache distinguishes changed neighboring openings and reuses matching topology (193.999125ms)
+✔ GR-08 portrait centering ignores transparent padding and dragon defeat cycles authored wings (371.5365ms)
+✔ S1 all eleven companions, ring stats, portals and exact town patrol state round trip (2342.617666ms)
+✔ S2 load is allowed from launch, Help, stable god mode and ordinary death with correct focus/overlays (513.087125ms)
+✔ S2 restored portal returns once and ring HP, stock, keys, loot and descent rewards stay once-only (691.699958ms)
+ℹ tests 28
+ℹ suites 0
+ℹ pass 28
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 14962.339334

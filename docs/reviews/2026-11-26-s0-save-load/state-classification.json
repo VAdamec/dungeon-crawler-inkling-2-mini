@@ -1,0 +1,330 @@
+{
+  "depth": {
+    "category": "Persist \u2014 run identity/progression",
+    "rule": "run; save depth even in town (it remains the last dungeon depth and affects store pricing). Hero/gear hydrate together."
+  },
+  "area": {
+    "category": "Persist \u2014 run identity/progression",
+    "rule": "run; save depth even in town (it remains the last dungeon depth and affects store pricing). Hero/gear hydrate together."
+  },
+  "kills": {
+    "category": "Persist \u2014 run identity/progression",
+    "rule": "run; save depth even in town (it remains the last dungeon depth and affects store pricing). Hero/gear hydrate together."
+  },
+  "turn": {
+    "category": "Persist \u2014 run identity/progression",
+    "rule": "run; save depth even in town (it remains the last dungeon depth and affects store pricing). Hero/gear hydrate together."
+  },
+  "player": {
+    "category": "Persist \u2014 run identity/progression",
+    "rule": "run; save depth even in town (it remains the last dungeon depth and affects store pricing). Hero/gear hydrate together."
+  },
+  "spellReadyAt": {
+    "category": "Persist \u2014 run identity/progression",
+    "rule": "run; save depth even in town (it remains the last dungeon depth and affects store pricing). Hero/gear hydrate together."
+  },
+  "inventory": {
+    "category": "Persist \u2014 run identity/progression",
+    "rule": "run; save depth even in town (it remains the last dungeon depth and affects store pricing). Hero/gear hydrate together."
+  },
+  "townScrolls": {
+    "category": "Persist \u2014 run identity/progression",
+    "rule": "run; save depth even in town (it remains the last dungeon depth and affects store pricing). Hero/gear hydrate together."
+  },
+  "gold": {
+    "category": "Persist \u2014 run identity/progression",
+    "rule": "run; save depth even in town (it remains the last dungeon depth and affects store pricing). Hero/gear hydrate together."
+  },
+  "equipment": {
+    "category": "Persist \u2014 run identity/progression",
+    "rule": "run; save depth even in town (it remains the last dungeon depth and affects store pricing). Hero/gear hydrate together."
+  },
+  "warnedLow": {
+    "category": "Persist \u2014 recovery/deadlines",
+    "rule": "run timing; preserve absolute active-time deadlines and warning latches. No elapsed wall-clock credit."
+  },
+  "warnedCritical": {
+    "category": "Persist \u2014 recovery/deadlines",
+    "rule": "run timing; preserve absolute active-time deadlines and warning latches. No elapsed wall-clock credit."
+  },
+  "combatElapsed": {
+    "category": "Persist \u2014 recovery/deadlines",
+    "rule": "run timing; preserve absolute active-time deadlines and warning latches. No elapsed wall-clock credit."
+  },
+  "healElapsed": {
+    "category": "Persist \u2014 recovery/deadlines",
+    "rule": "run timing; preserve absolute active-time deadlines and warning latches. No elapsed wall-clock credit."
+  },
+  "activeTime": {
+    "category": "Persist \u2014 recovery/deadlines",
+    "rule": "run timing; preserve absolute active-time deadlines and warning latches. No elapsed wall-clock credit."
+  },
+  "manaRegenAt": {
+    "category": "Persist \u2014 recovery/deadlines",
+    "rule": "run timing; preserve absolute active-time deadlines and warning latches. No elapsed wall-clock credit."
+  },
+  "retreatReadyAt": {
+    "category": "Persist \u2014 recovery/deadlines",
+    "rule": "run timing; preserve absolute active-time deadlines and warning latches. No elapsed wall-clock credit."
+  },
+  "selectedCompanion": {
+    "category": "Persist \u2014 companions",
+    "rule": "run roster/actor; companion registry ID + exact logical x/y, derive static registry attributes without activation/reposition or deadline reset."
+  },
+  "unlockedCompanions": {
+    "category": "Persist \u2014 companions",
+    "rule": "run roster/actor; companion registry ID + exact logical x/y, derive static registry attributes without activation/reposition or deadline reset."
+  },
+  "companionChoice": {
+    "category": "Persist \u2014 companions",
+    "rule": "run roster/actor; companion registry ID + exact logical x/y, derive static registry attributes without activation/reposition or deadline reset."
+  },
+  "companionEntryDone": {
+    "category": "Persist \u2014 companions",
+    "rule": "run roster/actor; companion registry ID + exact logical x/y, derive static registry attributes without activation/reposition or deadline reset."
+  },
+  "companion": {
+    "category": "Persist \u2014 companions",
+    "rule": "run roster/actor; companion registry ID + exact logical x/y, derive static registry attributes without activation/reposition or deadline reset."
+  },
+  "companionSpeechReadyAt": {
+    "category": "Persist \u2014 companions",
+    "rule": "run roster/actor; companion registry ID + exact logical x/y, derive static registry attributes without activation/reposition or deadline reset."
+  },
+  "companionQuoteIndex": {
+    "category": "Persist \u2014 companions",
+    "rule": "run roster/actor; companion registry ID + exact logical x/y, derive static registry attributes without activation/reposition or deadline reset."
+  },
+  "companionAttackAt": {
+    "category": "Persist \u2014 companions",
+    "rule": "run roster/actor; companion registry ID + exact logical x/y, derive static registry attributes without activation/reposition or deadline reset."
+  },
+  "entranceCat": {
+    "category": "Persist \u2014 companions",
+    "rule": "run roster/actor; companion registry ID + exact logical x/y, derive static registry attributes without activation/reposition or deadline reset."
+  },
+  "townExit": {
+    "category": "Persist \u2014 return/journal",
+    "rule": "run; bounded journal and deterministic quote counters/readiness survive; visual bubbles do not."
+  },
+  "townPortalOpen": {
+    "category": "Persist \u2014 return/journal",
+    "rule": "run; bounded journal and deterministic quote counters/readiness survive; visual bubbles do not."
+  },
+  "monsterSpeechReadyAt": {
+    "category": "Persist \u2014 return/journal",
+    "rule": "run; bounded journal and deterministic quote counters/readiness survive; visual bubbles do not."
+  },
+  "monsterQuoteIndex": {
+    "category": "Persist \u2014 return/journal",
+    "rule": "run; bounded journal and deterministic quote counters/readiness survive; visual bubbles do not."
+  },
+  "messages": {
+    "category": "Persist \u2014 return/journal",
+    "rule": "run; bounded journal and deterministic quote counters/readiness survive; visual bubbles do not."
+  },
+  "floors": {
+    "category": "Persist \u2014 containers",
+    "rule": "one canonical floor table and town object; explicit nested allowlists, never recursively export arbitrary state."
+  },
+  "town": {
+    "category": "Persist \u2014 containers",
+    "rule": "one canonical floor table and town object; explicit nested allowlists, never recursively export arbitrary state."
+  },
+  "monsters": {
+    "category": "Persist \u2014 current encounter",
+    "rule": "active dungeon encounter only, separate from respawn templates; include dead rows and summoned guards. Town encounter is null."
+  },
+  "bossIntroSeen": {
+    "category": "Persist \u2014 current encounter",
+    "rule": "active dungeon encounter only, separate from respawn templates; include dead rows and summoned guards. Town encounter is null."
+  },
+  "bossSummonAt": {
+    "category": "Persist \u2014 current encounter",
+    "rule": "active dungeon encounter only, separate from respawn templates; include dead rows and summoned guards. Town encounter is null."
+  },
+  "map": {
+    "category": "Persist once / rebuild aliases \u2014 floor/town fields",
+    "rule": "FLOOR_FIELDS. Overlay active dungeon values into its detached floor DTO (including scalar clocks); active town map/visited/props/store override its town DTO. Do not call saveFloor/saveTown during export."
+  },
+  "rooms": {
+    "category": "Persist once / rebuild aliases \u2014 floor/town fields",
+    "rule": "FLOOR_FIELDS. Overlay active dungeon values into its detached floor DTO (including scalar clocks); active town map/visited/props/store override its town DTO. Do not call saveFloor/saveTown during export."
+  },
+  "potions": {
+    "category": "Persist once / rebuild aliases \u2014 floor/town fields",
+    "rule": "FLOOR_FIELDS. Overlay active dungeon values into its detached floor DTO (including scalar clocks); active town map/visited/props/store override its town DTO. Do not call saveFloor/saveTown during export."
+  },
+  "stairs": {
+    "category": "Persist once / rebuild aliases \u2014 floor/town fields",
+    "rule": "FLOOR_FIELDS. Overlay active dungeon values into its detached floor DTO (including scalar clocks); active town map/visited/props/store override its town DTO. Do not call saveFloor/saveTown during export."
+  },
+  "upstairs": {
+    "category": "Persist once / rebuild aliases \u2014 floor/town fields",
+    "rule": "FLOOR_FIELDS. Overlay active dungeon values into its detached floor DTO (including scalar clocks); active town map/visited/props/store override its town DTO. Do not call saveFloor/saveTown during export."
+  },
+  "treasures": {
+    "category": "Persist once / rebuild aliases \u2014 floor/town fields",
+    "rule": "FLOOR_FIELDS. Overlay active dungeon values into its detached floor DTO (including scalar clocks); active town map/visited/props/store override its town DTO. Do not call saveFloor/saveTown during export."
+  },
+  "merchant": {
+    "category": "Persist once / rebuild aliases \u2014 floor/town fields",
+    "rule": "FLOOR_FIELDS. Overlay active dungeon values into its detached floor DTO (including scalar clocks); active town map/visited/props/store override its town DTO. Do not call saveFloor/saveTown during export."
+  },
+  "prisoner": {
+    "category": "Persist once / rebuild aliases \u2014 floor/town fields",
+    "rule": "FLOOR_FIELDS. Overlay active dungeon values into its detached floor DTO (including scalar clocks); active town map/visited/props/store override its town DTO. Do not call saveFloor/saveTown during export."
+  },
+  "princess": {
+    "category": "Persist once / rebuild aliases \u2014 floor/town fields",
+    "rule": "FLOOR_FIELDS. Overlay active dungeon values into its detached floor DTO (including scalar clocks); active town map/visited/props/store override its town DTO. Do not call saveFloor/saveTown during export."
+  },
+  "visited": {
+    "category": "Persist once / rebuild aliases \u2014 floor/town fields",
+    "rule": "FLOOR_FIELDS. Overlay active dungeon values into its detached floor DTO (including scalar clocks); active town map/visited/props/store override its town DTO. Do not call saveFloor/saveTown during export."
+  },
+  "monsterSpawns": {
+    "category": "Persist once / rebuild aliases \u2014 floor/town fields",
+    "rule": "FLOOR_FIELDS. Overlay active dungeon values into its detached floor DTO (including scalar clocks); active town map/visited/props/store override its town DTO. Do not call saveFloor/saveTown during export."
+  },
+  "bossDefeated": {
+    "category": "Persist once / rebuild aliases \u2014 floor/town fields",
+    "rule": "FLOOR_FIELDS. Overlay active dungeon values into its detached floor DTO (including scalar clocks); active town map/visited/props/store override its town DTO. Do not call saveFloor/saveTown during export."
+  },
+  "floorKey": {
+    "category": "Persist once / rebuild aliases \u2014 floor/town fields",
+    "rule": "FLOOR_FIELDS. Overlay active dungeon values into its detached floor DTO (including scalar clocks); active town map/visited/props/store override its town DTO. Do not call saveFloor/saveTown during export."
+  },
+  "obstacles": {
+    "category": "Persist once / rebuild aliases \u2014 floor/town fields",
+    "rule": "FLOOR_FIELDS. Overlay active dungeon values into its detached floor DTO (including scalar clocks); active town map/visited/props/store override its town DTO. Do not call saveFloor/saveTown during export."
+  },
+  "hazards": {
+    "category": "Persist once / rebuild aliases \u2014 floor/town fields",
+    "rule": "FLOOR_FIELDS. Overlay active dungeon values into its detached floor DTO (including scalar clocks); active town map/visited/props/store override its town DTO. Do not call saveFloor/saveTown during export."
+  },
+  "hazardTime": {
+    "category": "Persist once / rebuild aliases \u2014 floor/town fields",
+    "rule": "FLOOR_FIELDS. Overlay active dungeon values into its detached floor DTO (including scalar clocks); active town map/visited/props/store override its town DTO. Do not call saveFloor/saveTown during export."
+  },
+  "biome": {
+    "category": "Persist once / rebuild aliases \u2014 floor/town fields",
+    "rule": "FLOOR_FIELDS. Overlay active dungeon values into its detached floor DTO (including scalar clocks); active town map/visited/props/store override its town DTO. Do not call saveFloor/saveTown during export."
+  },
+  "props": {
+    "category": "Persist once / rebuild aliases \u2014 floor/town fields",
+    "rule": "FLOOR_FIELDS. Overlay active dungeon values into its detached floor DTO (including scalar clocks); active town map/visited/props/store override its town DTO. Do not call saveFloor/saveTown during export."
+  },
+  "boss": {
+    "category": "Rebuild \u2014 boss/landmark aliases",
+    "rule": "bossId links to the current encounter actor, including a dead boss when still present; null after defeated-floor revisit. inn/gate link town landmarks in either area."
+  },
+  "inn": {
+    "category": "Rebuild \u2014 boss/landmark aliases",
+    "rule": "bossId links to the current encounter actor, including a dead boss when still present; null after defeated-floor revisit. inn/gate link town landmarks in either area."
+  },
+  "townGate": {
+    "category": "Rebuild \u2014 boss/landmark aliases",
+    "rule": "bossId links to the current encounter actor, including a dead boss when still present; null after defeated-floor revisit. inn/gate link town landmarks in either area."
+  },
+  "started": {
+    "category": "Derive \u2014 live-only defaults",
+    "rule": "accepted v1 living save resumes started=true, gameOver=won=false; derive logical camera from saved hero without revealing more tiles."
+  },
+  "gameOver": {
+    "category": "Derive \u2014 live-only defaults",
+    "rule": "accepted v1 living save resumes started=true, gameOver=won=false; derive logical camera from saved hero without revealing more tiles."
+  },
+  "won": {
+    "category": "Derive \u2014 live-only defaults",
+    "rule": "accepted v1 living save resumes started=true, gameOver=won=false; derive logical camera from saved hero without revealing more tiles."
+  },
+  "camera": {
+    "category": "Derive \u2014 live-only defaults",
+    "rule": "accepted v1 living save resumes started=true, gameOver=won=false; derive logical camera from saved hero without revealing more tiles."
+  },
+  "helpOpen": {
+    "category": "Exclude \u2014 UI/developer/cinematic visuals",
+    "rule": "fresh closed/transient state; no DOM, inert/focus references, UI sessions or in-progress cinematics in file."
+  },
+  "helpFocus": {
+    "category": "Exclude \u2014 UI/developer/cinematic visuals",
+    "rule": "fresh closed/transient state; no DOM, inert/focus references, UI sessions or in-progress cinematics in file."
+  },
+  "consoleOpen": {
+    "category": "Exclude \u2014 UI/developer/cinematic visuals",
+    "rule": "fresh closed/transient state; no DOM, inert/focus references, UI sessions or in-progress cinematics in file."
+  },
+  "consoleLines": {
+    "category": "Exclude \u2014 UI/developer/cinematic visuals",
+    "rule": "fresh closed/transient state; no DOM, inert/focus references, UI sessions or in-progress cinematics in file."
+  },
+  "consoleHistory": {
+    "category": "Exclude \u2014 UI/developer/cinematic visuals",
+    "rule": "fresh closed/transient state; no DOM, inert/focus references, UI sessions or in-progress cinematics in file."
+  },
+  "consoleHistoryIndex": {
+    "category": "Exclude \u2014 UI/developer/cinematic visuals",
+    "rule": "fresh closed/transient state; no DOM, inert/focus references, UI sessions or in-progress cinematics in file."
+  },
+  "godMode": {
+    "category": "Exclude \u2014 UI/developer/cinematic visuals",
+    "rule": "fresh closed/transient state; no DOM, inert/focus references, UI sessions or in-progress cinematics in file."
+  },
+  "godModeStats": {
+    "category": "Exclude \u2014 UI/developer/cinematic visuals",
+    "rule": "fresh closed/transient state; no DOM, inert/focus references, UI sessions or in-progress cinematics in file."
+  },
+  "trade": {
+    "category": "Exclude \u2014 UI/developer/cinematic visuals",
+    "rule": "fresh closed/transient state; no DOM, inert/focus references, UI sessions or in-progress cinematics in file."
+  },
+  "companionPicker": {
+    "category": "Exclude \u2014 UI/developer/cinematic visuals",
+    "rule": "fresh closed/transient state; no DOM, inert/focus references, UI sessions or in-progress cinematics in file."
+  },
+  "pause": {
+    "category": "Exclude \u2014 UI/developer/cinematic visuals",
+    "rule": "fresh closed/transient state; no DOM, inert/focus references, UI sessions or in-progress cinematics in file."
+  },
+  "ending": {
+    "category": "Exclude \u2014 UI/developer/cinematic visuals",
+    "rule": "fresh closed/transient state; no DOM, inert/focus references, UI sessions or in-progress cinematics in file."
+  },
+  "bossIntro": {
+    "category": "Exclude \u2014 UI/developer/cinematic visuals",
+    "rule": "fresh closed/transient state; no DOM, inert/focus references, UI sessions or in-progress cinematics in file."
+  },
+  "bossDefeat": {
+    "category": "Exclude \u2014 UI/developer/cinematic visuals",
+    "rule": "fresh closed/transient state; no DOM, inert/focus references, UI sessions or in-progress cinematics in file."
+  },
+  "bubble": {
+    "category": "Exclude \u2014 UI/developer/cinematic visuals",
+    "rule": "fresh closed/transient state; no DOM, inert/focus references, UI sessions or in-progress cinematics in file."
+  },
+  "monsterSpeech": {
+    "category": "Exclude \u2014 UI/developer/cinematic visuals",
+    "rule": "fresh closed/transient state; no DOM, inert/focus references, UI sessions or in-progress cinematics in file."
+  },
+  "companionSpeech": {
+    "category": "Exclude \u2014 UI/developer/cinematic visuals",
+    "rule": "fresh closed/transient state; no DOM, inert/focus references, UI sessions or in-progress cinematics in file."
+  },
+  "lastTick": {
+    "category": "Exclude/reuse \u2014 local resources/clocks",
+    "rule": "retain receiving browser audio preferences/context and disposable art; create fresh motion and timestamps, no object serialization."
+  },
+  "audio": {
+    "category": "Exclude/reuse \u2014 local resources/clocks",
+    "rule": "retain receiving browser audio preferences/context and disposable art; create fresh motion and timestamps, no object serialization."
+  },
+  "art": {
+    "category": "Exclude/reuse \u2014 local resources/clocks",
+    "rule": "retain receiving browser audio preferences/context and disposable art; create fresh motion and timestamps, no object serialization."
+  },
+  "motion": {
+    "category": "Exclude/reuse \u2014 local resources/clocks",
+    "rule": "retain receiving browser audio preferences/context and disposable art; create fresh motion and timestamps, no object serialization."
+  }
+}

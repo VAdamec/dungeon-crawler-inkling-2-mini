@@ -1,0 +1,47 @@
+{
+  "js/game.js": {
+    "before": "93e04a916ac272acdaf46109e0f7259f93479cccd601063e33f10f8544c4fa77",
+    "after": "0356562688a3c26d27283340de7f1c1ebc8fcd32a70443d1438b51b24de881cb",
+    "changed": true
+  },
+  "tests/game.test.cjs": {
+    "before": "6fbb0ded25d358a60f2f03a145fefe4ffc08d74fe312a6052d5082d389e30089",
+    "after": "b94e3e3402836754a78041269b584d2e8f520d35c05fbca6818629d618069d7c",
+    "changed": true
+  },
+  "index.html": {
+    "before": "6a411328a77d6f8178287c63014aeb27369bda06a802e14d11cbb7fdf53609a1",
+    "after": "6a411328a77d6f8178287c63014aeb27369bda06a802e14d11cbb7fdf53609a1",
+    "changed": false
+  },
+  "style.css": {
+    "before": "a272598214df0c9dcdfab6bbf8cee2ff58ac7de0c3076da7eab680517bd880fb",
+    "after": "a272598214df0c9dcdfab6bbf8cee2ff58ac7de0c3076da7eab680517bd880fb",
+    "changed": false
+  },
+  "js/sprites.js": {
+    "before": "bb693477e29d08341bd8bc96692e6b577a88fbc39cb537cbb0ccd313c15e0ced",
+    "after": "bb693477e29d08341bd8bc96692e6b577a88fbc39cb537cbb0ccd313c15e0ced",
+    "changed": false
+  },
+  "js/art-runtime.js": {
+    "before": "ac12a9d1d03226eb16473922efc189ed0b601a784d5051be9d9587c9621d0ae9",
+    "after": "ac12a9d1d03226eb16473922efc189ed0b601a784d5051be9d9587c9621d0ae9",
+    "changed": false
+  },
+  "README.md": {
+    "before": "1669a8c1179fcaebd1350edd9f66fb0f6b85397181150b01c037a429a5b3e535",
+    "after": "1669a8c1179fcaebd1350edd9f66fb0f6b85397181150b01c037a429a5b3e535",
+    "changed": false
+  },
+  "CREDITS.md": {
+    "before": "7c4c22f30e289b84a15531d4421c3c76bcce9b9db2f5795b64c4a7f8f5149dba",
+    "after": "7c4c22f30e289b84a15531d4421c3c76bcce9b9db2f5795b64c4a7f8f5149dba",
+    "changed": false
+  },
+  "DOCUMENTATION.md": {
+    "before": "0846417e98d82cf1671ce78f9609698fdb97b70db400c86808739e93332c7fd3",
+    "after": "16c2e639ceee6eddf248b4470d365ae26f1c1a55784909568248ecbda88b22b4",
+    "changed": true
+  }
+}

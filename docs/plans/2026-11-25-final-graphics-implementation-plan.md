@@ -2,9 +2,22 @@
 
 Date: 2026-11-25. **Integrated graphics worktree; documentation refreshed under GR-10. GR-09 native background-tab observation remains unverified.**
 
-Current execution record: [GR-10 documentation/delivery ledger](../reviews/2026-11-25-graphics-recovery/gr10/README.md), [GR-09 measured checks and remaining limit](../reviews/2026-11-25-graphics-recovery/gr09/README.md), [recovery task queue](2026-11-25-graphics-recovery-plan.md). GR-01–GR-08 are complete. Latest runtime verification is 181 passing game tests and 27 passing preview tests; the original test-memory failure was resolved in GR-01. The explicit visibility-handler fixture passes, but native background/minimize behavior has not been observed in automated Chrome. Do not close that item or infer final user visual acceptance from documentation completion.
+Current execution record: [GR-10 documentation/delivery ledger](../reviews/2026-11-25-graphics-recovery/gr10/README.md), [GR-09 measured checks and remaining limit](../reviews/2026-11-25-graphics-recovery/gr09/README.md), [recovery task queue](2026-11-25-graphics-recovery-plan.md). GR-01–GR-08 are complete. Historical graphics verification was181 game/27 preview; current M3 evidence records307 game/27 preview passing; the original test-memory failure was resolved in GR-01. The explicit visibility-handler fixture passes, but native background/minimize behavior has not been observed in automated Chrome. Do not close that item or infer final user visual acceptance from documentation completion.
 
-This plan retains the original FG contract and earlier checklist below as the design record; GR-01–10 and their evidence files are the current implementation status. The user approved the reference-led source style and runtime integration, then authorized GR-10 documentation while explicitly keeping the GR-09 exception open. The later user request explicitly authorizes concise player Help and release 2.0.0 after checks. Source art/game mechanics remain unchanged; unrelated gameplay drafts remain excluded. No blanket completion of FG-01/FG-07 is implied.
+This plan retains the original FG contract and earlier checklist below as the design record; GR-01–10 and their evidence files are the current implementation status. The user approved the reference-led source style and runtime integration, then authorized GR-10 documentation while explicitly keeping the GR-09 exception open. The later user request explicitly authorizes concise player Help and release 2.0.0 after checks. That graphics-only release excluded the then-unrelated gameplay drafts. The current unreleased worktree now includes completed companion/travel/gold/save/market queues; the release-readiness review records its exact scope. No blanket completion of FG-01/FG-07 is implied.
+
+## Current status reconciliation —2026-11-26
+
+[Readiness review](../reviews/2026-11-26-release-readiness/README.md) and [manual acceptance](../reviews/2026-11-26-release-readiness/manual-acceptance.md) are current. Required generated art is tracked; GR-01–08/10 are complete, including GR-08 technical cinematic coverage. Native GR-09 remains **unverified** and final explicit human visual acceptance remains pending. The original unchecked FG criteria below remain a historical design checklist; they do not reopen completed GR implementation. Do not convert those rows into blanket human approval. No commits/publication/version action in this review.
+
+| Original FG area | Current implementation evidence |
+| --- | --- |
+| FG-01 inventory/role geometry/cinematic audit | GR-02/03/08 complete; final human visual acceptance pending |
+| FG-02 bake | GR-02/04 complete; payload tracked and reproduced non-writing |
+| FG-03/04/05 terrain/actors/town/items | GR-05/06/07 complete |
+| FG-06 cinematics | GR-08 complete |
+| FG-07 acceptance/performance | Automated GR-09 complete; native visibility **unverified** |
+| FG-08 docs/delivery | GR-10/recorded2.0.0 complete; current unreleased package reviewed separately |
 
 ## Review package and source of truth
 
@@ -23,7 +36,7 @@ The current load order is `index.html` → `js/art-runtime.js` → `js/sprites.j
 
 Keep map dimensions 96×64, viewport 18×12, MAP_ZOOM=2, all generation/RNG calls, collision values, interaction coordinates, keys/loot persistence, monster recreation, stats/combat/targeting, town travel/portals, companions, pauses/help/console, audio and campaign behavior unchanged. All map positions stay in world tiles. Do not move buildings, add doors, widen arenas, introduce new theme props/spawns or add town monsters to fit a screenshot. New road textures are cosmetic and must stay on existing walkable tiles; the preview's derived paths do not change the map.
 
-State caches remain disposable `state.art`; motion remains transient `state.motion`; do not put either into floor saves/templates. Save layouts/progression exactly as before. Preserve all user edits/staging, especially companion, teleportation and trading drafts. Do not commit, tag, publish or change 1.0.1 branding without a separate request.
+State caches remain disposable `state.art`; motion remains transient `state.motion`; do not put either into floor saves/templates. Save layouts/progression exactly as before. Preserve all user edits/staging, especially companion, teleportation and trading drafts. Current branding remains2.0.0. Do not commit, tag, publish or change it without a separate request.
 
 ## FG-01 — accept and freeze the art contract
 

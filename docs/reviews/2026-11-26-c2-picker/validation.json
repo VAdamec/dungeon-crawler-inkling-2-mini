@@ -1,0 +1,24 @@
+{
+  "full": {
+    "pass": 215,
+    "fail": 0
+  },
+  "focused": {
+    "pass": 56,
+    "fail": 0
+  },
+  "helpLaunch": {
+    "pass": 13,
+    "fail": 0
+  },
+  "preview": {
+    "pass": 27,
+    "fail": 0
+  },
+  "seededStateMatches": 9,
+  "desktopAndMobileTouch": true,
+  "screenshotsInspected": true,
+  "localLinksChecked": 48,
+  "brokenLinks": [],
+  "nativeBackgroundVerified": false
+}

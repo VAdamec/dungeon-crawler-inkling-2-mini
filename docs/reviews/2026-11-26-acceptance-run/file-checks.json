@@ -1,0 +1,159 @@
+{
+  "protectedFiles": [
+    {
+      "file": "index.html",
+      "sha256": "5e8564a4454c94e211ad6ac729d5393be7d584a168623eec16bf72d365966649",
+      "matchesTaskStart": true,
+      "matchesReadiness": true
+    },
+    {
+      "file": "style.css",
+      "sha256": "295668ca48e608c71dee020030e3d2bedc3bc11b45c86de995a4af351ace2acb",
+      "matchesTaskStart": true,
+      "matchesReadiness": true
+    },
+    {
+      "file": "js/art-runtime.js",
+      "sha256": "ac12a9d1d03226eb16473922efc189ed0b601a784d5051be9d9587c9621d0ae9",
+      "matchesTaskStart": true,
+      "matchesReadiness": true
+    },
+    {
+      "file": "js/sprites.js",
+      "sha256": "0f9a18356afa369a1b2912caf80e589109a379fc3e019e32ee214e4b002301d2",
+      "matchesTaskStart": true,
+      "matchesReadiness": true
+    },
+    {
+      "file": "js/game.js",
+      "sha256": "6b9e865a1912f18e01bb666597f062624be360a4cfc9c2f1eaf674dee611f6b8",
+      "matchesTaskStart": true,
+      "matchesReadiness": true
+    },
+    {
+      "file": "tests/game.test.cjs",
+      "sha256": "f2c6956a672d04060f822a0ad4d6ac4a3b62b450968bf250c5d146a4b68b988e",
+      "matchesTaskStart": true,
+      "matchesReadiness": true
+    }
+  ],
+  "syntax": [
+    {
+      "file": "/Users/vadamec/workspace/ai_tmp/opencode_testing/js/art-runtime.js",
+      "exit": 0
+    },
+    {
+      "file": "/Users/vadamec/workspace/ai_tmp/opencode_testing/js/sprites.js",
+      "exit": 0
+    },
+    {
+      "file": "/Users/vadamec/workspace/ai_tmp/opencode_testing/js/game.js",
+      "exit": 0
+    },
+    {
+      "file": "/var/folders/lp/737kz569419gglsqmvs0x0200000gn/T/dungeon-release-readiness-_m45croa/clean runtime package/js/art-runtime.js",
+      "exit": 0
+    },
+    {
+      "file": "/var/folders/lp/737kz569419gglsqmvs0x0200000gn/T/dungeon-release-readiness-_m45croa/clean runtime package/js/sprites.js",
+      "exit": 0
+    },
+    {
+      "file": "/var/folders/lp/737kz569419gglsqmvs0x0200000gn/T/dungeon-release-readiness-_m45croa/clean runtime package/js/game.js",
+      "exit": 0
+    },
+    {
+      "file": "/var/folders/lp/737kz569419gglsqmvs0x0200000gn/T/dungeon-release-readiness-_m45croa/relocated unzipped game/js/art-runtime.js",
+      "exit": 0
+    },
+    {
+      "file": "/var/folders/lp/737kz569419gglsqmvs0x0200000gn/T/dungeon-release-readiness-_m45croa/relocated unzipped game/js/sprites.js",
+      "exit": 0
+    },
+    {
+      "file": "/var/folders/lp/737kz569419gglsqmvs0x0200000gn/T/dungeon-release-readiness-_m45croa/relocated unzipped game/js/game.js",
+      "exit": 0
+    },
+    {
+      "file": "/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs",
+      "exit": 0
+    },
+    {
+      "file": "/Users/vadamec/workspace/ai_tmp/opencode_testing/docs/reviews/2026-11-26-acceptance-run/check-campaign.cjs",
+      "exit": 0
+    },
+    {
+      "file": "/Users/vadamec/workspace/ai_tmp/opencode_testing/docs/reviews/2026-11-26-acceptance-run/check-package-original.cjs",
+      "exit": 0
+    },
+    {
+      "file": "/Users/vadamec/workspace/ai_tmp/opencode_testing/docs/reviews/2026-11-26-acceptance-run/check-package.cjs",
+      "exit": 0
+    },
+    {
+      "file": "/Users/vadamec/workspace/ai_tmp/opencode_testing/docs/reviews/2026-11-26-acceptance-run/check-portability.cjs",
+      "exit": 0
+    },
+    {
+      "file": "/Users/vadamec/workspace/ai_tmp/opencode_testing/docs/reviews/2026-11-26-acceptance-run/check-save-model.cjs",
+      "exit": 0
+    }
+  ],
+  "pythonSyntax": "pass ast.parse",
+  "zipSourceCopiesCrcHashes": "pass",
+  "stagedDiffUnchanged": true,
+  "stagedDiffBytes": 0,
+  "diffCheck": 0,
+  "localLinksChecked": 206,
+  "missingLocalLinks": [],
+  "freshChecks": {
+    "gameTests": "307/307",
+    "previewTests": "27/27",
+    "bake": "pass",
+    "smoke": "SMOKE_OK",
+    "chromePackage": "2 profiles pass",
+    "webkitPackage": "2 profiles pass",
+    "firefoxPackage": "incomplete; original harness failed; corrected harness not browser-rerun",
+    "chromePortabilityCases": 12,
+    "stagedCampaign": "100 floors; mechanics only",
+    "saveModel": "boundary, rejection and exact roundtrip pass"
+  },
+  "evidenceSha256": {
+    "bake.txt": "27b6df8afe8a5702e926ee49f6ce4da3b6a78f8704d84234758ba3db3280d807",
+    "before-hashes.json": "5de84d38bafd32d5cd9d21e4eab9c96f344f354b984acaede3c1553967cae92c",
+    "browser-install.txt": "57460faf3deb2558de96745836b170c37bf376dac9d25b738f726b54892c55bd",
+    "campaign.json": "a9058eb3972b850a5675077753c8d96ac896c05e8afa6bffd7a289bd2664ad9b",
+    "campaign.txt": "b4b8cd27095c27ee10ee0175130bdadb4463adeb4db66b04a151e64c6ccd9c1f",
+    "check-campaign.cjs": "6417eedfeddc9bb83b751e2f544d701252c55a06b6b8003e4e64dc2c17aa6274",
+    "check-package-original.cjs": "187996a8062d8d5827ad97a349d244e9b815bae037b5083c72bde33a6be7008a",
+    "check-package.cjs": "8852d0e8ddd2cab4bd6b676cdd35eb865382c74b8518b2d7c54819de68fe62bc",
+    "check-portability.cjs": "463a8a1fe099bd5f63349e8d4ed13b42a709d180597326c66a68f7d67bbb4f19",
+    "check-save-model.cjs": "586ba7d2eb195cf016b16659d7cc5a7fcbda98b1e04e82fabbfbe28490024562",
+    "environment.json": "21aa61449d869d2608c6b59762641eb8fd1b7f7463ec298e4df29a1f445f4f6d",
+    "fixtures.json": "8ce674e54d22b1b13b8d0d72a29f1d311d509222da7cfb21e27aaa8ad6390430",
+    "game-tests.txt": "0881b35a8a31b4cbbf4785a351b9c2ba13241119796e2009aa1d4349625a5fb7",
+    "native-driver.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-observation.json": "94e9dbfabee6dc037db7467112f8f143ba448a4eecf87f2efb3b3ab517764cb7",
+    "package-chromium.json": "5fbab51c95c8a562197ca76ceb9e4ee3ce016089f6a97cb4a1fc49b0d042b99c",
+    "package-chromium.txt": "729765283499995dc5c6b7fe2a694e4dfc7b3c1c38cd4efede4acd445fea56cc",
+    "package-desktop-save.json": "fe316217a503db9bd366d495ba0c416025ceabefcf13b605877311a8cade7ff5",
+    "package-firefox.txt": "bbbdd7e8f40de3de7838bd23b2489ba44ab4e6c01dda509076dc8cddc99d24bd",
+    "package-integrity.json": "9f17efd3eebb756c25671546d31b48112034a6a41727831a80f15dc406aaa699",
+    "package-touch-save.json": "80f363d0342421c16aa3c48bfb927a5f005b8a92bb93aebd9fcaa9bd87474002",
+    "package-webkit.json": "492227ef8e3e9228b44d08952766470b3dc5e822442467ccb38b2938d515e50d",
+    "package-webkit.txt": "729765283499995dc5c6b7fe2a694e4dfc7b3c1c38cd4efede4acd445fea56cc",
+    "package.json": "5f7f6cd1e21fe07da5f2c19a50afc6a013ea2d4d93fa0ee1f59ba2a4961109c5",
+    "portability.json": "9f7e50e21b34ef88bc99f6980d89007d6b6536914f1e8fbacfb7857475247a2e",
+    "portability.txt": "1091d4a8a3c7880adfeb9fe2f373191d6ecfd479ea40ebecdcf5362434a0dbbd",
+    "preview-tests.txt": "dd921458995542ca63037838fc75a8b360eafa4261c810a629f5a8b6f0d78eb2",
+    "save-model-initial-fixture-error.txt": "f1c6bb95502d858a0ab0e9c3611c659a7e31933216229ce7fc002bbfbdef819c",
+    "save-model.json": "df9345669a7f3ec3d7025038e31687f6c92c93e1b7580abf252d99964d70ae91",
+    "save-model.txt": "48239c948af4ea589f17b3a97413cc92c87bf1840f73a1fdd300ce9befd70d52",
+    "smoke.txt": "47d9682ed912ce466fa3a41de4bc235997fa8990d760b605f5e1abc186401b18"
+  },
+  "nativeGR09": "unverified",
+  "nativeChooserCancellation": "not observed; browser URL policy blocked file tab",
+  "manualBoxesChecked": 0,
+  "runtimeChanges": false,
+  "commitOrPublish": "none"
+}

@@ -1,0 +1,330 @@
+[art] missing required art __bad: alias __bad -> missing item nope
+✔ floors preserve layout, exploration, collected loot, and current progression on round trips (660.201792ms)
+✔ merchant purchases, sales, and rescues stay resolved on revisits (610.8575ms)
+✔ stairs require their tile, arrival connects both ways, and descent rewards happen once (371.691667ms)
+✔ safe monster spawns and accessible loot over varied floor generation (1294.668834ms)
+✔ stored potions heal only on use, cap at max HP, and are not wasted at full health (241.9105ms)
+✔ both thresholds pause immediately, freeze simulation, rearm on recovery, and allow healing (417.649ms)
+✔ enemy attack that crosses threshold stops remaining attackers in the same tick (242.628875ms)
+✔ retreat confirms/cancels, returns to town with full HP, and preserves progression and loot (495.477958ms)
+✔ depth 1 retreat returns to town and lethal damage wins over health pause (384.327ms)
+✔ retreat closes an open portal and blocked return points resolve safely (339.680291ms)
+✔ autohealing respects active time, cooldown, nearby enemies, pauses, and HP cap (283.915042ms)
+✔ hidden tabs and visibility changes do not accumulate recovery time (249.688041ms)
+✔ remembered stairs, loot, and terrain render without showing distant monsters (240.909459ms)
+✔ equipment with absent optional stats keeps combat numbers finite (197.849375ms)
+✔ audio starts on interaction, schedules tones, mutes output, and survives restart (351.605917ms)
+✔ audio absence or initialization failure does not break input or rendering (251.324083ms)
+✔ ten-floor campaign gates the Mimic, requires dragon defeat then princess rescue, and preserves boss defeats (8499.77875ms)
+✔ boss XP still levels the player and death persists before a floor transition (271.999666ms)
+✔ hero level stops at 100 and max-level kills do not grow XP (242.881041ms)
+✔ retaliation and timed enemy attacks share a per-monster cooldown including dodges (203.903083ms)
+✔ retreat cooldown counts only active time, pauses in town, and cancellation does not consume it (1020.84775ms)
+✔ healing scales with max HP, retains safety checks, and caps the final heal (195.334042ms)
+✔ late-floor scaling keeps the final boss above ordinary monsters without reducing reward scaling (290.8095ms)
+✔ boss roster gates every milestone floor with distinct names and scaled rewards (896.708125ms)
+✔ independent volume settings clamp, update their own buses, preserve mute, and survive restart (521.28975ms)
+✔ prepared no-gear endgame duel can finish using stored potions and the real combat/rescue functions (8044.374292ms)
+✔ Enter used by gameplay prevents native activation of the newly focused dialog button (241.024125ms)
+✔ launch screen freezes play, first key only starts, and restart keeps launch branding hidden (214.315084ms)
+✔ ring pickup increases real HP, replacement does not stack, and selling removes only the gear health bonus (326.974125ms)
+✔ merchant ring purchase applies health and gear bonuses persist across floor changes (419.046625ms)
+✔ sword raises actual attack and shield reduces actual incoming monster damage (278.715208ms)
+✔ larger generated worlds keep all floor tiles, key carriers, stairs and NPCs reachable around obstacles (3834.388709ms)
+✔ hidden key carrier drops a key, stairs stay locked until Space collects it, and unlock persists (509.366083ms)
+✔ uncollected key drop survives travel and another carrier death without duplication (429.133708ms)
+✔ key pickup takes priority over stairs and NPC interaction on the same tile (346.749417ms)
+✔ complete campaign can progress with real key drops and still requires both Mimic defeat and final rescue (17083.254ms)
+✔ spikes are invisible before stepping, deal damage once, and remain revealed after revisiting (438.767166ms)
+✔ flames cycle on/off and do not deal damage faster than once per active second (200.222167ms)
+✔ falling rocks warn before one impact, can be dodged by moving, and leave passable spent debris (282.498166ms)
+✔ hazard clocks and warnings freeze during pauses, hidden tabs, launch, and absence from the floor (486.326458ms)
+✔ hazards use centralized damage so threshold pauses and lethal hits stop immediately (324.05425ms)
+✔ blocking obstacles stop both player movement and monster movement without losing exploration (240.747208ms)
+✔ camera follows full-world movement, clamps at every edge, and draws only a viewport (285.368083ms)
+✔ falling-rock warning is drawn above the player instead of hidden under the sprite (237.625583ms)
+✔ final interaction starts the twist once, including after revisiting the defeated dragon floor (527.592541ms)
+✔ ending phases run, heal, escape, and finish with a smaller crying hero walking toward the sun (385.207666ms)
+✔ dungeon simulation and gameplay input freeze during the ending and its final hold (345.02525ms)
+✔ Esc and the skip button finish from every phase without repeating story events (2097.260708ms)
+✖ restart cancels the ending frame and rejects stale callbacks from an old ending (391.693084ms)
+✔ animation clock clamps frame gaps, freezes hidden tabs, and resumes without jumping (371.152791ms)
+✔ ending drawing uses screen coordinates, renders tears/end stats, and balances canvas state (372.252875ms)
+✔ surviving player hits and eligible enemy attacks trigger one rotating monster quote (420.226125ms)
+✔ speech stays for five active seconds without replacement and a global cooldown prevents crowd spam (222.757917ms)
+✔ quote timers freeze during pauses and hidden tabs, independently of NPC dialogue (297.295458ms)
+✔ lethal hits and player death clear speech without enabling an immediate crowd quote (255.280958ms)
+✔ travel, respawn, restart, and the ending clear transient monster speech (453.975584ms)
+✔ speech follows its actor, hides with fog/offscreen/death, and stays clamped at camera edges (197.598542ms)
+✔ quotes do not consume combat randomness or change damage outcomes (204.39475ms)
+✔ speech draws after world/player layers without replacing NPC bubbles or leaking offscreen actors (237.2745ms)
+✔ accepted combat quotes enter the journal once with the speaker name, including cooldown and pause guards (371.386584ms)
+✔ large boss artwork fits its clear arena on generation and revisits, with health bars and speech above its bounds (1505.408959ms)
+✔ boss floors retain large connected halls and trap-free arenas over varied generations (1106.182791ms)
+✔ minimap draws only explored terrain, discovered stairs, player and viewport without exposing hidden actors or traps (210.32425ms)
+✔ minimap follows floor-local exploration, scrolling and restart without mutating gameplay state (434.808375ms)
+✔ Mimic defeat plays a short in-world flourish and freezes play until it finishes (327.916916ms)
+✔ Dragon defeat uses a screen-space cinematic and clears before the romance ending (433.183667ms)
+✔ boss defeat frames are clamped, hidden-tab safe, identity-bound, and skippable (937.673208ms)
+✔ boss animations map every roster and themed boss to a distinct visual kind (334.958791ms)
+✔ boss intro freezes play, renders a themed name/HP card, and can be skipped (539.606208ms)
+✔ boss intro frames are clamped, hidden-tab safe, identity-bound, and cleared by travel/restart (720.953834ms)
+✔ remaining bosses use distinct defeat motifs and cleanup without repeating rewards (1546.438959ms)
+✔ JRPG sprite grids have complete palettes and explicit approved art dimensions (220.109667ms)
+✔ static sprite and terrain raster caches reuse surfaces and survive restart without becoming floor state (224.857209ms)
+✔ terrain decoration is deterministic without consuming combat RNG or revealing hidden spikes (295.782125ms)
+✔ two-times zoom scales only the world, draws 18 by 12 tiles, and leaves ending framing unscaled (402.598875ms)
+✔ help toggles by question mark and button, freezes gameplay and timers, and retains audio changes (520.478875ms)
+✔ help on launch does not start play and preserves health or retreat dialogs underneath (572.36925ms)
+✔ help freezes cinematic progression and resets their timestamps without consuming Escape (588.004291ms)
+✔ help traps Tab and Shift-Tab, closes from an input, and restores keyboard focus (295.608583ms)
+✔ movement is logically immediate while actors, camera, health bars, speech and minimap interpolate (297.469292ms)
+✔ animation frames vary legs and wings, keep logical dimensions, and moving slimes use a grounded hop (205.814166ms)
+✔ visual animation freezes during help, health pauses, hidden tabs and cinematics without advancing game clocks or RNG (307.195833ms)
+✔ animation clears across travel/respawn/restart/death and rejects stale callbacks (492.258042ms)
+✔ camera overscans only the entering tile strip during smooth steps and frame timing is capped (346.103791ms)
+✔ discovered wall torches and active vents animate without moving their fixtures or advancing trap damage (206.613625ms)
+✔ ranged and magic monsters attack from a distance but respect line of sight (346.014875ms)
+✔ archery, fireball and healing use equipment, mana and visible targets (479.901ms)
+✔ themed floors reserve an arena, spawn their themed boss and draw their props (261.488208ms)
+✔ ranged and spellcasting monsters have dedicated art with animated frames (207.095084ms)
+✔ projectiles launch at attack time, advance only with active motion, and clear on recreation (207.363416ms)
+✔ player attacks spawn arrow, fireball and heal projectiles (347.727709ms)
+✔ spellbook tomes have valid art and unlock by depth (209.248792ms)
+✔ spellbooks teach spells through treasures and merchants, and knowledge persists (372.009916ms)
+✔ advanced spells require learning and each spell keeps its own cooldown (567.332167ms)
+✔ ranged and spellcasting enemies unlock progressively by depth (222.422375ms)
+✔ biome variants use coordinate-derived tile palettes and saved props (223.891291ms)
+✔ merchant stock and prices scale with depth on every even non-boss floor (273.322667ms)
+✔ enemy healers prioritize the most wounded visible ally (205.269834ms)
+✔ depth 50 has a saved throne room with bone volleys and summoned guards (303.760542ms)
+✔ Skeleton King defeat shatters the crown, collapses guards, and never repeats rewards (577.995791ms)
+✔ dev console toggles with tilde and freezes gameplay while open (204.539625ms)
+✔ loadLevel jumps to a fresh boss floor and rejects invalid depths (475.034875ms)
+✔ godMode freezes only hero stats until disabled (476.029667ms)
+✔ objective hides future bosses and hero details sit above the adventure log (367.724166ms)
+✔ adventure log shows newest messages first while stored history stays chronological (204.830916ms)
+✔ mana regenerates only outside recent combat and away from monsters (204.693916ms)
+✔ Magic Barrier shoves a foe three tiles or damages it against a wall (484.04175ms)
+✖ defeated bosses become tiny companions that chip in and comment ironically (286.49725ms)
+✔ companions stay in a walkable adjacent tile and follow the hero (246.681542ms)
+✔ companions light nearby tiles without becoming floor-saved state (199.537334ms)
+✔ death clears the active companion (197.468084ms)
+✔ runs begin in a connected town instead of a dungeon floor (149.961792ms)
+✔ Inn and Store serve the town without advancing dungeon timers (281.18775ms)
+✔ townspeople patrol, talk on approach, and stay outside floor saves (206.617875ms)
+✔ town is fully visible, decorated, populated, and keeps the player clear of NPCs (246.331166ms)
+✔ the town gate enters floor one and town progress survives a return (247.35325ms)
+✔ depth 1 up stairs are drawn and return to town (348.344875ms)
+✔ Town Scroll can be bought, found, and counted without mixing with potions (243.356083ms)
+✔ J opens a one-shot Town Scroll portal and returns to the exact dungeon tile (357.170208ms)
+✔ Space at the town gate consumes an open portal instead of normal entry (319.994709ms)
+✔ a second scroll in the dungeon is not consumed while a portal is open (240.166666ms)
+✔ Town Scroll return reuses the saved floor instead of regenerating it (358.423917ms)
+✔ Town Scroll return resolves blocked exit tiles safely (312.273917ms)
+✔ Town Scroll portal survives dungeon travel but clears on retreat, death, ending, and restart (459.283625ms)
+✔ help and HUD describe Town Scroll availability and portal state (241.952625ms)
+✔ teleportTown creates a debug portal without consuming scrolls and returns through it (315.0215ms)
+✔ teleportTown rejects when portal open, in town, or blocked states (337.130959ms)
+✔ T1 debug portal rejects extra arguments atomically and accepts case-insensitive zero-argument commands (292.739875ms)
+✔ T1 debug portal rejects hidden, dead, paused, cinematic and player-menu contexts without changing gameplay (2783.339125ms)
+✔ T1 debug travel saves the current floor without healing, RNG, rewards or resource changes (308.104959ms)
+✔ T1 debug portal cannot replace a return point after loadLevel or repeated town commands (354.196792ms)
+✔ T1 J and Space return through the saved debug portal once without regenerating its floor (619.735709ms)
+✔ T1 debug portal uses the existing safe fallback when its return tile becomes blocked (301.78125ms)
+✔ addScrolls validates input and updates HUD (240.831417ms)
+✔ T2 addScrolls rejects non-decimal text and wrong arity without changing gameplay (207.285458ms)
+✔ T2 addScrolls rejects unsafe totals without losing the exact safe-integer boundary (284.665208ms)
+✔ T2 addScrolls rejects inactive, hidden, dead, paused, cinematic and player-menu contexts (2525.705375ms)
+✔ T2 addScrolls changes only the count in town or dungeon, including with an existing portal and god mode (544.542791ms)
+✔ console help lists teleportTown and addScrolls (200.157667ms)
+✔ trade menu buy/sell/cancel reverts with DOM fallback compatibility (394.505708ms)
+✔ companion registry and selection state initialize (208.106417ms)
+✔ Pip can be selected as starting companion and auto-joins (202.6195ms)
+✔ boss defeat unlocks companion and adoption selects it (271.629709ms)
+✔ a twice-size talking cat waits by the dungeon gate (151.044542ms)
+✔ Space recruits the gate cat before entering the dungeon (201.982834ms)
+✔ the first dungeon entry auto-joins the cat exactly once (249.655417ms)
+✔ Marmalade follows, renders twice normal cat size, and stays out of floor saves (284.808167ms)
+✔ Marmalade prefers bats and adds only one bonus point against them (202.883333ms)
+✖ the first boss kill retires Marmalade once before the boss companion joins (239.266292ms)
+✔ death, ending, and restart reset the waiting cat and active companion (211.423542ms)
+✔ JRPG directional frames have complete palettes, fixed bounds and distinct four-way hero art (217.518042ms)
+✔ directional movement and raster caches remain visual-only with a fixed tile foot anchor (194.517625ms)
+✔ town architecture derives existing blocked footprints without changing map or interaction tiles (247.564292ms)
+✔ throne rendering uses marble/carpet inside the saved arena without changing the floor biome or contents (301.344542ms)
+✔ art culling includes visible overhangs while undiscovered props and spikes stay hidden (279.525083ms)
+✔ themed boss companions draw the matching outfit without rewriting progression or combat sprites (198.756041ms)
+✔ floor 1 samples every weighted spawn-pool slot without depth-based clamping (264.14775ms)
+✔ floor 2 samples every weighted spawn-pool slot without depth-based clamping (291.902417ms)
+✔ floor 100 samples every weighted spawn-pool slot without depth-based clamping (1021.20925ms)
+✔ frostbolt targets the nearer enemy even when a farther enemy comes first (236.314292ms)
+✔ frostbolt breaks equal tile-distance ties by monster ID without RNG or array mutation (235.834416ms)
+✔ frostbolt ignores dead, unseen, blocked, off-camera and out-of-range enemies (238.517542ms)
+✔ frostbolt preserves its own range boundary (236.369ms)
+✔ frostbolt with no eligible target preserves existing mana, cooldown and empty-cast behavior (242.554334ms)
+✔ magicBarrier targets the nearer enemy even when a farther enemy comes first (247.831084ms)
+✔ magicBarrier breaks equal tile-distance ties by monster ID without RNG or array mutation (239.146292ms)
+✔ magicBarrier ignores dead, unseen, blocked, off-camera and out-of-range enemies (236.849708ms)
+✔ magicBarrier preserves its own range boundary (239.273792ms)
+✔ magicBarrier with no eligible target preserves existing mana, cooldown and empty-cast behavior (236.268875ms)
+✔ connected wall edges follow the blocked footprint including corners and obstacle neighbors (204.804583ms)
+✔ wall painters keep every edge combination inside one blocked tile without RNG or map changes (195.284625ms)
+✔ wall tile cache distinguishes changed neighboring openings and reuses matching topology (194.559042ms)
+✔ hero walks along a one-tile corridor while both adjacent walls reject movement (699.242958ms)
+✔ GR-02 art resolver unifies aliases, kind collisions, and fixed states (194.773ms)
+✔ GR-03 visual contract: manifest-derived bounds/anchors, boss scales, cache keys, and draw semantics (368.66775ms)
+✔ GR-05 dungeon wall topology/material parity covers 256 masks, 5 biomes, fixtures, and cache keys (2036.054583ms)
+✔ GR-04 bake is deterministic and round-trips selected source crops (431.455834ms)
+✔ GR-05 material surfaces preserve source identity and pixels across warm orders (201.951792ms)
+✔ GR-06 town material layout paints continuous river and cosmetic paths without world changes or RNG (155.554375ms)
+✔ GR-06 actual prop draws align bridge deck, facade doors and gate to existing interactions (154.022417ms)
+✔ wall torch animation keeps the whole mount pixel-stable while its flame changes (105.308292ms)
+✔ ground items rest on their own floor tile without changing icon anchors or reveal state (104.51925ms)
+✔ GR-07 hazards select only phase-correct prepared states without advancing the world (206.242792ms)
+✔ GR-07 prepared gait has no duplicate distortion and actor feet stay fixed across poses (235.299208ms)
+✔ GR-07 open portal requests frames while closed portals and hidden traps remain empty (254.392542ms)
+✔ GR-07 Greater Heal and barrier impact retain distinct animated effects and combat rules (297.853542ms)
+✔ GR-07 projectile source faces flight vector, uses animation phases and respects fog (206.30475ms)
+✔ GR-07 every prepared actor draws authored directions with stable union feet (373.914792ms)
+✔ GR-07 effect and portal clocks freeze for every simulation pause and stale callbacks are harmless (239.807542ms)
+✔ GR-08 in-world defeats pivot around original feet and retain authored facing for every boss (1116.91325ms)
+✔ GR-08 portrait centering ignores transparent padding and dragon defeat cycles authored wings (397.287125ms)
+✖ GR-08 throne guards collapse using skeleton art and cannot attack or award extra rewards afterward (311.533ms)
+✔ GR-08 ending runs princess toward dragon with authored poses then walks hero toward sunset (368.376958ms)
+✖ GR-08 every boss cinematic freezes and rejects stale callbacks after skip, travel and restart (1282.761291ms)
+✖ GR-08 ending milestones stay once-only with muted skip and no catch-up or stale resurrection (342.541875ms)
+✔ GR-08 large defeat art remains visible when the boss tile is just outside the camera (282.685208ms)
+✔ GR-08 intro portraits fill their card consistently and companion speech waits until the flourish ends (1159.606375ms)
+✔ GR-09 actual monster drawing uses the same foot anchor as bars, culling and defeat snapshots (682.873166ms)
+✔ GR-09 continuously scaled cinematic poses reuse source-resolution sprite canvases (219.019291ms)
+ℹ tests 199
+ℹ suites 0
+ℹ pass 193
+ℹ fail 6
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 115929.611042
+
+✖ failing tests:
+
+test at tests/game.test.cjs:937:1
+✖ restart cancels the ending frame and rejects stale callbacks from an old ending (391.693084ms)
+  evalmachine.<anonymous>:156
+    const clean = b64.replace(/[^A-Za-z0-9+/]/g, '');
+                      ^
+  
+  TypeError: Cannot read properties of undefined (reading 'replace')
+      at b64ToBytes (evalmachine.<anonymous>:156:21)
+      at decodeArtFrame (evalmachine.<anonymous>:172:15)
+      at artDecoded (evalmachine.<anonymous>:211:21)
+      at spriteAnchor (evalmachine.<anonymous>:690:19)
+      at drawActorSprite (evalmachine.<anonymous>:734:15)
+      at drawCompanion (evalmachine.<anonymous>:353:3)
+      at draw (evalmachine.<anonymous>:3244:3)
+      at startBossDefeat (evalmachine.<anonymous>:1926:3)
+      at damageMonster (evalmachine.<anonymous>:1380:7)
+      at evalmachine.<anonymous>:1:24
+
+test at tests/game.test.cjs:2001:1
+✖ defeated bosses become tiny companions that chip in and comment ironically (286.49725ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    [
+  +   'Mimic',
+  +   'mimic'
+  -   'Cook',
+  -   'orc'
+    ]
+  
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:2008:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ 'Mimic', 'mimic' ],
+    expected: [ 'Cook', 'orc' ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/game.test.cjs:2732:1
+✖ the first boss kill retires Marmalade once before the boss companion joins (239.266292ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  'Mimic' !== 'Cook'
+  
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:2738:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'Mimic',
+    expected: 'Cook',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/game.test.cjs:3591:1
+✖ GR-08 throne guards collapse using skeleton art and cannot attack or award extra rewards afterward (311.533ms)
+  evalmachine.<anonymous>:156
+    const clean = b64.replace(/[^A-Za-z0-9+/]/g, '');
+                      ^
+  
+  TypeError: Cannot read properties of undefined (reading 'replace')
+      at b64ToBytes (evalmachine.<anonymous>:156:21)
+      at decodeArtFrame (evalmachine.<anonymous>:172:15)
+      at artDecoded (evalmachine.<anonymous>:211:21)
+      at spriteAnchor (evalmachine.<anonymous>:690:19)
+      at drawActorSprite (evalmachine.<anonymous>:734:15)
+      at drawCompanion (evalmachine.<anonymous>:353:3)
+      at draw (evalmachine.<anonymous>:3244:3)
+      at startBossDefeat (evalmachine.<anonymous>:1926:3)
+      at damageMonster (evalmachine.<anonymous>:1380:7)
+      at evalmachine.<anonymous>:2:78
+
+test at tests/game.test.cjs:3614:1
+✖ GR-08 every boss cinematic freezes and rejects stale callbacks after skip, travel and restart (1282.761291ms)
+  evalmachine.<anonymous>:156
+    const clean = b64.replace(/[^A-Za-z0-9+/]/g, '');
+                      ^
+  
+  TypeError: Cannot read properties of undefined (reading 'replace')
+      at b64ToBytes (evalmachine.<anonymous>:156:21)
+      at decodeArtFrame (evalmachine.<anonymous>:172:15)
+      at artDecoded (evalmachine.<anonymous>:211:21)
+      at spriteAnchor (evalmachine.<anonymous>:690:19)
+      at drawActorSprite (evalmachine.<anonymous>:734:15)
+      at drawCompanion (evalmachine.<anonymous>:353:3)
+      at draw (evalmachine.<anonymous>:3244:3)
+      at startBossDefeat (evalmachine.<anonymous>:1926:3)
+      at damageMonster (evalmachine.<anonymous>:1380:7)
+      at evalmachine.<anonymous>:1:1
+
+test at tests/game.test.cjs:3638:1
+✖ GR-08 ending milestones stay once-only with muted skip and no catch-up or stale resurrection (342.541875ms)
+  evalmachine.<anonymous>:156
+    const clean = b64.replace(/[^A-Za-z0-9+/]/g, '');
+                      ^
+  
+  TypeError: Cannot read properties of undefined (reading 'replace')
+      at b64ToBytes (evalmachine.<anonymous>:156:21)
+      at decodeArtFrame (evalmachine.<anonymous>:172:15)
+      at artDecoded (evalmachine.<anonymous>:211:21)
+      at spriteAnchor (evalmachine.<anonymous>:690:19)
+      at drawActorSprite (evalmachine.<anonymous>:734:15)
+      at drawCompanion (evalmachine.<anonymous>:353:3)
+      at draw (evalmachine.<anonymous>:3244:3)
+      at startBossDefeat (evalmachine.<anonymous>:1926:3)
+      at damageMonster (evalmachine.<anonymous>:1380:7)
+      at evalmachine.<anonymous>:1:24

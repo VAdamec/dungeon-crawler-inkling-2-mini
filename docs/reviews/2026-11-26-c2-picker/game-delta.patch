@@ -1,0 +1,438 @@
+--- before/js/game.js
++++ after/js/game.js
+@@ -277,6 +277,7 @@
+ }
+ 
+ function resetCompanionRun() {
++  closeCompanionBoard(state && state.companionPicker, false);
+   clearCompanionMotion();
+   state.companion = null;
+   state.companionSpeech = null;
+@@ -372,6 +373,7 @@
+ }
+ 
+ function companionTick() {
++  if (state.companionPicker) return;
+   if (state.area === 'town') return;
+   const companion = state.companion;
+   if (!companion || state.gameOver) return;
+@@ -419,6 +421,7 @@
+ let state;
+ 
+ function newGame() {
++  closeCompanionBoard(state && state.companionPicker, false);
+   stopMotionAnimation();
+   stopEndingAnimation();
+   stopBossIntroAnimation();
+@@ -658,6 +661,22 @@
+     .map((item, index) => ({ ...item, id: 200 + index }));
+ }
+ 
++function companionPostTile(map, props, actors, spawn, landmarks) {
++  const reachable = floorDistances(map, spawn), reserved = new Set();
++  for (const item of [...props, ...actors]) {
++    reserved.add(`${item.x},${item.y}`);
++    for (const tile of item.path || []) reserved.add(`${tile.x},${tile.y}`);
++  }
++  const candidates = [];
++  for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
++    if (!reachable.has(`${x},${y}`) || map[y][x] !== 0 || reserved.has(`${x},${y}`)) continue;
++    if (landmarks.some(o => nearbyTile(x,y,o))) continue;
++    candidates.push({x,y});
++  }
++  candidates.sort((a,b) => (Math.abs(a.x-34)+Math.abs(a.y-26))-(Math.abs(b.x-34)+Math.abs(b.y-26)) || a.y-b.y || a.x-b.x);
++  return candidates[0] || null;
++}
++
+ function genTown() {
+   const map = [];
+   for (let y = 0; y < H; y++) map.push(new Array(W).fill(1));
+@@ -731,8 +750,9 @@
+   state.merchant = store;
+   state.inn = inn;
+   state.townGate = gate;
+-  const companionBoard = { x: 34, y: 26, sprite: 'noticeBoard', isCompanionBoard: true };
+-  props.push(companionBoard);
++  const postTile = companionPostTile(map, props, [...npcs,...animals], spawn, [inn,store,gate,spawn]);
++  const companionBoard = postTile && { ...postTile, isCompanionBoard: true };
++  if (companionBoard) props.push(companionBoard);
+   state.town = {
+     map, visited: state.visited, props, npcs, animals, spawn, store,
+     landmarks: { inn, store, gate, companionBoard }, tick: 0, quoteIndex: 0, nextTalkAt: 0, speech: null,
+@@ -769,6 +789,7 @@
+ }
+ 
+ function enterTown() {
++  closeCompanionBoard(state && state.companionPicker, false);
+   if (state.area === 'town' || !state.town) return;
+   saveFloor();
+   clearBossIntro();
+@@ -868,6 +889,7 @@
+ }
+ 
+ function useTownScroll() {
++  if (state.companionPicker) return;
+   if (state.gameOver || state.helpOpen || state.consoleOpen || state.trade || state.pause || state.ending || bossCinematicActive()) return;
+   if (state.area === 'town') {
+     if (!returnThroughTownPortal()) { log('No town portal is open.'); render(); }
+@@ -934,10 +956,11 @@
+ }
+ 
+ function townInteract() {
++  if (state.companionPicker) return;
+   if (state.area !== 'town') return false;
+   const p = state.player;
+   const starter = selectedCompanionActor();
+-  if (state.selectedCompanion === 'marmalade' && starter && !starter.hidden && state.entranceCat && !state.entranceCat.recruited && nearbyTile(p.x, p.y, starter)) return talkToEntranceCat();
++  if (!state.companion && !state.companionEntryDone && starter && !starter.hidden && nearbyTile(p.x,p.y,starter)) return talkToEntranceCat();
+   if (nearbyTile(p.x, p.y, state.townGate)) {
+     if (!state.townPortalOpen || !returnThroughTownPortal()) enterDungeonFromTown();
+     return true;
+@@ -967,6 +990,7 @@
+ }
+ 
+ function restAtInn() {
++  if (state.companionPicker) return;
+   if (state.area !== 'town') return;
+   state.player.hp = state.player.maxHp;
+   state.player.mp = state.player.maxMp;
+@@ -1008,8 +1032,12 @@
+ 
+ function drawTownSpeech() {
+   const starter = selectedCompanionActor();
+-  if (state.selectedCompanion === 'marmalade' && starter && !starter.hidden && state.entranceCat && !state.entranceCat.recruited && nearbyTile(state.player.x, state.player.y, starter) && inRenderCamera(starter.x, starter.y)) {
+-    drawBubble('Space: talk to Marmalade', worldXToScreen(starter.x + 0.5), worldYToScreen(starter.y) - 10);
++  if (!state.companion && !state.companionEntryDone && starter && !starter.hidden && nearbyTile(state.player.x,state.player.y,starter) && inRenderCamera(starter.x,starter.y)) {
++    drawBubble(`Space: recruit ${starter.name}`, (starter.x+.5)*TILE, starter.y*TILE-10);
++  }
++  const board = state.town && state.town.landmarks.companionBoard;
++  if (board && nearbyTile(state.player.x,state.player.y,board) && inRenderCamera(board.x,board.y)) {
++    drawBubble('Space: companions', (board.x+.5)*TILE, board.y*TILE-10);
+   }
+   if (state.townPortalOpen && state.townGate && inRenderCamera(state.townGate.x, state.townGate.y)) {
+     drawBubble('Portal ready (J)', state.townGate.x * TILE + TILE / 2, state.townGate.y * TILE - 12);
+@@ -1219,7 +1247,7 @@
+ }
+ 
+ function motionPlayable() {
+-  return state.started && !state.gameOver && !state.helpOpen && !state.consoleOpen && !state.pause && !document.hidden && !bossCinematicActive();
++  return state.started && !state.gameOver && !state.helpOpen && !state.consoleOpen && !state.companionPicker && !state.pause && !document.hidden && !bossCinematicActive();
+ }
+ 
+ function actorIsMoving(actor) {
+@@ -1311,6 +1339,7 @@
+ }
+ 
+ function hazardTick() {
++  if (state.companionPicker) return;
+   if (state.area === 'town') return;
+   if (!state.started || state.gameOver || state.helpOpen || state.consoleOpen || state.pause || document.hidden) return;
+   for (const hazard of state.hazards) {
+@@ -1509,6 +1538,7 @@
+ }
+ 
+ function shootBow() {
++  if (state.companionPicker) return;
+   if (state.area === 'town') return;
+   if (!state.started || state.gameOver || state.helpOpen || state.pause || bossCinematicActive()) return;
+   const weapon = rangedWeapon();
+@@ -1529,6 +1559,7 @@
+ }
+ 
+ function castSpell(spellName) {
++  if (state.companionPicker) return;
+   if (state.area === 'town') return;
+   if (!state.started || state.gameOver || state.helpOpen || state.pause || bossCinematicActive()) return;
+   const spell = SPELLS[spellName];
+@@ -1600,6 +1631,7 @@
+ }
+ 
+ function regenMana() {
++  if (state.companionPicker) return;
+   if (state.area === 'town' || state.godMode) return;
+   const p = state.player;
+   if (state.combatElapsed < 4) return;
+@@ -2084,6 +2116,7 @@
+ }
+ 
+ function movePlayer(dx, dy) {
++  if (state.companionPicker) return;
+   if (state.gameOver || state.helpOpen || state.pause || bossCinematicActive()) return;
+   const p = state.player;
+   const nx = p.x + dx, ny = p.y + dy;
+@@ -2170,6 +2203,7 @@
+ 
+ function enterFloor(depth, fromBelow, fresh = false, arrivalTile = null) {
+   if (depth < 1 || depth > FINAL_DEPTH) return;
++  closeCompanionBoard(state.companionPicker, false);
+   clearBossIntro();
+   clearBossDefeat();
+   state.bossIntroSeen = false;
+@@ -2263,40 +2297,76 @@
+     stock: m && m.stock ? JSON.parse(JSON.stringify(m.stock)) : [],
+   };
+ }
++function companionPostContext() {
++  if (!state.started || state.area !== 'town' || state.gameOver || state.player.hp <= 0 || document.hidden
++    || state.helpOpen || state.consoleOpen || state.trade || state.pause || state.ending || bossCinematicActive()) return null;
++  const trade = document.getElementById('tradeOverlay');
++  if (trade && !trade.hidden) return null;
++  const board = state.town && state.town.landmarks.companionBoard;
++  return board && state.map === state.town.map && state.map[board.y][board.x] === 0
++    && nearbyTile(state.player.x,state.player.y,board) ? board : null;
++}
++
++function restoreCompanionFocus(session) {
++  const focus = session.focus;
++  if (focus && focus.isConnected && !focus.disabled && !focus.hidden && !focus.closest?.('[inert], [hidden]')) focus.focus?.();
++  else canvas.focus?.();
++}
++
+ function openCompanionBoard() {
+-  if (state.area !== 'town' || state.gameOver || state.helpOpen || state.consoleOpen || state.trade || state.pause || state.ending || bossCinematicActive()) return;
+-  const overlay = document.getElementById('companionOverlay');
+-  const list = document.getElementById('companionBoardList');
+-  if (!overlay || !list || typeof document.createElement !== 'function') return;
++  const board = companionPostContext();
++  if (!board || state.companionPicker) return false;
++  const overlay = document.getElementById('companionOverlay'), list = document.getElementById('companionBoardList');
++  if (!overlay || !list || typeof document.createElement !== 'function') return false;
++  const session = { town:state.town, map:state.map, board, focus:document.activeElement,
++    gameInert:!!document.getElementById('gameLayout').inert, launchInert:!!document.getElementById('launchScreen').inert };
++  state.companionPicker = session;
+   list.innerHTML = '';
+   for (const id of Object.keys(COMPANIONS)) {
+-    const def = COMPANIONS[id]; const unlocked = isCompanionUnlocked(id);
+-    const row = document.createElement('div'); row.className = 'trade-item';
+-    row.innerHTML = `<div><b>${def.name}${state.selectedCompanion===id?' (active)':''}</b><div class="meta">${unlocked ? def.desc : 'Locked - ' + def.desc}</div></div>`;
+-    const btn = document.createElement('button'); btn.type='button'; btn.textContent = unlocked ? 'Choose' : 'Locked'; btn.disabled = !unlocked;
+-    btn.onclick = () => selectCompanion(id);
+-    row.appendChild(btn); list.appendChild(row);
++    const def = COMPANIONS[id], unlocked = isCompanionUnlocked(id), active = state.companion && state.companion.id === id;
++    const row = document.createElement('div'); row.className = 'companion-card';
++    const details = document.createElement('div'), name = document.createElement('strong'), hint = document.createElement('p');
++    name.textContent = `${def.name}${active ? ' · Active' : ''}`;
++    hint.textContent = unlocked ? def.desc : `Locked. ${def.desc}`;
++    details.appendChild(name); details.appendChild(hint);
++    const btn = document.createElement('button'); btn.type='button'; btn.dataset.companionId=id;
++    btn.textContent = active ? 'Keep' : unlocked ? 'Choose' : 'Locked'; btn.disabled = !unlocked;
++    btn.setAttribute('aria-label', `${active ? 'Keep' : unlocked ? 'Choose' : 'Locked:'} ${def.name}`);
++    btn.onclick = () => selectCompanion(id, session);
++    row.appendChild(details); row.appendChild(btn); list.appendChild(row);
+   }
+   overlay.hidden = false;
+-  render();
++  document.getElementById('gameLayout').inert = true;
++  document.getElementById('launchScreen').inert = true;
++  resetHelpClock(); stopMotionAnimation(); render();
+   document.getElementById('closeCompanionBoard').focus?.();
+-}
+-function closeCompanionBoard() {
+-  const overlay = document.getElementById('companionOverlay');
+-  if (!overlay || overlay.hidden) return;
+-  overlay.hidden = true;
+-  state.lastTick = Date.now();
+-  render();
+-  canvas.focus?.();
+-}
+-function selectCompanion(id) {
+-  if (!isCompanionUnlocked(id) || state.area !== 'town') return;
+-  if (!activateCompanion(id)) return;
++  return true;
++}
++
++function closeCompanionBoard(session = state && state.companionPicker, restoreFocus = true) {
++  if (!state || !session || state.companionPicker !== session) return false;
++  state.companionPicker = null;
++  document.getElementById('companionOverlay').hidden = true;
++  document.getElementById('gameLayout').inert = session.gameInert || false;
++  document.getElementById('launchScreen').inert = session.launchInert || false;
++  resetHelpClock();
++  if (restoreFocus) { render(); requestMotionFrame(); restoreCompanionFocus(session); }
++  return true;
++}
++
++function selectCompanion(id, session) {
++  if (!session || state.companionPicker !== session || session.town !== state.town || session.map !== state.map
++    || companionPostContext() !== session.board || !isCompanionUnlocked(id) || !companionDef(id)) return false;
++  if (state.companion && state.companion.id === id) return closeCompanionBoard(session);
++  closeCompanionBoard(session, false);
++  if (!activateCompanion(id)) return false;
+   log(`${companionDef(id).name} is now your active companion.`);
+-  closeCompanionBoard();
++  render(); requestMotionFrame(); restoreCompanionFocus(session);
++  return true;
+ }
+ 
+ function openTrade() {
++  if (state.companionPicker) return;
+   if (state.gameOver || state.helpOpen || state.consoleOpen || state.trade || state.pause || state.ending || bossCinematicActive()) return;
+   const m = merchantAt(state.player.x, state.player.y);
+   if (!m) { log('No merchant here.'); render(); return; }
+@@ -2466,6 +2536,7 @@
+ }
+ 
+ function pickup() {
++  if (state.companionPicker) return;
+   if (state.gameOver || state.helpOpen || state.pause) return;
+   if (state.area === 'town') { townInteract(); return; }
+   const p = state.player;
+@@ -2528,6 +2599,7 @@
+ }
+ 
+ function drinkPotion() {
++  if (state.companionPicker) return;
+   if (state.gameOver || state.helpOpen || state.trade || (state.pause && state.pause.kind !== 'health')) return;
+   const p = state.player;
+   if (state.godMode) { log('God mode holds your health steady; the potion stays stored.'); render(); return; }
+@@ -2633,6 +2705,7 @@
+ }
+ 
+ function recoveryTick(elapsed) {
++  if (state.companionPicker) return;
+   if (state.area === 'town') return;
+   if (!state.started || state.gameOver || state.helpOpen || state.trade || state.pause) return;
+   freezePlayerStats();
+@@ -2711,6 +2784,7 @@
+ }
+ 
+ function enemyTick() {
++  if (state.companionPicker) { state.lastTick = Date.now(); return; }
+   const now = Date.now();
+   const elapsed = Math.min(0.5, Math.max(0, (now - state.lastTick) / 1000));
+   state.lastTick = now;
+@@ -2806,6 +2880,19 @@
+   if(dx)state.motion.facing[key]=Math.sign(dx);
+   if(dx || dy)state.motion.directions[key]=Math.abs(dx)>=Math.abs(dy) ? (dx<0?'left':'right') : (dy<0?'back':'front');
+ }
++function drawCompanionPost(prop) {
++  if (!inRenderCamera(prop.x,prop.y)) return;
++  const x=prop.x*TILE, y=prop.y*TILE;
++  ctx.fillStyle='#1b1714'; ctx.fillRect(x+7,y+28,21,3);
++  ctx.fillStyle='#38281d'; ctx.fillRect(x+14,y+13,6,17);
++  ctx.fillStyle='#957047'; ctx.fillRect(x+15,y+13,2,16);
++  ctx.fillStyle='#251d19'; ctx.fillRect(x+3,y+4,26,17);
++  ctx.fillStyle='#8a6036'; ctx.fillRect(x+5,y+6,22,13);
++  ctx.fillStyle='#d5ad63'; ctx.fillRect(x+5,y+6,22,2);
++  ctx.fillStyle='#f1d593';
++  for (const [dx,dy,w,h] of [[12,12,8,5],[9,9,3,3],[14,8,3,3],[19,9,3,3],[22,12,2,3]]) ctx.fillRect(x+dx,y+dy,w,h);
++}
++
+ function townBuildingBounds(prop) {
+   const art=graphicsCache();
+   if(!art.townBuildings || art.townBuildings.map!==state.map) art.townBuildings={map:state.map,bounds:{}};
+@@ -2903,6 +2990,7 @@
+     }
+   }
+   for (const prop of [...state.props].sort((a,b)=>a.y-b.y)) {
++    if (state.area==='town' && prop.isCompanionBoard) { drawCompanionPost(prop); continue; }
+     if(state.area==='town' && ['inn','store','hut'].includes(prop.sprite)){drawTownBuilding(prop);continue;}
+     // Water is already painted tile-aligned, including beneath the bridge.
+     if(state.area==='town' && prop.sprite==='water') continue;
+@@ -3709,7 +3797,7 @@
+ }
+ 
+ function openConsole() {
+-  if (state.consoleOpen || state.helpOpen || state.trade) return;
++  if (state.consoleOpen || state.helpOpen || state.trade || state.companionPicker) return;
+   state.consoleOpen = true;
+   state.consoleLines = [];
+   state.consoleHistoryIndex = state.consoleHistory.length;
+@@ -3743,6 +3831,7 @@
+     consoleMessage(`Usage: loadLevel <1-${FINAL_DEPTH}>`);
+     return;
+   }
++  closeCompanionBoard(state.companionPicker, false);
+   if (!state.started) startGame();
+   clearBossIntro();
+   clearBossDefeat();
+@@ -3848,7 +3937,7 @@
+ }
+ 
+ function openHelp() {
+-  if (state.helpOpen || state.trade) return;
++  if (state.helpOpen || state.trade || state.companionPicker) return;
+   state.helpFocus = document.activeElement;
+   state.helpOpen = true;
+   resetHelpClock();
+@@ -3903,6 +3992,9 @@
+   document.getElementById('retreatStatus').textContent = retreatRemaining() > 0 ? `${Math.ceil(retreatRemaining())}s` : 'Ready';
+   document.getElementById('companionStat').hidden = !state.companion;
+   document.getElementById('companionName').textContent = state.companion ? state.companion.name : '';
++  const postAction=document.getElementById('companionPostAction');
++  postAction.hidden=!companionPostContext(); postAction.ariaExpanded=String(!!state.companionPicker);
++  document.getElementById('companionAudioToggle').textContent=`Sound: ${state.audio.enabled?'On':'Off'} (M)`;
+   document.getElementById('godModeStat').hidden = !state.godMode;
+   const objective = objectiveText();
+   if (document.getElementById('objective').textContent !== objective) document.getElementById('objective').textContent = objective;
+@@ -3938,6 +4030,28 @@
+     if (k === 'enter' || k === 'tab') consoleInput.focus?.();
+     return;
+   }
++  if (state.companionPicker) {
++    const overlay = document.getElementById('companionOverlay');
++    if (k === 'escape') { e.preventDefault(); closeCompanionBoard(); }
++    else if (k === 'm' && !e.repeat) { e.preventDefault(); toggleAudio(); }
++    else if (k === 'r' && !e.repeat) { e.preventDefault(); restartFromEnding(); }
++    else if (k === 'tab') {
++      const controls = [...overlay.querySelectorAll('button')].filter(el => !el.disabled && !el.hidden);
++      if (controls.length) {
++        const index=controls.indexOf(document.activeElement), step=e.shiftKey?-1:1;
++        const next=index<0 ? (e.shiftKey?controls.length-1:0) : (index+step+controls.length)%controls.length;
++        e.preventDefault(); controls[next].focus();
++      }
++    } else if (['arrowup','arrowdown','home','end'].includes(k)) {
++      const choices=[...overlay.querySelectorAll('[data-companion-id]')].filter(el=>!el.disabled);
++      if (choices.length) {
++        const index=choices.indexOf(document.activeElement), step=k==='arrowup'?-1:1;
++        const next=k==='home'?0:k==='end'?choices.length-1:index<0?0:(index+step+choices.length)%choices.length;
++        e.preventDefault(); choices[next].focus();
++      }
++    }
++    return;
++  }
+   if (k === '`' || k === '~') {
+     e.preventDefault();
+     if (!e.repeat) toggleConsole();
+@@ -3946,15 +4060,6 @@
+   if (k === '?') {
+     e.preventDefault();
+     if (!e.repeat) toggleHelp();
+-    return;
+-  }
+-  const companionOverlay = document.getElementById('companionOverlay');
+-  if (companionOverlay && !companionOverlay.hidden) {
+-    if (k === 'escape') { e.preventDefault(); closeCompanionBoard(); }
+-    else if (k === 'tab') {
+-      const controls = [...companionOverlay.querySelectorAll('button, [tabindex="0"]')].filter(el => !el.disabled && !el.hidden);
+-      if (controls.length) { const index = controls.indexOf(document.activeElement); const next = index < 0 ? 0 : (index + (e.shiftKey ? -1 : 1) + controls.length) % controls.length; e.preventDefault(); controls[next].focus(); }
+-    }
+     return;
+   }
+   if (state.trade) {
+@@ -3980,6 +4085,16 @@
+       e.preventDefault(); controls[next].focus();
+     }
+     return;
++  }
++  if (!state.started && ['arrowup','arrowdown','arrowleft','arrowright','home','end'].includes(k)) {
++    e.preventDefault();
++    const next = k==='home' ? 'marmalade' : k==='end' ? 'pip' : state.companionChoice==='pip' ? 'marmalade' : 'pip';
++    setCompanionChoice(next);
++    document.querySelector?.(`[data-companion-choice="${next}"]`)?.focus?.();
++    return;
++  }
++  if (!state.started && e.target && e.target.dataset && e.target.dataset.companionChoice && ['enter',' '].includes(k)) {
++    e.preventDefault(); setCompanionChoice(e.target.dataset.companionChoice); startGame(); return;
+   }
+   if (e.target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;
+   if (e.target && e.target.tagName === 'BUTTON' && [' ', 'enter'].includes(k)) return;
+@@ -4052,7 +4167,7 @@
+   ['confirmRetreat', confirmRetreat], ['cancelRetreat', cancelRetreat], ['audioToggle', toggleAudio],
+   ['helpToggle', toggleHelp], ['closeHelp', closeHelp], ['consoleClose', closeConsole],
+   ['closeTrade', () => closeTrade(false)], ['cancelTrade', () => closeTrade(false)], ['confirmTrade', () => closeTrade(true)],
+-  ['closeCompanionBoard', closeCompanionBoard],
++  ['closeCompanionBoard', () => closeCompanionBoard()], ['companionPostAction', openCompanionBoard], ['companionAudioToggle', toggleAudio],
+ ]) document.getElementById(id).addEventListener('click', () => { startAudio(); action(); });
+ document.getElementById('tradeOverlay').addEventListener('click', e => { if (e.target.id === 'tradeOverlay') closeTrade(false); });
+ document.getElementById('companionOverlay').addEventListener('click', e => { if (e.target.id === 'companionOverlay') closeCompanionBoard(); });

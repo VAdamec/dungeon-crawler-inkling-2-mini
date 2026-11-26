@@ -1,0 +1,17 @@
+✔ merchant purchases, sales, and rescues stay resolved on revisits (812.681333ms)
+✔ ring pickup increases real HP, replacement does not stack, and selling removes only the gear health bonus (423.817417ms)
+✔ merchant ring purchase applies health and gear bonuses persist across floor changes (516.554333ms)
+✔ spellbooks teach spells through treasures and merchants, and knowledge persists (460.667458ms)
+✔ merchant stock and prices scale with depth on every even non-boss floor (336.72ms)
+✔ Inn and Store serve the town without advancing dungeon timers (361.696042ms)
+✔ the town gate enters floor one and town progress survives a return (335.807375ms)
+✔ Town Scroll can be bought, found, and counted without mixing with potions (328.988583ms)
+✔ trade entry helpers always open a cart in the no-DOM harness and never buy or sell immediately (426.926ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4108.490083

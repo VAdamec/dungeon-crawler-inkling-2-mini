@@ -1,0 +1,5 @@
+SPRITES loaded: 76
+PALETTES loaded: 76
+state exists: true depth: 1 monsters: 0 rooms: 0
+after keys: px= 38 py= 26 hp= 60 log= You arrive in the village. Rest at the Inn, visit the Store, or enter the dungeon.
+SMOKE_OK

@@ -1,8 +1,8 @@
 # 0x72 graphics implementation checklist
 
-Date: 2026-11-25. Status: **town/biome previews prepared; partial runtime integration now exists**.
+Date: 2026-11-25. Status: **historical preparation checklist; runtime integration completed through GR-01–08/10**. Native GR-09 remains unverified. See [current readiness/manual acceptance](../reviews/2026-11-26-release-readiness/README.md).
 
-Immediate work queue: [graphics recovery GR-01–10](2026-11-25-graphics-recovery-plan.md); [local LLM prompt](../prompts/2026-11-25-graphics-recovery-local-llm.md). Full game suite currently crashes with heap exhaustion; resolve the recovery P0 tasks first.
+Immediate work queue: [graphics recovery GR-01–10](2026-11-25-graphics-recovery-plan.md); [local LLM prompt](../prompts/2026-11-25-graphics-recovery-local-llm.md). The original heap failure was resolved by GR-01. M3 records307 game/27 preview tests passing. The unchecked preparation rows below are historical criteria, not a new implementation queue.
 
 Master execution plan: [final graphics integration, FG-01–08](2026-11-25-final-graphics-implementation-plan.md). It supersedes provisional pack-actor/source choices below with the user-selected reference-derived collection. [Final preview](../previews/2026-11-25-0x72/final-preview.html) · [all 76 runtime source mappings](../previews/2026-11-25-0x72/environment-v1/final-coverage.md).
 

@@ -1,0 +1,112 @@
+✖ G1 goldADD adds exactly once in town/dungeon and god mode, changing only gold (251.938125ms)
+✖ G1 goldADD rejects invalid text, extra arguments and non-string helper inputs atomically (249.656333ms)
+✖ G1 goldADD preserves exact safe-integer limits and rejects invalid current gold (193.147916ms)
+✖ G1 goldADD blocks inactive, hidden, dead, menu and cinematic contexts (255.577ms)
+✖ G1 goldADD discovery appears in startup and help reply without depending on command echoes (197.972958ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 0
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1258.543625
+
+✖ failing tests:
+
+test at tests/game.test.cjs:2625:1
+✖ G1 goldADD adds exactly once in town/dungeon and god mode, changing only gold (251.938125ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  40 !== 290
+  
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:2638:14)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 40,
+    expected: 290,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/game.test.cjs:2649:1
+✖ G1 goldADD rejects invalid text, extra arguments and non-string helper inputs atomically (249.656333ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /Usage: goldADD <positive integer>/. Input:
+  
+  'Unknown command: goldADD'
+  
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:2660:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'Unknown command: goldADD',
+    expected: /Usage: goldADD <positive integer>/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at tests/game.test.cjs:2669:1
+✖ G1 goldADD preserves exact safe-integer limits and rejects invalid current gold (193.147916ms)
+  evalmachine.<anonymous>:1
+  state.gold=Number.MAX_SAFE_INTEGER-1;addGold("1")
+                                       ^
+  
+  ReferenceError: addGold is not defined
+      at evalmachine.<anonymous>:1:38
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:139:21)
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:2671:5)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+
+test at tests/game.test.cjs:2684:1
+✖ G1 goldADD blocks inactive, hidden, dead, menu and cinematic contexts (255.577ms)
+  AssertionError [ERR_ASSERTION]: state.started=false
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:2699:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'Unknown command: goldADD',
+    expected: /Cannot add gold now/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at tests/game.test.cjs:2703:1
+✖ G1 goldADD discovery appears in startup and help reply without depending on command echoes (197.972958ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /goldADD <amount>/. Input:
+  
+  'Commands: loadLevel <1-100> · godMode 0|1 · teleportTown · addScrolls <n> · help · clear'
+  
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:2705:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'Commands: loadLevel <1-100> · godMode 0|1 · teleportTown · addScrolls <n> · help · clear',
+    expected: /goldADD <amount>/,
+    operator: 'match',
+    diff: 'simple'
+  }

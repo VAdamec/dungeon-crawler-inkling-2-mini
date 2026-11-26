@@ -1,0 +1,35 @@
+✔ requested monster/boss/NPC/companion/animal roster is complete, with one dragon alias (0.908833ms)
+✔ each character has 16 unique transparent poses, correct sheet dimensions and source hashes (249.811208ms)
+✔ all character frames fit their declared bounds with real alpha margins and consistent anchors (93.081583ms)
+✔ walking and creature loops change silhouette; wings and blob deformation are real (93.096792ms)
+✔ bosses remain visibly larger than the knight and Mimic has a closed-to-open sequence (0.131375ms)
+✔ Marmalade and user-specific references are preserved as explicit, separate custom artwork (0.109709ms)
+✔ all 24 environment families export with verified source hashes and bounds (37.870833ms)
+✔ five biome materials have different luminance patterns, not just recolored copies (2.905709ms)
+✔ real fixtures preserve walkability, building doorsteps, river and arena dimensions (1.328541ms)
+✔ strict environment export fails on missing source instead of substituting old artwork (5.271625ms)
+✔ final source ledger resolves every current runtime role, including semantic aliases (1.121375ms)
+✔ export is complete and every checked-in transparent frame matches its sheet (60.828ms)
+✔ hidden spikes and closed portal contain no color or alpha information (6.875167ms)
+✔ animation sheets have distinct visible phases without independently rescaling them (0.531583ms)
+✔ projectiles remain small relative to knight and hidden floor has no grate alias (0.543958ms)
+✔ strict export fails if any requested generated source is absent (5.451333ms)
+✔ knight has four directions and four unique walking frames per direction (1.10675ms)
+✔ all PNG frames have real transparent margins, a uniform scale and the same foot baseline (10.703042ms)
+✔ walking phases change the lower-body silhouettes, not only equipment or colors (6.755834ms)
+✔ sheet crops and directional strips exactly match the individual exported frames (3.810833ms)
+✔ RGBA codec round-trips alpha and colors without a runtime or image dependency (7.08225ms)
+✔ 256 raw neighborhoods normalize to the 47 valid connected masks (1.9275ms)
+✔ diagonal floors create concave joints only when both adjoining walls connect (0.590916ms)
+✔ solid map borders and floor obstacles have explicit collision meaning (0.140417ms)
+✔ every wall plan draws inside its blocked tile, with balanced transforms (2.647666ms)
+✔ manifest reports frame counts and density units for all runtime roles (0.9045ms)
+✔ preview frame bounds and original crops are in range; entry uses local scripts (1.817791ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 575.613333

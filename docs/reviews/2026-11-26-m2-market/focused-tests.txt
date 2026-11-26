@@ -1,0 +1,40 @@
+✔ merchant purchases, sales, and rescues stay resolved on revisits (929.023208ms)
+✔ ring pickup increases real HP, replacement does not stack, and selling removes only the gear health bonus (455.644125ms)
+✔ merchant ring purchase applies health and gear bonuses persist across floor changes (557.845459ms)
+✔ spellbooks teach spells through treasures and merchants, and knowledge persists (521.552375ms)
+✔ merchant stock and prices scale with depth on every even non-boss floor (386.42ms)
+✔ Inn and Store serve the town without advancing dungeon timers (401.248917ms)
+✔ the town gate enters floor one and town progress survives a return (383.923833ms)
+✔ Town Scroll can be bought, found, and counted without mixing with potions (366.340542ms)
+✔ trade entry helpers always open a cart in the no-DOM harness and never buy or sell immediately (450.765458ms)
+✔ M1 shared prices preserve every catalog item/depth including remembered town depth and reject unsafe money (153.556084ms)
+✔ M1 opening snapshot and all pure cart operations stay detached from town/floor aliases and side effects (497.413875ms)
+✔ M1 second and last duplicate stock units use stable local row identities without source-ID writes (171.303459ms)
+✔ M1 only selected gear is sold and draft proceeds fund later purchases without loans (163.728458ms)
+✔ M1 potion, scroll, elixir and spell drafts match actual effects without learning or drinking live (156.447292ms)
+✔ M1 path-correct ring HP and Undo preserve clipping, same-bonus replacement and level-derived health (493.579167ms)
+✔ M1 god-mode preview freezes hero fields while equipment-derived bonuses follow proposed gear (157.427334ms)
+✔ M1 Undo and Reset retain only accepted operations including buy-then-sell and replacement notices (157.333917ms)
+✔ M1 rejects invalid source values and overflowing actions without altering source or accepted history (2833.564208ms)
+✔ M1 immutable captured depth/time/stock/spells keep a draft independent of later live changes (160.179084ms)
+✔ M2 Space and X open Buy/Sell carts with nearby town and exact dungeon access, never an immediate trade (623.515208ms)
+✔ M2 selecting rows and staging purchases/sales/Undo/Reset/Cancel leaves live state, aliases, HUD and notices unchanged (78.69275ms)
+✔ M2 Confirm applies retained operations once, defers spell/purchase/sale notices and companion sold-out remarks (68.678584ms)
+✔ M2 committed ring/god-mode HP equals the path-dependent preview including same-bonus replacements (328.374084ms)
+✔ M2 known/unaffordable/pending rows remain visible and disabled; no invalid or empty sale enters the cart (71.648541ms)
+✔ M2 staged sales fund selected purchases and removed/undone operations emit no notices (73.543417ms)
+✔ M2 Confirm rejects changed context, source values and forged cart results without overwriting newer progress (865.841917ms)
+✔ M2 callbacks capture session identity so stale select/add/Confirm/Cancel cannot affect another shop (66.34ms)
+✔ M2 failed equipment application or save restores exact scoped values and cached town/floor aliases before notices (510.775417ms)
+✔ M2 confirmed store/merchant stock, gear and spell knowledge persist across revisits and portable snapshots (228.685583ms)
+✔ M2 keyboard selection/shortcuts, trapped focus, audio, hidden retention and restart have guarded behavior (85.612916ms)
+✔ M2 forced travel, death and restart discard drafts without spell/HP/item/currency effects or stale commits (416.053041ms)
+✔ M2 item details warn about gear replacement, label elixir honestly and render names as plain text (66.94875ms)
+ℹ tests 32
+ℹ suites 0
+ℹ pass 32
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 13010.516208

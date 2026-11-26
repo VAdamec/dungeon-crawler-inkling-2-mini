@@ -1,0 +1,1 @@
+ok /Users/vadamec/workspace/ai_tmp/opencode_testing/js/art-runtime.js 10.78MB

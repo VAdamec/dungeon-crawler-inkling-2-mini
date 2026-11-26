@@ -1,0 +1,61 @@
+{
+  "results": [
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "mobileTouchEmulation": false,
+      "protocol": "file:",
+      "actualDownloadBytes": 42064,
+      "exportPure": true,
+      "nativeFileReader": true,
+      "oversizeBeforeRead": true,
+      "invalidFileReversible": true,
+      "validatedPreview": true,
+      "explicitConfirm": true,
+      "sameFileReselection": true,
+      "cancelEvent": "controlled DOM cancel event, not native OS observation",
+      "focusTrapAndReturn": true,
+      "liveIntervalFrozen": true,
+      "mutingPreserved": true,
+      "basicDownloadReloadLoad": true,
+      "activeDungeonEncounterRoundTrip": true,
+      "launchAndDeathEntry": true,
+      "delayedNativeReaderAfterRestart": "controlled start delay; late native read ignored",
+      "modalFits": true,
+      "errors": [],
+      "remote": []
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "mobileTouchEmulation": true,
+      "protocol": "file:",
+      "actualDownloadBytes": 41958,
+      "exportPure": true,
+      "nativeFileReader": true,
+      "oversizeBeforeRead": true,
+      "invalidFileReversible": true,
+      "validatedPreview": true,
+      "explicitConfirm": true,
+      "sameFileReselection": true,
+      "cancelEvent": "controlled DOM cancel event, not native OS observation",
+      "focusTrapAndReturn": true,
+      "liveIntervalFrozen": true,
+      "mutingPreserved": true,
+      "basicDownloadReloadLoad": true,
+      "activeDungeonEncounterRoundTrip": true,
+      "launchAndDeathEntry": true,
+      "delayedNativeReaderAfterRestart": "controlled start delay; late native read ignored",
+      "modalFits": true,
+      "errors": [],
+      "remote": []
+    }
+  ],
+  "nativeBackgroundObserved": false,
+  "nativeOsChooserCancellationObserved": false,
+  "S4FullPortabilityAndLargeFileAcceptanceComplete": false
+}

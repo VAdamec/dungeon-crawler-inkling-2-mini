@@ -1,0 +1,373 @@
+diff --git a/tmp/dungeon-s3-before/game.js b/js/game.js
+index d9faf55..e46a353 100644
+--- a/tmp/dungeon-s3-before/game.js
++++ b/js/game.js
+@@ -840,6 +840,228 @@ function captureSaveData(source, context) {
+ 
+ function serializeSaveData(source, context) { return JSON.stringify(captureSaveData(source,context)); }
+ 
++// S3 transport/UI is transient and belongs to the existing identity-bound load session.
++function fileActionMessage(text) {
++  for (const id of ['saveGameStatus','launchFileStatus','deathFileStatus']) document.getElementById(id).textContent=text;
++}
++
++function canSaveGameFile() {
++  return saveLoadAllowed() && state.started && !state.gameOver && !state.godMode && !state.loadSession;
++}
++
++function fileSnapshotContext() {
++  return {createdAt:new Date().toISOString(),hidden:!!document.hidden,
++    tradeOpen:!document.getElementById('tradeOverlay').hidden,companionOpen:!document.getElementById('companionOverlay').hidden};
++}
++
++function saveGameFile() {
++  if (!canSaveGameFile()) return false;
++  const owner=state;
++  let url=null, link=null;
++  try {
++    if (typeof window.Blob!=='function' || !window.URL || typeof window.URL.createObjectURL!=='function'
++      || typeof window.URL.revokeObjectURL!=='function' || typeof window.setTimeout!=='function') throw new Error('File API unavailable');
++    const context=fileSnapshotContext(), text=serializeSaveData(owner,context);
++    const blob=new window.Blob([text],{type:'application/json;charset=utf-8'});
++    url=window.URL.createObjectURL(blob);
++    link=document.createElement('a'); link.href=url;
++    link.download=`dungeon-crawler-${context.createdAt.replace(/[:.]/g,'-')}.json`;
++    document.body.appendChild(link); link.click();
++    const downloadUrl=url;
++    window.setTimeout(()=>window.URL.revokeObjectURL(downloadUrl),30000);
++    url=null; // This timer only releases its own URL; it never touches a later run/UI.
++    if (state===owner) fileActionMessage('Download requested. Keep the .json file to continue this adventure later.');
++    return true;
++  } catch (error) {
++    if (state===owner) fileActionMessage(error.message.includes('32 MiB') || error.message.includes('limit') || error.message.includes('array')
++      ? 'This adventure exceeds the supported save limits. Nothing was changed.'
++      : 'Could not prepare a save file. Nothing was changed. Try again in a supported browser.');
++    return false;
++  } finally {
++    link?.remove?.();
++    if (url!==null) { try { window.URL.revokeObjectURL(url); } catch (ignored) { /* No game/UI callback depends on URL cleanup. */ } }
++    if (state===owner) resetHelpClock();
++  }
++}
++
++function updateSaveFileButtons() {
++  document.getElementById('saveGameButton').disabled=!canSaveGameFile();
++  for (const id of ['loadGameButton','launchLoadGame','deathLoadGame']) document.getElementById(id).disabled=!saveLoadAllowed() || !!state.loadSession;
++  if (state.loadSession && state.loadSession.ui) renderSaveLoadUI(state.loadSession);
++}
++
++function disposeSaveLoadUI(session, restoreBackground, restoreFocus) {
++  const ui=session && session.ui;
++  if (!ui) return;
++  session.ui=null;
++  const reader=ui.reader;
++  ui.read=null; ui.data=null; ui.reader=null;
++  if (ui.task!==null) { window.clearTimeout?.(ui.task); ui.task=null; }
++  if (reader && reader.readyState===1) { try { reader.abort(); } catch (error) { /* The invalidated read cannot update UI. */ } }
++  if (state.loadSession && state.loadSession!==session && state.loadSession.ui) return;
++  if (document.getElementById('saveLoadFile')===ui.input) {
++    ui.input.value=''; document.getElementById('saveLoadFileHost').innerHTML='';
++    document.getElementById('saveLoadOverlay').hidden=true;
++    document.getElementById('saveLoadPreview').textContent='';
++    document.getElementById('saveLoadPreview').hidden=true;
++    document.getElementById('confirmSaveLoad').disabled=true;
++    document.getElementById('saveLoadSelectedFile').textContent='';
++    document.getElementById('saveLoadStatus').textContent='';
++  }
++  if (restoreBackground) {
++    document.getElementById('gameLayout').inert=ui.gameInert;
++    document.getElementById('launchScreen').inert=ui.launchInert;
++    document.getElementById('helpOverlay').inert=ui.helpInert;
++    updateSaveFileButtons(); // Re-enable the origin control before trying to focus it.
++    if (restoreFocus) (ui.focus && ui.focus.isConnected!==false ? ui.focus
++      : state.helpOpen ? document.getElementById('closeHelp') : state.started ? canvas : document.getElementById('startGame')).focus?.();
++  }
++}
++
++function openLoadGame() {
++  if (state.loadSession) return null;
++  const session=beginSaveLoad();
++  if (!session) return null;
++  const ui={focus:document.activeElement,gameInert:!!document.getElementById('gameLayout').inert,
++    launchInert:!!document.getElementById('launchScreen').inert,helpInert:!!document.getElementById('helpOverlay').inert,
++    input:null,reader:null,read:null,task:null,data:null,phase:'choose',message:'Choose a save file. Your current adventure stays unchanged until you load.'};
++  session.ui=ui;
++  try {
++    const input=document.createElement('input');
++    input.id='saveLoadFile'; input.type='file'; input.accept='.json,application/json';
++    input.disabled=typeof window.FileReader!=='function';
++    input.onchange=()=>{
++      const file=input.files && input.files[0];
++      input.value=''; // Also handles selecting the exact same file again using keyboard/native controls.
++      readSaveGameFile(session,input,file);
++    };
++    input.onclick=()=>{ if (saveLoadSessionBound(session) && session.ui===ui) { input.value=''; resetSaveFileRead(session); } };
++    input.oncancel=()=>{
++      if (!saveLoadSessionBound(session) || session.ui!==ui) return;
++      resetSaveFileRead(session);
++      ui.message='File selection canceled. Choose another file, or Cancel to resume.'; renderSaveLoadUI(session);
++    };
++    ui.input=input;
++    const host=document.getElementById('saveLoadFileHost'); host.innerHTML=''; host.appendChild(input);
++    if (input.disabled) ui.message='This browser cannot read save files. Cancel to resume.';
++    document.getElementById('gameLayout').inert=true;
++    document.getElementById('launchScreen').inert=true;
++    document.getElementById('helpOverlay').inert=true;
++    document.getElementById('saveLoadOverlay').hidden=false;
++    fileActionMessage(''); updateSaveFileButtons();
++    (input.disabled?document.getElementById('cancelSaveLoad'):input).focus?.();
++    return session;
++  } catch (error) {
++    cancelSaveLoad(session);
++    fileActionMessage('Could not open the file chooser. Your adventure is unchanged.');
++    return null;
++  }
++}
++
++function resetSaveFileRead(session) {
++  const ui=session.ui;
++  if (!ui) return;
++  const reader=ui.reader;
++  ui.read=null; ui.data=null; ui.reader=null; ui.phase='choose';
++  if (ui.task!==null) { window.clearTimeout?.(ui.task); ui.task=null; }
++  if (reader && reader.readyState===1) { try { reader.abort(); } catch (error) { /* Replaced selection is already invalid. */ } }
++  document.getElementById('saveLoadSelectedFile').textContent='';
++  ui.message='Choose a save file. Cancel keeps your current adventure.';
++  renderSaveLoadUI(session);
++}
++
++function saveFileReadCurrent(session, read) {
++  const ui=session && session.ui;
++  return saveLoadSessionBound(session) && !!ui && ui.read===read && ui.input===read.input
++    && document.getElementById('saveLoadFile')===read.input && read.input.isConnected!==false;
++}
++
++function renderSaveLoadUI(session) {
++  if (!saveLoadSessionBound(session) || !session.ui) return;
++  const ui=session.ui;
++  document.getElementById('saveLoadStatus').textContent=ui.message;
++  const preview=document.getElementById('saveLoadPreview');
++  preview.hidden=!ui.data;
++  if (ui.data) {
++    const d=ui.data, run=d.run, p=run.player;
++    preview.textContent=`${run.area==='town'?'Town':`Dungeon depth ${run.depth}`} · Hero level ${p.lvl}\nHP ${p.hp}/${p.maxHp} · MP ${p.mp}/${p.maxMp} · Gold ${run.gold}\nSaved ${new Date(d.createdAt).toLocaleString()} · Game v${d.gameVersion}`;
++  } else preview.textContent='';
++  document.getElementById('confirmSaveLoad').disabled=ui.phase!=='ready' || !ui.data || !saveLoadSessionCurrent(session);
++  const confirm=document.getElementById('confirmSaveLoad');
++  confirm.onclick=()=>confirmSaveGameLoad(session);
++  document.getElementById('cancelSaveLoad').onclick=()=>cancelSaveLoad(session);
++  document.getElementById('saveLoadAudioToggle').textContent=`Sound: ${state.audio.enabled?'On':'Off'} (M)`;
++}
++
++function saveFileReadError(session, read, message) {
++  if (!saveFileReadCurrent(session,read)) return;
++  session.ui.data=null; session.ui.phase='error'; session.ui.message=message;
++  renderSaveLoadUI(session);
++}
++
++function readSaveGameFile(session, input, file) {
++  if (!saveLoadSessionBound(session) || !session.ui || session.ui.input!==input) return;
++  resetSaveFileRead(session);
++  const ui=session.ui, read={input}; ui.read=read;
++  if (!file) { saveFileReadError(session,read,'No file selected. Choose a file, or Cancel to resume.'); return; }
++  if (!Number.isSafeInteger(file.size) || file.size<0 || file.size>SAVE_MAX_BYTES) {
++    saveFileReadError(session,read,'This file is larger than 32 MiB or cannot be read. Choose a smaller save.'); return;
++  }
++  document.getElementById('saveLoadSelectedFile').textContent=`Selected: ${String(file.name || 'save file').slice(0,128)}`;
++  ui.phase='reading'; ui.message='Reading and checking your save… Cancel keeps your current adventure.';
++  renderSaveLoadUI(session);
++  try {
++    const reader=new window.FileReader(); ui.reader=reader;
++    reader.onload=()=>{
++      if (!saveFileReadCurrent(session,read)) return;
++      const text=reader.result;
++      // Yield a task so progress/cancel controls can paint before bounded synchronous validation.
++      ui.task=window.setTimeout(()=>{
++        if (!saveFileReadCurrent(session,read)) return;
++        ui.task=null;
++        try {
++          const data=parseSaveData(text);
++          if (!saveFileReadCurrent(session,read)) return;
++          ui.data=data; ui.phase='ready'; ui.message='Save checked. Load replaces your current adventure; Cancel keeps it.';
++          renderSaveLoadUI(session);
++        } catch (error) {
++          saveFileReadError(session,read,error.message.includes('unsupported format version')
++            ? 'This save version is not supported by this game.' : 'This file is not a supported saved adventure. Choose another file or Cancel.');
++        }
++      },0);
++    };
++    reader.onerror=()=>saveFileReadError(session,read,'Could not read this file. Choose it again, or Cancel to resume.');
++    reader.onabort=()=>saveFileReadError(session,read,'File reading stopped. Choose a file, or Cancel to resume.');
++    reader.readAsText(file,'UTF-8');
++  } catch (error) { saveFileReadError(session,read,'Could not read this file. Choose it again, or Cancel to resume.'); }
++}
++
++function confirmSaveGameLoad(session) {
++  if (!saveLoadSessionCurrent(session) || !session.ui || session.ui.phase!=='ready' || !session.ui.data) return false;
++  const ui=session.ui, data=ui.data;
++  ui.phase='loading'; ui.message='Loading adventure…'; renderSaveLoadUI(session);
++  ui.task=window.setTimeout(()=>{
++    if (!saveLoadSessionBound(session) || session.ui!==ui || ui.data!==data || ui.phase!=='loading') return;
++    ui.task=null;
++    if (!saveLoadSessionCurrent(session)) {
++      ui.phase='ready'; ui.message='Loading is unavailable right now. Return to the game, or Cancel.'; renderSaveLoadUI(session); return;
++    }
++    try {
++      const loaded=commitSaveLoad(session,data);
++      if (!loaded && session.ui===ui && saveLoadSessionBound(session)) {
++        ui.phase='ready'; ui.message='Loading is unavailable right now. Return to the game, or Cancel.'; renderSaveLoadUI(session);
++      }
++    } catch (error) {
++      if (session.ui===ui && saveLoadSessionBound(session)) {
++        ui.data=null; ui.phase='error'; ui.message='Could not load this save. Your adventure is unchanged. Choose a file or Cancel.';
++        renderSaveLoadUI(session);
++      } else if (state===session.owner) fileActionMessage('Could not load this save. Your adventure is unchanged. Choose Load to try again.');
++    }
++  },0);
++  return true; // Confirmation queued; only S2 commit's result means a run was replaced.
++
++}
++
+ // S2 model hydration: validated detached data only; resources are attached at the commit boundary.
+ function hydrateSaveData(value) {
+   const run = validateSaveData(value).run;
+@@ -887,6 +1109,7 @@ function saveLoadAllowed() {
+ 
+ function beginSaveLoad() {
+   if (!saveLoadAllowed()) return null;
++  if (state.loadSession) cancelSaveLoad(state.loadSession,false);
+   const session={ owner:state, map:state.map, area:state.area, depth:state.depth,
+     started:state.started, gameOver:state.gameOver };
+   state.loadSession=session; // Replacing this identity invalidates every older read/confirmation.
+@@ -894,15 +1117,19 @@ function beginSaveLoad() {
+   return session;
+ }
+ 
+-function saveLoadSessionCurrent(session) {
++function saveLoadSessionBound(session) {
+   return !!session && state.loadSession===session && session.owner===state && session.map===state.map
+     && session.area===state.area && session.depth===state.depth && session.started===state.started
+-    && session.gameOver===state.gameOver && saveLoadAllowed();
++    && session.gameOver===state.gameOver;
+ }
+ 
++function saveLoadSessionCurrent(session) { return saveLoadSessionBound(session) && saveLoadAllowed(); }
++
+ function cancelSaveLoad(session = state && state.loadSession, resume = true) {
+   if (!session || !state || state.loadSession!==session) return false;
+   state.loadSession=null;
++  updateSaveFileButtons();
++  disposeSaveLoadUI(session,true,resume);
+   resetHelpClock();
+   if (resume) requestMotionFrame();
+   return true;
+@@ -916,16 +1143,19 @@ const SAVE_LOAD_UI_IDS = ['launchScreen','gameLayout','overlay','pauseOverlay','
+   'godModeStat','objective','musicVolume','musicVolumeText','effectsVolume','effectsVolumeText','audioToggle',
+   'weaponSlot','weaponName','weaponBonuses','armorSlot','armorName','armorBonuses','ringSlot','ringName','ringBonuses',
+   'gearHpBonus','gearStrBonus','heroMaxHp','heroStrength','heroAttack','heroDefense','heroDexterity','spellList',
+-  'merchantStock','minimapDepth'];
++  'merchantStock','minimapDepth','saveLoadOverlay','saveLoadFile','saveLoadStatus','saveLoadPreview','saveLoadSelectedFile',
++  'confirmSaveLoad','cancelSaveLoad','saveLoadAudioToggle','saveGameButton','loadGameButton','launchLoadGame','deathLoadGame',
++  'saveGameStatus','launchFileStatus','deathFileStatus'];
+ 
+ function captureLoadPresentation() {
+   const nodes=SAVE_LOAD_UI_IDS.map(id=>{
+     const node=document.getElementById(id);
++    if (!node) return null;
+     return {node, text:node.children && node.children.length ? null : node.textContent,
+       hidden:node.hidden, disabled:node.disabled, inert:node.inert, value:node.value,
+       ariaPressed:node.ariaPressed, ariaExpanded:node.ariaExpanded, className:node.className,
+       css:node.style.cssText, display:node.style.display, width:node.style.width, scrollTop:node.scrollTop};
+-  });
++  }).filter(Boolean);
+   const canvases=[];
+   for (const id of ['game','minimap','weaponIcon','armorIcon','ringIcon']) {
+     const surface=document.getElementById(id);
+@@ -939,7 +1169,9 @@ function restoreLoadPresentation(saved) {
+   for (const row of saved.nodes) {
+     const node=row.node;
+     if (row.text!==null) node.textContent=row.text;
+-    for (const key of ['hidden','disabled','inert','value','ariaPressed','ariaExpanded','className','scrollTop']) node[key]=row[key];
++    for (const key of ['hidden','disabled','inert','value','ariaPressed','ariaExpanded','className','scrollTop']) {
++      if (key!=='value' || node.type!=='file') node[key]=row[key];
++    }
+     if (row.css!==undefined) node.style.cssText=row.css;
+     else { node.style.display=row.display; node.style.width=row.width; }
+   }
+@@ -973,10 +1205,11 @@ function commitSaveLoad(session, value) {
+   previous.loadSession=null; // Invalidate the confirmation before swapping; a consumed token never retries.
+   state=candidate;
+   try {
+-    for (const id of ['helpOverlay','tradeOverlay','companionOverlay','devConsole','endingControls']) document.getElementById(id).hidden=true;
++    for (const id of ['helpOverlay','tradeOverlay','companionOverlay','devConsole','endingControls','saveLoadOverlay']) document.getElementById(id).hidden=true;
+     document.getElementById('overlay').style.display='none';
+     document.getElementById('pauseOverlay').style.display='none';
+     document.getElementById('helpToggle').ariaExpanded='false';
++    document.getElementById('helpOverlay').inert=false;
+     document.getElementById('gameLayout').inert=false;
+     document.getElementById('launchScreen').inert=false;
+     document.getElementById('launchScreen').hidden=true;
+@@ -991,6 +1224,8 @@ function commitSaveLoad(session, value) {
+     if (state!==candidate) return false;
+     candidate.lastTick=Date.now();
+     cancelSaveLoadFrames(previous);
++    disposeSaveLoadUI(session,false,false);
++    fileActionMessage('');
+     return true;
+   } catch (error) {
+     cancelSaveLoadFrames(candidate);
+@@ -998,6 +1233,7 @@ function commitSaveLoad(session, value) {
+       state=previous;
+       state.lastTick=Date.now(); // Failed presentation/cancel time earns no active-time credit.
+       restoreLoadPresentation(presentation);
++      disposeSaveLoadUI(session,true,true);
+       try { requestMotionFrame(); } catch (ignored) { /* Original render error remains the reported failure. */ }
+     }
+     throw error;
+@@ -1008,6 +1244,7 @@ let state;
+ 
+ function newGame() {
+   cancelSaveLoad(state && state.loadSession, false);
++  fileActionMessage('');
+   closeCompanionBoard(state && state.companionPicker, false);
+   stopMotionAnimation();
+   stopEndingAnimation();
+@@ -4646,11 +4883,20 @@ function render(preserveSaveState = false) {
+   const stock = m && m.stock && m.stock.length ? m.stock.map(i => i.name).join(', ') : '(sold out)';
+   document.getElementById('merchantStock').textContent = m ? `${state.area === 'town' ? 'Store' : 'Merchant'}: ${stock}` : '';
+   document.getElementById('merchantStock').hidden = !m;
++  updateSaveFileButtons();
+ }
+ 
+ document.addEventListener('keydown', e => {
+   const k = e.key.toLowerCase();
+   if (state.loadSession) {
++    const fileUI=state.loadSession.ui;
++    if (fileUI && k==='tab') {
++      const controls=[fileUI.input,document.getElementById('confirmSaveLoad'),document.getElementById('cancelSaveLoad'),document.getElementById('saveLoadAudioToggle')].filter(el=>el&&!el.disabled&&!el.hidden);
++      const index=controls.indexOf(document.activeElement);
++      const next=index<0?(e.shiftKey?controls.length-1:0):(index+(e.shiftKey?-1:1)+controls.length)%controls.length;
++      e.preventDefault();controls[next]?.focus?.();return;
++    }
++    if (fileUI && e.target===fileUI.input && ['enter',' '].includes(k)) return;
+     if (k==='escape') { e.preventDefault(); cancelSaveLoad(); return; }
+     if (k==='r' && !e.repeat) { e.preventDefault(); restartFromEnding(); return; }
+     if (k==='m' && !e.repeat) { e.preventDefault(); toggleAudio(); return; }
+@@ -4803,6 +5049,7 @@ document.addEventListener('visibilitychange', () => {
+   if (state.bossIntro) state.bossIntro.lastTimestamp = null;
+   if (state.bossDefeat) state.bossDefeat.lastTimestamp = null;
+   stopMotionAnimation(); requestMotionFrame();
++  updateSaveFileButtons();
+ });
+ 
+ for (const [id, action] of [
+@@ -4812,6 +5059,9 @@ for (const [id, action] of [
+   ['closeTrade', () => closeTrade(false)], ['cancelTrade', () => closeTrade(false)], ['confirmTrade', () => closeTrade(true)],
+   ['closeCompanionBoard', () => closeCompanionBoard()], ['companionPostAction', openCompanionBoard], ['companionAudioToggle', toggleAudio],
+ ]) document.getElementById(id).addEventListener('click', () => { startAudio(); action(); });
++for (const id of ['loadGameButton','launchLoadGame','deathLoadGame']) document.getElementById(id).addEventListener('click',openLoadGame);
++document.getElementById('saveGameButton').addEventListener('click',saveGameFile);
++document.getElementById('saveLoadAudioToggle').addEventListener('click',()=>{ startAudio();toggleAudio(); });
+ document.getElementById('tradeOverlay').addEventListener('click', e => { if (e.target.id === 'tradeOverlay') closeTrade(false); });
+ document.getElementById('companionOverlay').addEventListener('click', e => { if (e.target.id === 'companionOverlay') closeCompanionBoard(); });
+ document.querySelectorAll?.('[data-companion-choice]')?.forEach?.(btn => btn.addEventListener('click', () => { setCompanionChoice(btn.dataset.companionChoice); }));

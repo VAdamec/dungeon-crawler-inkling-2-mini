@@ -1,0 +1,18 @@
+AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+
+  {
++   focus: 'saveLoadAudioToggle',
+-   focus: 'loadGameButton',
+    help: true,
+    inert: false
+  }
+
+    at /Users/vadamec/workspace/ai_tmp/opencode_testing/docs/reviews/2026-11-26-s3-file-ui/check-browser.cjs:67:10 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: [Object],
+  expected: [Object],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}

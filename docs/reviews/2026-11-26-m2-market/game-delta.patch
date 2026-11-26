@@ -1,0 +1,491 @@
+--- /tmp/dungeon-m2-before/game.js	2026-11-26 17:44:34
++++ js/game.js	2026-11-26 18:09:49
+@@ -1381,6 +1381,7 @@
+ let state;
+ 
+ function newGame() {
++  dismissTrade(state && state.trade, false);
+   cancelSaveLoad(state && state.loadSession, false);
+   fileActionMessage('');
+   closeCompanionBoard(state && state.companionPicker, false);
+@@ -1753,6 +1754,7 @@
+ }
+ 
+ function enterTown() {
++  dismissTrade(state && state.trade, false);
+   cancelSaveLoad(state && state.loadSession, false);
+   closeCompanionBoard(state && state.companionPicker, false);
+   if (state.area === 'town' || !state.town) return;
+@@ -2722,6 +2724,7 @@
+ }
+ 
+ function gameOver(won) {
++  dismissTrade(state && state.trade, false);
+   cancelSaveLoad(state.loadSession, false);
+   if (won) { startEnding(); return; }
+   clearBossIntro();
+@@ -3162,6 +3165,7 @@
+ 
+ function enterFloor(depth, fromBelow, fresh = false, arrivalTile = null) {
+   if (depth < 1 || depth > FINAL_DEPTH) return;
++  dismissTrade(state.trade, false);
+   cancelSaveLoad(state.loadSession, false);
+   closeCompanionBoard(state.companionPicker, false);
+   clearBossIntro();
+@@ -3426,15 +3430,6 @@
+ 
+ function tradePrice(it) { return buyPrice(it, state.depth); }
+ function tradeSellPrice(it) { return sellPrice(it); }
+-function tradeSnapshot() {
+-  const m = state.merchant;
+-  return {
+-    gold: state.gold, townScrolls: state.townScrolls,
+-    inventory: JSON.parse(JSON.stringify(state.inventory)),
+-    equipment: JSON.parse(JSON.stringify(state.equipment)),
+-    stock: m && m.stock ? JSON.parse(JSON.stringify(m.stock)) : [],
+-  };
+-}
+ function companionPostContext() {
+   if (!state.started || state.area !== 'town' || state.gameOver || state.player.hp <= 0 || document.hidden
+     || state.helpOpen || state.consoleOpen || state.trade || state.pause || state.ending || bossCinematicActive()) return null;
+@@ -3504,137 +3499,248 @@
+   return true;
+ }
+ 
+-function openTrade() {
+-  if (state.loadSession) return;
+-  if (state.companionPicker) return;
+-  if (state.gameOver || state.helpOpen || state.consoleOpen || state.trade || state.pause || state.ending || bossCinematicActive()) return;
+-  const m = merchantAt(state.player.x, state.player.y);
+-  if (!m) { log('No merchant here.'); render(); return; }
+-  const overlay = document.getElementById('tradeOverlay');
+-  const buyList = document.getElementById('tradeBuyList');
+-  const sellList = document.getElementById('tradeSellList');
+-  if (!overlay || !buyList || !sellList || typeof document.createElement !== 'function') { buyFromMerchant(); return; }
+-  state.trade = { actor: m, kind: state.area === 'town' ? 'store' : 'merchant', snapshot: tradeSnapshot() };
+-  renderTrade();
+-  overlay.hidden = false;
+-  render();
+-  document.getElementById('closeTrade').focus?.();
++function tradeMerchant() {
++  const m = state.merchant;
++  if (!m) return null;
++  if (state.area === 'town') return state.town && state.map === state.town.map && m === state.town.store
++    && nearbyTile(state.player.x,state.player.y,m) ? m : null;
++  return merchantAt(state.player.x,state.player.y);
+ }
+-function closeTrade(confirm) {
+-  if (!state.trade) return;
+-  if (!confirm) {
+-    const snap = state.trade.snapshot;
+-    state.gold = snap.gold; state.townScrolls = snap.townScrolls;
+-    state.inventory = JSON.parse(JSON.stringify(snap.inventory));
+-    state.equipment = JSON.parse(JSON.stringify(snap.equipment));
+-    if (state.trade.actor) state.trade.actor.stock = JSON.parse(JSON.stringify(snap.stock));
+-    log('Trade cancelled; changes reverted.');
+-  }
+-  state.trade = null;
+-  const overlay=document.getElementById('tradeOverlay'); if(overlay) overlay.hidden = true;
+-  state.lastTick = Date.now();
+-  render();
+-  (state.started ? canvas : document.getElementById('startGame')).focus?.();
++
++function tradeAccessAllowed() {
++  return state.started && !state.gameOver && !state.won && state.player.hp > 0 && !document.hidden
++    && !state.helpOpen && !state.consoleOpen && !state.pause && !state.ending && !bossCinematicActive()
++    && !state.companionPicker && !state.loadSession && document.getElementById('companionOverlay').hidden;
+ }
+-function renderTrade() {
+-  const trade = state.trade; if (!trade) return;
+-  const buy = document.getElementById('tradeBuyList'); const sell = document.getElementById('tradeSellList'); if(!buy||!sell) return;
+-  buy.innerHTML = ''; sell.innerHTML = '';
+-  const stock = (trade.actor.stock || []);
+-  if (!stock.length) buy.innerHTML = '<div class="trade-item"><div><b>Sold out</b><div class="meta">Nothing left to buy.</div></div></div>';
+-  stock.forEach((it, idx) => {
+-    const cost = tradePrice(it);
+-    if (typeof document.createElement !== 'function') return; const row = document.createElement('div'); row.className = 'trade-item';
+-    row.innerHTML = `<div><b>${it.name}</b><div class="meta">${cost} gold</div></div>`;
+-    const btn = document.createElement('button'); btn.type='button'; btn.textContent='Buy'; btn.dataset.buyIndex=String(idx);
+-    btn.onclick = () => tradeBuy(idx);
+-    row.appendChild(btn); buy.appendChild(row);
+-  });
+-  const slots = ['weapon','armor','ring'];
+-  let hasSell = false;
+-  for (const slot of slots) {
+-    const it = state.equipment[slot]; if (!it) continue; hasSell = true;
+-    const price = tradeSellPrice(it);
+-    if (typeof document.createElement !== 'function') return; const row = document.createElement('div'); row.className='trade-item';
+-    row.innerHTML = `<div><b>${it.name}</b><div class="meta">${slot} · sell for ${price} gold</div></div>`;
+-    const btn = document.createElement('button'); btn.type='button'; btn.textContent='Sell'; btn.dataset.sellSlot=slot;
+-    btn.onclick = () => tradeSell(slot);
+-    row.appendChild(btn); sell.appendChild(row);
+-  }
+-  if (!hasSell) sell.innerHTML = '<div class="trade-item"><div><b>No gear</b><div class="meta">Equip items to sell them.</div></div></div>';
+-  const tg=document.getElementById('tradeGold'); if(tg) tg.textContent = `Gold: ${state.gold}`;
+-  const tt=document.getElementById('tradeTitle'); if(tt) tt.textContent = trade.kind === 'town' ? 'Store' : 'Merchant';
++
++function tradeSessionBound(session) {
++  return !!session && state.trade === session && session.owner === state && session.map === state.map
++    && session.area === state.area && session.depth === state.depth && session.actor === tradeMerchant();
+ }
+-function tradeBuy(idx) {
+-  const trade = state.trade; if (!trade) return;
+-  const m = trade.actor; const it = m.stock && m.stock[idx];
+-  if (!it) return;
+-  if (it.kind === 'spellbook' && state.player.spells[it.spell]) { log(`You already know ${SPELLS[it.spell].name}.`); m.stock.splice(idx,1); renderTrade(); render(); return; }
+-  const cost = tradePrice(it);
+-  if (state.gold < cost) { log(`Not enough gold (${cost} needed).`); renderTrade(); render(); return; }
+-  state.gold -= cost;
+-  m.stock.splice(idx,1);
+-  state.bubble = { text: 'Pleasure doing business!', ttl: 90 };
+-  if (it.kind === 'heal') { storePotion(it); log(`Bought ${it.name}! Press H to drink.`); }
+-  else if (it.kind === 'weapon' || it.kind === 'armor' || it.kind === 'ring') { const slot = it.kind === 'weapon' ? 'weapon' : it.kind === 'armor' ? 'armor' : 'ring'; const prev = state.equipment[slot]; equipItem(slot, it); log(`Bought ${it.name}!${prev ? ` (replaced ${prev.name})` : ''}`); }
+-  else if (it.kind === 'elixir') { state.gold += it.gold; log(`Bought ${it.name}! +${it.gold} gold`); }
+-  else if (it.kind === 'spellbook') { learnSpell(it.spell); log(`Bought ${it.name}!`); }
+-  else if (it.kind === 'scroll') { state.townScrolls++; log(`Bought ${it.name}! Press J in the dungeon to open a portal home.`); }
+-  else log(`Bought ${it.name}!`);
+-  if (!m.stock.length) companionTalk('merchant');
+-  renderTrade(); render();
++
++function tradeSessionCurrent(session) {
++  return tradeSessionBound(session) && tradeAccessAllowed() && !session.committing && !session.invalid;
+ }
+-function tradeSell(slot) {
+-  const trade = state.trade; if (!trade) return;
+-  const it = state.equipment[slot]; if (!it) return;
+-  const price = tradeSellPrice(it);
+-  state.gold += price;
+-  equipItem(slot, null);
+-  log(`Sold ${it.name} for ${price} gold.`);
+-  state.bubble = { text: 'Fair trade!', ttl: 90 };
+-  renderTrade(); render();
++
++function openTrade(mode = 'buy') {
++  if (state.trade || !tradeAccessAllowed() || !document.getElementById('tradeOverlay').hidden) return false;
++  const actor = tradeMerchant();
++  if (!actor) { log('No merchant here.'); render(); return false; }
++  let cart;
++  try { cart = createTradeDraft(state,actor);for (const row of cart.original.stock) buyPrice(row.item,cart.rules.pricingDepth); } catch (error) { return false; }
++  const session = { owner:state, actor, map:state.map, area:state.area, depth:state.depth,
++    cart, opening:cart.original, rules:cart.rules, selectedBuy:cart.original.stock[0]?.rowId || null,
++    selectedSell:['weapon','armor','ring'].find(slot=>cart.original.equipment[slot]) || null,
++    mode:mode === 'sell' ? 'sell' : 'buy', message:'Choose items, then add purchases or sales. Confirm applies your cart.',
++    focus:document.activeElement, gameInert:!!document.getElementById('gameLayout').inert,
++    launchInert:!!document.getElementById('launchScreen').inert };
++  state.trade = session;
++  document.getElementById('tradeOverlay').hidden = false;
++  document.getElementById('gameLayout').inert = true;
++  document.getElementById('launchScreen').inert = true;
++  resetHelpClock(); stopMotionAnimation(); renderTrade(session); render(true);
++  const list=document.getElementById(mode === 'sell' ? 'tradeSellList' : 'tradeBuyList');
++  ([...(list.querySelectorAll?.('button') || [])].find(button=>!button.disabled) || document.getElementById('closeTrade')).focus?.();
++  return true;
+ }
+-function buyFromMerchant() {
+-  if (state.loadSession) return;
+-  const m = merchantAt(state.player.x, state.player.y);
+-  if (!m) { log('No merchant here.'); render(); return; }
+-  if (state.trade) { tradeBuy(0); return; }
+-  if (!m.stock || m.stock.length === 0) { log('Nothing for sale here.'); render(); return; }
+-  // Compatibility: immediate buy of first item when menu not open.
+-  const it = m.stock[0];
+-  if (it.kind === 'spellbook' && state.player.spells[it.spell]) {
+-    log(`You already know ${SPELLS[it.spell].name}.`); m.stock.shift(); render(); return;
++
++function dismissTrade(session, resume = true) {
++  if (!session || state.trade !== session) return false;
++  state.trade = null;
++  document.getElementById('tradeOverlay').hidden = true;
++  // Release captured owner/cart references instead of retaining the previous run in hidden controls.
++  for (const id of ['closeTrade','cancelTrade','confirmTrade','addTradePurchase','addTradeSale','undoTrade','resetTrade','tradeAudioToggle']) document.getElementById(id).onclick=null;
++  for (const id of ['tradeBuyList','tradeSellList','tradeOrder']) document.getElementById(id).innerHTML='';
++  document.getElementById('gameLayout').inert = session.gameInert || false;
++  document.getElementById('launchScreen').inert = session.launchInert || false;
++  resetHelpClock();
++  if (resume) {
++    render(true); requestMotionFrame();
++    const focus=session.focus;
++    if (focus && focus.isConnected && !focus.disabled && !focus.hidden && !focus.closest?.('[inert], [hidden]')) focus.focus?.();
++    else canvas.focus?.();
+   }
+-  const cost = tradePrice(it);
+-  if (state.gold < cost) { log(`Not enough gold (${cost} needed).`); render(); return; }
+-  state.gold -= cost; m.stock.shift();
+-  state.bubble = { text: 'Pleasure doing business!', ttl: 90 };
+-  if (it.kind === 'heal') { storePotion(it); log(`Bought ${it.name}! Press H to drink.`); }
+-  else if (it.kind === 'weapon' || it.kind === 'armor' || it.kind === 'ring') { const slot = it.kind === 'weapon' ? 'weapon' : it.kind === 'armor' ? 'armor' : 'ring'; const prev = state.equipment[slot]; equipItem(slot, it); log(`Bought ${it.name}!${prev ? ` (replaced ${prev.name})` : ''}`); }
+-  else if (it.kind === 'elixir') { state.gold += it.gold; log(`Bought ${it.name}! +${it.gold} gold`); }
+-  else if (it.kind === 'spellbook') { learnSpell(it.spell); log(`Bought ${it.name}!`); }
+-  else if (it.kind === 'scroll') { state.townScrolls++; log(`Bought ${it.name}! Press J in the dungeon to open a portal home.`); }
+-  else log(`Bought ${it.name}!`);
+-  if (!m.stock.length) companionTalk('merchant');
+-  render();
++  return true;
+ }
+-function sellToMerchant() {
+-  if (state.loadSession) return;
+-  const m = merchantAt(state.player.x, state.player.y);
+-  if (!m) { log('No merchant here.'); render(); return; }
+-  if (state.trade) { const slot = ['weapon','armor','ring'].find(s => state.equipment[s]); if (slot) tradeSell(slot); else { log('You have no gear to sell.'); renderTrade(); render(); } return; }
+-  // Compatibility: sell all equipped gear when menu not open.
+-  const slots = ['weapon','armor','ring']; let sold = false;
+-  for (const slot of slots) {
+-    const it = state.equipment[slot]; if (!it) continue;
+-    const price = tradeSellPrice(it); state.gold += price; equipItem(slot, null);
+-    log(`Sold ${it.name} for ${price} gold.`); state.bubble = { text: 'Fair trade!', ttl: 90 }; sold = true;
+-  }
+-  if (!sold) log('You have no gear to sell.');
+-  render();
++
++function closeTrade(confirm, session = state.trade) {
++  return confirm ? confirmTrade(session) : dismissTrade(session);
+ }
+ 
++function tradeItemDetails(item) {
++  if (item.kind === 'heal') return `Stores a potion (${Math.round(item.heal*100)}% healing).`;
++  if (item.kind === 'scroll') return 'Adds one Town Scroll.';
++  if (item.kind === 'spellbook') return `Learn ${SPELLS[item.spell].name}.`;
++  if (item.kind === 'elixir') return `Returns ${item.gold} gold after payment; no stat bonus.`;
++  return ['maxHp','str','atk','def','dex'].filter(stat=>item[stat]).map(stat=>`${stat === 'maxHp' ? 'HP' : stat.toUpperCase()} +${item[stat]}`).join(' · ');
++}
+ 
++function drawTradeItemIcon(surface, item) {
++  const target=surface.getContext('2d'); target.imageSmoothingEnabled=false;
++  const decoded=artDecoded(item.sprite,0,'front');
++  if (decoded) {
++    const b=decoded.bounds || {x:0,y:0,width:decoded.w,height:decoded.h}, ratio=Math.min(28/b.width,28/b.height);
++    drawArtDecoded(target,decoded,(32-b.width*ratio)/2-b.x*ratio,(32-b.height*ratio)/2-b.y*ratio,decoded.w*ratio,decoded.h*ratio);
++  } else if (!artCovered(item.sprite) && SPRITES[item.sprite]) {
++    const size=spriteDimensions(item.sprite), ratio=Math.min(28/size.width,28/size.height);
++    paintLegacySprite(target,item.sprite,(32-size.width*ratio)/2,(32-size.height*ratio)/2,ratio/ART_DENSITY);
++  }
++}
++
++function tradeRowReason(session, row) {
++  const draft=session.cart.draft;
++  if (!draft.stock.some(current=>current.rowId===row.rowId)) return 'Pending purchase';
++  if (row.item.kind === 'spellbook' && draft.player.spells[row.item.spell]) return 'Already learned';
++  try { if (buyPrice(row.item,session.rules.pricingDepth)>draft.gold) return 'Not enough gold'; }
++  catch (error) { return 'Unavailable price'; }
++  return '';
++}
++
++function selectTradeRow(session, mode, key) {
++  if (!tradeSessionCurrent(session)) return false;
++  session.mode=mode;
++  if (mode === 'buy') session.selectedBuy=key; else session.selectedSell=key;
++  renderTrade(session);
++  const list=document.getElementById(mode === 'buy' ? 'tradeBuyList' : 'tradeSellList');
++  [...(list.querySelectorAll?.('button') || [])].find(b=>b.dataset.tradeKey===key)?.focus?.();
++  return true;
++}
++
++function renderTrade(session = state.trade) {
++  if (!session || state.trade !== session || !session.cart) return;
++  for (const id of ['closeTrade','cancelTrade']) document.getElementById(id).onclick=()=>closeTrade(false,session);
++  document.getElementById('confirmTrade').onclick=()=>confirmTrade(session);
++  document.getElementById('addTradePurchase').onclick=()=>tradeBuy(session.selectedBuy,session);
++  document.getElementById('addTradeSale').onclick=()=>tradeSell(session.selectedSell,session);
++  document.getElementById('undoTrade').onclick=()=>editTradeCart(session,false);
++  document.getElementById('resetTrade').onclick=()=>editTradeCart(session,true);
++  document.getElementById('tradeAudioToggle').onclick=()=>{ if(state.trade===session) { startAudio();toggleAudio(); } };
++  const draft=session.cart.draft, selected=session.cart.original.stock.find(row=>row.rowId===session.selectedBuy);
++  const selectedGear=draft.equipment[session.selectedSell];
++  document.getElementById('tradeTitle').textContent=session.area === 'town' ? 'Village Store' : 'Dungeon Merchant';
++  document.getElementById('tradeStatus').textContent=session.message;
++  document.getElementById('tradeGold').textContent=`Gold: ${session.opening.gold} → ${draft.gold}`;
++  const stats=equipmentStatsFor(draft.player,draft.equipment);
++  document.getElementById('tradeStats').textContent=`After trade: HP ${stats.hp}/${stats.maxHp} · STR ${stats.str} · ATK ${stats.atk} · DEF ${stats.def} · DEX ${stats.dex} · Potions ${draft.inventory.length} · Scrolls ${draft.townScrolls}`;
++  let details=selected ? `${selected.item.name}: ${tradeItemDetails(selected.item)}` : 'No stock to select.';
++  if (selected && ['weapon','armor','ring'].includes(selected.item.kind) && draft.equipment[selected.item.kind])
++    details+=` Replaces ${draft.equipment[selected.item.kind].name}; sell it first to receive its sale value.`;
++  document.getElementById('tradeBuyDetails').textContent=details;
++  document.getElementById('tradeSellDetails').textContent=selectedGear ? `${selectedGear.name}: ${tradeItemDetails(selectedGear)}` : 'Select an equipped item to sell.';
++  document.getElementById('addTradePurchase').textContent=selected && ['weapon','armor','ring'].includes(selected.item.kind) ? 'Buy & equip (B)' : 'Add purchase (B)';
++  document.getElementById('addTradePurchase').disabled=!!session.invalid || !selected || !!tradeRowReason(session,selected);
++  document.getElementById('addTradeSale').disabled=!!session.invalid || !selectedGear;
++  for (const id of ['undoTrade','resetTrade']) document.getElementById(id).disabled=!!session.invalid || !draft.operations.length;
++  document.getElementById('confirmTrade').disabled=!!session.invalid || !!session.committing;
++  document.getElementById('tradeAudioToggle').textContent=state.audio.enabled ? 'Sound: On (M)' : 'Sound: Off (M)';
++  if (typeof document.createElement !== 'function') return; // Static no-DOM test harness: never trade immediately.
++  const buy=document.getElementById('tradeBuyList'), sell=document.getElementById('tradeSellList'), order=document.getElementById('tradeOrder');
++  buy.innerHTML=''; sell.innerHTML=''; order.innerHTML='';
++  const appendRow=(host,item,key,mode,label,reason,active)=>{
++    const row=document.createElement('div'); row.className='trade-item';
++    const button=document.createElement('button'); button.type='button'; button.dataset.tradeMode=mode; button.dataset.tradeKey=key;
++    button.setAttribute('aria-pressed',String(active)); button.disabled=!!reason || !!session.invalid;
++    const icon=document.createElement('canvas'); icon.width=32; icon.height=32; icon.setAttribute('aria-hidden','true'); drawTradeItemIcon(icon,item);
++    const text=document.createElement('span'); text.textContent=label;
++    button.appendChild(icon); button.appendChild(text); button.onclick=()=>selectTradeRow(session,mode,key);
++    const hint=document.createElement('p'); hint.className='meta'; hint.textContent=reason || tradeItemDetails(item);
++    row.appendChild(button); row.appendChild(hint); host.appendChild(row);
++  };
++  for (const row of session.cart.original.stock) appendRow(buy,row.item,row.rowId,'buy',`${row.item.name} · ${buyPrice(row.item,session.rules.pricingDepth)} gold`,tradeRowReason(session,row),session.selectedBuy===row.rowId);
++  for (const slot of ['weapon','armor','ring']) if (draft.equipment[slot]) {
++    const item=draft.equipment[slot];appendRow(sell,item,slot,'sell',`${item.name} · ${slot} · ${sellPrice(item)} gold`,'',session.selectedSell===slot);
++  }
++  if (!session.cart.original.stock.length) buy.textContent='Sold out. Nothing to buy.';
++  if (!Object.values(draft.equipment).some(Boolean)) sell.textContent='No equipped gear to sell.';
++  for (const op of draft.operations) { const row=document.createElement('li');row.textContent=`${op.type === 'buy' ? 'Buy' : 'Sell'} ${op.item.name} · ${op.type === 'buy' ? '−' : '+'}${op.price} gold`;order.appendChild(row); }
++  if (!draft.operations.length) order.textContent='Cart is empty.';
++}
++
++function stageMarketAction(session, action) {
++  if (!tradeSessionCurrent(session)) return false;
++  try { session.cart=stageTradeAction(session.cart,action); session.message='Added to cart. Your adventure changes only on Confirm.'; }
++  catch (error) { session.message=error.message; renderTrade(session); document.getElementById('cancelTrade').focus?.();return false; }
++  renderTrade(session);document.getElementById('undoTrade').focus?.();return true;
++}
++function tradeBuy(rowId, session = state.trade) { return stageMarketAction(session,{type:'buy',rowId}); }
++function tradeSell(slot, session = state.trade) { return stageMarketAction(session,{type:'sell',slot}); }
++function editTradeCart(session, reset) {
++  if (!tradeSessionCurrent(session)) return false;
++  session.cart=reset ? resetTradeDraft(session.cart) : undoTradeAction(session.cart);
++  session.message=reset ? 'Cart reset. Nothing has changed in your adventure.' : 'Last action undone.';
++  renderTrade(session);document.getElementById('cancelTrade').focus?.();return true;
++}
++
++function tradeCommitNotices(operations) {
++  for (const op of operations) {
++    const item=op.item;
++    if (op.type === 'sell') log(`Sold ${item.name} for ${op.price} gold.`);
++    else {
++      if (item.kind === 'spellbook') { const spell=SPELLS[item.spell];log(`You learned ${spell.name}! Press ${spell.key} to cast it.`); }
++      const effect=item.kind === 'heal' ? ' Press H to drink.' : item.kind === 'scroll' ? ' Press J in the dungeon to open a portal home.'
++        : item.kind === 'elixir' ? ` +${item.gold} gold` : op.replaced ? ` (replaced ${op.replaced.name})` : '';
++      log(`Bought ${item.name}!${effect}`);
++    }
++    playSound('pickup');
++  }
++}
++
++function confirmTrade(session = state.trade) {
++  if (!session || state.trade !== session || session.committing || session.invalid) return false;
++  if (document.hidden) { session.message='Return to the game before confirming.';renderTrade(session);return false; }
++  let draft;
++  try {
++    tradeRequire(tradeSessionCurrent(session),'shop context changed; cancel and reopen');
++    const fresh=createTradeDraft(state,session.actor);
++    tradeRequire(JSON.stringify(fresh.original)===JSON.stringify(session.opening) && JSON.stringify(fresh.rules)===JSON.stringify(session.rules),'adventure changed; cancel and reopen');
++    let replay=fresh;
++    for (const op of session.cart.draft.operations) replay=stageTradeAction(replay,op.type === 'buy' ? {type:'buy',rowId:op.rowId} : {type:op.type,slot:op.slot});
++    tradeRequire(JSON.stringify(replay.draft)===JSON.stringify(session.cart.draft),'cart changed; cancel and reopen');
++    draft=replay.draft;
++  } catch (error) {
++    session.invalid=true;session.message='Trade is out of date. Cancel and reopen the shop; your adventure was not changed.';renderTrade(session);document.getElementById('cancelTrade').focus?.();return false;
++  }
++  if (!draft.operations.length) return dismissTrade(session);
++  const owner=state, actor=session.actor, equipment=state.equipment, player=state.player;
++  const prior={ gold:state.gold, inventory:state.inventory, townScrolls:state.townScrolls, slots:{...equipment},
++    hp:player.hp, maxHp:player.maxHp, spells:player.spells, ready:state.spellReadyAt, stock:actor.stock,
++    floor:state.floors[state.depth], floorFields:state.floors[state.depth] ? {...state.floors[state.depth]} : null,
++    town:state.town, townFields:state.town ? {...state.town} : null };
++  session.committing=true;
++  try {
++    for (const slot of ['weapon','armor','ring']) if (JSON.stringify(equipment[slot])!==JSON.stringify(draft.equipment[slot])) equipItem(slot,draft.equipment[slot] ? {...draft.equipment[slot]} : null);
++    state.gold=draft.gold;state.inventory=draft.inventory.map(item=>({...item}));state.townScrolls=draft.townScrolls;
++    player.hp=draft.player.hp;player.maxHp=draft.player.maxHp;player.spells={...draft.player.spells};state.spellReadyAt={...draft.spellReadyAt};
++    actor.stock=draft.stock.map(row=>({...row.item}));freezePlayerStats();
++    if (state.area === 'town') saveTown(); else saveFloor();
++    render(true);
++  } catch (error) {
++    if (state === owner) {
++      state.gold=prior.gold;state.inventory=prior.inventory;state.townScrolls=prior.townScrolls;
++      Object.assign(equipment,prior.slots);player.hp=prior.hp;player.maxHp=prior.maxHp;player.spells=prior.spells;state.spellReadyAt=prior.ready;actor.stock=prior.stock;
++      if (prior.floor) { for (const key of Object.keys(prior.floor)) if (!Object.hasOwn(prior.floorFields,key)) delete prior.floor[key];Object.assign(prior.floor,prior.floorFields);state.floors[session.depth]=prior.floor; }
++      else delete state.floors[session.depth];
++      if (prior.town) Object.assign(prior.town,prior.townFields);
++      session.committing=false;session.invalid=true;session.message='Could not confirm trade. Your adventure is unchanged. Cancel and reopen to retry.';
++      try { render(true); } catch (ignored) { /* Preserve the model and error controls if painting still fails. */ }
++      renderTrade(session);document.getElementById('cancelTrade').focus?.();
++    }
++    return false;
++  }
++  dismissTrade(session,false); // Consume identity before notices or any repeat activation.
++  tradeCommitNotices(draft.operations);
++  state.bubble={text:'Pleasure doing business!',ttl:90};
++  if (session.opening.stock.length && !actor.stock.length && draft.operations.some(op=>op.type==='buy')) companionTalk('merchant');
++  render(true);requestMotionFrame();
++  const focus=session.focus;
++  if (focus && focus.isConnected && !focus.disabled && !focus.hidden && !focus.closest?.('[inert], [hidden]')) focus.focus?.();else canvas.focus?.();
++  return true;
++}
++
++function buyFromMerchant() { return openTrade('buy'); }
++function sellToMerchant() { return openTrade('sell'); }
++
++
+ function prisonerAt(x, y) {
+   return state.prisoner && state.prisoner.x === x && state.prisoner.y === y ? state.prisoner : null;
+ }
+@@ -4552,6 +4658,7 @@
+ }
+ 
+ function startEnding() {
++  dismissTrade(state && state.trade, false);
+   cancelSaveLoad(state && state.loadSession, false);
+   if (state.ending || state.depth !== FINAL_DEPTH || !state.bossDefeated || !state.princess || !state.princess.rescued) return;
+   const dragon = state.boss || state.monsterSpawns.find(m => m.isDragon);
+@@ -5178,6 +5285,7 @@
+   }
+   document.getElementById('audioToggle').textContent = state.audio.enabled ? 'Sound: on (M)' : 'Sound: off (M)';
+   document.getElementById('audioToggle').ariaPressed = String(state.audio.enabled);
++  document.getElementById('tradeAudioToggle').textContent=state.audio.enabled ? 'Sound: On (M)' : 'Sound: Off (M)';
+   document.getElementById('endingControls').hidden = !state.ending;
+   document.getElementById('skipEnding').disabled = !!(state.ending && state.ending.completed);
+   renderEquipment();
+@@ -5254,16 +5362,28 @@
+     return;
+   }
+   if (state.trade) {
+-    if (k === 'escape') { e.preventDefault(); closeTrade(false); }
++    const session=state.trade, overlay=document.getElementById('tradeOverlay');
++    if (k === 'escape') { e.preventDefault(); closeTrade(false,session); }
++    else if (k === 'm' && !e.repeat) { e.preventDefault();toggleAudio(); }
++    else if (k === 'r' && !e.repeat) { e.preventDefault();restartFromEnding(); }
+     else if (k === 'tab') {
+-      const controls = [...document.getElementById('tradeOverlay').querySelectorAll('button, input, select, textarea, a[href], [tabindex="0"]')].filter(el => !el.disabled && !el.hidden);
+-      if (controls.length) {
+-        const index = controls.indexOf(document.activeElement);
+-        const next = index < 0 ? (e.shiftKey ? controls.length - 1 : 0) : (index + (e.shiftKey ? -1 : 1) + controls.length) % controls.length;
+-        e.preventDefault(); controls[next].focus();
+-      }
+-    } else if (k === 'enter' && document.activeElement && document.activeElement.dataset.buyIndex) { e.preventDefault(); tradeBuy(Number(document.activeElement.dataset.buyIndex)); }
+-    else if (k === 'enter' && document.activeElement && document.activeElement.dataset.sellSlot) { e.preventDefault(); tradeSell(document.activeElement.dataset.sellSlot); }
++      const controls=[...(overlay.querySelectorAll?.('button') || [])].filter(el=>!el.disabled&&!el.hidden);
++      const index=controls.indexOf(document.activeElement),next=index<0?(e.shiftKey?controls.length-1:0):(index+(e.shiftKey?-1:1)+controls.length)%controls.length;
++      e.preventDefault();controls[next]?.focus?.();
++    } else if (['arrowup','arrowdown','home','end'].includes(k)) {
++      e.preventDefault();
++      const mode=document.activeElement?.dataset?.tradeMode || session.mode;
++      const list=document.getElementById(mode === 'sell' ? 'tradeSellList' : 'tradeBuyList');
++      const rows=[...(list.querySelectorAll?.('button') || [])].filter(el=>!el.disabled);
++      const index=rows.indexOf(document.activeElement),step=k === 'arrowup' ? -1 : 1;
++      const next=k === 'home' ? 0 : k === 'end' ? rows.length-1 : index<0 ? 0 : (index+step+rows.length)%rows.length;
++      if (rows[next]) selectTradeRow(session,mode,rows[next].dataset.tradeKey);
++    } else if (!e.repeat && ['b','s','u'].includes(k)) {
++      e.preventDefault();
++      if (k === 'b') tradeBuy(session.selectedBuy,session);
++      else if (k === 's') tradeSell(session.selectedSell,session);
++      else editTradeCart(session,!!e.shiftKey);
++    } else if (!['enter',' '].includes(k) || e.target?.tagName !== 'BUTTON') e.preventDefault();
+     return;
+   }
+   if (state.helpOpen) {
+@@ -5334,7 +5454,7 @@
+   else if (k === ' ') pickup();
+   else if (k === 'h') drinkPotion();
+   else if (k === 'j') useTownScroll();
+-  else if (k === 'x') { if (state.trade) sellToMerchant(); else openTrade(); }
++  else if (k === 'x') sellToMerchant();
+   else if (k === 'q' || k === 'backspace') ascendStairs();
+   else if (k === 'enter') retreat();
+   else if (k === 'e') shootBow();
+@@ -5358,7 +5478,6 @@
+   ['skipEnding', skipEnding], ['restartEnding', restartFromEnding], ['startGame', startGame], ['drinkPotion', drinkPotion], ['continueGame', continueGame], ['retreatChoice', retreat],
+   ['confirmRetreat', confirmRetreat], ['cancelRetreat', cancelRetreat], ['audioToggle', toggleAudio],
+   ['helpToggle', toggleHelp], ['closeHelp', closeHelp], ['consoleClose', closeConsole],
+-  ['closeTrade', () => closeTrade(false)], ['cancelTrade', () => closeTrade(false)], ['confirmTrade', () => closeTrade(true)],
+   ['closeCompanionBoard', () => closeCompanionBoard()], ['companionPostAction', openCompanionBoard], ['companionAudioToggle', toggleAudio],
+ ]) document.getElementById(id).addEventListener('click', () => { startAudio(); action(); });
+ for (const id of ['loadGameButton','launchLoadGame','deathLoadGame']) document.getElementById(id).addEventListener('click',openLoadGame);

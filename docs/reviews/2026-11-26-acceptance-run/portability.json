@@ -1,0 +1,202 @@
+{
+  "workspace": "/tmp/dungeon-s4-portability-V8OtG8",
+  "originalPath": "/Users/vadamec/workspace/ai_tmp/opencode_testing",
+  "copiedPath": "/tmp/dungeon-s4-portability-V8OtG8/portable game copy",
+  "profiles": "two fresh persistent Chrome profiles; target uses390×844 touch emulation; storage APIs throw if accessed",
+  "results": [
+    {
+      "name": "large",
+      "fixtureBytes": 8960545,
+      "sourceDownloadBytes": 8960545,
+      "targetDownloadBytes": 8960545,
+      "sourceCommitMs": 538,
+      "targetCommitMs": 547,
+      "semanticEquality": true,
+      "aliasesAndReceivingResources": true,
+      "bidirectionalProfilesAndPaths": true,
+      "behavior": {
+        "ring": true,
+        "mp": true
+      }
+    },
+    {
+      "name": "max-bytes",
+      "fixtureBytes": 33554432,
+      "sourceDownloadBytes": 8960545,
+      "targetDownloadBytes": 8960545,
+      "sourceCommitMs": 516,
+      "targetCommitMs": 541,
+      "semanticEquality": true,
+      "aliasesAndReceivingResources": true,
+      "bidirectionalProfilesAndPaths": true,
+      "behavior": {
+        "ring": true,
+        "mp": true
+      }
+    },
+    {
+      "name": "town",
+      "fixtureBytes": 42080,
+      "sourceDownloadBytes": 42080,
+      "targetDownloadBytes": 42080,
+      "sourceCommitMs": 67,
+      "targetCommitMs": 67,
+      "semanticEquality": true,
+      "aliasesAndReceivingResources": true,
+      "bidirectionalProfilesAndPaths": true,
+      "behavior": {
+        "ring": true,
+        "mp": true
+      }
+    },
+    {
+      "name": "dungeon",
+      "fixtureBytes": 66298,
+      "sourceDownloadBytes": 66298,
+      "targetDownloadBytes": 66298,
+      "sourceCommitMs": 66,
+      "targetCommitMs": 66,
+      "semanticEquality": true,
+      "aliasesAndReceivingResources": true,
+      "bidirectionalProfilesAndPaths": true,
+      "behavior": {
+        "noReward": true,
+        "loot": true,
+        "stock": true,
+        "key": true,
+        "rescue": true,
+        "respawn": true,
+        "ring": true
+      }
+    },
+    {
+      "name": "scroll",
+      "fixtureBytes": 65034,
+      "sourceDownloadBytes": 65034,
+      "targetDownloadBytes": 65034,
+      "sourceCommitMs": 66,
+      "targetCommitMs": 66,
+      "semanticEquality": true,
+      "aliasesAndReceivingResources": true,
+      "bidirectionalProfilesAndPaths": true,
+      "behavior": {
+        "returned": true,
+        "once": true,
+        "hp": true
+      }
+    },
+    {
+      "name": "retreat",
+      "fixtureBytes": 65094,
+      "sourceDownloadBytes": 65094,
+      "targetDownloadBytes": 65094,
+      "sourceCommitMs": 66,
+      "targetCommitMs": 67,
+      "semanticEquality": true,
+      "aliasesAndReceivingResources": true,
+      "bidirectionalProfilesAndPaths": true,
+      "behavior": {
+        "safeFallback": true,
+        "cooldown": true,
+        "mp": true
+      }
+    },
+    {
+      "name": "cross-floor-portal",
+      "fixtureBytes": 90693,
+      "sourceDownloadBytes": 90693,
+      "targetDownloadBytes": 90693,
+      "sourceCommitMs": 66,
+      "targetCommitMs": 67,
+      "semanticEquality": true,
+      "aliasesAndReceivingResources": true,
+      "bidirectionalProfilesAndPaths": true,
+      "behavior": {
+        "oldFloor": true,
+        "safeFallback": true,
+        "once": true
+      }
+    },
+    {
+      "name": "guards",
+      "fixtureBytes": 120052,
+      "sourceDownloadBytes": 120052,
+      "targetDownloadBytes": 120052,
+      "sourceCommitMs": 66,
+      "targetCommitMs": 67,
+      "semanticEquality": true,
+      "aliasesAndReceivingResources": true,
+      "bidirectionalProfilesAndPaths": true,
+      "behavior": {
+        "history": true,
+        "newId": true
+      }
+    },
+    {
+      "name": "final",
+      "fixtureBytes": 95712,
+      "sourceDownloadBytes": 95712,
+      "targetDownloadBytes": 95712,
+      "sourceCommitMs": 67,
+      "targetCommitMs": 66,
+      "semanticEquality": true,
+      "aliasesAndReceivingResources": true,
+      "bidirectionalProfilesAndPaths": true,
+      "behavior": {
+        "pending": true,
+        "noBoss": true,
+        "rewards": true
+      }
+    },
+    {
+      "name": "level-83",
+      "fixtureBytes": 42273,
+      "sourceDownloadBytes": 42273,
+      "targetDownloadBytes": 42273,
+      "sourceCommitMs": 66,
+      "targetCommitMs": 67,
+      "semanticEquality": true,
+      "aliasesAndReceivingResources": true,
+      "bidirectionalProfilesAndPaths": true,
+      "behavior": {
+        "ring": true,
+        "mp": true
+      }
+    },
+    {
+      "name": "level-99",
+      "fixtureBytes": 42278,
+      "sourceDownloadBytes": 42278,
+      "targetDownloadBytes": 42278,
+      "sourceCommitMs": 66,
+      "targetCommitMs": 67,
+      "semanticEquality": true,
+      "aliasesAndReceivingResources": true,
+      "bidirectionalProfilesAndPaths": true,
+      "behavior": {
+        "ring": true,
+        "mp": true
+      }
+    },
+    {
+      "name": "level-100",
+      "fixtureBytes": 42243,
+      "sourceDownloadBytes": 42243,
+      "targetDownloadBytes": 42243,
+      "sourceCommitMs": 66,
+      "targetCommitMs": 67,
+      "semanticEquality": true,
+      "aliasesAndReceivingResources": true,
+      "bidirectionalProfilesAndPaths": true,
+      "behavior": {
+        "ring": true,
+        "mp": true
+      }
+    }
+  ],
+  "relocatedReloadAndDeath": true,
+  "largeLateSchemaAndDangerousFieldRejection": true,
+  "issues": [],
+  "remote": [],
+  "nativeGR09": "unverified"
+}

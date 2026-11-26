@@ -1,0 +1,40 @@
+{
+  "rows": [
+    {
+      "name": "large",
+      "bytes": 8960545,
+      "parseAndValidateMs": 2290.701459,
+      "hydrateMs": 1967.8014589999998,
+      "serializeAndValidateMs": 2005.692709,
+      "exact": true
+    },
+    {
+      "name": "max-bytes",
+      "bytes": 33554432,
+      "parseAndValidateMs": 3074.975458,
+      "hydrateMs": 2013.8801249999997,
+      "serializeAndValidateMs": 2012.6314160000002,
+      "exact": true
+    }
+  ],
+  "rejection": [
+    {
+      "case": 0,
+      "rejected": true
+    },
+    {
+      "case": 1,
+      "rejected": true
+    },
+    {
+      "case": 2,
+      "rejected": true
+    },
+    {
+      "case": "32MiB+1",
+      "rejected": true
+    }
+  ],
+  "liveStateUnchanged": true,
+  "scope": "One synchronous Node/VM sample each. These times exclude browser cooperative scheduling, file-picker/download/paint, audio and native visibility. Not browser/physical-mobile performance or FPS."
+}

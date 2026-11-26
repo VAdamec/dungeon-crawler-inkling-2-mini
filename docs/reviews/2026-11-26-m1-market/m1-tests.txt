@@ -1,0 +1,18 @@
+✔ M1 shared prices preserve every catalog item/depth including remembered town depth and reject unsafe money (251.556833ms)
+✔ M1 opening snapshot and all pure cart operations stay detached from town/floor aliases and side effects (450.003375ms)
+✔ M1 second and last duplicate stock units use stable local row identities without source-ID writes (153.84325ms)
+✔ M1 only selected gear is sold and draft proceeds fund later purchases without loans (152.825709ms)
+✔ M1 potion, scroll, elixir and spell drafts match actual effects without learning or drinking live (153.186125ms)
+✔ M1 path-correct ring HP and Undo preserve clipping, same-bonus replacement and level-derived health (486.259417ms)
+✔ M1 god-mode preview freezes hero fields while equipment-derived bonuses follow proposed gear (148.601917ms)
+✔ M1 Undo and Reset retain only accepted operations including buy-then-sell and replacement notices (147.434125ms)
+✔ M1 rejects invalid source values and overflowing actions without altering source or accepted history (2674.664208ms)
+✔ M1 immutable captured depth/time/stock/spells keep a draft independent of later live changes (148.735541ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4878.791416

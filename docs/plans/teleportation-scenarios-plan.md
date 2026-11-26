@@ -1,92 +1,53 @@
-# Teleportation Scenarios Plan (Corrected)
+# Teleportation — reviewed debug extension plan
 
-Status: corrected design for the next debug/verification iteration. No implementation yet.
+Originally reviewed against 2.0.0 on 2026-11-26. **T1/T2 implemented after explicit requests**, including the shared discovery/tests below. Existing player travel remains intact. [Coordinated tasks](implementation-plan.md) · [LLM prompt](../prompts/2026-11-26-companions-travel-trading-local-llm.md).
+> **Historical P0 prototype checkpoint:** the earlier concurrent live-mutation/partial prototypes were subsequently reviewed and corrected by T1/T2, C1–C3 and M1–M3. Their original baseline descriptions below are historical. Current scope/remaining manual checks: [release readiness](../reviews/2026-11-26-release-readiness/README.md). Preserve all worktree changes; do not restart completed queues.
 
-## What already exists
 
-Most scenario coverage requested in the earlier draft is already present in `tests/game.test.cjs`. Do not duplicate these tests:
+## Current phase status — 2026-11-26
 
-- Town Scroll is a real loot item: `ITEM_TABLE` entry with `kind: 'scroll'`, `minDepth: 1`, `lootWeight: 1`; `lootPool()` includes it.
-- Town Store stock includes Town Scroll via `townStoreStock()`.
-- Buying and finding scrolls increments `state.townScrolls` and does not mix with potions.
-- `J` in the dungeon consumes one scroll, saves `{ depth, x, y, reason: 'scroll' }` in `state.townExit`, opens the portal, and calls `enterTown()`.
-- `J`/Space at the gate returns through the portal to the exact saved tile.
-- A second scroll is not consumed while a portal is already open.
-- The portal survives dungeon travel.
-- The saved floor is reused instead of regenerated.
-- Blocked exit tiles resolve through `safeTownExitTile()`.
-- Retreat closes an open portal, stores `{ reason: 'retreat' }`, applies the 60-second active-time cooldown, and returns to town with full HP.
-- Portal state clears on retreat, death, ending, and restart.
-- HUD/help text already describes scroll and portal state.
+**T1 and T2 complete.** [T1 report](../reviews/2026-11-26-t1-debug-portal/README.md) and [T2 report](../reviews/2026-11-26-t2-add-scrolls/README.md). Strict command arity, safe decimal count/total and living/visible/player-menu checks are verified; existing save/return behavior is preserved. Developer discovery/docs and shared tests (the T3 section below) are covered within T1/T2. At the T2 checkpoint the full suite was193/199; C1 subsequently fixed those six companion/cinematic failures, and M3 now records307/307 passing. Focused travel/console 25/25 and preview 27/27 pass; native GR-09 remains unverified. No next travel/companion implementation phase remains.
 
-Current key functions: `useTownScroll()`, `returnThroughTownPortal()`, `enterDungeonFromTown()`, `safeTownExitTile()`, `clearTownReturn()`, `confirmRetreat()`, `townInteract()`.
+## Preserve the existing player system
 
-## Single-portal rule to preserve
+`useTownScroll()`, `returnThroughTownPortal()`, `enterDungeonFromTown()`, `safeTownExitTile()`, `clearTownReturn()` and `confirmRetreat()` already implement scroll loot/store inventory, J travel, one return point/portal, exact saved-floor return, blocked-tile fallback, retreat cooldown and lifecycle cleanup. Tests already cover these. This task does **not** add a second player teleportation system, free player teleport button, arbitrary floor selection or new portal UI.
 
-There can be at most one return point and one portal at a time:
+Existing state is `townExit: {depth,x,y,reason}|null`, `townPortalOpen`, `townScrolls`, `retreatReadyAt`. Keep return state transient, never in `FLOOR_FIELDS`; active floors/town are saved through existing transition helpers. No healing, key/loot duplication, free descent rewards, regeneration or floor recreation during debug travel.
 
-- `state.townExit` holds one `{ depth, x, y, reason }` object.
-- `state.townPortalOpen` is the boolean gate for the open portal.
-- Any action that would create a new portal while one is open must refuse without consuming a scroll and without overwriting `state.townExit`.
-- `confirmRetreat()` may replace a scroll/debug portal with a retreat return point, but must close the portal first and log the collapse as it does today.
-- Death, ending, restart, and successful return call `clearTownReturn()`.
+## T1 — `teleportTown`
 
-## Debug commands to add
+Console-only free Town-Scroll-style debug portal:
 
-Add two console-only commands in `submitConsole()` and include them in both `openConsole()`’s startup line and the `help` response.
+- Exact command token `teleportTown`, case-insensitive dispatch; **zero arguments**. Invalid arity prints usage, without changing state.
+- Requires started living dungeon run, visible page, no ending/boss cinematic/help/health/retreat/player menu. If already in town, report that and do nothing.
+- **The developer console is expected to be open.** Do not copy `useTownScroll()`'s `consoleOpen` rejection into this command, or call that function as a shortcut: it would reject the command or charge a scroll.
+- If a portal is already open, refuse without changing count or overwriting its original return point. Test this in a dungeon reached through console `loadLevel` while another portal remains open, as well as repeated use from town.
+- Save `{depth,x,y,reason:'cheat'}` from the exact current logical tile, open the portal and call `enterTown()` through the existing save path. Keep HP/MP, scroll count, gold/inventory, companion selection/unlocks, active time and retreat deadline unchanged. Play the existing magic cue once and show clear console/journal debug feedback.
+- J/Space at the town gate uses the same existing return functions and clears the two return fields once. Add only the `reason:'cheat'` log distinction to `enterDungeonFromTown()`; do not create a debug-only return implementation or bypass `safeTownExitTile()`.
+- Normal retreat may close/replace the portal exactly as now; ordinary player travel/restart/death/ending semantics remain unchanged.
 
-### `teleportTown`
+Reuse/extract a small shared portal-opening data/transition helper if it prevents duplication, with explicit normal versus debug eligibility/cost policies. Do not introduce a general travel framework for two commands.
 
-Decision: `teleportTown` is a **free Town Scroll-style debug shortcut that creates a return point**. It does not consume a Town Scroll and does not act like a retreat.
+## T2 — `addScrolls <count>`
 
-Behavior:
+Console-only inventory aid:
 
-- Parse as `command === 'teleporttown'`; display as `teleportTown`.
-- Require `state.started`, dungeon area, and no gameOver/ending/help/pause/cinematic state. If already in town, report `Already in town.` and change nothing.
-- If `state.townPortalOpen`, report `A town portal is already open; return through it first.` and change nothing. This preserves the single-portal rule.
-- Otherwise:
-  - save `{ depth: state.depth, x: state.player.x, y: state.player.y, reason: 'cheat' }` into `state.townExit`;
-  - set `state.townPortalOpen = true`;
-  - play the magic sound;
-  - call `enterTown()`;
-  - log a short debug-portal message and `consoleMessage('Teleported to town; debug portal open.')`;
-  - `render()`.
-- Do not restore HP/MP, do not change `retreatReadyAt`, and do not consume `state.townScrolls`.
-- Extend `enterDungeonFromTown()`’s return log so `reason === 'cheat'` reads as stepping back through the debug portal; do not add a new state field.
-- Existing `returnThroughTownPortal()` and `safeTownExitTile()` remain unchanged.
-- No new floor-save field; `townExit`/`townPortalOpen` stay transient.
+- Exactly one decimal positive-integer argument. Validate both text/arity and `Number.isSafeInteger(count)`; reject zero, negatives, fractions, empty/NaN/Infinity, exponent/hex shorthand and extra tokens. Reject addition when the resulting total exceeds `Number.MAX_SAFE_INTEGER`.
+- Use a visible active run with no game over/ending/cinematic/help/health/retreat/player menu. Allow town or dungeon, and allow the console itself. No hidden-page mutation.
+- On success increment `townScrolls` once, render the HUD/spell list, and report the new total in the console. No gold cost, portal creation, HP/MP change, RNG or new floor field. Do not add a broad teleport-event logging service.
 
-### `addScrolls <count>`
+## T3 — Discovery and focused tests (covered by completed T1/T2)
 
-- Parse with `Number(args[0])`; require `Number.isInteger(count) && count > 0`.
-- Reject empty, `0`, negative, fractional, `NaN`, and extra non-count input with `Usage: addScrolls <positive integer>` and no state change.
-- On success: `state.townScrolls += count`; `render()`; `consoleMessage('Added N Town Scroll(s); total M.')`.
-- Keep cheat feedback in the console and HUD; do not add the earlier proposed `logTeleportEvent()` runtime logging layer.
+Update only developer console startup/help strings and `DOCUMENTATION.md`. **Do not put cheats in player README/Help.** Update compact player text only if an actual player-facing rule changes (none is proposed here).
 
-## Tests to extend, not duplicate
+Add focused coverage, reusing existing fixtures:
 
-Add only the gaps created by the new commands:
+1. Valid debug travel saves exact depth/tile/reason, preserves HP/MP/progression/scroll count/cooldown/companion, saves the floor and reaches town.
+2. Existing open portal and invalid command arity cannot overwrite state or consume resources.
+3. Return via J and Space restores the saved floor/tile, resolves a blocked return safely and clears the portal once. Floors are loaded, not freshly generated.
+4. Command works while consoleOpen, but rejects town travel, hidden/dead/ending/cinematic/health/retreat states and each player modal without semantic changes.
+5. `addScrolls 3` updates inventory/HUD; invalid/safe-integer/overflow/extra-argument cases are atomic no-ops.
+6. Both console help paths list both commands. Existing scroll purchase/loot, duplicate portal, retreat, death/ending/restart and persistence regressions still pass.
+7. file:// sequence: `~`, `loadLevel 2`, `addScrolls 1`, `teleportTown`, close console, J at gate returns exactly. Check normal scroll consumption separately.
 
-1. `teleportTown` from dungeon creates exactly one portal
-   - `townExit.reason === 'cheat'`, exact saved depth/tile, `townPortalOpen === true`, scroll count unchanged, area is town.
-2. Second `teleportTown` while portal is open is rejected
-   - No scroll change, no overwrite of the saved tile.
-3. Return through the debug portal works via `J` and via Space at the gate
-   - Restores the exact floor/tile and clears both return fields.
-4. `teleportTown` is rejected in town and while gameOver/ending/pause
-   - State remains unchanged.
-5. `addScrolls 3` increments the HUD count and `#spellList`; `0`, `-1`, `1.5`, `abc`, and no argument are rejected without changing the count.
-6. Console help lists both commands.
-7. Existing town-scroll, retreat, cooldown, blocked-tile, death/ending/restart tests remain green.
-
-## Files
-
-- `js/game.js`: `openConsole()`, `submitConsole()`, `enterDungeonFromTown()` log branch, optional small helper such as `addTownScrolls(raw)`.
-- `index.html`: dev-console/help text may mention the new commands only if desired; the console help string is authoritative.
-- `tests/game.test.cjs`: add the focused tests above.
-
-## Verification
-
-- `node --check js/game.js && node --check js/sprites.js`
-- `node --test tests/game.test.cjs`
-- Manual `file://` check: `~`, `loadLevel 2`, `addScrolls 1`, `teleportTown`, then `J` at the gate returns to the saved depth-2 tile.
+No version bump, release, staging or commit is part of this future implementation task unless requested separately.

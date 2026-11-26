@@ -1,0 +1,1372 @@
+{
+  "purpose": "REVIEW/S0 only: current-state probes and size estimates; no save/load implementation",
+  "seeds": [
+    {
+      "seed": 713,
+      "floorCount": 100,
+      "visitedCoordinates": 614400,
+      "bytes": 8381362,
+      "MiB": 7.99308967590332,
+      "with10000StoredPotionsBytes": 8961361,
+      "countMaxima": {
+        "rooms": 32,
+        "potions": 37,
+        "treasures": 29,
+        "monsterSpawns": 41,
+        "obstacles": 64,
+        "hazards": 124,
+        "props": 60
+      },
+      "townCounts": {
+        "npcs": 4,
+        "animals": 6,
+        "props": 104,
+        "stock": 6
+      },
+      "stringifyMs": 11.402416999999787,
+      "parseMs": 23.13437500000009,
+      "totalFixtureMs": 2852.065333
+    },
+    {
+      "seed": 42,
+      "floorCount": 100,
+      "visitedCoordinates": 614400,
+      "bytes": 8378768,
+      "MiB": 7.9906158447265625,
+      "with10000StoredPotionsBytes": 8958767,
+      "countMaxima": {
+        "rooms": 32,
+        "potions": 37,
+        "treasures": 28,
+        "monsterSpawns": 41,
+        "obstacles": 64,
+        "hazards": 124,
+        "props": 58
+      },
+      "townCounts": {
+        "npcs": 4,
+        "animals": 6,
+        "props": 104,
+        "stock": 6
+      },
+      "stringifyMs": 10.944749999999658,
+      "parseMs": 24.41033299999981,
+      "totalFixtureMs": 2780.6414159999995
+    }
+  ],
+  "initialKeys": [
+    "activeTime",
+    "area",
+    "art",
+    "audio",
+    "biome",
+    "boss",
+    "bossDefeat",
+    "bossDefeated",
+    "bossIntro",
+    "bossIntroSeen",
+    "bossSummonAt",
+    "bubble",
+    "camera",
+    "combatElapsed",
+    "companion",
+    "companionAttackAt",
+    "companionChoice",
+    "companionEntryDone",
+    "companionPicker",
+    "companionQuoteIndex",
+    "companionSpeech",
+    "companionSpeechReadyAt",
+    "consoleHistory",
+    "consoleHistoryIndex",
+    "consoleLines",
+    "consoleOpen",
+    "depth",
+    "ending",
+    "entranceCat",
+    "equipment",
+    "floorKey",
+    "floors",
+    "gameOver",
+    "godMode",
+    "godModeStats",
+    "gold",
+    "hazardTime",
+    "hazards",
+    "healElapsed",
+    "helpFocus",
+    "helpOpen",
+    "inn",
+    "inventory",
+    "kills",
+    "lastTick",
+    "manaRegenAt",
+    "map",
+    "merchant",
+    "messages",
+    "monsterQuoteIndex",
+    "monsterSpawns",
+    "monsterSpeech",
+    "monsterSpeechReadyAt",
+    "monsters",
+    "motion",
+    "obstacles",
+    "pause",
+    "player",
+    "potions",
+    "princess",
+    "prisoner",
+    "props",
+    "retreatReadyAt",
+    "rooms",
+    "selectedCompanion",
+    "spellReadyAt",
+    "stairs",
+    "started",
+    "town",
+    "townExit",
+    "townGate",
+    "townPortalOpen",
+    "townScrolls",
+    "trade",
+    "treasures",
+    "turn",
+    "unlockedCompanions",
+    "upstairs",
+    "visited",
+    "warnedCritical",
+    "warnedLow",
+    "won"
+  ],
+  "initialFieldTypes": {
+    "depth": "number",
+    "area": "string",
+    "town": "object",
+    "townExit": "null",
+    "townPortalOpen": "boolean",
+    "inn": "object",
+    "townGate": "object",
+    "kills": "number",
+    "turn": "number",
+    "started": "boolean",
+    "messages": "Array",
+    "helpOpen": "boolean",
+    "helpFocus": "null",
+    "consoleOpen": "boolean",
+    "consoleLines": "Array",
+    "consoleHistory": "Array",
+    "consoleHistoryIndex": "number",
+    "godMode": "boolean",
+    "godModeStats": "null",
+    "selectedCompanion": "string",
+    "unlockedCompanions": "Array",
+    "companionChoice": "string",
+    "companionEntryDone": "boolean",
+    "companionPicker": "null",
+    "trade": "null",
+    "player": "object",
+    "spellReadyAt": "object",
+    "inventory": "Array",
+    "townScrolls": "number",
+    "gold": "number",
+    "equipment": "object",
+    "map": "Array",
+    "rooms": "Array",
+    "monsters": "Array",
+    "potions": "Array",
+    "stairs": "null",
+    "biome": "string",
+    "props": "Array",
+    "treasures": "Array",
+    "merchant": "object",
+    "boss": "null",
+    "prisoner": "null",
+    "princess": "null",
+    "monsterSpeech": "null",
+    "monsterSpeechReadyAt": "number",
+    "monsterQuoteIndex": "number",
+    "companion": "null",
+    "companionSpeech": "null",
+    "companionSpeechReadyAt": "number",
+    "companionQuoteIndex": "number",
+    "companionAttackAt": "number",
+    "entranceCat": "object",
+    "gameOver": "boolean",
+    "won": "boolean",
+    "ending": "null",
+    "bossIntro": "null",
+    "bossIntroSeen": "boolean",
+    "bossDefeat": "null",
+    "bubble": "null",
+    "visited": "Set",
+    "floors": "object",
+    "upstairs": "null",
+    "monsterSpawns": "Array",
+    "pause": "null",
+    "warnedLow": "boolean",
+    "warnedCritical": "boolean",
+    "combatElapsed": "number",
+    "healElapsed": "number",
+    "activeTime": "number",
+    "manaRegenAt": "number",
+    "retreatReadyAt": "number",
+    "bossDefeated": "boolean",
+    "bossSummonAt": "number",
+    "camera": "object",
+    "floorKey": "null",
+    "obstacles": "Array",
+    "hazards": "Array",
+    "hazardTime": "number",
+    "lastTick": "number",
+    "audio": "object",
+    "art": "object",
+    "motion": "object"
+  },
+  "townAliases": {
+    "map": true,
+    "visited": true,
+    "props": true,
+    "merchant": true,
+    "landmarkStore": true,
+    "inn": true,
+    "gate": true,
+    "boardInProps": true
+  },
+  "floorAliasesBefore": {
+    "map": true,
+    "rooms": true,
+    "potions": true,
+    "stairs": true,
+    "upstairs": true,
+    "treasures": true,
+    "merchant": true,
+    "prisoner": true,
+    "princess": true,
+    "visited": true,
+    "monsterSpawns": true,
+    "bossDefeated": true,
+    "floorKey": true,
+    "obstacles": true,
+    "hazards": true,
+    "hazardTime": true,
+    "biome": true,
+    "props": true
+  },
+  "staleActiveCache": {
+    "potionsSame": false,
+    "currentPotions": 3,
+    "cachedPotions": 4,
+    "currentHazardTime": 3.75,
+    "cachedHazardTime": 0,
+    "descentRewarded": false,
+    "inFloorFields": false
+  },
+  "guards": [
+    {
+      "cycles": 1,
+      "activeRows": 42,
+      "guardRows": 2,
+      "livingGuards": 2,
+      "templateGuards": 0,
+      "cachedTemplateGuards": 0,
+      "maxId": 1001
+    },
+    {
+      "cycles": 10,
+      "activeRows": 60,
+      "guardRows": 20,
+      "livingGuards": 2,
+      "templateGuards": 0,
+      "cachedTemplateGuards": 0,
+      "maxId": 1019
+    },
+    {
+      "cycles": 100,
+      "activeRows": 240,
+      "guardRows": 200,
+      "livingGuards": 2,
+      "templateGuards": 0,
+      "cachedTemplateGuards": 0,
+      "maxId": 1199
+    }
+  ],
+  "guardRecordKeys": [
+    "atk",
+    "def",
+    "gold",
+    "hp",
+    "id",
+    "isGuard",
+    "maxHp",
+    "name",
+    "nextAttackAt",
+    "sprite",
+    "x",
+    "xp",
+    "y"
+  ],
+  "levelThresholds": [
+    {
+      "level": 1,
+      "xpNext": 40,
+      "safe": true
+    },
+    {
+      "level": 2,
+      "xpNext": 60,
+      "safe": true
+    },
+    {
+      "level": 3,
+      "xpNext": 90,
+      "safe": true
+    },
+    {
+      "level": 4,
+      "xpNext": 135,
+      "safe": true
+    },
+    {
+      "level": 5,
+      "xpNext": 203,
+      "safe": true
+    },
+    {
+      "level": 6,
+      "xpNext": 305,
+      "safe": true
+    },
+    {
+      "level": 7,
+      "xpNext": 458,
+      "safe": true
+    },
+    {
+      "level": 8,
+      "xpNext": 687,
+      "safe": true
+    },
+    {
+      "level": 9,
+      "xpNext": 1031,
+      "safe": true
+    },
+    {
+      "level": 10,
+      "xpNext": 1547,
+      "safe": true
+    },
+    {
+      "level": 11,
+      "xpNext": 2321,
+      "safe": true
+    },
+    {
+      "level": 12,
+      "xpNext": 3482,
+      "safe": true
+    },
+    {
+      "level": 13,
+      "xpNext": 5223,
+      "safe": true
+    },
+    {
+      "level": 14,
+      "xpNext": 7835,
+      "safe": true
+    },
+    {
+      "level": 15,
+      "xpNext": 11753,
+      "safe": true
+    },
+    {
+      "level": 16,
+      "xpNext": 17630,
+      "safe": true
+    },
+    {
+      "level": 17,
+      "xpNext": 26445,
+      "safe": true
+    },
+    {
+      "level": 18,
+      "xpNext": 39668,
+      "safe": true
+    },
+    {
+      "level": 19,
+      "xpNext": 59502,
+      "safe": true
+    },
+    {
+      "level": 20,
+      "xpNext": 89253,
+      "safe": true
+    },
+    {
+      "level": 21,
+      "xpNext": 133880,
+      "safe": true
+    },
+    {
+      "level": 22,
+      "xpNext": 200820,
+      "safe": true
+    },
+    {
+      "level": 23,
+      "xpNext": 301230,
+      "safe": true
+    },
+    {
+      "level": 24,
+      "xpNext": 451845,
+      "safe": true
+    },
+    {
+      "level": 25,
+      "xpNext": 677768,
+      "safe": true
+    },
+    {
+      "level": 26,
+      "xpNext": 1016652,
+      "safe": true
+    },
+    {
+      "level": 27,
+      "xpNext": 1524978,
+      "safe": true
+    },
+    {
+      "level": 28,
+      "xpNext": 2287467,
+      "safe": true
+    },
+    {
+      "level": 29,
+      "xpNext": 3431201,
+      "safe": true
+    },
+    {
+      "level": 30,
+      "xpNext": 5146802,
+      "safe": true
+    },
+    {
+      "level": 31,
+      "xpNext": 7720203,
+      "safe": true
+    },
+    {
+      "level": 32,
+      "xpNext": 11580305,
+      "safe": true
+    },
+    {
+      "level": 33,
+      "xpNext": 17370458,
+      "safe": true
+    },
+    {
+      "level": 34,
+      "xpNext": 26055687,
+      "safe": true
+    },
+    {
+      "level": 35,
+      "xpNext": 39083531,
+      "safe": true
+    },
+    {
+      "level": 36,
+      "xpNext": 58625297,
+      "safe": true
+    },
+    {
+      "level": 37,
+      "xpNext": 87937946,
+      "safe": true
+    },
+    {
+      "level": 38,
+      "xpNext": 131906919,
+      "safe": true
+    },
+    {
+      "level": 39,
+      "xpNext": 197860379,
+      "safe": true
+    },
+    {
+      "level": 40,
+      "xpNext": 296790569,
+      "safe": true
+    },
+    {
+      "level": 41,
+      "xpNext": 445185854,
+      "safe": true
+    },
+    {
+      "level": 42,
+      "xpNext": 667778781,
+      "safe": true
+    },
+    {
+      "level": 43,
+      "xpNext": 1001668172,
+      "safe": true
+    },
+    {
+      "level": 44,
+      "xpNext": 1502502258,
+      "safe": true
+    },
+    {
+      "level": 45,
+      "xpNext": 2253753387,
+      "safe": true
+    },
+    {
+      "level": 46,
+      "xpNext": 3380630081,
+      "safe": true
+    },
+    {
+      "level": 47,
+      "xpNext": 5070945122,
+      "safe": true
+    },
+    {
+      "level": 48,
+      "xpNext": 7606417683,
+      "safe": true
+    },
+    {
+      "level": 49,
+      "xpNext": 11409626525,
+      "safe": true
+    },
+    {
+      "level": 50,
+      "xpNext": 17114439788,
+      "safe": true
+    },
+    {
+      "level": 51,
+      "xpNext": 25671659682,
+      "safe": true
+    },
+    {
+      "level": 52,
+      "xpNext": 38507489523,
+      "safe": true
+    },
+    {
+      "level": 53,
+      "xpNext": 57761234285,
+      "safe": true
+    },
+    {
+      "level": 54,
+      "xpNext": 86641851428,
+      "safe": true
+    },
+    {
+      "level": 55,
+      "xpNext": 129962777142,
+      "safe": true
+    },
+    {
+      "level": 56,
+      "xpNext": 194944165713,
+      "safe": true
+    },
+    {
+      "level": 57,
+      "xpNext": 292416248570,
+      "safe": true
+    },
+    {
+      "level": 58,
+      "xpNext": 438624372855,
+      "safe": true
+    },
+    {
+      "level": 59,
+      "xpNext": 657936559283,
+      "safe": true
+    },
+    {
+      "level": 60,
+      "xpNext": 986904838925,
+      "safe": true
+    },
+    {
+      "level": 61,
+      "xpNext": 1480357258388,
+      "safe": true
+    },
+    {
+      "level": 62,
+      "xpNext": 2220535887582,
+      "safe": true
+    },
+    {
+      "level": 63,
+      "xpNext": 3330803831373,
+      "safe": true
+    },
+    {
+      "level": 64,
+      "xpNext": 4996205747060,
+      "safe": true
+    },
+    {
+      "level": 65,
+      "xpNext": 7494308620590,
+      "safe": true
+    },
+    {
+      "level": 66,
+      "xpNext": 11241462930885,
+      "safe": true
+    },
+    {
+      "level": 67,
+      "xpNext": 16862194396328,
+      "safe": true
+    },
+    {
+      "level": 68,
+      "xpNext": 25293291594492,
+      "safe": true
+    },
+    {
+      "level": 69,
+      "xpNext": 37939937391738,
+      "safe": true
+    },
+    {
+      "level": 70,
+      "xpNext": 56909906087607,
+      "safe": true
+    },
+    {
+      "level": 71,
+      "xpNext": 85364859131411,
+      "safe": true
+    },
+    {
+      "level": 72,
+      "xpNext": 128047288697117,
+      "safe": true
+    },
+    {
+      "level": 73,
+      "xpNext": 192070933045676,
+      "safe": true
+    },
+    {
+      "level": 74,
+      "xpNext": 288106399568514,
+      "safe": true
+    },
+    {
+      "level": 75,
+      "xpNext": 432159599352771,
+      "safe": true
+    },
+    {
+      "level": 76,
+      "xpNext": 648239399029157,
+      "safe": true
+    },
+    {
+      "level": 77,
+      "xpNext": 972359098543736,
+      "safe": true
+    },
+    {
+      "level": 78,
+      "xpNext": 1458538647815604,
+      "safe": true
+    },
+    {
+      "level": 79,
+      "xpNext": 2187807971723406,
+      "safe": true
+    },
+    {
+      "level": 80,
+      "xpNext": 3281711957585109,
+      "safe": true
+    },
+    {
+      "level": 81,
+      "xpNext": 4922567936377664,
+      "safe": true
+    },
+    {
+      "level": 82,
+      "xpNext": 7383851904566496,
+      "safe": true
+    },
+    {
+      "level": 83,
+      "xpNext": 11075777856849744,
+      "safe": false
+    },
+    {
+      "level": 84,
+      "xpNext": 16613666785274616,
+      "safe": false
+    },
+    {
+      "level": 85,
+      "xpNext": 24920500177911924,
+      "safe": false
+    },
+    {
+      "level": 86,
+      "xpNext": 37380750266867890,
+      "safe": false
+    },
+    {
+      "level": 87,
+      "xpNext": 56071125400301830,
+      "safe": false
+    },
+    {
+      "level": 88,
+      "xpNext": 84106688100452750,
+      "safe": false
+    },
+    {
+      "level": 89,
+      "xpNext": 126160032150679140,
+      "safe": false
+    },
+    {
+      "level": 90,
+      "xpNext": 189240048226018700,
+      "safe": false
+    },
+    {
+      "level": 91,
+      "xpNext": 283860072339028030,
+      "safe": false
+    },
+    {
+      "level": 92,
+      "xpNext": 425790108508542100,
+      "safe": false
+    },
+    {
+      "level": 93,
+      "xpNext": 638685162762813200,
+      "safe": false
+    },
+    {
+      "level": 94,
+      "xpNext": 958027744144219800,
+      "safe": false
+    },
+    {
+      "level": 95,
+      "xpNext": 1437041616216329700,
+      "safe": false
+    },
+    {
+      "level": 96,
+      "xpNext": 2155562424324494600,
+      "safe": false
+    },
+    {
+      "level": 97,
+      "xpNext": 3233343636486742000,
+      "safe": false
+    },
+    {
+      "level": 98,
+      "xpNext": 4850015454730113000,
+      "safe": false
+    },
+    {
+      "level": 99,
+      "xpNext": 7275023182095170000,
+      "safe": false
+    },
+    {
+      "level": 100,
+      "xpNext": 1,
+      "safe": true
+    }
+  ],
+  "highLevelJsonRoundTrip": true,
+  "observedRecordFields": {
+    "rooms": {
+      "x": [
+        "number"
+      ],
+      "y": [
+        "number"
+      ],
+      "w": [
+        "number"
+      ],
+      "h": [
+        "number"
+      ],
+      "cx": [
+        "number"
+      ],
+      "cy": [
+        "number"
+      ],
+      "isArena": [
+        "boolean"
+      ],
+      "isThroneRoom": [
+        "boolean"
+      ]
+    },
+    "potions": {
+      "x": [
+        "number"
+      ],
+      "y": [
+        "number"
+      ],
+      "heal": [
+        "number"
+      ]
+    },
+    "treasures": {
+      "x": [
+        "number"
+      ],
+      "y": [
+        "number"
+      ],
+      "name": [
+        "string"
+      ],
+      "sprite": [
+        "string"
+      ],
+      "gold": [
+        "number"
+      ],
+      "kind": [
+        "string"
+      ],
+      "def": [
+        "number"
+      ],
+      "str": [
+        "number"
+      ],
+      "id": [
+        "number"
+      ],
+      "heal": [
+        "number"
+      ],
+      "atk": [
+        "number"
+      ],
+      "scroll": [
+        "string"
+      ],
+      "minDepth": [
+        "number"
+      ],
+      "lootWeight": [
+        "number"
+      ],
+      "dex": [
+        "number"
+      ],
+      "range": [
+        "number"
+      ],
+      "spell": [
+        "string"
+      ],
+      "maxHp": [
+        "number"
+      ]
+    },
+    "props": {
+      "x": [
+        "number"
+      ],
+      "y": [
+        "number"
+      ],
+      "sprite": [
+        "string"
+      ]
+    },
+    "hazards": {
+      "x": [
+        "number"
+      ],
+      "y": [
+        "number"
+      ],
+      "type": [
+        "string"
+      ],
+      "revealed": [
+        "boolean"
+      ],
+      "triggered": [
+        "boolean"
+      ],
+      "stage": [
+        "string"
+      ],
+      "offset": [
+        "number"
+      ],
+      "nextDamageAt": [
+        "number"
+      ],
+      "impactAt": [
+        "null"
+      ]
+    },
+    "obstacles": {
+      "x": [
+        "number"
+      ],
+      "y": [
+        "number"
+      ],
+      "type": [
+        "string"
+      ]
+    },
+    "monsterSpawns": {
+      "name": [
+        "string"
+      ],
+      "sprite": [
+        "string"
+      ],
+      "hp": [
+        "number"
+      ],
+      "atk": [
+        "number"
+      ],
+      "def": [
+        "number"
+      ],
+      "xp": [
+        "number"
+      ],
+      "x": [
+        "number"
+      ],
+      "y": [
+        "number"
+      ],
+      "maxHp": [
+        "number"
+      ],
+      "gold": [
+        "number"
+      ],
+      "id": [
+        "number"
+      ],
+      "minDepth": [
+        "number"
+      ],
+      "range": [
+        "number"
+      ],
+      "ranged": [
+        "boolean"
+      ],
+      "projectile": [
+        "string"
+      ],
+      "isBoss": [
+        "boolean"
+      ],
+      "isThemed": [
+        "boolean"
+      ],
+      "themedType": [
+        "string"
+      ],
+      "magic": [
+        "boolean"
+      ],
+      "magicType": [
+        "string"
+      ],
+      "magicRange": [
+        "number"
+      ],
+      "throne": [
+        "boolean"
+      ],
+      "summons": [
+        "boolean"
+      ],
+      "dragon": [
+        "boolean"
+      ],
+      "isDragon": [
+        "boolean"
+      ],
+      "isThroneBoss": [
+        "boolean"
+      ]
+    },
+    "stairs": {
+      "x": [
+        "number"
+      ],
+      "y": [
+        "number"
+      ]
+    },
+    "upstairs": {
+      "x": [
+        "number"
+      ],
+      "y": [
+        "number"
+      ]
+    },
+    "floorKey": {
+      "carrierId": [
+        "number"
+      ],
+      "dropped": [
+        "boolean"
+      ],
+      "collected": [
+        "boolean"
+      ],
+      "drop": [
+        "null"
+      ]
+    },
+    "merchant": {
+      "x": [
+        "number"
+      ],
+      "y": [
+        "number"
+      ],
+      "isMerchant": [
+        "boolean"
+      ],
+      "stock": [
+        "Array"
+      ]
+    },
+    "prisoner": {
+      "x": [
+        "number"
+      ],
+      "y": [
+        "number"
+      ],
+      "rescued": [
+        "boolean"
+      ],
+      "isPrisoner": [
+        "boolean"
+      ]
+    },
+    "princess": {
+      "x": [
+        "number"
+      ],
+      "y": [
+        "number"
+      ],
+      "rescued": [
+        "boolean"
+      ],
+      "isPrincess": [
+        "boolean"
+      ]
+    },
+    "town.npcs": {
+      "name": [
+        "string"
+      ],
+      "sprite": [
+        "string"
+      ],
+      "x": [
+        "number"
+      ],
+      "y": [
+        "number"
+      ],
+      "pathIndex": [
+        "number"
+      ],
+      "step": [
+        "number"
+      ],
+      "path": [
+        "Array"
+      ]
+    },
+    "town.animals": {
+      "name": [
+        "string"
+      ],
+      "sprite": [
+        "string"
+      ],
+      "x": [
+        "number"
+      ],
+      "y": [
+        "number"
+      ],
+      "pathIndex": [
+        "number"
+      ],
+      "step": [
+        "number"
+      ],
+      "path": [
+        "Array"
+      ],
+      "hidden": [
+        "boolean"
+      ],
+      "scale": [
+        "number"
+      ],
+      "isEntranceCat": [
+        "boolean"
+      ]
+    },
+    "player": {
+      "x": [
+        "number"
+      ],
+      "y": [
+        "number"
+      ],
+      "hp": [
+        "number"
+      ],
+      "maxHp": [
+        "number"
+      ],
+      "mp": [
+        "number"
+      ],
+      "maxMp": [
+        "number"
+      ],
+      "str": [
+        "number"
+      ],
+      "dex": [
+        "number"
+      ],
+      "def": [
+        "number"
+      ],
+      "lvl": [
+        "number"
+      ],
+      "xp": [
+        "number"
+      ],
+      "xpNext": [
+        "number"
+      ],
+      "spells": [
+        "object"
+      ]
+    },
+    "town": {
+      "map": [
+        "Array"
+      ],
+      "visited": [
+        "Array"
+      ],
+      "props": [
+        "Array"
+      ],
+      "npcs": [
+        "Array"
+      ],
+      "animals": [
+        "Array"
+      ],
+      "spawn": [
+        "object"
+      ],
+      "store": [
+        "object"
+      ],
+      "landmarks": [
+        "object"
+      ],
+      "tick": [
+        "number"
+      ],
+      "quoteIndex": [
+        "number"
+      ],
+      "nextTalkAt": [
+        "number"
+      ]
+    },
+    "companion": {
+      "id": [
+        "string"
+      ],
+      "name": [
+        "string"
+      ],
+      "sprite": [
+        "string"
+      ],
+      "kind": [
+        "string"
+      ],
+      "behavior": [
+        "string"
+      ],
+      "linePool": [
+        "string"
+      ],
+      "damage": [
+        "number"
+      ],
+      "batBonus": [
+        "number"
+      ],
+      "scale": [
+        "number"
+      ],
+      "x": [
+        "number"
+      ],
+      "y": [
+        "number"
+      ]
+    }
+  },
+  "allReferencedStateKeys": [
+    "activeTime",
+    "area",
+    "art",
+    "audio",
+    "biome",
+    "boss",
+    "bossDefeat",
+    "bossDefeated",
+    "bossIntro",
+    "bossIntroSeen",
+    "bossSummonAt",
+    "bubble",
+    "camera",
+    "combatElapsed",
+    "companion",
+    "companionAttackAt",
+    "companionChoice",
+    "companionEntryDone",
+    "companionPicker",
+    "companionQuoteIndex",
+    "companionSpeech",
+    "companionSpeechReadyAt",
+    "consoleHistory",
+    "consoleHistoryIndex",
+    "consoleLines",
+    "consoleOpen",
+    "depth",
+    "ending",
+    "entranceCat",
+    "equipment",
+    "floorKey",
+    "floors",
+    "gameOver",
+    "godMode",
+    "godModeStats",
+    "gold",
+    "hazardTime",
+    "hazards",
+    "healElapsed",
+    "helpFocus",
+    "helpOpen",
+    "inn",
+    "inventory",
+    "kills",
+    "lastTick",
+    "manaRegenAt",
+    "map",
+    "merchant",
+    "messages",
+    "monsterQuoteIndex",
+    "monsterSpawns",
+    "monsterSpeech",
+    "monsterSpeechReadyAt",
+    "monsters",
+    "motion",
+    "obstacles",
+    "pause",
+    "player",
+    "potions",
+    "princess",
+    "prisoner",
+    "props",
+    "retreatReadyAt",
+    "rooms",
+    "selectedCompanion",
+    "spellReadyAt",
+    "stairs",
+    "started",
+    "town",
+    "townExit",
+    "townGate",
+    "townPortalOpen",
+    "townScrolls",
+    "trade",
+    "treasures",
+    "turn",
+    "unlockedCompanions",
+    "upstairs",
+    "visited",
+    "warnedCritical",
+    "warnedLow",
+    "won"
+  ],
+  "sourceBounds": {
+    "rooms": 32,
+    "ordinaryTemplates": 40,
+    "totalTemplates": 41,
+    "props": 76,
+    "potions": 37,
+    "treasures": 29,
+    "obstacles": 64,
+    "hazards": 124,
+    "merchantStock": 6,
+    "naturalPotionInventoryUpperBound": 3921
+  },
+  "assertions": "pass"
+}

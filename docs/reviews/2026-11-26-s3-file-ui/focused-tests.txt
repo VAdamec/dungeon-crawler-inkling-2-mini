@@ -1,0 +1,20 @@
+✔ S2 stale or cancelled confirmations cannot replace restart, travel, death or a newer session (2814.065ms)
+✔ S2 failed commit presentation restores old state, HUD, Help and focus without replaying render (316.861292ms)
+✔ S3 save requests portable JSON without progress/RNG/audio changes and cleans each URL independently (99.134166ms)
+✔ S3 unsupported/failed export leaves adventure and URLs intact or cleaned with honest feedback (271.149542ms)
+✔ S3 Help/launch/death Load opens one frozen accessible dialog and Cancel restores focus/inert context (181.267709ms)
+✔ S3 real read phases validate before preview and only explicit deferred confirmation loads (286.425042ms)
+✔ S3 file size is checked before reading and corrupt/future/read errors remain reversible (300.354166ms)
+✔ S3 replacement reads, same-file reselection and native cancel ignore old results (261.699708ms)
+✔ S3 stale file events and queued validation/confirmation cannot affect a newer session or run (684.625417ms)
+✔ S3 deferred validation while hidden stays owned and permits confirmation only after visibility returns (243.794125ms)
+✔ S3 failed commit returns to the origin with error feedback and releases read/UI resources (319.027625ms)
+✔ S3 cancel aborts an active reader and R clears dialog/status without serializing UI (88.686792ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6043.635

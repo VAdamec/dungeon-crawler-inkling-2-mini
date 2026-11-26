@@ -1,8 +1,8 @@
 # Graphics integration recovery and next tasks
 
-Date: 2026-11-25. Status: **GR-01–GR-08 and GR-10 complete; GR-09 partial (native visibility unverified)**. See [current evidence and remaining limit](../reviews/2026-11-25-graphics-recovery/gr09/README.md).
+Date: 2026-11-25. Status: **GR-01–GR-08 and GR-10 complete; GR-09 partial (native visibility unverified)**. Current [readiness review](../reviews/2026-11-26-release-readiness/README.md) and [manual acceptance](../reviews/2026-11-26-release-readiness/manual-acceptance.md) supersede stale execution defaults; old counts below are historical. See [current evidence and remaining limit](../reviews/2026-11-25-graphics-recovery/gr09/README.md).
 
-This is the immediate work queue for the partially migrated worktree. It refines [FG-01–08](2026-11-25-final-graphics-implementation-plan.md); preserve the detailed gameplay boundaries and final art direction in that plan. Use the [local LLM prompt](../prompts/2026-11-25-graphics-recovery-local-llm.md) when assigning work. Do not restart the graphics project or regenerate accepted artwork.
+This is the completed graphics implementation record; only GR-09 native visibility and separate human visual acceptance remain open. Current readiness/manual work is linked below. It refines [FG-01–08](2026-11-25-final-graphics-implementation-plan.md); preserve the detailed gameplay boundaries and final art direction in that plan. Use the [local LLM prompt](../prompts/2026-11-25-graphics-recovery-local-llm.md) when assigning work. Do not restart the graphics project or regenerate accepted artwork.
 
 ## Historical starting point (before GR-01)
 
@@ -32,9 +32,9 @@ env DYLD_LIBRARY_PATH=/opt/homebrew/Cellar/simdutf/9.3.2_1/lib /opt/homebrew/bin
 
 This library path is environment-specific, not a project dependency. A normal working `node` elsewhere is sufficient. Do not install a runtime package or alter system libraries to make the game work.
 
-Keep plain scripts, shared globals and `file://`; no modules, bundler, CDN, remote assets or startup fetch. Preserve 96×64 maps, 18×12 view, 2× zoom, all logical positions/collision/generation/RNG, progression and saves. Drawing/animation must not advance combat or change stats. Keep caches transient. No release/version change, staging, commit, tag or publishing without a separate request. Required generated output must eventually be delivered with its reproducible exporter; untracked is not the same as intentionally excluded.
+Keep plain scripts, shared globals and `file://`; no modules, bundler, CDN, remote assets or startup fetch. Preserve 96×64 maps, 18×12 view, 2× zoom, all logical positions/collision/generation/RNG, progression and saves. Drawing/animation must not advance combat or change stats. Keep caches transient. No release/version change, staging, commit, tag or publishing without a separate request. Required generated output is now tracked and included in recorded2.0.0 and the clean review package; continue verifying it rather than omitting it.
 
-The final scene selection/visual acceptance record and cinematic audit remain incomplete. Record actual user decisions, never invent approval. Stabilizing the existing integration and tests does not require approving unseen art. Before broadening the visual implementation, use the session's actual authorized scope and flag unresolved visual decisions explicitly; do not repeatedly ask for already-given permission.
+The final human visual acceptance record remains pending; GR-08 completed the technical cinematic audit. Record actual user decisions, never invent approval. Stabilizing the existing integration and tests does not require approving unseen art. Before broadening the visual implementation, use the session's actual authorized scope and flag unresolved visual decisions explicitly; do not repeatedly ask for already-given permission.
 
 ## Queue
 
@@ -142,7 +142,8 @@ Done: completed matrix, representative stills/short recordings and lifecycle tes
 ### GR-09 — full acceptance on the actual game
 
 - [x] Run all required syntax/behavior/preview/focused graphics tests, external smoke and the automated normal `file://` scenarios from FG-07; native visibility remains the exception below. Update the external smoke loader if its old two-script assumption needs the new data file; keep that smoke script outside the repo.
-- [ ] Browser scenarios cover launch, walking/camera/corridor rejection, all biomes, NPC/store/Inn, stairs/keys/loot, Bow/five spells, potions/health/retreat, portals/town, companions, Help/console/hidden tab, sound after interaction, all boss intros/defeats and ending/skip/restart; include mobile.
+- [x] Automated actual file:// browser scenarios cover launch, movement/walls/biomes, interactions/travel/loot/combat/spells/health/Help/audio/companions/bosses/ending and mobile viewport layout, as recorded in GR-09. Controlled visibility-handler evidence is separate.
+- [ ] **Native GR-09 remains unverified:** observe genuine background-tab/minimize freeze/resume without catch-up in an ordinary browser; use the current manual checklist. This is not completed by the automated scenarios above.
 - [x] Compare seeded gameplay snapshots to committed pre-art baseline or captured baseline using controlled harnesses, excluding only documented visual metadata. Never rewrite expected gameplay snapshots to hide drift.
 - [x] Compare hidden-spike/unexplored content pixels and real fog/minimap secrecy. Final-preview fog is illustrative and cannot substitute for this.
 - [x] Compare cold parse/load, file sizes, warm draw p50/p95, cache memory and animation rate using same browser/machine/scenes. Separate measured facts from suspected bottlenecks.
@@ -155,7 +156,7 @@ Done: compact reproducible evidence, zero unexpected browser errors/network requ
 
 - [x] Update handover/tasks/master plan to actual completed stages and remaining limitations. Keep historical preview evidence labeled historical.
 - [x] Replace README/bestiary imagery with actual integrated screenshots; update art credits/provenance, load-order/exporter guidance and changelog truthfully.
-- [x] Document required generated output and reproducible source. Do not hand-edit generated data or leave referenced files absent from the eventual delivery. User must explicitly request any staging/commit/release/tag/publish action; keep branding 1.0.1 meanwhile.
+- [x] Document required generated output and reproducible source. Do not hand-edit generated data or leave referenced files absent from the eventual delivery. User must explicitly request any staging/commit/release/tag/publish action; keep current2.0.0 branding unchanged unless a new version action is explicitly requested.
 
 Done: docs agree with code and evidence; current source/artifact list is clear; no unrelated drafts changed.
 

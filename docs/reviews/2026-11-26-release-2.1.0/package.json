@@ -1,0 +1,63 @@
+{
+  "status": "user-authorized 2.1.0 alpha release package",
+  "versionBranding": "2.1.0; alpha prerelease; save format version 1 unchanged",
+  "sourceRoot": "/Users/vadamec/workspace/ai_tmp/opencode_testing",
+  "packagePath": "/var/folders/lp/737kz569419gglsqmvs0x0200000gn/T/dungeon-release-2.1.0-u739vo9k/clean runtime package",
+  "extractedPath": "/var/folders/lp/737kz569419gglsqmvs0x0200000gn/T/dungeon-release-2.1.0-u739vo9k/relocated unzipped game",
+  "archivePath": "/var/folders/lp/737kz569419gglsqmvs0x0200000gn/T/dungeon-release-2.1.0-u739vo9k/dungeon-crawler-2.1.0.zip",
+  "archiveBytes": 4545098,
+  "archiveSha256": "c69a5ff682eb4b842d6eac0fe1e6a300d3893abd4701c8ecb0552a3fcb6af498",
+  "sourceFingerprint": "fc84f66c1cf5d2d034dca5a635d4a966f3506bd7c5212d32a5a06cc150962a30",
+  "runtimeBytes": 11957538,
+  "files": [
+    {
+      "file": "index.html",
+      "bytes": 14806,
+      "sha256": "5e8564a4454c94e211ad6ac729d5393be7d584a168623eec16bf72d365966649",
+      "tracked": true,
+      "copyMatches": true
+    },
+    {
+      "file": "style.css",
+      "bytes": 19239,
+      "sha256": "295668ca48e608c71dee020030e3d2bedc3bc11b45c86de995a4af351ace2acb",
+      "tracked": true,
+      "copyMatches": true
+    },
+    {
+      "file": "js/art-runtime.js",
+      "bytes": 11299262,
+      "sha256": "ac12a9d1d03226eb16473922efc189ed0b601a784d5051be9d9587c9621d0ae9",
+      "tracked": true,
+      "copyMatches": true
+    },
+    {
+      "file": "js/sprites.js",
+      "bytes": 346729,
+      "sha256": "0f9a18356afa369a1b2912caf80e589109a379fc3e019e32ee214e4b002301d2",
+      "tracked": true,
+      "copyMatches": true
+    },
+    {
+      "file": "js/game.js",
+      "bytes": 277502,
+      "sha256": "9532ea2a46d49f0aecbccb089693b6ae3e049ecb1a63db9bfb99d893354e5ebc",
+      "tracked": true,
+      "copyMatches": true
+    }
+  ],
+  "scriptOrder": [
+    "js/art-runtime.js",
+    "js/sprites.js",
+    "js/game.js"
+  ],
+  "htmlLocalDependencies": [
+    "style.css",
+    "js/art-runtime.js",
+    "js/sprites.js",
+    "js/game.js"
+  ],
+  "cssReferences": [],
+  "zipCrcAndExtraction": true,
+  "nativeGR09": "unverified"
+}

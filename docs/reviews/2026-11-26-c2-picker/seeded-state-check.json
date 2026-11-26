@@ -1,0 +1,19 @@
+{
+  "seed": 713,
+  "depths": [
+    1,
+    2,
+    3,
+    5,
+    7,
+    10,
+    40,
+    50,
+    100
+  ],
+  "match": true,
+  "beforeSha256": "2e0c3d6d03635272dc38c17871bf02aae0eb2077001f50db43d7e3629d87b788",
+  "afterSha256": "2e0c3d6d03635272dc38c17871bf02aae0eb2077001f50db43d7e3629d87b788",
+  "compared": "dungeon maps/world contents/monsters, hero progression/rewards, flags/clocks, next RNG values; intentional post/menu/input UI metadata excluded",
+  "fixture": "VM current/pre-C2 source; new run per depth, generate floor, kill boss if any, skip defeat, save; no player menus"
+}

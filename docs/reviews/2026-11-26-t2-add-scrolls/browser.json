@@ -1,0 +1,35 @@
+{
+  "results": [
+    {
+      "width": 1440,
+      "protocol": "file:",
+      "consoleDiscovery": true,
+      "strictInput": true,
+      "safeIntegerBoundary": true,
+      "hiddenCheck": "explicit document.hidden fixture",
+      "tradeExclusion": true,
+      "townAndDungeon": true,
+      "portalPreserved": true,
+      "hudUpdated": true,
+      "normalScrollCost": true,
+      "errors": [],
+      "remote": []
+    },
+    {
+      "width": 390,
+      "protocol": "file:",
+      "consoleDiscovery": true,
+      "strictInput": true,
+      "safeIntegerBoundary": true,
+      "hiddenCheck": "explicit document.hidden fixture",
+      "tradeExclusion": true,
+      "townAndDungeon": true,
+      "portalPreserved": true,
+      "hudUpdated": true,
+      "normalScrollCost": true,
+      "errors": [],
+      "remote": []
+    }
+  ],
+  "nativeBackgroundObserved": "unverified; not attempted"
+}

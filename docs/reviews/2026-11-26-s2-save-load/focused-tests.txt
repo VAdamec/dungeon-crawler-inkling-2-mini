@@ -1,0 +1,23 @@
+✔ S2 detached hydration reconstructs every alias without touching source, live state or action helpers (582.440125ms)
+✔ S2 atomic load restores exact progression/world/deadlines and retains receiver audio/art (881.27225ms)
+✔ S2 load is allowed from launch, Help, stable god mode and ordinary death with correct focus/overlays (533.438792ms)
+✔ S2 pending load freezes simulation, player actions and launch choices without charging time (456.191ms)
+✔ S2 stale or cancelled confirmations cannot replace restart, travel, death or a newer session (2559.554042ms)
+✔ S2 conflicting load contexts and changed bindings reject without state or focus changes (3512.785417ms)
+✔ S2 malformed or failed hydration preserves the exact old run and retryable session (97.714875ms)
+✔ S2 failed commit presentation restores old state, HUD, Help and focus without replaying render (317.734834ms)
+✔ S2 active encounter, guards and final dragon restore exactly while later revisits retain respawn rules (1263.320292ms)
+✔ S2 restored portal returns once and ring HP, stock, keys, loot and descent rewards stay once-only (715.265833ms)
+✔ S2 stale motion/cinematic callbacks and reentrant reset cannot overwrite a loaded or newer run (665.252917ms)
+✔ S2 all companions and high-level XP hydrate with exact positions, static roles and readiness (1442.318083ms)
+✔ S2 restored hazard warnings and cooldowns use saved active time without replay or catch-up (539.303583ms)
+✔ S2 presentation preparation errors and reentrant commits reject before touching the current run (325.397917ms)
+✔ S2 hydrates and atomically loads the final fully explored 100-floor DTO without mutation or RNG (12936.0735ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 26947.435208

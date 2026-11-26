@@ -1,0 +1,124 @@
+✖ M3 direct player/combat/portal helpers independently honor an open market without side effects (260.915917ms)
+✖ M3 market freezes every timed subsystem and resumes without charging menu or slow-paint time (87.034542ms)
+✖ M3 failed opening and closing paints release modal ownership, inert flags, callbacks and focus for retry (74.044916ms)
+✔ M3 shop/companion/Help/health/retreat/load dialogs exclude each other and preserve underlying warnings (78.383083ms)
+✔ M3 scroll/debug/retreat returns survive shopping exactly once without changing companions or cooldowns (287.11725ms)
+✔ M3 every companion can shop without reselection, retirement, unlock or attack-time changes (135.860458ms)
+✔ M3 successful market commit survives save/hydrate, god-mode freeze and once-only ordinary revisit rules (536.957083ms)
+✔ M3 forced boss-ending/debug transitions discard pending carts and reject all saved shop handlers (494.687958ms)
+✖ M3 forced transitions inside equipment/save/paint hooks roll back before switching context and stop stale commit work (115.124083ms)
+✖ M3 stale backdrop callbacks and unavailable audio cannot cancel newer shops or repeat a successful trade (68.665125ms)
+✔ M3 final ending discards a staged cart and cannot carry its session into ending skip or restart (213.228792ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 6
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2480.918
+
+✖ failing tests:
+
+test at tests/game.test.cjs:5359:1
+✖ M3 direct player/combat/portal helpers independently honor an open market without side effects (260.915917ms)
+  AssertionError [ERR_ASSERTION]: movePlayer(1,0) state.turn: 0 -> 1
+  
+  false !== true
+  
+      at m2AssertSame (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5202:10)
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5366:17)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/game.test.cjs:5372:1
+✖ M3 market freezes every timed subsystem and resumes without charging menu or slow-paint time (87.034542ms)
+  AssertionError [ERR_ASSERTION]: close paint earns no catch-up time
+  
+  false !== true
+  
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5382:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/game.test.cjs:5388:1
+✖ M3 failed opening and closing paints release modal ownership, inert flags, callbacks and focus for retry (74.044916ms)
+  evalmachine.<anonymous>:1
+  document.getElementById('game').focus();window.m3Render=render;render=()=>{throw new Error('open paint');}
+                                                                             ^
+  
+  Error: open paint
+      at render (evalmachine.<anonymous>:1:82)
+      at openTrade (evalmachine.<anonymous>:3541:66)
+      at evalmachine.<anonymous>:1:1
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:141:21)
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5390:45)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+
+test at tests/game.test.cjs:5455:1
+✖ M3 forced transitions inside equipment/save/paint hooks roll back before switching context and stop stale commit work (115.124083ms)
+  AssertionError [ERR_ASSERTION]: equipnewGame()
+  
+  true !== false
+  
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5461:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/game.test.cjs:5469:1
+✖ M3 stale backdrop callbacks and unavailable audio cannot cancel newer shops or repeat a successful trade (68.665125ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'undefined'
+  - 'function'
+  
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5471:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

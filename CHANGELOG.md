@@ -2,6 +2,20 @@
 
 Versions below distinguish the current working build from committed releases. Entries summarize local source, plans and git history; dates are local commit/review dates. Intermediate working-version numbers are not reconstructed as releases.
 
+## 2.1.0 — 2026-11-26 (alpha)
+
+Released for alpha testing by explicit user decision. Remaining native/platform/manual acceptance checks are deferred to alpha testing, not marked passed. **Native GR-09 background-tab/minimize remains UNVERIFIED.** [Release verification and alpha follow-up](docs/reviews/2026-11-26-release-2.1.0/README.md).
+
+- Added starter companion selection and the town companion post for choosing unlocked companions, with corrected companion/cinematic behavior and input/focus handling.
+- Hardened developer-console travel and inventory commands; added `goldADD <amount>` with strict numeric/overflow checks and immediate gold display updates. Developer commands remain outside player Help.
+
+- Added a selectable Buy/Sell cart with item details, projected stats, Undo/Reset and explicit Confirm/Cancel. Town Store and dungeon merchant stock, gear and learned spells persist correctly; known tomes stay in stock disabled.
+- Completed market recovery checks: guarded direct actions during shopping, excluded closing paint time from gameplay, recovered failed dialog paints/audio and rejected stale or interrupted commits. [Market integration results](docs/reviews/2026-11-26-m3-market/README.md). **Native GR-09 background-tab/minimize remains unverified.**
+
+- Added portable manual JSON Save/Load in Help, with Load on the start and death screens, a checked preview, explicit confirmation and Cancel. Files preserve progression, explored floors, current encounters, companions and town portals without browser storage.
+- S4 fixed long UI stalls on large files by validating and hydrating in cancellable chunks. Save preparation now has a Cancel button; stale work cannot load or download after cancellation/restart.
+- Verified real files in both directions between two fresh Chrome profiles and a copied game folder, including 100 explored floors and the exact 32 MiB input boundary. Added seven S4 regression groups and updated player instructions/screenshots. [S4 results and performance limits](docs/reviews/2026-11-26-s4-acceptance/README.md). Physical mobile and native OS chooser-cancel observation remain unverified; later acceptance added passing WebKit package flows while Firefox coverage remains incomplete; **native GR-09 background-tab/minimize remains unverified**.
+
 ## 2.0.0 — 2026-11-25
 
 Integrated graphics release, with a concise player README/Help and separate player reference/developer documentation. Includes the required offline art payload; no install, server or runtime network dependency. **GR-09 native background-tab/minimize observation remains unverified**; the explicit visibility-handler fixture passing is not native validation.

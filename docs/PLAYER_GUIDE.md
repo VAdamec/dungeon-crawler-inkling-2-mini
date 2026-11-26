@@ -1,6 +1,6 @@
 # Player guide
 
-Detailed controls, exploration rules, monster stats and spell reference for Dungeon Crawler 2.0.0. [Back to the quick start](../README.md).
+Detailed controls, exploration rules, monster stats and spell reference for Dungeon Crawler 2.1.0 (alpha). [Back to the quick start](../README.md).
 
 ## Controls
 
@@ -9,13 +9,13 @@ Detailed controls, exploration rules, monster stats and spell reference for Dung
 | ? / HUD ? button | Open or close Help & settings; pauses play |
 | Esc in Help | Close Help & settings |
 | Arrows / WASD | Move; attack by walking into a monster |
-| Space | In town, recruit Marmalade the cat, use the Inn, Store, villagers, or dungeon gate; in the dungeon, collect a key/item, buy the first merchant item, rescue an NPC, or use the staircase under you |
+| Space | In town, recruit Marmalade the cat, use the Inn, Store, villagers, or dungeon gate; in the dungeon, collect a key/item, open a merchant’s Buy list, rescue an NPC, or use the staircase under you |
 | Q / Backspace | Ascend while standing on ▲ |
 | H | Drink a stored potion |
 | E | Shoot the equipped Bow at the nearest eligible visible enemy |
 | J | Use a Town Scroll in the dungeon; press again at the town gate to return through the open portal |
 | F / G / V / B / Z | Cast Fireball, Heal, Frostbolt, Greater Heal, or Magic Barrier if learned (each costs MP) |
-| X | Sell all equipped gear while standing on the merchant |
+| X | Open the shop’s Sell list (nearby Store in town, exact merchant tile in the dungeon) |
 | Enter | Request retreat during normal play |
 | C / Escape | Continue from a health pause |
 | Escape during the ending | Skip to the final sunset scene |
@@ -29,13 +29,15 @@ Dialog buttons also work with mouse or Tab and Enter/Space.
 
 ## Town hub
 
-Runs begin in a small persistent village with grass, sand roads, a river, bridge, trees, huts, an Inn with a doorstep, a Store with a doorstep, wandering villagers, small cats/dogs/chickens, and a dungeon gate. A huge, sarcastic cat named Marmalade waits near the gate; Space beside it recruits it before the first descent, and it joins automatically if you leave without asking. The town is fully visible without dungeon fog, and the player stays drawn above townsfolk and animals. Space at the Inn fully restores HP and MP. Space at the Store buys the next item from stock that persists for the run, and X still sells equipped gear there. Standing near a villager prompts a line of dialogue; walking into a villager talks instead of overlapping them. Townspeople and animals patrol fixed routes, and villagers chat on approach. Space at the gate uses an open Town Scroll portal, returns to a saved retreat point when one exists, or enters depth 1 otherwise. A prepared portal glows at the gate. Dungeon monsters, traps, healing, mana regeneration, companion attacks, and active-time cooldowns do not advance in town. Retreat still follows the dungeon rules described below.
+Runs begin in a small persistent village with grass, sand roads, a river, bridge, trees, huts, an Inn with a doorstep, a Store with a doorstep, wandering villagers, small cats/dogs/chickens, and a dungeon gate. A huge, sarcastic cat named Marmalade waits near the gate; Space beside it recruits it before the first descent, and it joins automatically if you leave without asking. The town is fully visible without dungeon fog, and the player stays drawn above townsfolk and animals. Space at the Inn fully restores HP and MP. Space near the Store opens Buy; X opens Sell. Select items, add purchases/sales to the cart, then Confirm to apply them. Undo/Reset correct the cart; Cancel/Esc discards it. Stock persists for the run. Buying gear replaces the old item; sell it first to receive its sale value. Standing near a villager prompts a line of dialogue; walking into a villager talks instead of overlapping them. Townspeople and animals patrol fixed routes, and villagers chat on approach. Space at the gate uses an open Town Scroll portal, returns to a saved retreat point when one exists, or enters depth 1 otherwise. A prepared portal glows at the gate. Dungeon monsters, traps, healing, mana regeneration, companion attacks, and active-time cooldowns do not advance in town. Retreat still follows the dungeon rules described below.
+
+In a shop, arrows and Enter select an item; B adds a purchase, S adds a sale, U undoes, and Shift+U resets the cart. Tab reaches Confirm and Cancel. Time pauses while shopping; closing the menu never confirms it.
 
 ## Exploration and recovery
 
 Floors retain their layout, explored terrain, remaining items, merchant stock, and rescues when you leave. Ordinary monsters return at full health when you revisit; defeated bosses stay defeated. Your current XP, stats, gear, gold, inventory, stored Town Scrolls, kills, and turn count carry between floors. Collected treasure and potions stay collected. The descent reward is paid only once per floor.
 
-Space on an unlocked ▼ goes down; Space on ▲ goes up, and the ▲ on depth 1 returns to town. You arrive at the connecting staircase. Stairs, treasure chests, and potions remain visible on explored terrain; distant enemies stay hidden. These saves last for the current run only: restarting or reloading clears them.
+Space on an unlocked ▼ goes down; Space on ▲ goes up, and the ▲ on depth 1 returns to town. You arrive at the connecting staircase. Stairs, treasure chests, and potions remain visible on explored terrain; distant enemies stay hidden. To keep your adventure after closing the page, open **? → Save game** and keep the downloaded `.json` file. Use **Load game** in Help or **Load adventure** on the start/death screen, choose that file, review it and confirm Load. Cancel keeps your current adventure. There is no autosave; restarting or reloading clears unsaved progress. Save while alive outside combat scenes and dialogs; the Save button shows when saving is available.
 
 Potions are stored when found or bought, rather than consumed automatically. H uses one and heals up to maximum HP; a full-health player does not waste a potion.
 
@@ -53,7 +55,7 @@ Sound starts after your first keyboard/button interaction if browser audio is av
 
 Each floor is **96×64 tiles** (about 32 rooms), larger than the **18×12-tile viewport at 2× zoom**. The camera follows you and stops at the world edges; HUD, log, and equipment stay in place. Rooms connect through branching corridors and loops. Pillars and rubble block movement, and generation checks that all remaining floor tiles and important objects stay reachable. The HUD shows your world position.
 
-The **Floor chart** above the equipment on the right shows explored terrain for the current floor. Green marks you, blue/gold mark discovered up/down stairs, and the pale outline shows the main camera area. Unexplored terrain, monsters, items, keys, and traps are hidden. Exploration returns when you revisit a floor; R/reload clears it. The chart stacks below the map/log on narrow screens.
+The **Floor chart** above the equipment on the right shows explored terrain for the current floor. Green marks you, blue/gold mark discovered up/down stairs, and the pale outline shows the main camera area. Unexplored terrain, monsters, items, keys, and traps are hidden. Exploration returns when you revisit a floor; R/reload clears unsaved exploration; loading your file restores it. The chart stacks below the map/log on narrow screens.
 
 On floors 1–99, one random ordinary monster secretly carries that floor’s key. There is no carrier icon. Defeat it to drop a golden key, then stand on the drop and press Space. This permanently unlocks that floor’s down stairs. The key is collected before using stairs or interacting with an NPC on the same tile. Drops, collection, and unlocks survive revisits; returning monsters do not duplicate them. The Key HUD shows Missing, Dropped, or Unlocked. Depth 100 has no further descent and needs no floor key; the final dragon’s defeat unlocks the princess rescue.
 
@@ -153,7 +155,7 @@ The Skeleton King has a dedicated 24×18 throne arena with a dais, torch rows, b
 
 ## Magic and ranged attacks
 
-Fireball and Heal are known at the start. Learn the other spells by collecting/buying their tomes from the listed minimum depth; already-known tomes are skipped without charging again. Costs and cooldowns below are for ordinary play. Cooldowns count active dungeon time.
+Fireball and Heal are known at the start. Learn the other spells by collecting/buying their tomes from the listed minimum depth; already-known tomes remain in shop stock, disabled without a charge. Costs and cooldowns below are for ordinary play. Cooldowns count active dungeon time.
 
 | Key | Spell | MP | Cooldown | Range / target | Effect | Unlock |
 | --- | --- | ---: | --- | --- | --- | --- |
@@ -190,6 +192,6 @@ The right sidebar shows weapon, armor/shield, and ring slots with icons, each it
 - A **Shield** occupies the armor slot and adds 5 defense, reducing melee monster hit damage by 5 compared with the same hero without that shield, down to the minimum of 1 damage. Armor and helmets remain alternative defensive gear.
 - A **Ring** adds 20 maximum HP and 20 current HP when first equipped, plus its existing attack/defense/strength/dexterity modifiers. Replacing it with another equal ring does not stack or grant another heal. Removing or selling it removes the maximum-HP bonus and caps current HP at the resulting maximum.
 
-A **Bow** adds 8 attack and 1 strength; **Armor** adds 4 defense and 1 strength; a **Helmet** adds 2 defense and 2 dexterity. Armor, Helmet and Shield compete for the same slot. An **Elixir** permanently adds 2 strength and 2 dexterity. A stored **Potion** restores 35% maximum HP when used.
+A **Bow** adds 8 attack and 1 strength; **Armor** adds 4 defense and 1 strength; a **Helmet** adds 2 defense and 2 dexterity. Armor, Helmet and Shield compete for the same slot. An **Elixir** grants 60 gold when collected; buying one returns 60 gold after paying its shop price. It adds no stats. A stored **Potion** restores 35% maximum HP when used.
 
 Collecting or buying gear equips it; selling removes its modifiers. Floor changes preserve equipment and bonuses. HP and strength modifiers appear even when zero, and the hero stats show the resulting totals.

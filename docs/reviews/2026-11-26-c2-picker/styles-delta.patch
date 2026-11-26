@@ -1,0 +1,29 @@
+--- before/style.css
++++ after/style.css
+@@ -120,7 +120,7 @@
+ .console-prompt { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-top: 1px solid #3b4550; }
+ .console-prompt input { flex: 1; min-width: 0; border: 1px solid #3b4550; border-radius: 4px; padding: 6px 8px; background: #111821; color: #f0e2c0; font: inherit; }
+ .console-prompt button { font-size: 11px; }
+-#helpOverlay { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 20px; background: #050810cf; }
++#helpOverlay, #companionOverlay { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 20px; background: #050810cf; }
+ .help-dialog { width: min(720px, 100%); max-height: calc(100dvh - 40px); display: flex; flex-direction: column; overflow: hidden; border: 1px solid #a88a52; border-radius: 8px; background: #131b25; box-shadow: 0 18px 80px #000b; }
+ .help-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex: none; padding: 22px 24px; background: #1c2632; border-bottom: 1px solid #3b4550; }
+ .help-header h2 { font: 25px Georgia, serif; color: #e1c082; }
+@@ -132,4 +132,16 @@
+ #helpOverlay #audioControls { justify-content: flex-start; margin: 24px 0 18px; padding-top: 20px; border-top: 1px solid #3b4550; }
+ .help-shortcuts { color: #8e9fae; font-size: 11px; line-height: 1.8; }
+ #equip #merchantStock { text-align: left; margin-top: 12px; padding-top: 12px; border-top: 1px solid #343f4b; line-height: 1.8; overflow-wrap: anywhere; }
+-@media (max-width: 700px) { #helpOverlay { padding: 10px; } .help-dialog { max-height: calc(100dvh - 20px); } .help-header, .help-content { padding: 16px; } .help-header h2 { font-size: 21px; } #endingControls { top: 8px; right: 8px; gap: 6px; } #endingControls button { font-size: 10px; padding: 6px; } }
++@media (max-width: 700px) { #helpOverlay, #companionOverlay { padding: 10px; } .help-dialog { max-height: calc(100dvh - 20px); } .help-header, .help-content { padding: 16px; } .help-header h2 { font-size: 21px; } #endingControls { top: 8px; right: 8px; gap: 6px; } #endingControls button { font-size: 10px; padding: 6px; } }
++
++.companion-dialog { width: min(700px, 100%); }
++.companion-dialog .help-content { min-height: 0; overscroll-behavior: contain; }
++.companion-list { display: grid; gap: 10px; }
++.companion-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 12px; border: 1px solid #3b4550; border-radius: 6px; background: #18202c; }
++.companion-card strong { color: #f0deb2; font-size: 15px; }
++.companion-card p { color: #aab8ce; line-height: 1.5; font-size: 12px; margin-top: 4px; }
++.companion-dialog button, #companionPostAction { min-height: 44px; }
++.companion-card button { min-width: 84px; }
++.companion-footer { display: flex; flex: none; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 24px; border-top: 1px solid #3b4550; font-size: 11px; color: #aab8ce; }
++.companion-choice:focus-visible, .companion-dialog button:focus-visible, #companionPostAction:focus-visible { outline: 3px solid #f4d58b; outline-offset: 3px; }
++@media (max-width: 700px) { .companion-dialog .help-header { align-items: flex-start; flex-wrap: wrap; } .companion-dialog .help-header button { margin-left: auto; } .companion-card { padding: 10px; } .companion-footer { padding: 10px 16px; flex-wrap: wrap; } }

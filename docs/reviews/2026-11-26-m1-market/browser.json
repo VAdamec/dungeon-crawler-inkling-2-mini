@@ -1,0 +1,31 @@
+{
+  "results": [
+    {
+      "mobile": false,
+      "model": {
+        "same": true,
+        "hudSame": true,
+        "aliases": true,
+        "reset": true,
+        "stateKeys": 83,
+        "tradeAttached": false
+      },
+      "nativeHelpAudioAndConnectedTownStairs": true
+    },
+    {
+      "mobile": true,
+      "model": {
+        "same": true,
+        "hudSame": true,
+        "aliases": true,
+        "reset": true,
+        "stateKeys": 83,
+        "tradeAttached": false
+      },
+      "nativeHelpAudioAndConnectedTownStairs": true
+    }
+  ],
+  "errors": [],
+  "remote": [],
+  "note": "Actual file:// Chrome; touch emulation is not physical mobile. Model setup/probes are staged. No M2 market UI/commit acceptance or native GR-09 observation."
+}

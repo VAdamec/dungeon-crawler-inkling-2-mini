@@ -1,0 +1,26 @@
+[
+  {
+    "file": "index.html",
+    "sha256": "5e8564a4454c94e211ad6ac729d5393be7d584a168623eec16bf72d365966649"
+  },
+  {
+    "file": "style.css",
+    "sha256": "295668ca48e608c71dee020030e3d2bedc3bc11b45c86de995a4af351ace2acb"
+  },
+  {
+    "file": "js/art-runtime.js",
+    "sha256": "ac12a9d1d03226eb16473922efc189ed0b601a784d5051be9d9587c9621d0ae9"
+  },
+  {
+    "file": "js/sprites.js",
+    "sha256": "0f9a18356afa369a1b2912caf80e589109a379fc3e019e32ee214e4b002301d2"
+  },
+  {
+    "file": "js/game.js",
+    "sha256": "6b9e865a1912f18e01bb666597f062624be360a4cfc9c2f1eaf674dee611f6b8"
+  },
+  {
+    "file": "tests/game.test.cjs",
+    "sha256": "f2c6956a672d04060f822a0ad4d6ac4a3b62b450968bf250c5d146a4b68b988e"
+  }
+]

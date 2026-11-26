@@ -1,0 +1,55 @@
+{
+  "results": [
+    {
+      "rate": 1,
+      "previewMs": 679,
+      "preview": {
+        "maxHeartbeatGap": 36.59999996423721,
+        "longTasks": []
+      },
+      "commitMs": 529,
+      "commit": {
+        "maxHeartbeatGap": 38.19999998807907,
+        "longTasks": []
+      },
+      "exportMs": 543,
+      "exporting": {
+        "maxHeartbeatGap": 43.10000002384186,
+        "longTasks": []
+      },
+      "bytes": 8960545
+    },
+    {
+      "rate": 4,
+      "previewMs": 2239,
+      "preview": {
+        "maxHeartbeatGap": 105.5,
+        "longTasks": [
+          100,
+          58,
+          77
+        ]
+      },
+      "commitMs": 1708,
+      "commit": {
+        "maxHeartbeatGap": 89,
+        "longTasks": [
+          59,
+          79,
+          61
+        ]
+      },
+      "exportMs": 1679,
+      "exporting": {
+        "maxHeartbeatGap": 90.59999996423721,
+        "longTasks": [
+          59,
+          77,
+          82
+        ]
+      },
+      "bytes": 8960545
+    }
+  ],
+  "note": "20ms heartbeat; 4x CDP CPU slowdown and touch viewport simulate a constrained device, not physical mobile."
+}

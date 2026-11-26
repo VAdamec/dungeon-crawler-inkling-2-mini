@@ -1,0 +1,19 @@
+{
+  "seed": 713,
+  "depths": [
+    1,
+    2,
+    3,
+    5,
+    7,
+    10,
+    40,
+    50,
+    100
+  ],
+  "match": true,
+  "beforeSha256": "2e0c3d6d03635272dc38c17871bf02aae0eb2077001f50db43d7e3629d87b788",
+  "afterSha256": "2e0c3d6d03635272dc38c17871bf02aae0eb2077001f50db43d7e3629d87b788",
+  "compared": "world maps/content/monsters, hero stats, gold/xp/kills/turn, flags/clocks and next RNG values; excludes intentional companion/selection/entry/quotes/hidden-starter metadata",
+  "fixture": "VM helper, new run per depth; generate floor, kill its boss if any, skip defeat, save; no browser rAF"
+}

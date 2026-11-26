@@ -1,0 +1,55 @@
+✖ defeated bosses become tiny companions that chip in and comment ironically (351.756167ms)
+✖ the first boss kill retires Marmalade once before the boss companion joins (248.181083ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 0
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 878.8405
+
+✖ failing tests:
+
+test at ../../../../../private/tmp/dungeon-t1-before/tests/game.test.cjs:2001:1
+✖ defeated bosses become tiny companions that chip in and comment ironically (351.756167ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    [
+  +   'Marmalade',
+  +   'catCompanion'
+  -   'Cook',
+  -   'orc'
+    ]
+  
+      at TestContext.<anonymous> (/private/tmp/dungeon-t1-before/tests/game.test.cjs:2008:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ 'Marmalade', 'catCompanion' ],
+    expected: [ 'Cook', 'orc' ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at ../../../../../private/tmp/dungeon-t1-before/tests/game.test.cjs:2515:1
+✖ the first boss kill retires Marmalade once before the boss companion joins (248.181083ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  'Mimic' !== 'Cook'
+  
+      at TestContext.<anonymous> (/private/tmp/dungeon-t1-before/tests/game.test.cjs:2521:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'Mimic',
+    expected: 'Cook',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

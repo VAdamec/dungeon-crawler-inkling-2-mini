@@ -1,0 +1,41 @@
+✔ teleportTown creates a debug portal without consuming scrolls and returns through it (439.701416ms)
+✔ teleportTown rejects when portal open, in town, or blocked states (363.018167ms)
+✔ addScrolls validates input and updates HUD (248.230125ms)
+✔ console help lists teleportTown and addScrolls (207.998875ms)
+✔ trade menu buy/sell/cancel reverts with DOM fallback compatibility (422.642958ms)
+✔ companion registry and selection state initialize (211.724083ms)
+✖ Pip can be selected as starting companion and auto-joins (207.330458ms)
+✔ boss defeat unlocks companion and adoption selects it (291.279958ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 7
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2513.896958
+
+✖ failing tests:
+
+test at ../../../../../private/tmp/dungeon-p0-audit-20261126/tests/game.test.cjs:2397:1
+✖ Pip can be selected as starting companion and auto-joins (207.330458ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - false
+  
+      at TestContext.<anonymous> (/private/tmp/dungeon-p0-audit-20261126/tests/game.test.cjs:2405:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

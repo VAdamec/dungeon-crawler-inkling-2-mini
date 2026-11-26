@@ -1,0 +1,29 @@
+--- before/js/game.js
++++ after/js/game.js
+@@ -3735,8 +3735,15 @@
+   render();
+ }
+ 
+-function teleportTown() {
+-  if (!state.started || state.gameOver || state.ending || state.helpOpen || state.pause || bossCinematicActive()) {
++function teleportTown(...args) {
++  if (args.length) { consoleMessage('Usage: teleportTown'); return; }
++  // The console itself is allowed; player menus and hidden simulation are not.
++  // Check DOM visibility too while the companion prototype has no session state.
++  const roster = document.getElementById('companionOverlay');
++  const trade = document.getElementById('tradeOverlay');
++  if (!state.started || state.gameOver || state.player.hp <= 0 || document.hidden
++    || state.ending || state.helpOpen || state.pause || bossCinematicActive()
++    || state.trade || state.companionPicker || (roster && !roster.hidden) || (trade && !trade.hidden)) {
+     consoleMessage('Cannot teleport now.'); return;
+   }
+   if (state.area === 'town') { consoleMessage('Already in town.'); return; }
+@@ -3772,7 +3779,7 @@
+   const command = name.toLowerCase();
+   if (command === 'loadlevel') loadLevel(args[0]);
+   else if (command === 'godmode') setGodMode(args[0]);
+-  else if (command === 'teleporttown') teleportTown();
++  else if (command === 'teleporttown') teleportTown(...args);
+   else if (command === 'addscrolls') addScrolls(args[0]);
+   else if (command === 'clear') { state.consoleLines = []; document.getElementById('consoleOutput').textContent = ''; }
+   else if (command === 'help') consoleMessage('loadLevel <1-100> · godMode 0|1 · teleportTown · addScrolls <n> · help · clear');

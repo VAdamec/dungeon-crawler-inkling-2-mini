@@ -1,0 +1,20 @@
+✔ floors preserve layout, exploration, collected loot, and current progression on round trips (524.636708ms)
+✔ ring pickup increases real HP, replacement does not stack, and selling removes only the gear health bonus (317.919333ms)
+✔ merchant ring purchase applies health and gear bonuses persist across floor changes (416.48425ms)
+✔ hidden key carrier drops a key, stairs stay locked until Space collects it, and unlock persists (508.055ms)
+✔ uncollected key drop survives travel and another carrier death without duplication (421.992291ms)
+✔ key pickup takes priority over stairs and NPC interaction on the same tile (342.299042ms)
+✔ hazard clocks and warnings freeze during pauses, hidden tabs, launch, and absence from the floor (478.16425ms)
+✔ depth 50 has a saved throne room with bone volleys and summoned guards (281.336542ms)
+✔ Town Scroll return reuses the saved floor instead of regenerating it (348.354292ms)
+✔ Town Scroll return resolves blocked exit tiles safely (318.433292ms)
+✔ Town Scroll portal survives dungeon travel but clears on retreat, death, ending, and restart (451.042542ms)
+✔ T2 addScrolls rejects unsafe totals without losing the exact safe-integer boundary (286.012833ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4809.498875

@@ -1,0 +1,10 @@
+{
+  "version": "2.1.0",
+  "launchVersion": "v2.1.0",
+  "saveFormatVersion": 1,
+  "exportVersion": "2.1.0",
+  "previousBrandedV1FileAccepted": true,
+  "exactDurableRun": true,
+  "nativeGR09": "unverified",
+  "scope": "VM/DOM-stub version and save compatibility checks; no native/browser/manual acceptance claim"
+}

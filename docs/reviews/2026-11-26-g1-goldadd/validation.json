@@ -1,0 +1,33 @@
+{
+  "date": "2026-11-26",
+  "phase": "G1",
+  "status": "complete",
+  "fullGameTests": 229,
+  "focusedTests": 19,
+  "newRegressionGroups": 5,
+  "previewTests": 27,
+  "originalRuntimeNewTestsFailed": 5,
+  "syntax": [
+    "js/art-runtime.js",
+    "js/sprites.js",
+    "js/game.js",
+    "tests/game.test.cjs",
+    "docs/reviews/2026-11-26-g1-goldadd/check-browser.cjs"
+  ],
+  "deterministicBake": "pass, non-writing --check",
+  "externalSmoke": "SMOKE_OK",
+  "actualFileBrowser": [
+    "Chrome desktop 1440x1000",
+    "Chrome touch-emulated mobile 390x844"
+  ],
+  "browserErrors": 0,
+  "remoteRequests": 0,
+  "screenshotsInspected": true,
+  "localMarkdownLinksChecked": 145,
+  "diffWhitespaceCheck": "pass",
+  "runtimeChanges": "js/game.js gold helper/dispatch/discovery only",
+  "nativeBackgroundTabObserved": false,
+  "saveLoadImplemented": false,
+  "marketImplemented": false,
+  "stagedCommittedReleased": false
+}

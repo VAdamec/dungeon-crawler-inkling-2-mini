@@ -1,0 +1,59 @@
+diff --git a/tmp/dungeon-s3-before/index.html b/index.html
+index 5d32009..60df8fc 100644
+--- a/tmp/dungeon-s3-before/index.html
++++ b/index.html
+@@ -35,6 +35,8 @@
+       </div>
+     </div>
+     <button id="startGame" type="button">Enter the dungeon <span aria-hidden="true">◆</span></button>
++    <button id="launchLoadGame" type="button">Load adventure</button>
++    <p id="launchFileStatus" class="file-status" role="status" aria-live="polite"></p>
+     <p class="launch-hint">Arrow keys choose a companion · Enter starts</p>
+     <p id="launchVersion" class="launch-version"></p>
+   </div>
+@@ -98,6 +100,8 @@
+     <h2 id="ovTitle">GAME OVER</h2>
+     <p id="ovText"></p>
+     <p>Press <b>R</b> to restart</p>
++    <button id="deathLoadGame" type="button">Load adventure</button>
++    <p id="deathFileStatus" class="file-status" role="status" aria-live="polite"></p>
+   </div>
+ <div id="endingControls" hidden><button id="skipEnding" type="button">Skip to sunset (Esc)</button><button id="restartEnding" type="button">New adventure (R)</button></div>
+ </div>
+@@ -166,6 +170,12 @@
+   <p><strong>Tips:</strong> Rest at the Inn. Recruit your starter with Space. Switch at the companion post near the Inn. Collect a monster’s key before descending at ▼. Low health pauses the action; critical health offers retreat.</p>
+   <p><strong>R</strong> starts a new adventure. <strong>Esc</strong> skips a boss scene or ending.</p>
+ </div>
++<section id="saveFileControls" aria-labelledby="saveFileTitle">
++  <h3 id="saveFileTitle">Your adventure</h3>
++  <p>Save to a file. Choose that file later to continue.</p>
++  <div class="file-actions"><button id="saveGameButton" type="button">Save game</button><button id="loadGameButton" type="button">Load game</button></div>
++  <p id="saveGameStatus" class="file-status" role="status" aria-live="polite"></p>
++</section>
+ <div id="audioControls">
+   <button id="audioToggle" type="button" aria-pressed="true">Sound: on (M)</button>
+   <label for="musicVolume">Music <input id="musicVolume" type="range" min="0" max="100" value="45"> <output id="musicVolumeText" for="musicVolume">45%</output></label>
+@@ -176,6 +186,23 @@
+     </div>
+   </section>
+ </div>
++<div id="saveLoadOverlay" role="dialog" aria-modal="true" aria-labelledby="saveLoadTitle" aria-describedby="saveLoadHint" hidden>
++  <section class="help-dialog save-load-dialog">
++    <header class="help-header"><div><h2 id="saveLoadTitle">Load adventure</h2><p id="saveLoadHint">Choose a save file, review it, then load. Cancel keeps your current adventure.</p></div></header>
++    <div class="help-content save-load-content">
++      <label for="saveLoadFile">Choose a saved adventure (.json)</label>
++      <div id="saveLoadFileHost"></div>
++      <p id="saveLoadSelectedFile" class="file-status"></p>
++      <p id="saveLoadStatus" class="file-status" role="status" aria-live="polite"></p>
++      <p id="saveLoadPreview" tabindex="-1" hidden></p>
++    </div>
++    <footer class="save-load-footer">
++      <button id="confirmSaveLoad" type="button" disabled>Load adventure</button>
++      <button id="cancelSaveLoad" type="button">Cancel (Esc)</button>
++      <button id="saveLoadAudioToggle" type="button">Sound (M)</button>
++    </footer>
++  </section>
++</div>
+ <div id="devConsole" role="dialog" aria-label="Developer console" hidden>
+   <div class="console-header"><b>DEV CONSOLE</b><span>~ / Esc to close</span></div>
+   <pre id="consoleOutput" aria-live="polite"></pre>

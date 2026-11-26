@@ -1,0 +1,22 @@
+✔ teleportTown creates a debug portal without consuming scrolls and returns through it (419.788209ms)
+✔ teleportTown rejects when portal open, in town, or blocked states (343.759291ms)
+✔ T1 debug portal rejects extra arguments atomically and accepts case-insensitive zero-argument commands (294.4065ms)
+✔ T1 debug portal rejects hidden, dead, paused, cinematic and player-menu contexts without changing gameplay (2745.48825ms)
+✔ T1 debug travel saves the current floor without healing, RNG, rewards or resource changes (302.651917ms)
+✔ T1 debug portal cannot replace a return point after loadLevel or repeated town commands (352.385292ms)
+✔ T1 J and Space return through the saved debug portal once without regenerating its floor (640.258458ms)
+✔ T1 debug portal uses the existing safe fallback when its return tile becomes blocked (289.925417ms)
+✔ addScrolls validates input and updates HUD (238.024417ms)
+✔ T2 addScrolls rejects non-decimal text and wrong arity without changing gameplay (203.471708ms)
+✔ T2 addScrolls rejects unsafe totals without losing the exact safe-integer boundary (281.740459ms)
+✔ T2 addScrolls rejects inactive, hidden, dead, paused, cinematic and player-menu contexts (2408.724375ms)
+✔ T2 addScrolls changes only the count in town or dungeon, including with an existing portal and god mode (521.082208ms)
+✔ console help lists teleportTown and addScrolls (200.339ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9358.817833

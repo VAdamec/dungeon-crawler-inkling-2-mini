@@ -1,0 +1,214 @@
+✖ M1 shared prices preserve every catalog item/depth including remembered town depth and reject unsafe money (259.165459ms)
+✖ M1 opening snapshot and all pure cart operations stay detached from town/floor aliases and side effects (175.214375ms)
+✖ M1 second and last duplicate stock units use stable local row identities without source-ID writes (151.849792ms)
+✖ M1 only selected gear is sold and draft proceeds fund later purchases without loans (159.907625ms)
+✖ M1 potion, scroll, elixir and spell drafts match actual effects without learning or drinking live (153.2385ms)
+✖ M1 path-correct ring HP and Undo preserve clipping, same-bonus replacement and level-derived health (159.522625ms)
+✖ M1 god-mode preview freezes hero fields while equipment-derived bonuses follow proposed gear (157.572709ms)
+✖ M1 Undo and Reset retain only accepted operations including buy-then-sell and replacement notices (161.91875ms)
+✖ M1 rejects invalid source values and overflowing actions without altering source or accepted history (157.132875ms)
+✖ M1 immutable captured depth/time/stock/spells keep a draft independent of later live changes (169.226417ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 0
+ℹ fail 10
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1824.518041
+
+✖ failing tests:
+
+test at tests/game.test.cjs:5051:1
+✖ M1 shared prices preserve every catalog item/depth including remembered town depth and reject unsafe money (259.165459ms)
+  evalmachine.<anonymous>:1
+  ITEM_TABLE.every(it=>buyPrice(it,1)===Math.round(it.gold*(1.5+(1-1)*.03))
+                                     ^
+  
+  ReferenceError: buyPrice is not defined
+      at evalmachine.<anonymous>:1:36
+      at Array.every (<anonymous>)
+      at evalmachine.<anonymous>:1:12
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:139:21)
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5055:20)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+
+test at tests/game.test.cjs:5063:1
+✖ M1 opening snapshot and all pure cart operations stay detached from town/floor aliases and side effects (175.214375ms)
+  evalmachine.<anonymous>:1
+  window.m1Cart=createTradeDraft(state,state.merchant)
+  ^
+  
+  ReferenceError: createTradeDraft is not defined
+      at evalmachine.<anonymous>:1:1
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:139:21)
+      at m1Cart (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5048:24)
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5070:51)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+
+test at tests/game.test.cjs:5085:1
+✖ M1 second and last duplicate stock units use stable local row identities without source-ID writes (151.849792ms)
+  evalmachine.<anonymous>:1
+  window.m1Cart=createTradeDraft(state,state.merchant)
+  ^
+  
+  ReferenceError: createTradeDraft is not defined
+      at evalmachine.<anonymous>:1:1
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:139:21)
+      at m1Cart (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5048:24)
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5087:87)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+
+test at tests/game.test.cjs:5097:1
+✖ M1 only selected gear is sold and draft proceeds fund later purchases without loans (159.907625ms)
+  evalmachine.<anonymous>:1
+  window.m1Cart=createTradeDraft(state,state.merchant)
+  ^
+  
+  ReferenceError: createTradeDraft is not defined
+      at evalmachine.<anonymous>:1:1
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:139:21)
+      at m1Cart (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5048:24)
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5100:30)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+
+test at tests/game.test.cjs:5110:1
+✖ M1 potion, scroll, elixir and spell drafts match actual effects without learning or drinking live (153.2385ms)
+  evalmachine.<anonymous>:1
+  window.m1Cart=createTradeDraft(state,state.merchant)
+  ^
+  
+  ReferenceError: createTradeDraft is not defined
+      at evalmachine.<anonymous>:1:1
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:139:21)
+      at m1Cart (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5048:24)
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5112:30)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+
+test at tests/game.test.cjs:5125:1
+✖ M1 path-correct ring HP and Undo preserve clipping, same-bonus replacement and level-derived health (159.522625ms)
+  evalmachine.<anonymous>:1
+  window.m1Cart=createTradeDraft(state,state.merchant)
+  ^
+  
+  ReferenceError: createTradeDraft is not defined
+      at evalmachine.<anonymous>:1:1
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:139:21)
+      at m1Cart (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5048:24)
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5129:32)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+
+test at tests/game.test.cjs:5141:1
+✖ M1 god-mode preview freezes hero fields while equipment-derived bonuses follow proposed gear (157.572709ms)
+  evalmachine.<anonymous>:1
+  window.m1Cart=createTradeDraft(state,state.merchant)
+  ^
+  
+  ReferenceError: createTradeDraft is not defined
+      at evalmachine.<anonymous>:1:1
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:139:21)
+      at m1Cart (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5048:24)
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5144:30)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+
+test at tests/game.test.cjs:5152:1
+✖ M1 Undo and Reset retain only accepted operations including buy-then-sell and replacement notices (161.91875ms)
+  evalmachine.<anonymous>:1
+  window.m1Cart=createTradeDraft(state,state.merchant)
+  ^
+  
+  ReferenceError: createTradeDraft is not defined
+      at evalmachine.<anonymous>:1:1
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:139:21)
+      at m1Cart (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5048:24)
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5154:78)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+
+test at tests/game.test.cjs:5168:1
+✖ M1 rejects invalid source values and overflowing actions without altering source or accepted history (157.132875ms)
+  AssertionError [ERR_ASSERTION]: state.gold=-1
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5174:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: evalmachine.<anonymous>:1
+    window.m1Cart=createTradeDraft(state,state.merchant)
+    ^
+    
+    ReferenceError: createTradeDraft is not defined
+        at evalmachine.<anonymous>:1:1
+        at Script.runInContext (node:vm:150:12)
+        at Object.runInContext (node:vm:302:6)
+        at Object.run (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:139:21)
+        at m1Cart (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5048:24)
+        at /Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5174:23
+        at getActual (node:assert:580:5)
+        at strict.throws (node:assert:728:24)
+        at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5174:12)
+        at Test.runInAsyncScope (node:async_hooks:226:14),
+    expected: /Invalid trade:/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests/game.test.cjs:5186:1
+✖ M1 immutable captured depth/time/stock/spells keep a draft independent of later live changes (169.226417ms)
+  evalmachine.<anonymous>:1
+  window.m1Cart=createTradeDraft(state,state.merchant)
+  ^
+  
+  ReferenceError: createTradeDraft is not defined
+      at evalmachine.<anonymous>:1:1
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:139:21)
+      at m1Cart (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5048:24)
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5187:86)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)

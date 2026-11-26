@@ -1,0 +1,27 @@
+✔ dev console toggles with tilde and freezes gameplay while open (299.825542ms)
+✔ teleportTown creates a debug portal without consuming scrolls and returns through it (309.122666ms)
+✔ teleportTown rejects when portal open, in town, or blocked states (351.353375ms)
+✔ T1 debug portal rejects extra arguments atomically and accepts case-insensitive zero-argument commands (305.398958ms)
+✔ T1 debug portal rejects hidden, dead, paused, cinematic and player-menu contexts without changing gameplay (2767.214875ms)
+✔ T1 debug travel saves the current floor without healing, RNG, rewards or resource changes (301.73725ms)
+✔ T1 debug portal cannot replace a return point after loadLevel or repeated town commands (353.585ms)
+✔ T1 debug portal uses the existing safe fallback when its return tile becomes blocked (289.834208ms)
+✔ addScrolls validates input and updates HUD (246.271792ms)
+✔ T2 addScrolls rejects non-decimal text and wrong arity without changing gameplay (205.116833ms)
+✔ T2 addScrolls rejects unsafe totals without losing the exact safe-integer boundary (278.938209ms)
+✔ T2 addScrolls rejects inactive, hidden, dead, paused, cinematic and player-menu contexts (2404.265125ms)
+✔ T2 addScrolls changes only the count in town or dungeon, including with an existing portal and god mode (522.691042ms)
+✔ G1 goldADD adds exactly once in town/dungeon and god mode, changing only gold (1402.748958ms)
+✔ G1 goldADD rejects invalid text, extra arguments and non-string helper inputs atomically (444.948166ms)
+✔ G1 goldADD preserves exact safe-integer limits and rejects invalid current gold (350.923333ms)
+✔ G1 goldADD blocks inactive, hidden, dead, menu and cinematic contexts (3564.256667ms)
+✔ G1 goldADD discovery appears in startup and help reply without depending on command echoes (194.950583ms)
+✔ console help lists teleportTown and addScrolls (192.017917ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 14900.742125

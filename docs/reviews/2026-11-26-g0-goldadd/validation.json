@@ -1,0 +1,17 @@
+{
+  "review": "G0 complete",
+  "implementation": "G1 pending",
+  "focusedExistingTests": {
+    "pass": 14,
+    "fail": 0
+  },
+  "diagnosticContexts": 4,
+  "unknownSubmissions": 12,
+  "syntax": "three snapshot scripts pass",
+  "protectedFilesUnchanged": 10,
+  "fullSuiteRerun": false,
+  "browserAcceptanceRun": false,
+  "localLinksChecked": 26,
+  "brokenLinks": [],
+  "nativeBackgroundVerified": false
+}

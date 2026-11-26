@@ -48,7 +48,7 @@ function makeRecorder(limit = 250000) {
   });
 }
 
-function game(seed = 42, start = true, area = 'dungeon') {
+function game(seed = 42, start = true, area = 'dungeon', withDom = false) {
   const listeners = {};
   const elements = {};
   const calls = makeRecorder();
@@ -82,13 +82,53 @@ function game(seed = 42, start = true, area = 'dungeon') {
   const minimapCtx = new Proxy(minimapCtxBase, {
     set: (t, name, value) => { t[name] = value; recordCall(minimapCalls, 'set', [name, value]); return true; },
   });
+  let fixtureDocument;
+  const nodes=[];
+  function enhance(el,tag='DIV') {
+    el.tagName=tag;el.children=[];el.dataset={};el.attributes={};el.isConnected=true;
+    el.classList={toggle:noop};el.appendChild=child=>{el.children.push(child);child.parentElement=el;if(child.id)elements[child.id]=child;return child;};
+    el.contains=node=>{for(let n=node;n;n=n.parentElement)if(n===el)return true;return false;};
+    el.setAttribute=(name,value)=>{el.attributes[name]=String(value);};el.getAttribute=name=>el.attributes[name]??null;
+    Object.defineProperty(el,'innerHTML',{get:()=>'',set:()=>{for(const child of el.children)child.isConnected=false;el.children=[];}});
+    const matches=(node,selector)=>selector.split(',').some(part=>{
+      part=part.trim();if(part==='button')return node.tagName==='BUTTON';
+      if(part==='[inert]')return !!node.inert;if(part==='[hidden]')return !!node.hidden;
+      if(part.startsWith('[data-companion-')){
+        const field=part.includes('choice')?'companionChoice':'companionId',value=part.match(/="([^"\]]+)"/);
+        return node.dataset[field]!==undefined&&(!value||node.dataset[field]===value[1]);
+      }return false;
+    });
+    el.querySelectorAll=selector=>{const found=[];function visit(node){for(const child of node.children){if(matches(child,selector))found.push(child);visit(child);}}visit(el);return found;};
+    el.closest=selector=>{for(let n=el;n;n=n.parentElement)if(matches(n,selector))return n;return null;};
+    el.focus=()=>{if(!el.disabled&&!el.closest('[hidden], [inert]'))fixtureDocument.activeElement=el;};
+    nodes.push(el);return el;
+  }
   function element(id) {
-    return elements[id] ||= { style: {}, hidden: false, disabled: false,
+    const el=elements[id] ||= { style: {}, hidden: ['tradeOverlay', 'companionOverlay', 'saveLoadOverlay'].includes(id), disabled: false,
       textContent: '', value: '', ariaPressed: '', addEventListener: (name, fn) => { listeners[`${id}:${name}`] = fn; },
       getContext: () => id === 'minimap' ? minimapCtx : ctx, focus: noop };
+    if(withDom&&!el.children)enhance(el,id==='consoleInput'?'INPUT':/startGame|closeCompanionBoard|companionPostAction|companionAudioToggle|saveGameButton|loadGameButton|launchLoadGame|deathLoadGame|confirmSaveLoad|cancelSaveLoad|cancelSavePreparation|saveLoadAudioToggle|closeTrade|cancelTrade|confirmTrade|addTradePurchase|addTradeSale|undoTrade|resetTrade|tradeAudioToggle/.test(id)?'BUTTON':'DIV');
+    return el;
+  }
+  fixtureDocument={getElementById:element,addEventListener:(name,fn)=>{listeners[name]=fn;}};
+  if(withDom){
+    fixtureDocument.createElement=tag=>{const node=enhance({style:{},hidden:false,disabled:false,textContent:'',value:''},tag.toUpperCase());if(tag==='canvas')node.getContext=()=>ctx;return node;};
+    for(const id of ['marmalade','pip']){const btn=enhance({style:{},hidden:false,disabled:false,textContent:'',value:'',addEventListener:(name,fn)=>{listeners[`choice_${id}:${name}`]=fn;}},'BUTTON');
+      btn.dataset.companionChoice=id;element('launchScreen').appendChild(btn);}
+    fixtureDocument.querySelectorAll=selector=>{
+      if(selector.startsWith('[data-companion-choice'))return element('launchScreen').querySelectorAll(selector);
+      return [];
+    };
+    fixtureDocument.querySelector=selector=>fixtureDocument.querySelectorAll(selector)[0]||null;
+    element('gameLayout').appendChild(element('game'));
+    element('gameLayout').appendChild(element('companionPostAction'));
+    const trade=element('tradeOverlay');
+    for(const id of ['closeTrade','tradeBuyList','addTradePurchase','tradeSellList','addTradeSale','undoTrade','resetTrade','confirmTrade','cancelTrade','tradeAudioToggle'])trade.appendChild(element(id));
+    const overlay=element('companionOverlay');
+    for(const id of ['closeCompanionBoard','companionBoardList','companionAudioToggle'])overlay.appendChild(element(id));
   }
   const sandbox = vm.createContext({
-    document: { getElementById: element, addEventListener: (name, fn) => { listeners[name] = fn; } },
+    document: fixtureDocument,
     window: {}, Date, setInterval: noop, console,
     Math: Object.assign(Object.create(Math), { random: () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 2 ** 32) }),
   });
@@ -100,7 +140,7 @@ function game(seed = 42, start = true, area = 'dungeon') {
   return {
     run: code => vm.runInContext(code, sandbox),
     json: code => JSON.parse(vm.runInContext(`JSON.stringify(${code})`, sandbox)),
-    key: (key, extra = {}) => listeners.keydown({ key, preventDefault: noop, ...extra }),
+    key: (key, extra = {}) => listeners.keydown({ key, target:withDom?fixtureDocument.activeElement:undefined, preventDefault: noop, ...extra }),
     click: id => listeners[`${id}:click`](),
     visibility: () => listeners.visibilitychange(), elements, calls, minimapCalls,
   };
@@ -152,7 +192,7 @@ test('merchant purchases, sales, and rescues stay resolved on revisits', () => {
   g.run(`state.gold = 500;
     state.merchant.stock = [{ ...ITEM_TABLE[0] }, { ...ITEM_TABLE[1] }];
     state.player.x = state.merchant.x; state.player.y = state.merchant.y;
-    pickup(); pickup(); sellToMerchant();
+    pickup(); tradeBuy('stock:0'); tradeBuy('stock:1'); confirmTrade(); sellToMerchant(); tradeSell('weapon'); confirmTrade();
     state.player.x = state.prisoner.x; state.player.y = state.prisoner.y; pickup()`);
   const progress = g.json('[state.gold, state.inventory, state.equipment]');
   down(g); up(g);
@@ -615,7 +655,7 @@ test('ring pickup increases real HP, replacement does not stack, and selling rem
   g.run(`state.player.xp=state.player.xpNext-1;
     damageMonster({hp:1,maxHp:1,xp:1,gold:0,name:'Test'},1)`);
   assert.equal(g.run('state.player.maxHp'), 90, 'level-up stacks with equipped ring');
-  g.run(`state.player.hp=89; state.merchant={x:state.player.x,y:state.player.y,stock:[]}; sellToMerchant()`);
+  g.run(`state.player.hp=89; state.merchant={x:state.player.x,y:state.player.y,stock:[]}; sellToMerchant();tradeSell('ring');confirmTrade()`);
   assert.equal(g.run('state.player.maxHp'), 70);
   assert.equal(g.run('state.player.hp'), 70, 'selling clamps HP to new maximum');
   assert.equal(g.elements.gearHpBonus.textContent, '+0');
@@ -625,7 +665,7 @@ test('ring pickup increases real HP, replacement does not stack, and selling rem
 test('merchant ring purchase applies health and gear bonuses persist across floor changes', () => {
   const g = game(); down(g);
   g.run(`state.gold=500; state.merchant.stock=[{...ITEM_TABLE.find(it=>it.kind==='ring')}];
-    state.player.x=state.merchant.x;state.player.y=state.merchant.y;buyFromMerchant()`);
+    state.player.x=state.merchant.x;state.player.y=state.merchant.y;buyFromMerchant();tradeBuy('stock:0');confirmTrade()`);
   assert.equal(g.run('state.player.maxHp'), 80);
   assert.equal(g.run('state.player.hp'), 80);
   down(g); up(g);
@@ -1714,11 +1754,11 @@ test('spellbooks teach spells through treasures and merchants, and knowledge per
   g.run(`state.gold = 200; state.merchant = { x: state.player.x, y: state.player.y, stock: [
     { ...ITEM_TABLE.find(it => it.spell === 'greaterHeal'), id: 100 },
     { ...ITEM_TABLE.find(it => it.spell === 'frostbolt'), id: 101 }
-  ] }; buyFromMerchant();`);
+  ] }; buyFromMerchant();tradeBuy('stock:0');confirmTrade();`);
   assert.equal(g.run('!!state.player.spells.greaterHeal'), true);
   assert.equal(g.run('state.gold'), 200 - Math.round(85 * 1.5));
-  assert.equal(g.run('state.merchant.stock.length'), 1, 'known spellbooks are skipped');
-  g.run('buyFromMerchant()');
+  assert.equal(g.run('state.merchant.stock.length'), 1, 'known spellbook remains in stock');
+  g.run("buyFromMerchant();tradeBuy('stock:0');confirmTrade()");
   assert.equal(g.run('state.gold'), 200 - Math.round(85 * 1.5), 'duplicate knowledge costs no gold');
   const learned = g.json('state.player.spells');
   g.run('enterFloor(2, false)');
@@ -1802,7 +1842,7 @@ test('merchant stock and prices scale with depth on every even non-boss floor', 
   const g = game();
   g.run(`state.depth = 8; state.gold = 500;
     state.merchant = { x: state.player.x, y: state.player.y, isMerchant: true,
-      stock: [{ ...ITEM_TABLE[1], id: 100 }] }; buyFromMerchant();`);
+      stock: [{ ...ITEM_TABLE[1], id: 100 }] }; buyFromMerchant();tradeBuy('stock:0');confirmTrade();`);
   assert.equal(g.run('state.gold'), 500 - Math.round(40 * (1.5 + 7 * 0.03)));
   assert.equal(g.run('merchantStock().length'), 5);
   g.run('enterFloor(6, false)');
@@ -2005,7 +2045,7 @@ test('defeated bosses become tiny companions that chip in and comment ironically
     state.monsters = [{ id: 99, name: 'Cook', sprite: 'orc', hp: 1, maxHp: 1,
       atk: 1, def: 0, xp: 1, gold: 0, x: state.player.x + 1, y: state.player.y, isBoss: true }]`);
   g.key('f');
-  assert.deepEqual(g.json('[state.companion.name, state.companion.sprite]'), ['Cook', 'orc']);
+  assert.deepEqual(g.json('[state.companion.name, state.companion.sprite]'), ['Cook', 'cook']);
   assert.equal(g.run(`Math.max(Math.abs(state.companion.x - state.player.x), Math.abs(state.companion.y - state.player.y)) <= 1 &&
     state.map[state.companion.y][state.companion.x] === 0 &&
     !(state.companion.x === state.player.x && state.companion.y === state.player.y)`), true);
@@ -2085,7 +2125,7 @@ test('Inn and Store serve the town without advancing dungeon timers', () => {
   assert.equal(g.run('state.player.hp'), g.run('state.player.maxHp'));
   assert.equal(g.run('state.player.mp'), g.run('state.player.maxMp'));
   assert.equal(g.run('state.pause'), null);
-  g.run('state.gold = 500; state.player.x = state.merchant.x; state.player.y = state.merchant.y; pickup()');
+  g.run('state.gold = 500; state.player.x = state.merchant.x; state.player.y = state.merchant.y; pickup();tradeBuy("stock:0");confirmTrade()');
   assert.equal(g.run('state.merchant.stock.length'), 5);
   assert.equal(g.run('state.inventory.length'), 1);
   assert.equal(g.run('state.gold < 500'), true);
@@ -2143,7 +2183,7 @@ test('town is fully visible, decorated, populated, and keeps the player clear of
 
 test('the town gate enters floor one and town progress survives a return', () => {
   const g = game(42, true, 'town');
-  g.run('state.gold = 500; state.player.x = state.merchant.x; state.player.y = state.merchant.y; pickup()');
+  g.run('state.gold = 500; state.player.x = state.merchant.x; state.player.y = state.merchant.y; pickup();tradeBuy("stock:0");confirmTrade()');
   const stock = g.run('state.merchant.stock.length');
   g.run('state.player.x = state.townGate.x; state.player.y = state.townGate.y; pickup()');
   assert.equal(g.run('state.area'), 'dungeon');
@@ -2186,7 +2226,7 @@ test('Town Scroll can be bought, found, and counted without mixing with potions'
   const g = game(42, true, 'town');
   g.run(`state.gold = 500;
     state.merchant.stock = [{ ...ITEM_TABLE.find(item => item.name === 'Town Scroll'), id: 900 }];
-    state.player.x = state.merchant.x; state.player.y = state.merchant.y; pickup()`);
+    state.player.x = state.merchant.x; state.player.y = state.merchant.y; pickup();tradeBuy('stock:0');confirmTrade()`);
   assert.equal(g.run('state.townScrolls'), 1);
   assert.equal(g.run('state.inventory.length'), 0);
   assert.match(g.elements.spellList.textContent, /J Town Scroll \(1\)/);
@@ -2305,6 +2345,831 @@ test('help and HUD describe Town Scroll availability and portal state', () => {
   g.run('state.townPortalOpen = true; render()');
   assert.match(g.elements.spellList.textContent, /J Town Portal \(ready\)/);
   assert.match(g.elements.objective.textContent, /portal/i);
+});
+
+test('teleportTown creates a debug portal without consuming scrolls and returns through it', () => {
+  const g = game();
+  g.run('enterFloor(2,false); state.townScrolls = 3; state.player.x=12; state.player.y=9; state.map[9][12]=0;');
+  g.key('`');
+  const input = g.elements.consoleInput;
+  input.value = 'teleportTown'; g.key('Enter', { target: input });
+  assert.equal(g.run('state.area'), 'town');
+  assert.equal(g.run('state.townScrolls'), 3);
+  assert.deepEqual(g.json('state.townExit'), { depth: 2, x: 12, y: 9, reason: 'cheat' });
+  assert.equal(g.run('state.townPortalOpen'), true);
+  assert.ok(g.elements.consoleOutput.textContent.includes('Teleported to town; debug portal open.'));
+  g.run('closeConsole(); state.player.x = state.townGate.x; state.player.y = state.townGate.y; pickup()');
+  assert.equal(g.run('state.area'), 'dungeon');
+  assert.deepEqual(g.json('[state.depth,state.player.x,state.player.y]'), [2, 12, 9]);
+  assert.equal(g.run('state.townPortalOpen'), false);
+  assert.equal(g.run('state.townExit'), null);
+  assert.match(g.json('state.messages.at(-1)'), /debug portal/);
+});
+
+test('teleportTown rejects when portal open, in town, or blocked states', () => {
+  const g = game();
+  g.run('state.townPortalOpen = true; state.townExit = {depth:1,x:1,y:1,reason:"scroll"};');
+  g.key('`'); const input = g.elements.consoleInput;
+  input.value = 'teleportTown'; g.key('Enter', { target: input });
+  assert.ok(g.elements.consoleOutput.textContent.includes('already open'));
+  assert.equal(g.run('state.area'), 'dungeon');
+  g.run('closeConsole(); enterTown(); render();');
+  g.key('`'); input.value = 'teleportTown'; g.key('Enter', { target: input });
+  assert.ok(g.elements.consoleOutput.textContent.includes('Already in town.'));
+  g.run('closeConsole(); enterDungeonFromTown(); state.gameOver = true; render();');
+  g.key('`'); input.value = 'teleportTown'; g.key('Enter', { target: input });
+  assert.ok(g.elements.consoleOutput.textContent.includes('Cannot teleport now.'));
+});
+
+function debugPortalSnapshot(g) {
+  return g.json(`({ area:state.area, depth:state.depth, player:state.player,
+    exit:state.townExit, portal:state.townPortalOpen, scrolls:state.townScrolls,
+    gold:state.gold, inventory:state.inventory, equipment:state.equipment, spells:state.spellReadyAt,
+    companion:state.companion, selected:state.selectedCompanion, unlocked:state.unlockedCompanions,
+    floors:state.floors, visited:[...state.visited], map:state.map, hazards:state.hazards,
+    active:state.activeTime, retreat:state.retreatReadyAt, recovery:[state.healElapsed,state.combatElapsed,state.manaRegenAt],
+    pause:state.pause, messages:state.messages, kills:state.kills, turn:state.turn })`);
+}
+
+test('T1 debug portal rejects extra arguments atomically and accepts case-insensitive zero-argument commands', () => {
+  const g = game();
+  g.key('`');
+  for (const command of ['teleportTown extra', 'teleportTown 1 2']) {
+    const before = debugPortalSnapshot(g);
+    g.elements.consoleInput.value = command;
+    g.key('Enter', { target:g.elements.consoleInput });
+    assert.deepEqual(debugPortalSnapshot(g), before, command);
+    assert.match(g.elements.consoleOutput.textContent, /Usage: teleportTown/);
+  }
+  const before = debugPortalSnapshot(g);
+  g.run('teleportTown("extra")');
+  assert.deepEqual(debugPortalSnapshot(g), before, 'direct calls must not ignore arguments either');
+  g.elements.consoleInput.value = '  TeLePoRtToWn  ';
+  g.key('Enter', { target:g.elements.consoleInput });
+  assert.equal(g.run('state.area'), 'town');
+  assert.equal(g.run('state.townExit.reason'), 'cheat');
+});
+
+test('T1 debug portal rejects hidden, dead, paused, cinematic and player-menu contexts without changing gameplay', () => {
+  const cases = [
+    'state.started=false', 'state.gameOver=true', 'state.player.hp=0', 'document.hidden=true',
+    'state.helpOpen=true', 'state.pause={kind:"health"}', 'state.pause={kind:"retreat"}',
+    'state.ending={completed:false}', 'state.bossIntro={completed:false}', 'state.bossDefeat={completed:false}',
+    'state.trade={snapshot:{gold:123}}', 'state.companionPicker={id:123}',
+    'document.getElementById("companionOverlay").hidden=false',
+    'document.getElementById("tradeOverlay").hidden=false',
+  ];
+  for (const setup of cases) {
+    const g = game();
+    g.key('`');
+    g.run(`state.consoleOpen=true; window.t1Sounds=[]; playSound=name=>window.t1Sounds.push(name); ${setup}`);
+    const before = debugPortalSnapshot(g);
+    g.elements.consoleInput.value = 'teleportTown';
+    g.key('Enter', { target:g.elements.consoleInput });
+    assert.deepEqual(debugPortalSnapshot(g), before, setup);
+    assert.match(g.elements.consoleOutput.textContent, /Cannot teleport now/, setup);
+    assert.deepEqual(g.json('window.t1Sounds'), [], setup);
+  }
+});
+
+test('T1 debug travel saves the current floor without healing, RNG, rewards or resource changes', () => {
+  const g = game();
+  g.run(`enterFloor(2,false); state.player.hp=37;state.player.mp=7;state.player.xp=19;
+    state.gold=123;state.townScrolls=3;state.inventory=[{...ITEM_TABLE.find(i=>i.kind==='heal')}];
+    state.activeTime=15;state.retreatReadyAt=72;state.floorKey.collected=true;
+    state.potions=state.potions.slice(1);state.treasures=state.treasures.slice(1);state.visited.add('12,9');
+    window.t1Map=state.map;window.t1World=JSON.stringify([state.map,state.potions,state.treasures,state.merchant,state.floorKey,state.hazards]);
+    window.t1Progress=JSON.stringify([snapshotPlayerStats(),state.equipment,state.inventory,state.gold,state.townScrolls,
+      state.activeTime,state.retreatReadyAt,state.selectedCompanion,state.unlockedCompanions,state.kills,state.turn,
+      state.companion&&[state.companion.id,state.companion.name,state.companion.kind],state.spellReadyAt]);
+    window.t1Sounds=[];playSound=name=>window.t1Sounds.push(name);window.t1Rng=0;
+    const t1Random=Math.random;Math.random=()=>{window.t1Rng++;return t1Random();};`);
+  const exit = g.json('({depth:state.depth,x:state.player.x,y:state.player.y,reason:"cheat"})');
+  g.key('`');
+  g.elements.consoleInput.value = 'teleportTown';
+  g.key('Enter', { target:g.elements.consoleInput });
+  assert.equal(g.run('state.area'), 'town');
+  assert.equal(g.run('state.consoleOpen'), true, 'the command must work with its console open');
+  assert.deepEqual(g.json('state.townExit'), exit);
+  assert.equal(g.run('state.townPortalOpen'), true);
+  assert.equal(g.run('state.floors[2].map===window.t1Map'), true);
+  assert.equal(g.run(`JSON.stringify([state.floors[2].map,state.floors[2].potions,state.floors[2].treasures,
+    state.floors[2].merchant,state.floors[2].floorKey,state.floors[2].hazards])===window.t1World`), true);
+  assert.equal(g.run("state.floors[2].visited.has('12,9')"), true);
+  assert.equal(g.run(`JSON.stringify([snapshotPlayerStats(),state.equipment,state.inventory,state.gold,state.townScrolls,
+    state.activeTime,state.retreatReadyAt,state.selectedCompanion,state.unlockedCompanions,state.kills,state.turn,
+    state.companion&&[state.companion.id,state.companion.name,state.companion.kind],state.spellReadyAt])===window.t1Progress`), true);
+  assert.equal(g.run('window.t1Rng'), 0);
+  assert.equal(g.json('window.t1Sounds').filter(name=>name==='magic').length, 1);
+  assert.equal(g.json('state.messages').filter(line=>line.includes('A debug portal snaps open')).length, 1);
+});
+
+test('T1 debug portal cannot replace a return point after loadLevel or repeated town commands', () => {
+  const g = game();
+  g.key('`');
+  for (const command of ['teleportTown', 'teleportTown', 'loadLevel 2']) {
+    g.elements.consoleInput.value = command;g.key('Enter', { target:g.elements.consoleInput });
+  }
+  const before = debugPortalSnapshot(g);
+  g.elements.consoleInput.value = 'teleportTown';g.key('Enter', { target:g.elements.consoleInput });
+  assert.deepEqual(debugPortalSnapshot(g), before);
+  assert.match(g.elements.consoleOutput.textContent, /already open/);
+  assert.equal(g.run('state.townExit.depth'), 1);
+});
+
+test('T1 J and Space return through the saved debug portal once without regenerating its floor', () => {
+  for (const key of ['j', ' ']) {
+    const g = game();
+    g.run(`enterFloor(2,false);state.townScrolls=3;state.floorKey.collected=true;
+      state.player.x=12;state.player.y=9;state.map[9][12]=0;
+      state.hazards=state.hazards.filter(h=>h.x!==12||h.y!==9);
+      state.merchant=null;state.prisoner=null;state.princess=null;
+      state.potions=state.potions.slice(1);state.treasures=state.treasures.slice(1);
+      window.t1World=JSON.stringify([state.map,state.potions,state.treasures,state.floorKey]);window.t1Map=state.map;`);
+    g.key('`');g.elements.consoleInput.value='teleportTown';g.key('Enter',{target:g.elements.consoleInput});
+    g.key('Escape');
+    g.run('state.player.x=state.townGate.x;state.player.y=state.townGate.y');
+    g.key(key);
+    assert.deepEqual(g.json('[state.area,state.depth,state.player.x,state.player.y]'), ['dungeon',2,12,9], key);
+    assert.equal(g.run('state.map===window.t1Map'), true);
+    assert.equal(g.run('JSON.stringify([state.map,state.potions,state.treasures,state.floorKey])===window.t1World'), true);
+    assert.deepEqual(g.json('[state.townExit,state.townPortalOpen,state.townScrolls]'), [null,false,3]);
+    const before = debugPortalSnapshot(g);
+    assert.equal(g.run('returnThroughTownPortal()'), false);
+    assert.deepEqual(debugPortalSnapshot(g), before);
+  }
+});
+
+test('T1 debug portal uses the existing safe fallback when its return tile becomes blocked', () => {
+  const g = game();
+  g.run(`state.player.x=12;state.player.y=9;state.map[9][12]=0;teleportTown();
+    state.floors[1].map[9][12]=1;window.t1Safe=safeTownExitTile(state.townExit);
+    state.player.x=state.townGate.x;state.player.y=state.townGate.y;`);
+  const safe = g.json('window.t1Safe');
+  assert.notDeepEqual(safe, {x:12,y:9});
+  g.key(' ');
+  assert.deepEqual(g.json('({x:state.player.x,y:state.player.y})'), safe);
+  assert.equal(g.run('state.map[state.player.y][state.player.x]'), 0);
+  assert.deepEqual(g.json('[state.townExit,state.townPortalOpen]'), [null,false]);
+});
+
+test('addScrolls validates input and updates HUD', () => {
+  const g = game();
+  g.key('`'); const input = g.elements.consoleInput;
+  input.value = 'addScrolls 3'; g.key('Enter', { target: input });
+  assert.equal(g.run('state.townScrolls'), 3);
+  assert.match(g.elements.spellList.textContent, /J Town Scroll \(3\)/);
+  assert.ok(g.elements.consoleOutput.textContent.includes('Added 3 Town Scroll(s); total 3.'));
+  for (const bad of ['0', '-1', '1.5', 'abc', '']) {
+    const before = g.run('state.townScrolls');
+    input.value = bad ? `addScrolls ${bad}` : 'addScrolls'; g.key('Enter', { target: input });
+    assert.equal(g.run('state.townScrolls'), before, bad);
+    assert.ok(g.elements.consoleOutput.textContent.includes('Usage: addScrolls <positive integer>'));
+  }
+});
+
+test('T2 addScrolls rejects non-decimal text and wrong arity without changing gameplay', () => {
+  const g = game();
+  g.key('`');
+  const invalid = ['', '0', '-1', '+3', '1.5', '3.0', '1e2', '1E2', '0x10', '0b10',
+    'NaN', 'Infinity', 'abc', '1_000', '1,000', '3 extra', '1 2',
+    '9007199254740992', '9999999999999999999999999999999999999999'];
+  for (const text of invalid) {
+    const before = debugPortalSnapshot(g);
+    g.elements.consoleInput.value = `addScrolls ${text}`;
+    g.key('Enter', {target:g.elements.consoleInput});
+    assert.deepEqual(debugPortalSnapshot(g), before, text);
+    assert.match(g.elements.consoleOutput.textContent, /Usage: addScrolls <positive integer>/, text);
+  }
+  for (const args of ['"3","extra"', '', 'null', 'true', '3', '[3]', '{}', '" 3 "']) {
+    const before = debugPortalSnapshot(g);
+    g.run(`addScrolls(${args})`);
+    assert.deepEqual(debugPortalSnapshot(g), before, `direct helper: ${args}`);
+    assert.match(g.elements.consoleOutput.textContent, /Usage: addScrolls <positive integer>/);
+  }
+});
+
+test('T2 addScrolls rejects unsafe totals without losing the exact safe-integer boundary', () => {
+  const g = game();
+  g.key('`');
+  g.run('state.townScrolls=Number.MAX_SAFE_INTEGER-1');
+  g.elements.consoleInput.value='addScrolls 1';g.key('Enter',{target:g.elements.consoleInput});
+  assert.equal(g.run('state.townScrolls'), Number.MAX_SAFE_INTEGER);
+  for (const total of ['Number.MAX_SAFE_INTEGER', 'Number.MAX_SAFE_INTEGER-1', '-1', 'NaN', 'Infinity', '1.5']) {
+    g.run(`state.townScrolls=${total}`);
+    const before = debugPortalSnapshot(g);
+    g.elements.consoleInput.value='addScrolls 2';g.key('Enter',{target:g.elements.consoleInput});
+    assert.deepEqual(debugPortalSnapshot(g), before, total);
+    assert.match(g.elements.consoleOutput.textContent, /Usage: addScrolls <positive integer>/);
+  }
+  g.run('state.townScrolls=0');
+  g.elements.consoleInput.value=`addScrolls ${Number.MAX_SAFE_INTEGER}`;
+  g.key('Enter',{target:g.elements.consoleInput});
+  assert.equal(g.run('state.townScrolls'), Number.MAX_SAFE_INTEGER);
+});
+
+test('T2 addScrolls rejects inactive, hidden, dead, paused, cinematic and player-menu contexts', () => {
+  const cases = ['state.started=false', 'state.gameOver=true', 'state.player.hp=0', 'document.hidden=true',
+    'state.helpOpen=true', 'state.pause={kind:"health"}', 'state.pause={kind:"retreat"}',
+    'state.ending={completed:false}', 'state.bossIntro={completed:false}', 'state.bossDefeat={completed:false}',
+    'state.trade={snapshot:{gold:123}}', 'state.companionPicker={id:123}',
+    'document.getElementById("companionOverlay").hidden=false',
+    'document.getElementById("tradeOverlay").hidden=false'];
+  for (const [index,setup] of cases.entries()) {
+    const g=game(42,true,index%2?'town':'dungeon');
+    g.key('`');
+    g.run(`window.t2Sounds=[];playSound=name=>window.t2Sounds.push(name);${setup}`);
+    const before=debugPortalSnapshot(g);
+    g.elements.consoleInput.value='addScrolls 3';g.key('Enter',{target:g.elements.consoleInput});
+    assert.deepEqual(debugPortalSnapshot(g),before,setup);
+    assert.match(g.elements.consoleOutput.textContent,/Cannot add scrolls now/,setup);
+    assert.deepEqual(g.json('window.t2Sounds'),[],setup);
+  }
+});
+
+test('T2 addScrolls changes only the count in town or dungeon, including with an existing portal and god mode', () => {
+  for (const area of ['town','dungeon']) {
+    const g=game(42,true,area);
+    g.run(`state.townScrolls=2;state.gold=123;state.player.hp=37;state.player.mp=7;
+      state.activeTime=15;state.retreatReadyAt=72;state.townPortalOpen=true;
+      state.townExit={depth:1,x:12,y:9,reason:'cheat'};setGodMode('1');`);
+    g.key('`');
+    const before=debugPortalSnapshot(g);
+    const godStats=g.json('state.godModeStats');
+    g.run(`window.t2Sounds=[];playSound=name=>window.t2Sounds.push(name);
+      Math.random=()=>{throw new Error('addScrolls must not consume RNG');};`);
+    g.elements.consoleInput.value='  AdDsCrOlLs   0003  ';
+    g.key('Enter',{target:g.elements.consoleInput});
+    const after=debugPortalSnapshot(g);
+    assert.equal(after.scrolls,5);
+    after.scrolls=before.scrolls;
+    assert.deepEqual(after,before,area);
+    assert.deepEqual(g.json('state.godModeStats'),godStats);
+    assert.equal(g.run('state.consoleOpen'),true);
+    assert.equal(String(g.elements.scrolls.textContent),'5');
+    assert.match(g.elements.spellList.textContent,/J Town Portal \(ready\)/);
+    assert.match(g.elements.consoleOutput.textContent,/Added 3 Town Scroll\(s\); total 5\./);
+    assert.deepEqual(g.json('window.t2Sounds'),[]);
+  }
+});
+
+
+// Exclude disposable rendering/UI state while retaining every gameplay field, Sets and nonfinite sentinels.
+function goldSnapshot(g) {
+  return g.run(`JSON.stringify(state, (key,value) => {
+    if (['art','motion','audio','consoleLines','consoleHistory','consoleHistoryIndex','loadSession'].includes(key)) return undefined;
+    if (value instanceof Set) return [...value];
+    if (typeof value==='number' && !Number.isFinite(value)) return String(value);
+    return value;
+  })`);
+}
+
+test('G1 goldADD adds exactly once in town/dungeon and god mode, changing only gold', () => {
+  for (const area of ['town','dungeon']) for (const god of [false,true]) {
+    const g=game(42,true,area);
+    g.run(`state.gold=40;state.player.hp=37;state.player.mp=7;state.activeTime=15;
+      state.retreatReadyAt=72;state.townPortalOpen=true;
+      state.townExit={depth:1,x:12,y:9,reason:'cheat'};${god?"setGodMode('1');":''}`);
+    g.key('`');
+    g.run(`window.g1Renders=0;window.g1Render=render;render=()=>{window.g1Renders++;window.g1Render();};
+      playSound=()=>{throw new Error('goldADD must not play sound');};
+      Math.random=()=>{throw new Error('goldADD must not consume RNG');};`);
+    for (const [command,amount] of [['goldADD 250',250],['  GOLDADD   0003  ',3],['goldadd 1',1]]) {
+      const before=goldSnapshot(g),gold=g.run('state.gold'),renders=g.run('window.g1Renders');
+      g.elements.consoleInput.value=command;g.key('Enter',{target:g.elements.consoleInput});
+      assert.equal(g.run('state.gold'),gold+amount);
+      assert.equal(String(g.elements.gold.textContent),String(gold+amount));
+      assert.equal(g.run('window.g1Renders'),renders+1);
+      assert.match(g.run('state.consoleLines.at(-1)'),new RegExp(`Added ${amount} gold; total ${gold+amount}\\.`));
+      g.run(`state.gold=${gold}`);assert.equal(goldSnapshot(g),before,`${area}/${god}/${command}`);
+      g.run(`state.gold=${gold+amount}`);
+    }
+    assert.equal(g.run('state.consoleOpen'),true);
+  }
+});
+
+test('G1 goldADD rejects invalid text, extra arguments and non-string helper inputs atomically', () => {
+  const g=game();g.key('`');
+  g.run(`state.gold=40;render();Math.random=()=>{throw new Error('invalid gold RNG');};
+    playSound=()=>{throw new Error('invalid gold sound');};`);
+  const invalid=['','0','-1','+3','1.5','3.0','1e2','1E2','0x10','0b10','NaN','Infinity','abc',
+    '1_000','1,000','3 extra','1 2','9007199254740992','9999999999999999999999999999999999999999','٣','３'];
+  for (const text of invalid) {
+    const before=goldSnapshot(g);
+    g.elements.consoleInput.value=`goldADD ${text}`;g.key('Enter',{target:g.elements.consoleInput});
+    assert.equal(goldSnapshot(g),before,text);
+    assert.equal(String(g.elements.gold.textContent),'40');
+    assert.match(g.run('state.consoleLines.at(-1)'),/Usage: goldADD <positive integer>/);
+  }
+  for (const args of ['"3","extra"','','null','undefined','true','3','[3]','{}','" 3 "','"3\\n"']) {
+    const before=goldSnapshot(g);g.run(`addGold(${args})`);
+    assert.equal(goldSnapshot(g),before,`helper ${args}`);
+    assert.match(g.run('state.consoleLines.at(-1)'),/Usage: goldADD <positive integer>/);
+  }
+});
+
+test('G1 goldADD preserves exact safe-integer limits and rejects invalid current gold', () => {
+  const g=game();g.key('`');
+  g.run('state.gold=Number.MAX_SAFE_INTEGER-1;addGold("1")');
+  assert.equal(g.run('state.gold'),Number.MAX_SAFE_INTEGER);
+  assert.equal(String(g.elements.gold.textContent),String(Number.MAX_SAFE_INTEGER));
+  for (const gold of ['Number.MAX_SAFE_INTEGER','Number.MAX_SAFE_INTEGER-1','Number.MAX_SAFE_INTEGER+1',
+    '-1','NaN','Infinity','-Infinity','1.5','"40"','null','undefined']) {
+    g.run(`state.gold=${gold}`);const before=goldSnapshot(g);
+    g.run('addGold("2")');assert.equal(goldSnapshot(g),before,gold);
+    assert.match(g.run('state.consoleLines.at(-1)'),/Usage: goldADD <positive integer>/);
+  }
+  g.run('state.gold=0;addGold("9007199254740991")');
+  assert.equal(g.run('state.gold'),Number.MAX_SAFE_INTEGER);
+});
+
+test('G1 goldADD blocks inactive, hidden, dead, menu and cinematic contexts', () => {
+  const cases=['state.started=false','state.area="invalid"','state.gameOver=true','state.player.hp=0','state.player.hp=-1',
+    'document.hidden=true','state.helpOpen=true','state.pause={kind:"health"}','state.pause={kind:"retreat"}',
+    'state.ending={completed:false}','state.bossIntro={completed:false}','state.bossDefeat={completed:false}',
+    'state.trade={snapshot:{gold:123}}','state.companionPicker={id:123}',
+    'document.getElementById("companionOverlay").hidden=false',
+    'document.getElementById("tradeOverlay").hidden=false'];
+  for (const [index,setup] of cases.entries()) {
+    const g=game(42,true,index%2?'town':'dungeon');g.key('`');
+    g.run(`state.gold=40;render();${setup};Math.random=()=>{throw new Error('blocked gold RNG');};
+      playSound=()=>{throw new Error('blocked gold sound');};`);
+    const before=goldSnapshot(g);g.elements.consoleInput.value='goldADD 250';
+    g.key('Enter',{target:g.elements.consoleInput});
+    assert.equal(goldSnapshot(g),before,setup);
+    assert.equal(String(g.elements.gold.textContent),'40');
+    assert.match(g.run('state.consoleLines.at(-1)'),/Cannot add gold now/,setup);
+  }
+});
+
+test('G1 goldADD discovery appears in startup and help reply without depending on command echoes', () => {
+  const g=game();g.key('`');
+  assert.match(g.run('state.consoleLines[0]'),/goldADD <amount>/);
+  g.elements.consoleInput.value='clear';g.key('Enter',{target:g.elements.consoleInput});
+  g.elements.consoleInput.value='help';g.key('Enter',{target:g.elements.consoleInput});
+  assert.match(g.run('state.consoleLines.at(-1)'),/goldADD <amount>/);
+  assert.equal(g.elements.consoleInput.value,'');
+});
+
+test('console help lists teleportTown and addScrolls', () => {
+  const g = game();
+  g.key('`'); const input = g.elements.consoleInput;
+  assert.ok(g.elements.consoleOutput.textContent.includes('teleportTown'), g.elements.consoleOutput.textContent);
+  assert.ok(g.elements.consoleOutput.textContent.includes('addScrolls'));
+  input.value = 'help'; g.key('Enter', { target: input });
+  assert.ok(g.elements.consoleOutput.textContent.includes('teleportTown · addScrolls <n>'));
+});
+
+test('trade entry helpers always open a cart in the no-DOM harness and never buy or sell immediately', () => {
+  const g=game();g.run(`enterFloor(2,false,true);state.gold=500;equipItem('weapon',{...ITEM_TABLE[1]});
+    state.merchant.stock=[{...ITEM_TABLE[5],id:111}];state.player.x=state.merchant.x;state.player.y=state.merchant.y;buyFromMerchant()`);
+  assert.equal(g.run('state.merchant.stock.length'),1);assert.equal(g.run('state.gold'),500);
+  g.run(`tradeBuy('stock:0');closeTrade(false)`);assert.equal(g.run('state.player.maxHp'),60);assert.equal(g.run('state.gold'),500);
+  g.run(`sellToMerchant()`);assert.equal(g.run('state.equipment.weapon.name'),'Sword');
+  g.run(`tradeSell('weapon');confirmTrade()`);assert.equal(g.run('state.equipment.weapon'),null);assert.equal(g.run('state.gold'),520);
+});
+
+test('companion registry and selection state initialize', () => {
+  const g = game();
+  assert.equal(g.run('!!COMPANIONS.marmalade && !!COMPANIONS.pip && !!COMPANIONS.dragon'), true);
+  assert.deepEqual(g.json('state.unlockedCompanions'), ['marmalade','pip']);
+  assert.equal(g.run('state.selectedCompanion'), 'marmalade');
+  assert.equal(g.run('Object.keys(state.floors).length === 0 || !Object.keys(state.floors[1]||{}).includes("selectedCompanion")'), true);
+});
+
+test('Pip can be selected as starting companion and auto-joins', () => {
+  const g = game(42, true, 'town');
+  g.run('setCompanionChoice("pip"); render()');
+  assert.equal(g.run('state.selectedCompanion'), 'pip');
+  g.run('state.player.x=state.townGate.x; state.player.y=state.townGate.y; pickup()');
+  assert.equal(g.run('state.area'), 'dungeon');
+  assert.equal(g.run('state.companion.name'), 'Pip');
+  assert.equal(g.run('state.companion.behavior || state.companion.kind'), 'sidekick');
+  assert.ok(!g.run('entranceCatActor().hidden'));
+  const pipHidden = g.run(`(() => { const a=((state.town&&state.town.animals)||[]).find(x=>x.name==='Pip'); return a ? !!a.hidden : null; })()`);
+  assert.equal(pipHidden, true);
+});
+
+test('boss defeat unlocks companion and adoption selects it', () => {
+  const g = game();
+  g.run(`enterFloor(5,false,true); const b=state.boss; damageMonster(b,b.hp);`);
+  assert.equal(g.run('state.unlockedCompanions.includes("mimic")'), true);
+  assert.equal(g.run('state.selectedCompanion'), 'mimic');
+  assert.equal(g.run('state.companion.name'), 'Mimic');
+});
+
+
+test('C1 registry roles and string-ID actor poses resolve authored frames for every companion', () => {
+  const g=game();enableMotion(g);
+  const rows=g.json(`(()=>{const rows=[];for(const id of Object.keys(COMPANIONS)){
+    const c=makeCompanion(id,5,5);state.companion=c;
+    for(const direction of ['front','back','left','right'])for(const time of [0,.125,.5,1.5]){
+      state.motion.time=time;state.motion.directions.companion=direction;
+      const pose=actorAnimationPose(c.sprite,c),frame=artFrame(c.sprite,pose.frame,direction);
+      rows.push({id,sprite:c.sprite,scale:c.scale,frame:pose.frame,valid:!!frame&&typeof frame.r==='string'});
+    }}return rows;})()`);
+  const roles={marmalade:'catCompanion',pip:'dog',mimic:'mimic',hydra:'hydra',boar:'boar',medusa:'medusa',
+    wizard:'darkWizard',skeletonKing:'skeletonKing',dragon:'dragonBoss',cook:'cook',bartender:'bartender'};
+  for(const row of rows){assert.equal(row.sprite,roles[row.id]);assert.equal(row.valid,true,JSON.stringify(row));
+    assert.ok(Number.isInteger(row.frame)&&row.frame>=0&&row.frame<4,JSON.stringify(row));
+    assert.equal(row.scale,row.id==='marmalade'?1.5:row.id==='pip'?.7:.55);}
+  assert.equal(g.run("makeCompanion('missing',5,5)"),null);
+  assert.equal(g.run("actorAnimationPose('dragonBoss',{id:7}).frame"),3,'numeric monster phase stays unchanged at time 1.5');
+});
+
+test('C1 restart, death and ending reset companion run progress without reopening branding', () => {
+  for(const end of ['restart','death','ending']){
+    const g=game();
+    g.run(`unlockCompanion('mimic');activateCompanion('mimic');state.companionChoice='pip';
+      state.companionPicker={old:true};document.getElementById('companionOverlay').hidden=false;`);
+    if(end==='restart')g.run('newGame()');
+    else if(end==='death')g.run('gameOver(false)');
+    else reachEnding(g);
+    assert.deepEqual(g.json('[state.selectedCompanion,state.companionChoice,state.unlockedCompanions,state.companionEntryDone,state.companionPicker,state.companion]'),
+      ['marmalade','marmalade',['marmalade','pip'],false,null,null],end);
+    assert.equal(g.elements.companionOverlay.hidden,true,end);
+    assert.equal(g.run('state.started'),true);
+    assert.equal(g.elements.launchScreen.hidden,true);
+  }
+});
+
+test('C1 both starters join once across manual recruitment, first descent and town returns', () => {
+  for(const id of ['marmalade','pip'])for(const manual of [false,true]){
+    const g=game(42,true,'town');
+    g.run(`setCompanionChoice('${id}')`);
+    if(manual){assert.equal(g.run('joinSelectedCompanion(false)'),true);g.run('window.c1First=state.companion');}
+    g.run('enterDungeonFromTown()');
+    assert.equal(g.run('state.companion.id'),id);
+    assert.equal(g.run('state.companionEntryDone&&state.entranceCat.entered'),true);
+    if(manual)assert.equal(g.run('state.companion===window.c1First'),true,'first descent preserves manually recruited actor');
+    const before=g.json('[state.companion.id,state.companionAttackAt,state.companionQuoteIndex]');
+    g.run('enterTown();enterDungeonFromTown()');
+    assert.deepEqual(g.json('[state.companion.id,state.companionAttackAt,state.companionQuoteIndex]'),before);
+    assert.equal(g.run('joinSelectedCompanion(true)'),false);
+    assert.equal(g.run("!!entranceCatActor().hidden"),id==='marmalade');
+    assert.equal(g.run("!!state.town.animals.find(a=>a.name==='Pip').hidden"),id==='pip');
+  }
+  const g=game(42,true,'town');
+  g.run("setCompanionChoice('pip');state.entranceCat={recruited:true,entered:true,retired:true}");
+  assert.equal(g.run('joinSelectedCompanion(false)'),true,'Pip does not depend on cat lifecycle latches');
+  assert.equal(g.run('state.companion.id'),'pip');
+});
+
+test('C1 all nine boss species unlock once, adopt correct art and preserve rewards and defeated floors', () => {
+  const g=game();
+  for(const [depth,id] of [[3,'cook'],[5,'mimic'],[7,'bartender'],[10,'hydra'],[20,'boar'],[30,'medusa'],[40,'wizard'],[50,'skeletonKing'],[100,'dragon']]){
+    g.run(`enterFloor(${depth},false,true);clearBossIntro();state.player.xpNext=10000000;
+      window.c1Boss=state.boss;window.c1Before=[state.gold,state.player.xp,state.kills];
+      damageMonster(state.boss,state.boss.hp);`);
+    assert.equal(g.run('state.companion.id'),id);
+    assert.equal(g.run('state.selectedCompanion'),id);
+    assert.equal(g.run(`state.unlockedCompanions.filter(x=>x==='${id}').length`),1);
+    assert.equal(g.run('state.gold-window.c1Before[0]'),g.run('window.c1Boss.gold||0'));
+    assert.equal(g.run('state.player.xp-window.c1Before[1]'),g.run('window.c1Boss.xp'));
+    assert.equal(g.run('state.kills-window.c1Before[2]'),1);
+    const before=g.json('[state.gold,state.player.xp,state.kills,state.unlockedCompanions,state.messages]');
+    g.run('damageMonster(window.c1Boss,1000)');
+    assert.deepEqual(g.json('[state.gold,state.player.xp,state.kills,state.unlockedCompanions,state.messages]'),before);
+    assert.equal(g.run(`state.floors[${depth}].bossDefeated`),true);
+    g.run(`enterTown();enterFloor(${depth},false)`);
+    assert.equal(g.run('state.boss'),null);
+    assert.equal(g.run('state.companion.id'),id);
+    assert.equal(g.run('state.unlockedCompanions.length'),new Set(g.json('state.unlockedCompanions')).size);
+    for(const field of ['companion','selectedCompanion','companionChoice','unlockedCompanions','companionEntryDone','companionPicker']){
+      assert.equal(g.run(`FLOOR_FIELDS.includes('${field}')||Object.hasOwn(state.floors[${depth}],'${field}')||Object.hasOwn(state.town,'${field}')`),false,field);
+    }
+  }
+});
+
+test('C1 activation clears follower motion and restores town starter actors without moving their patrols', () => {
+  const g=game(42,true,'town');enableMotion(g);
+  g.run(`window.c1Animals=JSON.stringify(state.town.animals.map(({hidden,...a})=>a));
+    joinSelectedCompanion(false);state.activeTime=20;state.companionSpeech={text:'old'};
+    state.motion.moves.companion={fromX:100,fromY:100,x:100,y:100,at:0,duration:99};
+    window.c1Move=state.motion.moves.companion;state.motion.directions.companion='back';
+    state.motion.facing.companion=-1;activateCompanion('pip');`);
+  assert.equal(g.run('state.motion.moves.companion===window.c1Move'),false);
+  assert.notEqual(g.run('state.motion.directions.companion'),'back');
+  assert.deepEqual(g.json('[state.companionSpeech,state.companionSpeechReadyAt,state.companionAttackAt]'),[null,20,23]);
+  assert.equal(g.run('!!entranceCatActor().hidden'),false);
+  assert.equal(g.run("!!state.town.animals.find(a=>a.name==='Pip').hidden"),true);
+  g.run("unlockCompanion('cook');activateCompanion('cook')");
+  assert.equal(g.run('!!entranceCatActor().hidden'),false);
+  assert.equal(g.run("!!state.town.animals.find(a=>a.name==='Pip').hidden"),false);
+  assert.equal(g.run('JSON.stringify(state.town.animals.map(({hidden,...a})=>a))===window.c1Animals'),true);
+});
+
+test('C1 invalid or locked selection cannot silently create Marmalade or unlock a boss', () => {
+  const g=game(42,true,'town');
+  const before=g.json('[state.selectedCompanion,state.companionChoice,state.unlockedCompanions,state.companion,state.messages]');
+  g.run("setCompanionChoice('mimic');setCompanionChoice('missing');activateCompanion('mimic');adoptBossCompanion({name:'Mimic'})");
+  assert.deepEqual(g.json('[state.selectedCompanion,state.companionChoice,state.unlockedCompanions,state.companion,state.messages]'),before);
+  assert.equal(g.run("unlockCompanion('missing')"),false);
+  assert.equal(g.run("unlockCompanion('mimic')"),true);
+  const logs=g.run('state.messages.length');
+  assert.equal(g.run("unlockCompanion('mimic')"),false);
+  assert.equal(g.run('state.messages.length'),logs);
+});
+
+test('C1 Marmalade may be reselected after retirement without repeating its once-only remark', () => {
+  const g=game(42,true,'dungeon',true);
+  g.run('enterFloor(5,false,true);damageMonster(state.boss,state.boss.hp);enterTown();state.player.x=state.town.landmarks.companionBoard.x;state.player.y=state.town.landmarks.companionBoard.y;openCompanionBoard();selectCompanion("marmalade",state.companionPicker)');
+  assert.equal(g.run('state.companion.id'),'marmalade');
+  assert.equal(g.run('state.entranceCat.retired'),true);
+  g.run('enterFloor(7,false,true);damageMonster(state.boss,state.boss.hp)');
+  assert.equal(g.run('state.companion.id'),'bartender');
+  assert.equal(g.run('state.messages.filter(m=>/household budget/i.test(m)).length'),1);
+});
+
+test('C1 Pip uses sidekick remarks and nearest deterministic targeting while preserving three-second cadence', () => {
+  const g=game(42,true,'town');
+  g.run(`setCompanionChoice('pip');enterDungeonFromTown();state.player.x=4;state.player.y=5;
+    state.companion.x=5;state.companion.y=5;state.hazards=[];
+    for(let y=3;y<9;y++)for(let x=3;x<10;x++)state.map[y][x]=0;
+    state.monsters=[{id:9,x:8,y:5},{id:6,x:6,y:5},{id:2,x:5,y:6}].map(m=>({...m,name:'Slime',sprite:'slime',hp:10,maxHp:10,def:0,xp:0}));
+    updateCamera();revealAroundPlayer();state.activeTime=20;state.companionAttackAt=0;
+    state.companionSpeechReadyAt=0;Math.random=()=>{throw new Error('companion choice consumed RNG');};
+    companionTalk('boss');companionTick();`);
+  assert.equal(g.run('COMPANION_LINES.sidekick.includes(state.companionSpeech.text)'),true);
+  assert.deepEqual(g.json('state.monsters.map(m=>[m.id,m.hp])'),[[9,10],[6,10],[2,9]]);
+  assert.equal(g.run('state.companionAttackAt'),23);
+  g.run('state.activeTime=22.99;companionTick()');
+  assert.equal(g.run('state.monsters[2].hp'),9);
+  g.run('state.activeTime=23;companionTick()');
+  assert.equal(g.run('state.monsters[2].hp'),8);
+});
+
+function c2AtPost(g) {
+  g.run(`{const c2Post=state.town.landmarks.companionBoard;state.player.x=c2Post.x;state.player.y=c2Post.y;
+    updateCamera();render();document.getElementById('companionPostAction').focus();}`);
+}
+
+test('C2 launch arrows select and focus without starting; Enter or Space explicitly starts with that card', () => {
+  for(const key of ['Enter',' ']){
+    const g=game(42,false,'town',true);
+    g.key('ArrowRight');assert.equal(g.run('state.started'),false);
+    assert.equal(g.run('state.companionChoice'),'pip');
+    assert.equal(g.run('document.activeElement.dataset.companionChoice'),'pip');
+    g.key('ArrowLeft');assert.equal(g.run('state.companionChoice'),'marmalade');
+    g.key('End');assert.equal(g.run('state.companionChoice'),'pip');
+    g.key('Tab');assert.equal(g.run('state.started'),false);
+    g.key(key);assert.equal(g.run('state.started'),true);
+    assert.equal(g.run('state.selectedCompanion'),'pip');
+  }
+  const g=game(42,false,'town',true);g.click('choice_pip');
+  assert.equal(g.run('state.started'),false);assert.equal(g.run('state.companionChoice'),'pip');
+  g.click('startGame');assert.equal(g.run('state.selectedCompanion'),'pip');
+});
+
+test('C2 post is reachable, clear of landmarks and actor paths, and drawn without missing artwork', () => {
+  for(const seed of [1,42,713]){
+    const g=game(seed,true,'town');
+    assert.equal(g.run(`(()=>{const b=state.town.landmarks.companionBoard;
+      return !!b&&state.map[b.y][b.x]===0&&floorDistances(state.map,state.town.spawn).has(b.x+','+b.y)
+      &&![state.inn,state.merchant,state.townGate,state.town.spawn].some(p=>nearbyTile(b.x,b.y,p))
+      &&![...state.town.npcs,...state.town.animals].some(a=>[a,...(a.path||[])].some(p=>p.x===b.x&&p.y===b.y))
+      &&state.props.filter(p=>p.isCompanionBoard).length===1&&!b.sprite;})()`),true);
+    g.run('state.player.x=state.town.landmarks.companionBoard.x;state.player.y=state.town.landmarks.companionBoard.y;updateCamera();clearMovementAnimation()');
+    g.calls.clear();g.run('drawCompanionPost(state.town.landmarks.companionBoard)');
+    assert.ok(g.calls.filter(c=>c[0]==='fillRect').length>=10);
+  }
+});
+
+test('C2 Space recruits either selected starter and never swaps to the other town animal', () => {
+  for(const id of ['pip','marmalade']){
+    const g=game(42,true,'town');
+    g.run(`setCompanionChoice('${id}');const c2Starter=selectedCompanionActor();state.player.x=c2Starter.x;state.player.y=c2Starter.y`);
+    g.key(' ');assert.equal(g.run('state.companion.id'),id);
+    g.run('window.c2Starter=state.companion;enterDungeonFromTown()');
+    assert.equal(g.run('state.companion===window.c2Starter'),true);
+    assert.equal(g.run("!!entranceCatActor().hidden"),id==='marmalade');
+    assert.equal(g.run("!!state.town.animals.find(a=>a.name==='Pip').hidden"),id==='pip');
+  }
+  const g=game(42,true,'town');g.run("setCompanionChoice('marmalade');const c2Other=state.town.animals.find(a=>a.name==='Pip');state.player.x=c2Other.x;state.player.y=c2Other.y");
+  g.key(' ');assert.equal(g.run('state.selectedCompanion'),'marmalade');assert.equal(g.run('state.companion'),null);
+});
+
+test('C2 picker traps focus, preserves cancel and same-choice state, and labels locked companions', () => {
+  const g=game(42,true,'town',true);g.run('joinSelectedCompanion(false)');c2AtPost(g);
+  const before=debugPortalSnapshot(g);g.click('companionPostAction');
+  assert.equal(g.run('!!state.companionPicker'),true);assert.equal(g.elements.gameLayout.inert,true);
+  assert.equal(g.elements.launchScreen.inert,true);assert.equal(g.run('document.activeElement===document.getElementById("closeCompanionBoard")'),true);
+  assert.equal(g.run("document.getElementById('companionOverlay').querySelectorAll('[data-companion-id]').length"),11);
+  assert.equal(g.run("document.getElementById('companionOverlay').querySelectorAll('[data-companion-id]').filter(b=>b.disabled).length"),9);
+  g.key('Tab',{shiftKey:true});assert.equal(g.run('document.activeElement===document.getElementById("companionAudioToggle")'),true);
+  g.key('Tab');assert.equal(g.run('document.activeElement===document.getElementById("closeCompanionBoard")'),true);
+  g.key('ArrowDown');g.key('ArrowDown');assert.equal(g.run('document.activeElement.dataset.companionId'),'pip');
+  assert.deepEqual(debugPortalSnapshot(g),before,'focus is only a preview');
+  g.key('Escape');assert.deepEqual(debugPortalSnapshot(g),before);
+  assert.equal(g.run('state.companionPicker'),null);assert.equal(g.elements.gameLayout.inert,false);
+  assert.equal(g.run('document.activeElement===document.getElementById("companionPostAction")'),true);
+  g.click('companionPostAction');
+  g.run("document.getElementById('companionBoardList').querySelectorAll('[data-companion-id]').find(b=>b.dataset.companionId==='marmalade').onclick()");
+  assert.deepEqual(debugPortalSnapshot(g),before,'keeping the active companion cannot reset attack/speech readiness');
+});
+
+test('C2 confirmed choice applies once; locked, stale, moved and closed-session callbacks cannot select', () => {
+  const g=game(42,true,'town',true);c2AtPost(g);g.click('companionPostAction');
+  g.run("window.c2Old=state.companionPicker;window.c2OldChoose=document.getElementById('companionBoardList').querySelectorAll('[data-companion-id]').find(b=>b.dataset.companionId==='pip').onclick");
+  let before=debugPortalSnapshot(g);
+  assert.equal(g.run("selectCompanion('mimic',state.companionPicker)"),false);
+  assert.deepEqual(debugPortalSnapshot(g),before);
+  g.key('Escape');g.click('companionPostAction');before=debugPortalSnapshot(g);
+  g.run('window.c2OldChoose();closeCompanionBoard(window.c2Old)');assert.deepEqual(debugPortalSnapshot(g),before);
+  assert.equal(g.run('!!state.companionPicker'),true);
+  g.run('state.player.x+=5');before=debugPortalSnapshot(g);
+  assert.equal(g.run("selectCompanion('pip',state.companionPicker)"),false);
+  assert.deepEqual(debugPortalSnapshot(g),before);g.key('Escape');c2AtPost(g);g.click('companionPostAction');
+  g.run("window.c2Choose=document.getElementById('companionBoardList').querySelectorAll('[data-companion-id]').find(b=>b.dataset.companionId==='pip').onclick;window.c2Choose()");
+  assert.equal(g.run('state.companion.id'),'pip');assert.equal(g.run('state.companionPicker'),null);
+  before=debugPortalSnapshot(g);g.run('window.c2Choose();window.c2OldChoose()');assert.deepEqual(debugPortalSnapshot(g),before);
+});
+
+test('C2 picker rejects launch, dungeon, distance, hidden and conflicting overlays', () => {
+  const cases=['state.started=false',"state.area='dungeon'",'state.player.x+=5','state.gameOver=true','state.player.hp=0',
+    'document.hidden=true','state.helpOpen=true','state.consoleOpen=true','state.trade={}',
+    'state.pause={kind:"health"}','state.pause={kind:"retreat"}','state.ending={completed:false}',
+    'state.bossIntro={completed:false}','state.bossDefeat={completed:false}'];
+  for(const setup of cases){const g=game(42,true,'town',true);c2AtPost(g);g.run(setup);
+    const before=debugPortalSnapshot(g);assert.equal(g.run('openCompanionBoard()'),false,setup);
+    assert.deepEqual(debugPortalSnapshot(g),before,setup);assert.equal(g.run('state.companionPicker'),null);}
+});
+
+test('C2 picker freezes actions and town motion, blocks nested overlays and supports M and R', () => {
+  const g=game(42,true,'town',true);enableMotion(g);c2AtPost(g);g.click('companionPostAction');
+  const before=debugPortalSnapshot(g),town=g.json('[state.town.tick,state.town.npcs,state.town.animals,state.motion.time]');
+  g.key('?');g.key('`');g.key('ArrowRight');g.key('f');g.key('j');
+  g.run('openHelp();openConsole();openTrade();townTick();enemyTick();advanceMotion(50);advanceActiveTime(50);movePlayer(1,0);pickup();useTownScroll();castSpell("heal");restAtInn()');
+  assert.deepEqual(debugPortalSnapshot(g),before);
+  assert.deepEqual(g.json('[state.town.tick,state.town.npcs,state.town.animals,state.motion.time]'),town);
+  assert.deepEqual(g.json('[state.helpOpen,state.consoleOpen]'),[false,false]);
+  const enabled=g.run('state.audio.enabled');g.key('m');assert.equal(g.run('state.audio.enabled'),!enabled);
+  assert.equal(g.run('!!state.companionPicker'),true);
+  g.key('r');assert.equal(g.run('state.companionPicker'),null);assert.equal(g.elements.companionOverlay.hidden,true);
+  assert.equal(g.elements.launchScreen.hidden,true);assert.equal(g.elements.gameLayout.inert,false);
+  assert.equal(g.run('state.audio.enabled'),!enabled);assert.equal(g.run('state.selectedCompanion'),'marmalade');
+});
+
+test('C2 forced travel, loadLevel and death discard a picker before old choices can act', () => {
+  for(const action of ['enterFloor(2,false)','loadLevel("2")','gameOver(false)']){
+    const g=game(42,true,'town',true);c2AtPost(g);g.click('companionPostAction');
+    g.run(`window.c2Stale=state.companionPicker;${action}`);
+    const before=debugPortalSnapshot(g);g.run("selectCompanion('pip',window.c2Stale)");
+    assert.deepEqual(debugPortalSnapshot(g),before,action);
+    assert.equal(g.run('state.companionPicker'),null);assert.equal(g.elements.companionOverlay.hidden,true);
+    assert.equal(g.elements.gameLayout.inert,false);
+  }
+});
+
+function c3Snapshot(g) {
+  return [debugPortalSnapshot(g),g.json('[state.monsters,state.companionAttackAt,state.companionSpeech,state.companionSpeechReadyAt,state.motion.time,state.motion.projectiles,state.hazardTime]')];
+}
+
+function c3CombatFixture(g) {
+  g.run(`state.player.x=5;state.player.y=5;state.player.hp=37;state.player.mp=0;
+    state.companion.x=6;state.companion.y=5;state.activeTime=20;state.companionAttackAt=0;
+    state.combatElapsed=10;state.healElapsed=0;state.manaRegenAt=0;state.pause=null;
+    for(let y=2;y<=11;y++)for(let x=2;x<=13;x++)state.map[y][x]=0;
+    state.monsters=[{id:1,name:'Bat',sprite:'bat',x:7,y:5,hp:100,maxHp:100,def:0,xp:0}];
+    state.hazards=[{type:'rocks',x:5,y:5,revealed:true,stage:'warning',impactAt:0}];
+    clearBossIntro();clearBossDefeat();updateCamera();revealAroundPlayer();`);
+}
+
+test('C3 simulation helpers independently freeze companion combat, hazards, recovery, mana and motion', () => {
+  const cases=['state.started=false','state.gameOver=true','document.hidden=true','state.helpOpen=true',
+    'state.consoleOpen=true','state.pause={kind:"health"}','state.pause={kind:"retreat"}',
+    'state.trade={}','state.companionPicker={}','state.ending={completed:false}',
+    'state.bossIntro={completed:false}','state.bossDefeat={completed:false}'];
+  for(const setup of cases){
+    const g=game();enableMotion(g);c3CombatFixture(g);g.run(setup);
+    let before=c3Snapshot(g);g.run('companionTick();hazardTick();applyPlayerHazards()');
+    assert.deepEqual(c3Snapshot(g),before,setup+' combat/hazards');
+    g.run('state.monsters=[]');before=c3Snapshot(g);
+    g.run('recoveryTick(10);regenMana();advanceActiveTime(10);advanceMotion(10)');
+    assert.deepEqual(c3Snapshot(g),before,setup+' recovery/clocks');
+  }
+});
+
+test('C3 direct retreat cannot journal or stack a pause behind a companion picker', () => {
+  const g=game(42,true,'town',true);c2AtPost(g);g.click('companionPostAction');
+  const before=c3Snapshot(g);g.run('retreat();confirmRetreat();cancelRetreat();continueGame()');
+  assert.deepEqual(c3Snapshot(g),before);assert.equal(g.run('!!state.companionPicker'),true);
+});
+
+test('C3 all companion identities and deadlines survive stairs, scroll returns and retreat', () => {
+  const g=game(42,true,'town',true);
+  for(const id of g.json('Object.keys(COMPANIONS)')){
+    g.run(`enterTown();unlockCompanion('${id}');`);c2AtPost(g);g.click('companionPostAction');
+    g.run(`selectCompanion('${id}',state.companionPicker);window.c3Actor=state.companion;
+      state.player.hp=37;state.player.mp=7;state.activeTime=50;state.retreatReadyAt=0;state.townScrolls=2;
+      window.c3Ready=state.companionAttackAt;window.c3Roster=JSON.stringify(state.unlockedCompanions);enterFloor(2,false);`);
+    const exit=g.json('[state.depth,state.player.x,state.player.y]');
+    g.run('useTownScroll()');assert.equal(g.run('state.area'),'town');
+    assert.equal(g.run('state.companion===window.c3Actor'),true,id);
+    assert.deepEqual(g.json('[state.player.hp,state.player.mp,state.townScrolls]'),[37,7,1]);
+    g.run('useTownScroll()');assert.deepEqual(g.json('[state.depth,state.player.x,state.player.y]'),exit);
+    up(g);assert.equal(g.run('state.depth'),1);g.run('enterFloor(2,false)');
+    assert.equal(g.run('state.companionAttackAt===window.c3Ready'),true,id);
+    g.run('state.player.hp=5;checkHealth();retreat();confirmRetreat()');
+    assert.equal(g.run('state.area'),'town');assert.equal(g.run('state.townExit.reason'),'retreat');
+    assert.equal(g.run('state.player.hp===state.player.maxHp'),true);
+    assert.deepEqual(g.json('[state.player.mp,state.townScrolls,state.retreatReadyAt,state.activeTime]'),[7,1,110,50]);
+    assert.equal(g.run('state.companion===window.c3Actor&&JSON.stringify(state.unlockedCompanions)===window.c3Roster'),true,id);
+    g.run('enterDungeonFromTown()');
+    assert.equal(g.run('state.companion===window.c3Actor&&state.companion.id===state.selectedCompanion'),true,id);
+    assert.equal(g.run('Math.max(Math.abs(state.companion.x-state.player.x),Math.abs(state.companion.y-state.player.y))===1&&companionTileOpen(state.companion.x,state.companion.y)'),true,id);
+    assert.equal(g.run('state.companionAttackAt===window.c3Ready'),true,id);
+    assert.equal(g.run('!!entranceCatActor().hidden'),id==='marmalade');
+    assert.equal(g.run("!!state.town.animals.find(a=>a.name==='Pip').hidden"),id==='pip');
+    for(const field of ['companion','selectedCompanion','unlockedCompanions','companionPicker','companionEntryDone'])
+      assert.equal(g.run(`Object.hasOwn(state.floors[2],'${field}')||Object.hasOwn(state.town,'${field}')`),false,field);
+  }
+});
+
+test('C3 every companion preserves its damage, target policy and three-active-second cadence', () => {
+  const g=game();
+  for(const id of g.json('Object.keys(COMPANIONS)')){
+    g.run(`unlockCompanion('${id}');activateCompanion('${id}');`);
+    c3CombatFixture(g);
+    g.run(`state.hazards=[];state.monsters=[{id:7,name:'Slime',sprite:'slime',x:6,y:6,hp:100,maxHp:100,def:0,xp:0},
+      {id:2,name:'Bat',sprite:'bat',x:7,y:5,hp:100,maxHp:100,def:0,xp:0}];
+      Math.random=()=>{throw new Error('companion consumed RNG');};companionTick()`);
+    assert.deepEqual(g.json('state.monsters.map(m=>m.hp)'),id==='marmalade'?[100,98]:id==='pip'?[100,99]:[99,100],id);
+    assert.equal(g.run('state.companionAttackAt'),23);
+    const hp=g.json('state.monsters.map(m=>m.hp)');g.run('state.activeTime=22.99;companionTick()');
+    assert.deepEqual(g.json('state.monsters.map(m=>m.hp)'),hp,id);
+    g.run('state.activeTime=23;companionTick()');
+    assert.deepEqual(g.json('state.monsters.map(m=>m.hp)'),id==='marmalade'?[100,96]:id==='pip'?[100,98]:[98,100],id);
+  }
+});
+
+test('C3 every companion lights and explores terrain without minimap entity or hidden-spike leakage', () => {
+  const g=game();
+  for(const id of g.json('Object.keys(COMPANIONS)')){
+    g.run(`unlockCompanion('${id}');activateCompanion('${id}');state.player.x=5;state.player.y=5;
+      state.companion.x=8;state.companion.y=5;state.visited=new Set();state.monsters=[];state.props=[];
+      state.stairs=null;state.upstairs=null;state.floorKey=null;state.hazards=[];state.treasures=[];state.potions=[];
+      for(let y=1;y<12;y++)for(let x=1;x<18;x++)state.map[y][x]=0;
+      updateCamera();clearMovementAnimation();revealAroundPlayer();`);
+    assert.equal(g.run("state.visited.has('10,5')"),true,id);assert.equal(g.run('fogLevel(10,5)'),0,id);
+    assert.equal(g.run("state.visited.has('11,5')"),false,id);assert.equal(g.run('fogLevel(13,5)'),3,id);
+    g.minimapCalls.clear();g.run('renderMinimap()');const chart=JSON.stringify(g.minimapCalls.toArray());
+    g.run(`state.monsters=[{id:91,x:15,y:5,sprite:'goblin',hp:10,maxHp:10}];
+      state.hazards=[{type:'spikes',x:10,y:5,revealed:false,triggered:false}];
+      state.potions=[{x:15,y:5}];state.treasures=[{x:15,y:5}];state.floorKey={drop:{x:15,y:5}};`);
+    g.minimapCalls.clear();g.run('renderMinimap()');assert.equal(JSON.stringify(g.minimapCalls.toArray()),chart,id);
+    assert.equal(g.run('state.hazards[0].revealed||state.hazards[0].triggered'),false,id);
+  }
+});
+
+test('C3 hidden picker keeps its session and rejects selection until visibility returns without catch-up', () => {
+  const g=game(42,true,'town',true);enableMotion(g);c2AtPost(g);g.click('companionPostAction');
+  g.run('window.c3Session=state.companionPicker;document.hidden=true');g.visibility();
+  const before=c3Snapshot(g);
+  assert.equal(g.run("selectCompanion('pip',window.c3Session)"),false);
+  g.run('enemyTick();townTick();advanceActiveTime(99);advanceMotion(99)');assert.deepEqual(c3Snapshot(g),before);
+  assert.equal(g.run('state.companionPicker===window.c3Session'),true);
+  g.run('document.hidden=false');g.visibility();
+  assert.equal(g.run('state.motion.lastTimestamp'),null);
+  assert.equal(g.run("selectCompanion('pip',window.c3Session)"),true);
+  assert.equal(g.run('state.companion.id'),'pip');assert.equal(g.run('state.companionPicker'),null);
+  assert.equal(g.elements.gameLayout.inert,false);
+});
+
+test('C3 restart and ending discard picker sessions and cannot resurrect companions via old callbacks', () => {
+  for(const action of ['newGame()',`state.depth=100;state.bossDefeated=true;state.princess={rescued:true};state.boss={hp:0,maxHp:160,sprite:'dragonBoss',isDragon:true};startEnding()`]){
+    const g=game(42,true,'town',true);c2AtPost(g);g.click('companionPostAction');
+    g.run(`window.c3Old=state.companionPicker;window.c3Click=document.getElementById('companionBoardList').querySelectorAll('[data-companion-id]').find(b=>b.dataset.companionId==='pip').onclick;${action}`);
+    const before=c3Snapshot(g);g.run('window.c3Click();closeCompanionBoard(window.c3Old)');
+    assert.deepEqual(c3Snapshot(g),before);assert.equal(g.run('state.companionPicker'),null);
+    assert.equal(g.elements.companionOverlay.hidden,true);assert.equal(g.elements.gameLayout.inert,false);
+    assert.equal(g.run('state.companion'),null);
+  }
+});
+
+test('C3 companion-delivered boss kill awards once, retires Marmalade once and adopts after rewards', () => {
+  const g=game();c3CombatFixture(g);
+  g.run(`state.player.xpNext=1000000;state.hazards=[];state.monsters=[{id:999,name:'Cook',sprite:'orc',
+    x:7,y:5,hp:1,maxHp:1,isBoss:true,def:0,xp:10,gold:11}];
+    window.c3Boss=state.monsters[0];window.c3Rewards=[state.gold,state.player.xp,state.kills];companionTick()`);
+  assert.deepEqual(g.json('[state.gold-window.c3Rewards[0],state.player.xp-window.c3Rewards[1],state.kills-window.c3Rewards[2]]'),[11,10,1]);
+  assert.equal(g.run('state.companion.id'),'cook');assert.equal(g.run('state.bossDefeated&&state.floors[state.depth].bossDefeated'),true);
+  assert.equal(g.run('state.messages.filter(m=>/household budget/i.test(m)).length'),1);
+  assert.equal(g.run("state.unlockedCompanions.filter(id=>id==='cook').length"),1);
+  const before=c3Snapshot(g);g.run('damageMonster(window.c3Boss,1000);companionTick()');assert.deepEqual(c3Snapshot(g),before);
+});
+
+test('C3 companion boss kill stops the current enemy tick before surviving monsters can attack', () => {
+  const g=game();c3CombatFixture(g);
+  g.run(`state.hazards=[];state.player.xpNext=1000000;state.bossIntroSeen=true;state.boss=null;
+    state.monsters=[{id:999,name:'Cook',sprite:'orc',x:7,y:5,hp:1,maxHp:1,isBoss:true,def:0,xp:0,gold:0},
+      {id:12,name:'Guard',sprite:'skeleton',x:8,y:5,hp:100,maxHp:100,ranged:true,range:9,atk:999,nextAttackAt:0}];
+    window.c3EnemyRng=0;Math.random=()=>{window.c3EnemyRng++;return .5;};enemyTick()`);
+  assert.equal(g.run('state.player.hp'),37);
+  assert.equal(g.run('state.gameOver'),false);
+  assert.equal(g.run('bossDefeatActive()'),true);
+  assert.equal(g.run('state.monsters[1].nextAttackAt'),0);
+  assert.equal(g.run('window.c3EnemyRng'),0);
 });
 
 test('a twice-size talking cat waits by the dungeon gate', () => {
@@ -3366,4 +4231,1256 @@ test('GR-09 continuously scaled cinematic poses reuse source-resolution sprite c
   assert.equal(g.run('window.gr09Surfaces'),4,'one raw canvas per authored frame, independent of cinematic scale');
   g.run(`for(let i=0;i<200;i++)drawSprite('knight',100,100,4+i/100,i%4,'back')`);
   assert.equal(g.run('window.gr09Surfaces'),4,'restarts and new scale values do not grow the cache');
+});
+
+const SAVE_TEST_CONTEXT = {createdAt:'2026-11-26T12:00:00.000Z',hidden:false,tradeOpen:false,companionOpen:false};
+function saveFixture(g) { return g.json(`captureSaveData(state,${JSON.stringify(SAVE_TEST_CONTEXT)})`); }
+function saveParse(g, dto) { return g.json(`parseSaveData(${JSON.stringify(JSON.stringify(dto))})`); }
+function saveReject(g, dto, message) {
+  const before=goldSnapshot(g);
+  assert.throws(()=>saveParse(g,dto),/Invalid save:/,message);
+  assert.equal(goldSnapshot(g),before,message);
+}
+
+test('S1 snapshot is detached, deterministic and pure in town/dungeon, overlaying stale caches', () => {
+  for (const area of ['town','dungeon']) {
+    const g=game(713,true,area);
+    g.run(`state.gold=293;state.player.hp=37;state.player.mp=7;state.activeTime=14.75;
+      state.warnedLow=true;state.retreatReadyAt=72.5;state.inventory=[{name:'Potion',kind:'heal',heal:.499}];
+      state.spellReadyAt.fireball=17.25;state.monsterQuoteIndex=7;state.companionQuoteIndex=3;
+      state.helpOpen=true;state.bubble={text:'omit',ttl:5};`);
+    if (area==='dungeon') g.run('state.potions=state.potions.slice(1);state.hazardTime=3.75;state.monsters[0].hp=4;state.monsters[0].nextAttackAt=16.25');
+    else g.run('state.visited=new Set(["38,26"]);state.props=state.props.slice();state.merchant={...state.merchant,stock:state.merchant.stock.slice(1)}');
+    const before=goldSnapshot(g);
+    g.run(`Math.random=()=>{throw new Error('save consumed RNG');};
+      for(const name of ['render','log','playSound','saveFloor','saveTown','equipItem','revealAroundPlayer','activateCompanion','newGame','genLevel','genTown','enterFloor','recreateMonsters'])
+        globalThis[name]=()=>{throw new Error('save called '+name);};`);
+    const dto=saveFixture(g),again=saveFixture(g);
+    assert.deepEqual(dto,again); assert.equal(goldSnapshot(g),before);
+    assert.deepEqual(saveParse(g,dto),dto);
+    assert.equal(dto.run.player.hp,37);assert.equal(dto.run.gold,293);
+    assert.equal('helpOpen' in dto.run,false);assert.equal('art' in dto.run,false);
+    if (area==='dungeon') {
+      assert.equal(dto.run.floors[1].potions.length,g.run('state.potions.length'));
+      assert.notEqual(dto.run.floors[1].potions.length,g.run('state.floors[1].potions.length'));
+      assert.equal(dto.run.floors[1].hazardTime,3.75);
+      assert.equal(dto.run.encounter.monsters[0].hp,4);
+      assert.equal(dto.run.encounter.monsters[0].nextAttackAt,16.25);
+    } else {
+      assert.equal(dto.run.encounter,null);assert.deepEqual(dto.run.town.visited,['38,26']);
+      assert.equal(dto.run.town.store.stock.length,5);
+      assert.equal(g.run('state.town.store.stock.length'),6);
+      assert.equal(dto.run.town.props[dto.run.town.landmarks.companionBoardIndex].isCompanionBoard,true);
+      assert.equal('store' in dto.run.town.landmarks,false);
+    }
+    dto.run.player.hp=1;dto.run.floors[1].map[0][0]=0;
+    assert.equal(g.run('state.player.hp'),37);assert.equal(g.run('state.floors[1].map[0][0]'),1);
+  }
+});
+
+test('S1 XP round trips preserve levels 1 through 100 including unsafe integer thresholds', () => {
+  const g=game(42,true,'town');
+  let threshold=40;
+  for(let level=1;level<=100;level++) {
+    const xpNext=level===100?1:threshold;
+    g.run(`state.player.lvl=${level};state.player.xpNext=${xpNext};state.player.xp=${level===100?0:Math.floor(xpNext/2)}`);
+    const dto=saveFixture(g);assert.deepEqual(saveParse(g,dto),dto);
+    if(level===83||level===99)assert.equal(Number.isSafeInteger(dto.run.player.xpNext),false);
+    threshold=Math.round(threshold*1.5);
+  }
+  const dto=saveFixture(g);dto.run.player.xp=1;saveReject(g,dto,'level cap XP');
+  dto.run.player.xp=0;dto.run.player.xpNext=40;saveReject(g,dto,'threshold mismatch');
+});
+
+test('S1 current encounter keeps corpse order, dead guard history, boss links and negative HP', () => {
+  const g=game();g.run(`render=()=>{};playSound=()=>{};enterFloor(50,false,true);
+    for(let i=0;i<100;i++){for(const m of state.monsters)if(m.isGuard)m.hp=-7;state.activeTime+=6;summonThroneGuards();}
+    state.bossIntroSeen=true;state.player.hp=37;state.monsters[0].hp=-43;`);
+  const before=goldSnapshot(g),dto=saveFixture(g);
+  assert.equal(dto.run.encounter.monsters.filter(m=>m.isGuard).length,200);
+  assert.equal(dto.run.floors[50].monsterSpawns.some(m=>m.isGuard),false);
+  assert.deepEqual(dto.run.encounter.monsters,g.json('state.monsters'));
+  assert.equal(dto.run.encounter.bossId,g.run('state.boss.id'));
+  assert.equal(dto.run.encounter.bossSummonAt,g.run('state.bossSummonAt'));
+  assert.deepEqual(saveParse(g,dto),dto);assert.equal(goldSnapshot(g),before);
+  const bad=structuredClone(dto);bad.run.encounter.bossId=12;saveReject(g,bad,'boss alias');
+  bad.run.encounter.bossId=999;bad.run.encounter.monsters[0].id=bad.run.encounter.monsters[1].id;saveReject(g,bad,'duplicate encounter ID');
+});
+
+test('S1 all eleven companions, ring stats, portals and exact town patrol state round trip', () => {
+  for(const id of ['marmalade','pip','mimic','hydra','boar','medusa','wizard','skeletonKing','dragon','cook','bartender']) {
+    const g=game(42,true,'town');
+    g.run(`unlockCompanion('${id}');activateCompanion('${id}');equipItem('ring',{...ITEM_TABLE[5]});
+      state.player.hp=37;state.townExit={depth:1,x:0,y:0,reason:'cheat'};state.townPortalOpen=true;
+      state.town.npcs[0].pathIndex=2;state.companionAttackAt=12.75;state.retreatReadyAt=80.5;`);
+    const dto=saveFixture(g);assert.deepEqual(saveParse(g,dto),dto);
+    assert.equal(dto.run.player.maxHp,80);assert.equal(dto.run.player.hp,37);
+    assert.equal(dto.run.townExit.x,0);assert.equal(dto.run.town.map[0][0],1);
+    assert.equal(dto.run.companion.id,id);assert.equal(dto.run.companionAttackAt,12.75);
+    assert.equal(dto.run.town.npcs[0].pathIndex,2);assert.equal(dto.run.town.npcs[0].x,34);
+  }
+  const g=game();g.run(`state.townExit={depth:1,x:0,y:0,reason:'scroll'};state.townPortalOpen=true;enterFloor(2,false,true)`);
+  const dto=saveFixture(g);assert.deepEqual(saveParse(g,dto),dto);
+  assert.equal(dto.run.depth,2);assert.equal(dto.run.townExit.depth,1);
+  g.run('enterTown();state.townExit.reason="retreat";state.townPortalOpen=false');
+  const town=saveFixture(g);assert.equal(town.run.depth,2);assert.deepEqual(saveParse(g,town),town);
+});
+
+test('S1 snapshot refuses conflicting contexts but allows own Help and leaves state unchanged', () => {
+  const setups=['state.started=false','state.gameOver=true','state.won=true','state.player.hp=0','state.godMode=true',
+    'state.consoleOpen=true','state.pause={kind:"health"}','state.pause={kind:"retreat"}',
+    'state.trade={}','state.companionPicker={}','state.ending={completed:true}',
+    'state.bossIntro={completed:false}','state.bossDefeat={completed:false}'];
+  for(const setup of setups) {
+    const g=game(42,true,'town');g.run(setup);const before=goldSnapshot(g);
+    assert.throws(()=>saveFixture(g),/Invalid save:/,setup);assert.equal(goldSnapshot(g),before);
+  }
+  const g=game();
+  for(const key of ['hidden','tradeOpen','companionOpen']) {
+    const before=goldSnapshot(g),context={...SAVE_TEST_CONTEXT,[key]:true};
+    assert.throws(()=>g.run(`captureSaveData(state,${JSON.stringify(context)})`),/Invalid save:/,key);
+    assert.equal(goldSnapshot(g),before);
+  }
+  g.run('state.helpOpen=true');assert.ok(saveFixture(g));
+  assert.throws(()=>g.run('captureSaveData(state,{})'),/Invalid save:/);
+});
+
+test('S1 validator rejects malformed, unknown and cross-field data without mutating DTO or game', () => {
+  const g=game(),base=saveFixture(g);
+  const cases=[
+    d=>{d.format='other';},d=>{d.formatVersion=2;},d=>{d.extra=true;},d=>{delete d.run.gold;},
+    d=>{d.run.gold=-1;},d=>{d.run.gold=1.5;},d=>{d.run.gold=Number.MAX_SAFE_INTEGER+1;},
+    d=>{d.gameVersion='x'.repeat(129);},d=>{d.createdAt='2026-02-31T00:00:00.000Z';},
+    d=>{d.run.player.hp=0;},d=>{d.run.player.hp=d.run.player.maxHp+1;},
+    d=>{d.run.player.xpNext=41;},d=>{d.run.player.spells.fake=true;},
+    d=>{d.run.equipment.weapon={...d.run.floors[1].treasures[0],atk:999};},
+    d=>{d.run.inventory=[{name:'Potion',kind:'heal',heal:1}];},
+    d=>{d.run.floors[1].map.pop();},d=>{d.run.floors[1].map[0][0]=3;},
+    d=>{d.run.floors[1].visited=['01,2'];},d=>{d.run.floors[1].visited=['1,2','1,2'];},
+    d=>{d.run.floors[1].visited=['96,0'];},d=>{d.run.floors['01']=d.run.floors[1];},
+    d=>{d.run.floors[1].floorKey.carrierId=999;},
+    d=>{d.run.floors[1].floorKey.collected=true;},
+    d=>{d.run.floors[1].hazards.find(h=>h.type==='spikes').revealed=true;},
+    d=>{d.run.floors[1].hazards.find(h=>h.type==='rocks').stage='warning';},
+    d=>{d.run.floors[1].monsterSpawns[0].hp=1;},
+    d=>{d.run.encounter.monsters[0].sprite='knight';},
+    d=>{d.run.encounter.monsters[0].atk+=1;},
+    d=>{d.run.encounter.monsters[0].id=999;},
+    d=>{d.run.town.landmarks.companionBoardIndex=0;},
+    d=>{d.run.town.props.find(p=>p.sprite==='water').scale=3;},
+    d=>{d.run.town.animals[0].name='Unknown';},
+    d=>{d.run.town.npcs[0].pathIndex=4;},
+    d=>{d.run.selectedCompanion='hydra';},d=>{d.run.companion.id='fake';},
+    d=>{d.run.unlockedCompanions.push('pip');},
+    d=>{d.run.townPortalOpen=true;},
+    d=>{d.run.townExit={depth:2,x:1,y:1,reason:'cheat'};d.run.townPortalOpen=true;},
+    d=>{d.run.messages=['a'.repeat(513)];},d=>{d.run.messages=Array(81).fill('x');}
+  ];
+  for(const [index,mutate] of cases.entries()) {
+    const dto=structuredClone(base);mutate(dto);const text=JSON.stringify(dto);
+    saveReject(g,dto,`case ${index}`);assert.equal(JSON.stringify(dto),text);
+  }
+  for(const text of ['','{','null','[]','{"format":"dungeon-crawler-save"}',
+    '{"__proto__":{"polluted":true}}','{"constructor":{}}','{"prototype":{}}']) {
+    assert.throws(()=>g.run(`parseSaveData(${JSON.stringify(text)})`),/Invalid save:/,text);
+  }
+  assert.equal(g.run('({}).polluted'),undefined);
+});
+
+test('S1 parser bounds bytes and nesting, rejecting non-JSON object hazards without executing code', () => {
+  const g=game(),before=goldSnapshot(g);
+  for(const expression of [
+    '" ".repeat(SAVE_MAX_BYTES+1)',
+    '" ".repeat(SAVE_MAX_BYTES-1)+"é"',
+    '"[".repeat(17)+"0"+"]".repeat(17)'
+  ]) assert.throws(()=>g.run(`parseSaveData(${expression})`),/Invalid save:/,expression);
+  for(const expression of [
+    '({run:NaN})','({run:Infinity})','({run:undefined})','({run:()=>1})','({run:1n})',
+    '({run:new Date()})','({run:new Set()})','(()=>{const a={};a.a=a;return a;})()',
+    '({get run(){throw new Error("getter executed");}})',
+    '({toJSON(){throw new Error("toJSON executed");}})',
+    '({run:Array(3)})','({run:Object.create({gold:2})})',
+    '({run:new Array(4000000).fill(null)})'
+  ]) assert.throws(()=>g.run(`validateSaveData(${expression})`),/Invalid save:/,expression);
+  assert.equal(goldSnapshot(g),before);
+  assert.equal(g.run('saveTextBudget(JSON.stringify("😀é"))'),8);
+  assert.equal(g.run('saveTextBudget(JSON.stringify("[not nesting]"))'),15);
+});
+
+test('S1 valid revealed/spent hazards, key collection, rescue and final boss defeat retain once-only data', () => {
+  const g=game();g.run(`render=()=>{};playSound=()=>{};enterFloor(2,false,true);
+    state.prisoner.rescued=true;state.merchant.stock=state.merchant.stock.slice(2);
+    state.floorKey.dropped=true;state.floorKey.collected=true;state.floorKey.drop=null;
+    state.floors[2].descentRewarded=true;
+    const spikes=state.hazards.find(h=>h.type==='spikes');spikes.triggered=true;spikes.revealed=true;
+    const rocks=state.hazards.find(h=>h.type==='rocks');rocks.triggered=true;rocks.stage='spent';rocks.impactAt=2.75;
+    state.hazardTime=4.5;`);
+  let dto=saveFixture(g);assert.deepEqual(saveParse(g,dto),dto);
+  assert.equal(dto.run.floors[2].descentRewarded,true);assert.equal(dto.run.floors[2].prisoner.rescued,true);
+  g.run(`enterFloor(100,false,true);damageMonster(state.boss,state.boss.hp+7);clearBossDefeat();`);
+  dto=saveFixture(g);assert.deepEqual(saveParse(g,dto),dto);
+  assert.equal(dto.run.floors[100].bossDefeated,true);assert.equal(dto.run.floors[100].princess.rescued,false);
+  assert.equal(dto.run.encounter.monsters.find(m=>m.id===dto.run.encounter.bossId).hp,-7);
+  const gold=dto.run.gold,kills=dto.run.kills;
+  assert.equal(saveParse(g,dto).run.gold,gold);assert.equal(g.run('state.kills'),kills);
+  dto.run.floors[100].princess.rescued=true;saveReject(g,dto,'rescue already ended run');
+  g.run('enterTown();enterFloor(100,false)');
+  dto=saveFixture(g);assert.equal(dto.run.encounter.bossId,null);assert.deepEqual(saveParse(g,dto),dto);
+});
+
+test('S1 structural validator rejects null/wrong record types and hidden executable array properties', () => {
+  const g=game(),base=saveFixture(g);
+  for(const path of ['run.floors','run.town','run.player','run.equipment','run.entranceCat','run.companion',
+    'run.floors.1.rooms.0','run.floors.1.floorKey','run.floors.1.monsterSpawns.0',
+    'run.floors.1.hazards.0','run.floors.1.props.0','run.town.props.0','run.town.animals.0',
+    'run.town.landmarks','run.town.store.stock.0','run.encounter']) {
+    for(const value of [null,1,[],true]) {
+      const dto=structuredClone(base),parts=path.split('.');let parent=dto;
+      for(const key of parts.slice(0,-1))parent=parent[key];parent[parts.at(-1)]=value;
+      // Null companion is an intentionally supported empty party.
+      if(path==='run.companion' && value===null)continue;
+      saveReject(g,dto,`${path}=${JSON.stringify(value)}`);
+    }
+  }
+  assert.throws(()=>g.run(`validateSaveData({run:Object.defineProperty([],'toJSON',{value:()=>{throw new Error('executed');}})})`),/Invalid save:/);
+  assert.throws(()=>g.run('saveStructure(Array.from({length:65},()=>Array(65536).fill(0)))'),/Invalid save: structure exceeds 4000000 nodes/);
+});
+
+test('S1 actual DTO accepts a fully explored 100-floor content-retention fixture below format limits', () => {
+  const g=game(713,true,'town');
+  g.run(`render=()=>{};playSound=()=>{};state.visited=new Set(Array.from({length:W*H},(_,i)=>(i%W)+','+Math.floor(i/W)));saveTown();`);
+  for(let depth=1;depth<=100;depth++)g.run(`enterFloor(${depth},false);state.visited=new Set(Array.from({length:W*H},(_,i)=>(i%W)+','+Math.floor(i/W)));saveFloor()`);
+  g.run(`state.inventory=Array.from({length:10000},()=>({name:'Potion',kind:'heal',heal:0.5999999999999999}));
+    Math.random=()=>{throw new Error('size fixture RNG');};
+    window.s1Text=serializeSaveData(state,${JSON.stringify(SAVE_TEST_CONTEXT)});
+    window.s1Parsed=parseSaveData(window.s1Text);`);
+  assert.equal(g.run('Object.keys(window.s1Parsed.run.floors).length'),100);
+  assert.equal(g.run('window.s1Parsed.run.inventory.length'),10000);
+  assert.ok(g.run('saveTextBudget(window.s1Text)')<32*2**20);
+  assert.ok(g.run('saveStructure(window.s1Parsed)')<4000000);
+  assert.equal(g.run('JSON.stringify(window.s1Parsed)===window.s1Text'),true);
+  assert.equal(g.run('window.s1Parsed.run.floors[50].rooms.some(r=>r.isThroneRoom)'),true);
+});
+
+test('S1 over-limit histories and inventory refuse losslessly rather than pruning live data', () => {
+  for(const field of ['inventory','monsters']) {
+    const g=game();
+    if(field==='inventory')g.run("state.inventory=Array.from({length:65537},()=>({name:'Potion',kind:'heal',heal:.35}))");
+    else g.run('state.monsters=Array.from({length:65537},(_,id)=>({...state.monsters[0],id,hp:-3}))');
+    const before=goldSnapshot(g);
+    assert.throws(()=>saveFixture(g),/Invalid save:/,field);
+    assert.equal(goldSnapshot(g),before);assert.equal(g.run(`state.${field}.length`),65537);
+  }
+});
+
+test('S1 keeps the S0 state inventory explicit and Unicode journal text lossless', () => {
+  const g=game(42,true,'town');
+  const classified=JSON.parse(fs.readFileSync(path.join(__dirname,'../docs/reviews/2026-11-26-s0-save-load/state-classification.json'),'utf8'));
+  assert.deepEqual(g.json('Object.keys(state).filter(k=>k!=="loadSession").sort()'),Object.keys(classified).sort());
+  g.run(`state.messages=['A dragon says: "[hello]" 🐉 é <script>plain text</script>'];`);
+  const dto=saveFixture(g);assert.deepEqual(saveParse(g,dto),dto);
+  assert.deepEqual(dto.run.messages,g.json('state.messages'));
+  assert.equal(g.run('saveTextBudget(" ".repeat(SAVE_MAX_BYTES))'),32*2**20);
+  const detached=g.run(`(()=>{const d=captureSaveData(state,${JSON.stringify(SAVE_TEST_CONTEXT)});const v=validateSaveData(d);
+    v.run.messages[0]='changed';return d.run.messages[0]!==v.run.messages[0];})()`);
+  assert.equal(detached,true);
+});
+
+function s2Snapshot(g) {
+  return g.run(`JSON.stringify(state,(key,value)=>{
+    if (['art','motion','audio','consoleLines','consoleHistory','consoleHistoryIndex','loadSession','lastTick','helpFocus'].includes(key)) return undefined;
+    return value instanceof Set?[...value]:value;
+  })`);
+}
+function s2InstallDto(g, dto) { g.run(`window.s2Dto=JSON.parse(${JSON.stringify(JSON.stringify(dto))})`); }
+function s2Load(g, dto) { s2InstallDto(g,dto); return g.run('commitSaveLoad(beginSaveLoad(),window.s2Dto)'); }
+function s2Aliases(g) {
+  return g.run(`(()=>{const t=state.town,f=state.floors[state.depth];return state.inn===t.landmarks.inn&&state.townGate===t.landmarks.gate
+    &&t.store===t.landmarks.store&&t.props.includes(t.landmarks.companionBoard)
+    &&t.visited instanceof Set&&Object.values(state.floors).every(f=>f.visited instanceof Set)
+    &&(state.area==='town'?state.map===t.map&&state.props===t.props&&state.visited===t.visited&&state.merchant===t.store
+      :FLOOR_FIELDS.every(k=>state[k]===f[k])&&(!state.boss||state.monsters.includes(state.boss)));})()`);
+}
+
+test('S2 detached hydration reconstructs every alias without touching source, live state or action helpers', () => {
+  for(const area of ['town','dungeon']) {
+    const g=game(713,true,area),dto=saveFixture(g);s2InstallDto(g,dto);
+    const before=s2Snapshot(g);
+    g.run(`Math.random=()=>{throw new Error('hydration RNG');};
+      for(const name of ['render','log','playSound','equipItem','activateCompanion','placeCompanionNearPlayer','revealAroundPlayer','saveTown','saveFloor','newGame','genLevel','genTown','enterFloor','recreateMonsters'])
+        globalThis[name]=()=>{throw new Error('hydration called '+name);};
+      window.s2Candidate=hydrateSaveData(window.s2Dto);`);
+    assert.equal(s2Snapshot(g),before);
+    assert.deepEqual(g.json('window.s2Dto'),dto);
+    assert.deepEqual(g.json(`captureSaveData(window.s2Candidate,${JSON.stringify(SAVE_TEST_CONTEXT)})`),dto);
+    assert.equal(g.run('window.s2Candidate.audio'),null);assert.equal(g.run('window.s2Candidate.art'),null);
+    assert.equal(g.run('window.s2Candidate.lastTick'),0);
+    assert.equal(g.run('Object.keys(window.s2Candidate).length===Object.keys(state).length'),true);
+    g.run('window.s2Candidate.player.hp=1;window.s2Candidate.town.store.stock.length=0');
+    assert.equal(s2Snapshot(g),before);assert.deepEqual(g.json('window.s2Dto'),dto);
+  }
+});
+
+test('S2 atomic load restores exact progression/world/deadlines and retains receiver audio/art', () => {
+  for(const area of ['town','dungeon']) {
+    const source=game(713,true,area);
+    source.run(`equipItem('ring',{...ITEM_TABLE[5]});state.player.hp=37;state.player.mp=7;
+      state.gold=293;state.activeTime=15.25;state.retreatReadyAt=72.5;state.warnedLow=true;
+      state.combatElapsed=3.5;state.healElapsed=1.25;state.spellReadyAt.fireball=17.75;
+      state.inventory=[{name:'Potion',kind:'heal',heal:.499}];state.townScrolls=3;
+      state.townExit={depth:1,x:0,y:0,reason:'cheat'};state.townPortalOpen=true;
+      state.messages=['Exact saved log','<plain text>'];`);
+    if(area==='dungeon')source.run('state.monsters[0].hp=4;state.monsters[0].nextAttackAt=17.5;state.potions=state.potions.slice(1);state.hazardTime=3.75');
+    const dto=saveFixture(source),g=game(42,true,'town');
+    s2InstallDto(g,dto);
+    g.run(`window.s2Audio=state.audio;window.s2Art=state.art;state.audio.enabled=false;state.audio.musicVolume=.19;state.audio.effectsVolume=.31;
+      state.consoleHistory=['old command'];state.godModeStats={hp:2};state.motion.time=123;
+      Math.random=()=>{throw new Error('load RNG');};
+      for(const name of ['log','playSound','equipItem','activateCompanion','placeCompanionNearPlayer','revealAroundPlayer','newGame','genLevel','genTown','enterFloor','recreateMonsters'])
+        globalThis[name]=()=>{throw new Error('load called '+name);};`);
+    assert.equal(g.run('commitSaveLoad(beginSaveLoad(),window.s2Dto)'),true);
+    assert.deepEqual(saveFixture(g),dto,area);
+    assert.equal(s2Aliases(g),true);
+    assert.equal(g.run('state.audio===window.s2Audio&&state.art===window.s2Art'),true);
+    assert.deepEqual(g.json('[state.audio.enabled,state.audio.musicVolume,state.audio.effectsVolume]'),[false,.19,.31]);
+    assert.equal(String(g.elements.hpText.textContent),'37/80');assert.equal(String(g.elements.gold.textContent),'293');
+    assert.equal(g.elements.log.textContent,'<plain text>\n\nExact saved log');
+    assert.equal(g.elements.launchScreen.hidden,true);assert.equal(g.elements.gameLayout.hidden,false);
+    assert.deepEqual(g.json('[state.godMode,state.godModeStats,state.helpOpen,state.consoleHistory,state.pause,state.ending,state.bossIntro,state.bossDefeat,state.loadSession]'),[false,null,false,[],null,null,null,null,null]);
+    assert.equal(g.run('state.lastTick>Date.now()-1000'),true);
+    assert.equal(g.run('state.motion.time'),0);
+    assert.deepEqual(g.json('state.motion.moves'),{});
+  }
+});
+
+test('S2 load is allowed from launch, Help, stable god mode and ordinary death with correct focus/overlays', () => {
+  const dto=saveFixture(game(713,true,'town'));
+  for(const origin of ['launch','help','god','death']) {
+    const g=game(42,origin!=='launch','town',true);s2InstallDto(g,dto);
+    if(origin==='help')g.run('openHelp()');
+    if(origin==='god')g.run('setGodMode("1")');
+    if(origin==='death')g.run('die()');
+    assert.equal(g.run('commitSaveLoad(beginSaveLoad(),window.s2Dto)'),true,origin);
+    assert.equal(g.run('state.started&&!state.gameOver&&!state.won&&!state.godMode'),true);
+    assert.equal(g.elements.helpOverlay.hidden,true);assert.equal(g.elements.devConsole.hidden,true);
+    assert.equal(g.elements.overlay.style.display,'none');assert.equal(g.elements.pauseOverlay.style.display,'none');
+    assert.equal(g.elements.gameLayout.inert,false);assert.equal(g.elements.launchScreen.inert,false);
+    assert.equal(g.run('document.activeElement===canvas'),true);
+    assert.deepEqual(saveFixture(g),dto);
+  }
+});
+
+test('S2 pending load freezes simulation, player actions and launch choices without charging time', () => {
+  for(const area of ['town','dungeon']) {
+    const g=game(42,true,area);g.run('window.s2Session=beginSaveLoad()');
+    const before=s2Snapshot(g);
+    g.run(`advanceActiveTime(20);enemyTick();townTick();companionTick();hazardTick();recoveryTick(20);regenMana();advanceMotion(20);
+      movePlayer(1,0);castSpell('heal');shootBow();drinkPotion();pickup();useTownScroll();descendStairs();ascendStairs();retreat();
+      openTrade();openCompanionBoard();openConsole();openHelp();buyFromMerchant();sellToMerchant();`);
+    g.key('ArrowRight');g.key('h');g.key('j');g.key('x');g.key('`');
+    assert.equal(s2Snapshot(g),before,area);
+    assert.throws(()=>saveFixture(g),/Invalid save:/,'cannot save an unconfirmed load session');
+    assert.equal(g.run('cancelSaveLoad(window.s2Session)'),true);
+    assert.equal(g.run('state.loadSession'),null);assert.equal(g.run('state.activeTime'),JSON.parse(before).activeTime);
+    assert.equal(g.run('state.lastTick>Date.now()-1000'),true);
+    g.run('beginSaveLoad();state.lastTick=1;cancelSaveLoad(state.loadSession,false)');
+    assert.equal(g.run('state.lastTick>Date.now()-1000'),true,'forced discard must not credit pending-load time');
+  }
+  const g=game(42,false,'town');g.run('beginSaveLoad();setCompanionChoice("pip");startGame()');
+  assert.equal(g.run('state.started'),false);assert.equal(g.run('state.companionChoice'),'marmalade');
+});
+
+test('S2 stale or cancelled confirmations cannot replace restart, travel, death or a newer session', () => {
+  const dto=saveFixture(game(713,true,'town'));
+  const transitions=['cancelSaveLoad()','newGame()','enterFloor(2,false,true)','enterTown()','loadLevel("3")',
+    'die()','startEnding()','closeHelp()','window.s2New=beginSaveLoad()'];
+  for(const transition of transitions) {
+    const g=game();s2InstallDto(g,dto);g.run(`window.s2Old=beginSaveLoad();${transition}`);
+    const before=s2Snapshot(g);
+    assert.equal(g.run('commitSaveLoad(window.s2Old,window.s2Dto)'),false,transition);
+    assert.equal(s2Snapshot(g),before,transition);
+    if(transition.includes('s2New')) {
+      assert.equal(g.run('cancelSaveLoad(window.s2Old)'),false);
+      assert.equal(g.run('state.loadSession===window.s2New'),true);
+      assert.equal(g.run('commitSaveLoad(window.s2New,window.s2Dto)'),true);
+    }
+  }
+  const g=game();s2InstallDto(g,dto);g.run('window.s2Token=beginSaveLoad()');
+  assert.equal(g.run('commitSaveLoad(window.s2Token,window.s2Dto)'),true);
+  const before=s2Snapshot(g);assert.equal(g.run('commitSaveLoad(window.s2Token,window.s2Dto)'),false);
+  assert.equal(s2Snapshot(g),before);
+});
+
+test('S2 conflicting load contexts and changed bindings reject without state or focus changes', () => {
+  const dto=saveFixture(game());
+  for(const setup of ['document.hidden=true','state.pause={kind:"health"}','state.pause={kind:"retreat"}',
+    'state.consoleOpen=true','state.trade={}','state.companionPicker={}',
+    'state.ending={completed:true}','state.bossIntro={completed:false}','state.bossDefeat={completed:false}',
+    'state.won=true','document.getElementById("tradeOverlay").hidden=false','document.getElementById("companionOverlay").hidden=false']) {
+    const g=game();g.run(setup);const before=s2Snapshot(g);
+    assert.equal(g.run('beginSaveLoad()'),null,setup);assert.equal(s2Snapshot(g),before);
+  }
+  for(const setup of ['document.hidden=true','state.pause={kind:"health"}','state.map=state.map.map(row=>row.slice())','state.depth=2']) {
+    const g=game();s2InstallDto(g,dto);g.run(`window.s2Token=beginSaveLoad();${setup}`);
+    const before=s2Snapshot(g);assert.equal(g.run('commitSaveLoad(window.s2Token,window.s2Dto)'),false,setup);
+    assert.equal(s2Snapshot(g),before);
+  }
+});
+
+test('S2 malformed or failed hydration preserves the exact old run and retryable session', () => {
+  const g=game(42,true,'town',true),dto=saveFixture(g);s2InstallDto(g,dto);
+  g.run('openHelp();window.s2Token=beginSaveLoad();window.s2OldState=state;window.s2Focus=document.activeElement');
+  const before=s2Snapshot(g);
+  assert.throws(()=>g.run('commitSaveLoad(window.s2Token,{})'),/Invalid save:/);
+  assert.equal(s2Snapshot(g),before);assert.equal(g.run('state===window.s2OldState&&state.loadSession===window.s2Token&&document.activeElement===window.s2Focus'),true);
+  g.run('window.s2Hydrate=hydrateSaveData;hydrateSaveData=()=>{throw new Error("hydrate allocation failure");}');
+  assert.throws(()=>g.run('commitSaveLoad(window.s2Token,window.s2Dto)'),/hydrate allocation failure/);
+  assert.equal(s2Snapshot(g),before);
+  g.run('hydrateSaveData=window.s2Hydrate');
+  assert.equal(g.run('commitSaveLoad(window.s2Token,window.s2Dto)'),true);
+});
+
+test('S2 failed commit presentation restores old state, HUD, Help and focus without replaying render', () => {
+  const g=game(42,true,'town',true),dto=saveFixture(game(713));s2InstallDto(g,dto);
+  g.run(`state.gold=42;render();openHelp();window.s2Token=beginSaveLoad();window.s2OldState=state;
+    window.s2Focus=document.activeElement;window.s2Render=render;
+    render=()=>{document.getElementById('gold').textContent='partly changed';throw new Error('paint failure');};`);
+  const before=s2Snapshot(g),gold=g.elements.gold.textContent;
+  assert.throws(()=>g.run('commitSaveLoad(window.s2Token,window.s2Dto)'),/paint failure/);
+  assert.equal(s2Snapshot(g),before);assert.equal(g.run('state===window.s2OldState'),true);
+  assert.equal(g.elements.gold.textContent,gold);assert.equal(g.elements.helpOverlay.hidden,false);
+  assert.equal(g.elements.gameLayout.inert,true);assert.equal(g.run('document.activeElement===window.s2Focus'),true);
+  assert.equal(g.run('state.loadSession'),null);assert.equal(g.run('commitSaveLoad(window.s2Token,window.s2Dto)'),false);
+  g.run('render=window.s2Render');assert.equal(g.run('commitSaveLoad(beginSaveLoad(),window.s2Dto)'),true);
+});
+
+test('S2 active encounter, guards and final dragon restore exactly while later revisits retain respawn rules', () => {
+  const source=game();source.run(`render=()=>{};playSound=()=>{};enterFloor(50,false,true);
+    state.activeTime=20;summonThroneGuards();state.monsters[0].hp=-7;state.monsters.find(m=>m.isGuard).hp=-13;
+    state.monsters[1].hp=4;state.monsters[1].nextAttackAt=21.5;state.bossIntroSeen=true;`);
+  const dto=saveFixture(source),g=game();assert.equal(s2Load(g,dto),true);
+  assert.deepEqual(saveFixture(g),dto);assert.equal(s2Aliases(g),true);
+  g.run('enterTown();enterFloor(50,false)');
+  assert.equal(g.run('state.monsters.some(m=>m.isGuard)'),false);
+  assert.equal(g.run('state.monsters.every(m=>m.hp===m.maxHp)'),true);
+  assert.equal(g.run('state.boss.hp'),g.run('state.boss.maxHp'));
+  source.run('enterFloor(100,false,true);damageMonster(state.boss,state.boss.hp+7);clearBossDefeat()');
+  const final=saveFixture(source),receiving=game();assert.equal(s2Load(receiving,final),true);
+  assert.deepEqual(saveFixture(receiving),final);const gold=receiving.run('state.gold'),kills=receiving.run('state.kills');
+  receiving.run('enterTown();enterFloor(100,false)');
+  assert.equal(receiving.run('state.boss'),null);assert.equal(receiving.run('state.princess.rescued'),false);
+  assert.equal(receiving.run('state.gold'),gold);assert.equal(receiving.run('state.kills'),kills);
+});
+
+test('S2 restored portal returns once and ring HP, stock, keys, loot and descent rewards stay once-only', () => {
+  const source=game();source.run(`equipItem('ring',{...ITEM_TABLE[5]});state.player.hp=37;state.player.mp=7;
+    state.potions=state.potions.slice(1);state.floorKey.dropped=true;state.floorKey.collected=true;state.floorKey.drop=null;
+    state.floors[1].descentRewarded=true;state.gold=123;state.townScrolls=3;useTownScroll();`);
+  const dto=saveFixture(source),g=game();assert.equal(s2Load(g,dto),true);
+  assert.equal(g.run('state.player.maxHp'),80);assert.equal(g.run('state.player.hp'),37);
+  const potionCount=g.run('state.floors[1].potions.length'),exit=g.json('state.townExit');
+  g.key('j');assert.equal(g.run('state.area'),'dungeon');assert.equal(g.run('state.townScrolls'),2);
+  assert.deepEqual(g.json('[state.player.x,state.player.y]'),[exit.x,exit.y]);
+  assert.equal(g.run('state.townPortalOpen'),false);assert.equal(g.run('state.townExit'),null);
+  assert.equal(g.run('state.potions.length'),potionCount);assert.equal(g.run('state.floorKey.collected'),true);
+  g.run('state.player.x=state.stairs.x;state.player.y=state.stairs.y;descendStairs()');
+  assert.equal(g.run('state.gold'),123,'descent reward must not duplicate');
+  assert.equal(s2Load(g,dto),true);assert.equal(g.run('state.player.maxHp'),80);assert.equal(g.run('state.player.hp'),37);
+});
+
+test('S2 stale motion/cinematic callbacks and reentrant reset cannot overwrite a loaded or newer run', () => {
+  const g=game(),dto=saveFixture(game(713,true,'town'));s2InstallDto(g,dto);
+  g.run(`window.s2OldMotion=state.motion;window.s2Intro={completed:false,frameId:31};
+    window.s2Defeat={completed:false,frameId:32};window.s2Ending={completed:false,frameId:33};
+    window.s2Cancelled=[];window.cancelAnimationFrame=id=>window.s2Cancelled.push(id);
+    state.bossIntro={completed:true,frameId:31};state.bossDefeat={completed:true,frameId:32};
+    window.s2Session=beginSaveLoad();`);
+  assert.equal(g.run('commitSaveLoad(window.s2Session,window.s2Dto)'),true);
+  const before=s2Snapshot(g);
+  g.run('motionFrame(99999,window.s2OldMotion);bossIntroFrame(99999,window.s2Intro);bossDefeatFrame(99999,window.s2Defeat);endingFrame(99999,window.s2Ending)');
+  assert.equal(s2Snapshot(g),before);assert.deepEqual(g.json('window.s2Cancelled'),[31,32]);
+  const other=game();s2InstallDto(other,dto);
+  other.run('window.s2Session=beginSaveLoad();window.s2OriginalHydrate=hydrateSaveData;hydrateSaveData=v=>{const c=window.s2OriginalHydrate(v);newGame();return c;}');
+  assert.equal(other.run('commitSaveLoad(window.s2Session,window.s2Dto)'),false);
+  assert.equal(other.run('state.depth'),1);assert.equal(other.run('state.gold'),0);
+});
+
+test('S2 all companions and high-level XP hydrate with exact positions, static roles and readiness', () => {
+  const source=game(713,true,'town'),g=game();
+  for(const [i,id] of ['marmalade','pip','mimic','hydra','boar','medusa','wizard','skeletonKing','dragon','cook','bartender'].entries()) {
+    source.run(`unlockCompanion('${id}');activateCompanion('${id}');state.companion.x=34;state.companion.y=27;
+      state.companionAttackAt=19.75;state.companionSpeechReadyAt=17.25;state.companionQuoteIndex=8;
+      state.player.lvl=${i%3===0?83:i%3===1?99:100};var s2Threshold=40;
+      for(let level=1;level<state.player.lvl;level++)s2Threshold=Math.round(s2Threshold*1.5);
+      state.player.xpNext=state.player.lvl===100?1:s2Threshold;state.player.xp=state.player.lvl===100?0:Math.floor(s2Threshold/2);`);
+    const dto=saveFixture(source);assert.equal(s2Load(g,dto),true,id);
+    assert.deepEqual(saveFixture(g),dto,id);assert.deepEqual(g.json('state.companion'),source.json('state.companion'));
+    assert.equal(g.run('state.companion.x'),34);assert.equal(g.run('state.companionAttackAt'),19.75);
+    assert.equal(s2Aliases(g),true);
+  }
+});
+
+test('S2 restored hazard warnings and cooldowns use saved active time without replay or catch-up', () => {
+  const source=game();source.run(`enterFloor(2,false,true);state.activeTime=10;state.retreatReadyAt=70;
+    state.hazardTime=4;const rock=state.hazards.find(h=>h.type==='rocks');rock.triggered=true;rock.stage='warning';rock.impactAt=4.5;
+    state.player.x=rock.x;state.player.y=rock.y;state.companion.x=rock.x;state.companion.y=rock.y;`);
+  const dto=saveFixture(source),g=game();assert.equal(s2Load(g,dto),true);
+  const hp=g.run('state.player.hp');assert.deepEqual(saveFixture(g),dto);
+  assert.equal(g.run('retreatRemaining()'),60);
+  g.run('advanceActiveTime(.4);hazardTick()');assert.equal(g.run('state.player.hp'),hp);
+  g.run('advanceActiveTime(.2);hazardTick()');assert.equal(g.run('state.player.hp'),hp-12);
+  g.run('hazardTick()');assert.equal(g.run('state.player.hp'),hp-12,'spent impact must not repeat');
+  assert.ok(Math.abs(g.run('retreatRemaining()')-59.4)<1e-8);
+});
+
+test('S2 presentation preparation errors and reentrant commits reject before touching the current run', () => {
+  const g=game(42,true,'town',true),dto=saveFixture(game());s2InstallDto(g,dto);
+  g.run('openHelp();window.s2Session=beginSaveLoad();window.s2Presentation=captureLoadPresentation;captureLoadPresentation=()=>{throw new Error("canvas read failure");}');
+  const before=s2Snapshot(g);
+  assert.throws(()=>g.run('commitSaveLoad(window.s2Session,window.s2Dto)'),/canvas read failure/);
+  assert.equal(s2Snapshot(g),before);assert.equal(g.run('state.loadSession===window.s2Session'),true);
+  g.run('captureLoadPresentation=()=>{const p=window.s2Presentation();newGame();return p;}');
+  assert.equal(g.run('commitSaveLoad(window.s2Session,window.s2Dto)'),false);
+  assert.equal(g.run('state.gold'),0);assert.equal(g.run('state.area'),'town');
+});
+
+test('S2 hydrates and atomically loads the final fully explored 100-floor DTO without mutation or RNG', () => {
+  const source=game(713,true,'town');source.run('render=()=>{};playSound=()=>{}');
+  for(let depth=1;depth<=100;depth++)source.run(`enterFloor(${depth},false);state.visited=new Set(Array.from({length:W*H},(_,i)=>(i%W)+','+Math.floor(i/W)));saveFloor()`);
+  const dto=saveFixture(source),g=game();s2InstallDto(g,dto);
+  g.run(`Math.random=()=>{throw new Error('large load RNG');};playSound=()=>{throw new Error('large load sound');};
+    window.s2Detached=hydrateSaveData(window.s2Dto);`);
+  assert.equal(g.run('Object.keys(window.s2Detached.floors).length'),100);
+  assert.equal(g.run('window.s2Detached.visited instanceof Set'),true);
+  assert.equal(g.run('commitSaveLoad(beginSaveLoad(),window.s2Dto)'),true);
+  assert.equal(s2Aliases(g),true);assert.deepEqual(saveFixture(g),dto);
+});
+
+function s3Files(g) {
+  g.run(`var s3=window.s3={readers:[],jobs:new Map(),next:0,revoked:[],blobs:[],downloads:[]};
+    window.setTimeout=(fn,delay)=>{const id=++s3.next;s3.jobs.set(id,{fn,delay});return id;};
+    window.clearTimeout=id=>s3.jobs.delete(id);
+    var s3Flush=window.s3Flush=()=>{for(const [id,job]of [...s3.jobs])if(job.delay===0){s3.jobs.delete(id);job.fn();}};
+    var s3Finish=window.s3Finish=(index,text)=>{const r=s3.readers[index];r.readyState=2;r.result=text;r.onload?.();};
+    window.FileReader=class{constructor(){this.readyState=0;s3.readers.push(this);}readAsText(file,encoding){this.file=file;this.encoding=encoding;this.readyState=1;if(s3.readError)throw new Error('read failed');}
+      abort(){this.aborted=true;this.readyState=2;this.onabort?.();}};
+    window.Blob=class{constructor(parts,options){if(s3.blobError)throw new Error('blob failed');this.parts=parts;this.options=options;s3.blobs.push(this);}};
+    window.URL={createObjectURL:blob=>'blob:test-'+s3.blobs.indexOf(blob),revokeObjectURL:url=>s3.revoked.push(url)};
+    var s3Create=window.s3Create=document.createElement;
+    document.createElement=tag=>{const el=s3Create(tag);if(tag==='a'){el.click=()=>{if(s3.clickError)throw new Error('click failed');s3.downloads.push({url:el.href,name:el.download});};
+      el.remove=()=>{el.isConnected=false;if(el.parentElement)el.parentElement.children=el.parentElement.children.filter(c=>c!==el);};}return el;};
+    document.body=document.createElement('body');
+    const host=document.getElementById('saveLoadOverlay');
+    for(const id of ['saveLoadFileHost','saveLoadStatus','saveLoadSelectedFile','saveLoadPreview','confirmSaveLoad','cancelSaveLoad','saveLoadAudioToggle'])host.appendChild(document.getElementById(id));
+    for(const id of ['loadGameButton','saveGameButton','cancelSavePreparation'])document.getElementById('helpOverlay').appendChild(document.getElementById(id));
+    document.getElementById('launchScreen').appendChild(document.getElementById('launchLoadGame'));
+    document.getElementById('overlay').appendChild(document.getElementById('deathLoadGame'));
+    updateSaveFileButtons();`);
+}
+function s3Select(g,dto,name='adventure.json') {
+  const text=typeof dto==='string'?dto:JSON.stringify(dto);
+  g.run(`document.getElementById('saveLoadFile').files=[{name:${JSON.stringify(name)},size:${Buffer.byteLength(text)}}];document.getElementById('saveLoadFile').onchange()`);
+  return text;
+}
+function s3Ready(g,dto,name) {
+  const index=g.run('s3.readers.length'),text=s3Select(g,dto,name);
+  g.run(`s3Finish(${index},${JSON.stringify(text)});s3Flush()`);
+}
+
+test('S3 save requests portable JSON without progress/RNG/audio changes and cleans each URL independently', () => {
+  const g=game(42,true,'town',true);s3Files(g);
+  g.run(`openHelp();state.gold=293;state.player.hp=37;Math.random=()=>{throw new Error('save RNG');};playSound=()=>{throw new Error('save sound');};`);
+  const before=s2Snapshot(g);assert.equal(g.run('saveGameFile()'),true);assert.equal(s2Snapshot(g),before);
+  assert.equal(g.run('s3.downloads.length'),1);assert.match(g.run('s3.downloads[0].name'),/^dungeon-crawler-.*\.json$/);
+  assert.equal(g.run('s3.blobs[0].options.type'),'application/json;charset=utf-8');
+  assert.equal(g.run('parseSaveData(s3.blobs[0].parts[0]).run.gold'),293);
+  assert.equal(g.run('document.body.children.length'),0);assert.deepEqual(g.json('s3.revoked'),[]);
+  assert.match(g.elements.saveGameStatus.textContent,/Download requested/);
+  g.run(`window.s3Cleanup=[...s3.jobs.values()][0].fn;state.gold=9;`);const later=s2Snapshot(g);
+  g.run('window.s3Cleanup()');assert.deepEqual(g.json('s3.revoked'),['blob:test-0']);assert.equal(s2Snapshot(g),later);
+});
+
+test('S3 unsupported/failed export leaves adventure and URLs intact or cleaned with honest feedback', () => {
+  for(const setup of ['delete window.Blob','s3.blobError=true','s3.clickError=true']) {
+    const g=game(42,true,'town',true);s3Files(g);g.run(setup);const before=s2Snapshot(g);
+    assert.equal(g.run('saveGameFile()'),false);assert.equal(s2Snapshot(g),before);
+    assert.match(g.elements.saveGameStatus.textContent,/Could not prepare/);
+    if(setup.includes('clickError'))assert.deepEqual(g.json('s3.revoked'),['blob:test-0']);
+    assert.equal(g.run('document.body.children.length'),0);
+  }
+  const g=game(42,true,'town',true);s3Files(g);g.run('state.godMode=true;updateSaveFileButtons()');
+  assert.equal(g.elements.saveGameButton.disabled,true);assert.equal(g.run('saveGameFile()'),false);
+});
+
+test('S3 Help/launch/death Load opens one frozen accessible dialog and Cancel restores focus/inert context', () => {
+  for(const origin of ['launch','help','death']) {
+    const g=game(42,origin!=='launch','town',true);s3Files(g);
+    if(origin==='help')g.run('openHelp()');if(origin==='death')g.run('die()');
+    const id=origin==='launch'?'launchLoadGame':origin==='help'?'loadGameButton':'deathLoadGame';
+    g.run(`document.getElementById('${id}').focus()`);const before=s2Snapshot(g);
+    g.click(id);assert.equal(g.elements.saveLoadOverlay.hidden,false);
+    assert.equal(g.run('!!state.loadSession.ui'),true);assert.equal(g.run('document.activeElement===state.loadSession.ui.input'),true);
+    assert.equal(g.elements.gameLayout.inert,true);assert.equal(g.elements.launchScreen.inert,true);assert.equal(g.elements.helpOverlay.inert,true);
+    assert.equal(g.run('openLoadGame()'),null);assert.equal(g.elements.confirmSaveLoad.disabled,true);
+    g.key('Tab');assert.equal(g.run('document.activeElement===document.getElementById("cancelSaveLoad")'),true);
+    g.key('Tab',{shiftKey:true});assert.equal(g.run('document.activeElement===state.loadSession.ui.input'),true);
+    assert.equal(g.elements[id].disabled,true);
+    g.key('Escape');assert.equal(g.run('state.loadSession'),null);assert.equal(g.elements.saveLoadOverlay.hidden,true);
+    assert.equal(g.elements[id].disabled,false);
+    assert.equal(s2Snapshot(g),before);assert.equal(g.run(`document.activeElement===document.getElementById('${id}')`),true);
+    assert.equal(!!g.elements.helpOverlay.inert,false);
+  }
+});
+
+test('S3 real read phases validate before preview and only explicit deferred confirmation loads', () => {
+  const dto=saveFixture(game(713,true,'town')),g=game(42,true,'town',true);s3Files(g);
+  g.run('openHelp();openLoadGame()');const before=s2Snapshot(g),text=s3Select(g,dto,'<img src=x>.json');
+  assert.equal(g.run('state.loadSession.ui.phase'),'reading');assert.equal(g.elements.confirmSaveLoad.disabled,true);
+  assert.equal(g.run('s3.readers[0].encoding'),'UTF-8');assert.equal(g.run('state.loadSession.ui.input.value'),'');
+  assert.equal(g.elements.saveLoadSelectedFile.textContent,'Selected: <img src=x>.json');
+  g.run(`s3Finish(0,${JSON.stringify(text)})`);assert.equal(g.run('state.loadSession.ui.data'),null);
+  g.run('s3Flush()');assert.equal(g.run('state.loadSession.ui.phase'),'ready');assert.equal(g.elements.confirmSaveLoad.disabled,false);
+  assert.match(g.elements.saveLoadPreview.textContent,/Town · Hero level 1/);assert.equal(s2Snapshot(g),before);
+  g.run('document.getElementById("confirmSaveLoad").onclick()');assert.equal(g.run('state.loadSession.ui.phase'),'loading');
+  assert.equal(s2Snapshot(g),before,'confirmation yields before replacing state');
+  g.run('s3Flush()');assert.equal(g.run('state.loadSession'),null);assert.equal(g.elements.saveLoadOverlay.hidden,true);
+  assert.deepEqual(saveFixture(g),dto);assert.equal(g.run('document.activeElement===canvas'),true);
+  assert.equal(g.run('document.getElementById("saveLoadFileHost").children.length'),0);
+});
+
+test('S3 file size is checked before reading and corrupt/future/read errors remain reversible', () => {
+  const g=game(42,true,'town',true);s3Files(g);g.run('openHelp();openLoadGame()');const before=s2Snapshot(g);
+  g.run('readSaveGameFile(state.loadSession,state.loadSession.ui.input,{name:"large.json",size:SAVE_MAX_BYTES+1})');
+  assert.equal(g.run('s3.readers.length'),0);assert.match(g.elements.saveLoadStatus.textContent,/32 MiB/);
+  for(const text of ['{bad','{"formatVersion":100}','null']) {
+    const index=g.run('s3.readers.length'),body=s3Select(g,text);g.run(`s3Finish(${index},${JSON.stringify(body)});s3Flush()`);
+    assert.equal(g.run('state.loadSession.ui.phase'),'error');assert.equal(g.elements.confirmSaveLoad.disabled,true);assert.equal(s2Snapshot(g),before);
+  }
+  const future=saveFixture(game());future.formatVersion=100;s3Ready(g,future);
+  assert.match(g.elements.saveLoadStatus.textContent,/save version is not supported/);
+  g.run('s3.readError=true');s3Select(g,'{}');assert.match(g.elements.saveLoadStatus.textContent,/Could not read/);
+  assert.equal(s2Snapshot(g),before);g.key('Escape');assert.equal(g.run('state.loadSession'),null);
+});
+
+test('S3 replacement reads, same-file reselection and native cancel ignore old results', () => {
+  const a=saveFixture(game(713,true,'town')),b=structuredClone(a);b.run.gold=123;
+  const g=game(42,true,'town',true);s3Files(g);g.run('openLoadGame()');
+  const first=s3Select(g,a,'same.json');const second=s3Select(g,b,'same.json');
+  assert.equal(g.run('s3.readers[0].aborted'),true);
+  g.run(`s3Finish(0,${JSON.stringify(first)});s3Flush()`);assert.equal(g.run('state.loadSession.ui.data'),null);
+  g.run(`s3Finish(1,${JSON.stringify(second)});s3Flush()`);assert.equal(g.run('state.loadSession.ui.data.run.gold'),123);
+  g.run('state.loadSession.ui.input.oncancel()');assert.equal(g.run('state.loadSession.ui.phase'),'choose');
+  assert.equal(g.run('state.loadSession.ui.data'),null);assert.equal(g.elements.confirmSaveLoad.disabled,true);
+  assert.match(g.elements.saveLoadStatus.textContent,/selection canceled/);
+  s3Ready(g,b,'same.json');assert.equal(g.run('state.loadSession.ui.data.run.gold'),123);
+});
+
+test('S3 stale file events and queued validation/confirmation cannot affect a newer session or run', () => {
+  const dto=saveFixture(game(713,true,'town'));
+  for(const transition of ['cancelSaveLoad()','newGame()','enterFloor(2,false,true)','die()','closeHelp()','beginSaveLoad()']) {
+    const g=game(42,true,'town',true);s3Files(g);g.run('openHelp();window.s3Old=openLoadGame();window.s3Input=window.s3Old.ui.input');
+    const text=s3Select(g,dto);g.run(transition);const before=s2Snapshot(g);
+    g.run(`s3Finish(0,${JSON.stringify(text)});window.s3Input.oncancel();s3Flush()`);
+    assert.equal(s2Snapshot(g),before,transition);assert.equal(g.run('confirmSaveGameLoad(window.s3Old)'),false);
+  }
+  const g=game(42,true,'town',true);s3Files(g);g.run('window.s3Old=openLoadGame()');s3Ready(g,dto);
+  g.run('window.s3OldConfirm=document.getElementById("confirmSaveLoad").onclick;window.s3OldConfirm();window.s3Queued=[...s3.jobs.values()][0].fn;cancelSaveLoad();openLoadGame()');
+  const before=s2Snapshot(g);g.run('window.s3Queued();window.s3OldConfirm()');assert.equal(s2Snapshot(g),before);
+  assert.equal(g.run('!!state.loadSession.ui'),true);
+  // A newly selected file in the same modal must also invalidate a queued confirmation.
+  s3Ready(g,dto);g.run('confirmSaveGameLoad(state.loadSession);window.s3PreviousCommit=[...s3.jobs.values()][0].fn');
+  const latest=structuredClone(dto);latest.run.gold=123;s3Ready(g,latest);
+  const unchanged=s2Snapshot(g);g.run('window.s3PreviousCommit()');
+  assert.equal(s2Snapshot(g),unchanged);assert.equal(g.run('state.loadSession.ui.phase'),'ready');
+  assert.equal(g.run('state.loadSession.ui.data.run.gold'),123);
+});
+
+test('S3 deferred validation while hidden stays owned and permits confirmation only after visibility returns', () => {
+  const g=game(42,true,'town',true),dto=saveFixture(game(713,true,'town'));s3Files(g);g.run('openLoadGame()');
+  const text=s3Select(g,dto);g.run(`document.hidden=true;s3Finish(0,${JSON.stringify(text)});s3Flush()`);
+  assert.equal(g.run('state.loadSession.ui.phase'),'ready');assert.equal(g.elements.confirmSaveLoad.disabled,true);
+  assert.equal(g.run('confirmSaveGameLoad(state.loadSession)'),false);
+  g.run('document.hidden=false');g.visibility();assert.equal(g.elements.confirmSaveLoad.disabled,false);
+  const before=s2Snapshot(g);g.run('confirmSaveGameLoad(state.loadSession);document.hidden=true;s3Flush()');
+  assert.equal(g.run('state.loadSession.ui.phase'),'ready');assert.equal(s2Snapshot(g),before);
+  g.run('document.hidden=false');g.visibility();
+  g.key('Escape');assert.equal(g.run('state.loadSession'),null);
+});
+
+test('S3 failed commit returns to the origin with error feedback and releases read/UI resources', () => {
+  const dto=saveFixture(game(713)),g=game(42,true,'town',true);s3Files(g);
+  g.run('openHelp();document.getElementById("loadGameButton").focus();openLoadGame()');s3Ready(g,dto);
+  const before=s2Snapshot(g);g.run('window.s3Render=render;render=()=>{throw new Error("paint fail");};document.getElementById("confirmSaveLoad").onclick();s3Flush()');
+  assert.equal(s2Snapshot(g),before);assert.equal(g.run('state.loadSession'),null);
+  assert.equal(g.elements.saveLoadOverlay.hidden,true);assert.equal(g.elements.helpOverlay.hidden,false);
+  assert.equal(g.elements.helpOverlay.inert,false);assert.equal(g.run('document.activeElement===document.getElementById("loadGameButton")'),true);
+  assert.match(g.elements.saveGameStatus.textContent,/adventure is unchanged/);
+  g.run('render=window.s3Render;openLoadGame()');assert.equal(g.elements.saveLoadOverlay.hidden,false);
+});
+
+test('S3 cancel aborts an active reader and R clears dialog/status without serializing UI', () => {
+  const g=game(42,true,'town',true);s3Files(g);g.run('openLoadGame()');s3Select(g,'{}');
+  g.run('window.s3Old=state.loadSession;fileActionMessage("Old status")');g.key('r');
+  assert.equal(g.run('state.loadSession'),null);assert.equal(g.run('window.s3Old.ui'),null);
+  assert.equal(g.run('s3.readers[0].aborted'),true);assert.equal(g.elements.saveLoadOverlay.hidden,true);
+  assert.equal(g.elements.saveGameStatus.textContent,'');assert.equal(g.run('Object.keys(state).length'),83);
+  assert.equal('loadSession' in saveFixture(g).run,false);
+});
+
+
+// S4 deliberately advances one cooperative yield per queued task so races are repeatable.
+function s4Pacing(g) {
+  g.run(`window.s4Clock=0;window.performance={now:()=>window.s4Clock+=9};
+    var s4Drain=()=>{let count=0;while([...s3.jobs.values()].some(j=>j.delay===0)){
+      if(++count>20000)throw new Error('save work did not settle');s3Flush();}return count;};`);
+}
+function s4Fixture() {
+  const g=game(713,true,'town');g.run('state.inventory=Array.from({length:300},()=>({name:"Potion",kind:"heal",heal:0.5}));state.gold=321');
+  return saveFixture(g);
+}
+
+test('S4 chunked UTF-8/nesting scanner matches native byte lengths across escapes and surrogate boundaries', () => {
+  const g=game();
+  for(const text of [' '.repeat(65535)+'😀', '"'+'a'.repeat(65534)+'\\"'+ '{}'.repeat(100)+'"',
+    '['+' '.repeat(65534)+'["é😀"]]', '"'+' '.repeat(65534)+'\\\\"']) {
+    assert.equal(g.run(`drainSaveSteps(saveTextBudgetSteps(${JSON.stringify(text)}))`),Buffer.byteLength(text));
+  }
+  const nested=' '.repeat(65530)+'['.repeat(17)+']'.repeat(17);
+  assert.throws(()=>g.run(`drainSaveSteps(saveTextBudgetSteps(${JSON.stringify(nested)}))`),/nesting/);
+});
+
+test('S4 cooperative validation never commits before explicit Load and reconstructs exact detached data', () => {
+  const dto=s4Fixture(),g=game(42,true,'town',true);s3Files(g);s4Pacing(g);
+  g.run('openHelp();openLoadGame();Math.random=()=>{throw new Error("save RNG");};playSound=()=>{throw new Error("save sound");}');
+  const before=s2Snapshot(g),text=s3Select(g,JSON.stringify(dto)+' '.repeat(70000));
+  g.run(`s3Finish(0,${JSON.stringify(text)});s3Flush();s3Flush()`);
+  assert.equal(g.run('!!state.loadSession.work'),true);assert.equal(s2Snapshot(g),before);
+  assert.ok(g.run('s4Drain()')>2);assert.equal(g.run('state.loadSession.ui.phase'),'ready');assert.equal(s2Snapshot(g),before);
+  g.run('confirmSaveGameLoad(state.loadSession);s3Flush();s3Flush()');
+  assert.equal(g.run('!!state.loadSession.work'),true);assert.equal(s2Snapshot(g),before);
+  g.run('s4Drain()');assert.equal(g.run('state.loadSession'),null);assert.equal(s2Aliases(g),true);
+  assert.deepEqual(saveFixture(g),dto);
+});
+
+test('S4 cancel/replacement/restart reject an already queued validation task without changing either run', () => {
+  const dto=s4Fixture();
+  for(const action of ['cancelSaveLoad()','newGame()','openLoadGame()']) {
+    const g=game(42,true,'town',true);s3Files(g);s4Pacing(g);g.run('openLoadGame()');
+    const text=s3Select(g,JSON.stringify(dto)+' '.repeat(70000));
+    g.run(`s3Finish(0,${JSON.stringify(text)});s3Flush();s3Flush();window.s4Late=[...s3.jobs.values()].find(j=>j.delay===0).fn;`);
+    g.run(action);const before=s2Snapshot(g);g.run('window.s4Late();s4Drain()');assert.equal(s2Snapshot(g),before,action);
+  }
+  const g=game(42,true,'town',true);s3Files(g);s4Pacing(g);g.run('openLoadGame()');
+  const text=s3Select(g,JSON.stringify(dto)+' '.repeat(70000));g.run(`s3Finish(0,${JSON.stringify(text)});s3Flush();s3Flush()`);
+  const next=structuredClone(dto);next.run.gold=999;s3Ready(g,next);g.run('s4Drain()');
+  assert.equal(g.run('state.loadSession.ui.data.run.gold'),999);
+});
+
+test('S4 cooperative confirmation cancellation and late schema errors preserve atomicity', () => {
+  const dto=s4Fixture();
+  for(const action of ['cancelSaveLoad()','newGame()']) {
+    const g=game(42,true,'town',true);s3Files(g);s4Pacing(g);g.run('openLoadGame()');s3Ready(g,dto);g.run('s4Drain()');
+    const before=s2Snapshot(g);g.run('confirmSaveGameLoad(state.loadSession);s3Flush();s3Flush()');
+    assert.equal(s2Snapshot(g),before);assert.equal(g.run('!!state.loadSession.work'),true);
+    g.run('window.s4Late=[...s3.jobs.values()].find(j=>j.delay===0).fn');g.run(action);
+    const after=s2Snapshot(g);g.run('window.s4Late();s4Drain()');assert.equal(s2Snapshot(g),after);
+  }
+  const g=game(42,true,'town',true);s3Files(g);s4Pacing(g);g.run('openLoadGame()');s3Ready(g,dto);g.run('s4Drain()');
+  const before=s2Snapshot(g);g.run('state.loadSession.ui.data.run.town.map[63][95]=3;confirmSaveGameLoad(state.loadSession);s3Flush();s4Drain()');
+  assert.equal(s2Snapshot(g),before);assert.equal(g.run('state.loadSession.ui.phase'),'error');
+  assert.match(g.elements.saveLoadStatus.textContent,/unchanged/);g.run('cancelSaveLoad()');
+  const h=game(42,true,'town',true);s3Files(h);s4Pacing(h);h.run('openHelp();openLoadGame()');s3Ready(h,dto);h.run('s4Drain()');
+  const previous=s2Snapshot(h);h.run('render=()=>{throw new Error("large paint failure");};confirmSaveGameLoad(state.loadSession);s3Flush();s4Drain()');
+  assert.equal(s2Snapshot(h),previous);assert.equal(h.run('state.loadSession'),null);
+  assert.equal(h.elements.saveLoadOverlay.hidden,true);assert.match(h.elements.saveGameStatus.textContent,/unchanged/);
+  const hidden=game(42,true,'town',true);s3Files(hidden);s4Pacing(hidden);hidden.run('openLoadGame()');s3Ready(hidden,dto);hidden.run('s4Drain()');
+  const unchanged=s2Snapshot(hidden);hidden.run('confirmSaveGameLoad(state.loadSession);s3Flush();s3Flush();document.hidden=true;s4Drain()');
+  assert.equal(s2Snapshot(hidden),unchanged);assert.equal(hidden.run('state.loadSession.ui.phase'),'ready');
+  hidden.run('document.hidden=false');hidden.visibility();assert.equal(s2Snapshot(hidden),unchanged);hidden.run('cancelSaveLoad()');
+});
+
+test('S4 large export freezes source, stays cancellable and emits no late download after cancellation', () => {
+  for(const action of ['cancelSaveLoad()','newGame()','closeHelp()']) {
+    const g=game(42,true,'town',true);s3Files(g);s4Pacing(g);
+    g.run('state.inventory=Array.from({length:300},()=>({name:"Potion",kind:"heal",heal:0.5}));openHelp()');
+    const before=s2Snapshot(g);assert.equal(g.run('saveGameFile()'),true);
+    assert.equal(g.elements.cancelSavePreparation.hidden,false);assert.equal(g.run('state.loadSession.exporting'),true);
+    g.run('s3Flush();enemyTick();movePlayer(1,0)');assert.equal(s2Snapshot(g),before);
+    g.run('window.s4Late=[...s3.jobs.values()].find(j=>j.delay===0).fn');g.run(action);
+    const after=s2Snapshot(g);g.run('window.s4Late();s4Drain()');assert.equal(s2Snapshot(g),after);
+    assert.equal(g.run('s3.downloads.length'),0);assert.equal(g.elements.cancelSavePreparation.hidden,true);
+  }
+});
+
+test('S4 cooperative export is lossless and refuses malformed history without pruning it', () => {
+  const g=game(42,true,'town',true);s3Files(g);s4Pacing(g);
+  g.run('state.inventory=Array.from({length:300},()=>({name:"Potion",kind:"heal",heal:0.5}));openHelp()');
+  const before=s2Snapshot(g),expected=saveFixture(g);g.run('saveGameFile();s4Drain()');
+  assert.equal(g.run('s3.downloads.length'),1);assert.equal(g.run('state.loadSession'),null);assert.equal(s2Snapshot(g),before);
+  assert.deepEqual(g.json('parseSaveData(s3.blobs[0].parts[0]).run'),expected.run);
+  g.run('state.inventory[299].heal=-1');const invalid=s2Snapshot(g);g.run('saveGameFile();s4Drain()');
+  assert.equal(g.run('s3.downloads.length'),1);assert.equal(s2Snapshot(g),invalid);
+  assert.match(g.elements.saveGameStatus.textContent,/Could not prepare/);
+});
+
+test('S4 bounded format accepts 65536 stored potions losslessly and refuses the next row', () => {
+  const g=game(713,true,'town');
+  g.run('state.inventory=Array.from({length:65536},()=>({name:"Potion",kind:"heal",heal:.5999999999999999}))');
+  assert.equal(g.run(`parseSaveData(serializeSaveData(state,${JSON.stringify(SAVE_TEST_CONTEXT)})).run.inventory.length`),65536);
+  g.run('state.inventory.push({name:"Potion",kind:"heal",heal:.5})');const before=s2Snapshot(g);
+  assert.throws(()=>saveFixture(g),/Invalid save:/);assert.equal(s2Snapshot(g),before);
+});
+
+function m1Setup(g, stock = 'ITEM_TABLE') {
+  g.run(`state.gold=2000;state.activeTime=37.25;state.inventory=[{name:'Potion',kind:'heal',heal:.499}];
+    state.merchant.stock=${stock}.map((item,index)=>({...item,id:100+index}));`);
+}
+function m1Cart(g) { g.run('window.m1Cart=createTradeDraft(state,state.merchant)'); }
+function m1Stage(g, action) { g.run(`window.m1Cart=stageTradeAction(window.m1Cart,${JSON.stringify(action)})`); }
+
+test('M1 shared prices preserve every catalog item/depth including remembered town depth and reject unsafe money', () => {
+  const g=game(713,true,'town');
+  for(const depth of [1,2,50,100]) {
+    g.run(`state.depth=${depth}`);
+    assert.equal(g.run(`ITEM_TABLE.every(it=>buyPrice(it,${depth})===Math.round(it.gold*(1.5+(${depth}-1)*.03))
+      &&tradePrice(it)===buyPrice(it,${depth})&&sellPrice(it)===Math.round(it.gold*.5)&&tradeSellPrice(it)===sellPrice(it))`),true);
+  }
+  for(const expression of ['buyPrice({gold:NaN},1)','buyPrice({gold:-1},1)','buyPrice({gold:"15"},1)',
+    'buyPrice({gold:Number.MAX_SAFE_INTEGER},100)','sellPrice({gold:Infinity})','buyPrice(ITEM_TABLE[0],0)',
+    'buyPrice(ITEM_TABLE[0],101)','buyPrice(ITEM_TABLE[0],2.5)']) assert.throws(()=>g.run(expression),/Invalid trade:/,expression);
+});
+
+test('M1 opening snapshot and all pure cart operations stay detached from town/floor aliases and side effects', () => {
+  for(const area of ['town','dungeon']) {
+    const g=game(713,true,area);if(area==='dungeon')g.run('enterFloor(2,false,true)');m1Setup(g,'[ITEM_TABLE[0],ITEM_TABLE[8],ITEM_TABLE[5]]');
+    g.run(`equipItem('ring',{...ITEM_TABLE[5]});state.player.hp=75;
+      window.m1Stock=state.merchant.stock;window.m1Inventory=state.inventory;window.m1Spells=state.player.spells;
+      Math.random=()=>{throw new Error('draft RNG');};log=()=>{throw new Error('draft log');};
+      playSound=()=>{throw new Error('draft sound');};render=()=>{throw new Error('draft render');};`);
+    const before=s2Snapshot(g),dto=saveFixture(g);m1Cart(g);
+    for(const action of [{type:'buy',rowId:'stock:0'},{type:'buy',rowId:'stock:1'},{type:'sell',slot:'ring'}])m1Stage(g,action);
+    g.run('window.m1Cart=undoTradeAction(window.m1Cart);window.m1Cart=resetTradeDraft(window.m1Cart)');
+    assert.equal(s2Snapshot(g),before);assert.deepEqual(saveFixture(g),dto);
+    assert.equal(g.run(`state.merchant.stock===window.m1Stock&&state.inventory===window.m1Inventory&&state.player.spells===window.m1Spells
+      &&window.m1Cart.original.stock[0].item!==state.merchant.stock[0]&&window.m1Cart.original.inventory[0]!==state.inventory[0]
+      &&window.m1Cart.original.equipment.ring!==state.equipment.ring&&window.m1Cart.original.player.spells!==state.player.spells
+      &&window.m1Cart.original.spellReadyAt!==state.spellReadyAt&&Object.isFrozen(window.m1Cart.original.player.spells)
+      &&Object.isFrozen(window.m1Cart.original.stock[0].item)&&Object.isFrozen(window.m1Cart.rules)&&Object.isFrozen(window.m1Cart.history)
+      &&!Object.isFrozen(state.merchant.stock[0])&&!Object.isFrozen(state.inventory[0])`),true);
+    assert.throws(()=>g.run(`(()=>{'use strict';window.m1Cart.original.stock[0].item.gold=0;})()`),/read only/);
+    assert.equal(g.run('state.trade'),null);assert.equal(g.run('Object.keys(state).length'),83);
+  }
+});
+
+test('M1 second and last duplicate stock units use stable local row identities without source-ID writes', () => {
+  const g=game(713,true,'town');m1Setup(g,'[ITEM_TABLE[0],ITEM_TABLE[0],ITEM_TABLE[0]]');
+  g.run('state.merchant.stock.forEach(item=>item.id=100)');const before=s2Snapshot(g);m1Cart(g);
+  m1Stage(g,{type:'buy',rowId:'stock:1'});m1Stage(g,{type:'buy',rowId:'stock:2'});
+  assert.deepEqual(g.json('window.m1Cart.draft.stock.map(row=>row.rowId)'),['stock:0']);
+  assert.deepEqual(g.json('window.m1Cart.draft.operations.map(op=>op.rowId)'),['stock:1','stock:2']);
+  assert.equal(g.run('window.m1Cart.draft.gold'),1954);assert.equal(g.run('window.m1Cart.draft.inventory.length'),3);
+  const cart=g.json('window.m1Cart');assert.throws(()=>m1Stage(g,{type:'buy',rowId:'stock:1'}),/unavailable/);
+  assert.deepEqual(g.json('window.m1Cart'),cart);assert.equal(s2Snapshot(g),before);
+  assert.equal(g.run('state.merchant.stock.every(it=>it.id===100&&!Object.hasOwn(it,"rowId"))'),true);
+});
+
+test('M1 only selected gear is sold and draft proceeds fund later purchases without loans', () => {
+  const g=game(713,true,'town');m1Setup(g,'[ITEM_TABLE[1]]');
+  g.run(`state.gold=30;equipItem('weapon',{...ITEM_TABLE[1]});equipItem('armor',{...ITEM_TABLE[3]});equipItem('ring',{...ITEM_TABLE[5]})`);
+  const before=s2Snapshot(g);m1Cart(g);m1Stage(g,{type:'sell',slot:'weapon'});
+  assert.equal(g.run('window.m1Cart.draft.gold'),50);assert.equal(g.run('window.m1Cart.draft.equipment.weapon'),null);
+  assert.throws(()=>m1Stage(g,{type:'buy',rowId:'stock:0'}),/not enough/);
+  assert.equal(g.run('window.m1Cart.history.length'),1);
+  m1Stage(g,{type:'sell',slot:'armor'});m1Stage(g,{type:'buy',rowId:'stock:0'});
+  assert.equal(g.run('window.m1Cart.draft.gold'),13);assert.equal(g.run('window.m1Cart.draft.equipment.weapon.name'),'Sword');
+  assert.equal(g.run('window.m1Cart.draft.equipment.ring.name'),'Ring');assert.equal(s2Snapshot(g),before);
+  assert.throws(()=>m1Stage(g,{type:'sell',slot:'inventory'}),/sell slot/);
+});
+
+test('M1 potion, scroll, elixir and spell drafts match actual effects without learning or drinking live', () => {
+  const g=game(713,true,'town');m1Setup(g,'[...ITEM_TABLE,ITEM_TABLE[8]]');g.run('state.player.hp=23');
+  const before=s2Snapshot(g);m1Cart(g);
+  for(const index of [0,11,6,8])m1Stage(g,{type:'buy',rowId:'stock:'+index});
+  assert.equal(g.run('window.m1Cart.draft.player.hp'),23);assert.equal(g.run('window.m1Cart.draft.inventory.length'),2);
+  assert.equal(g.run('window.m1Cart.draft.inventory[1].heal'),.35);assert.equal(g.run('window.m1Cart.draft.townScrolls'),1);
+  assert.equal(g.run('window.m1Cart.draft.gold'),1759);assert.equal(g.run('window.m1Cart.draft.player.str'),12);
+  assert.equal(g.run('window.m1Cart.draft.player.dex'),10);assert.equal(g.run('window.m1Cart.draft.player.spells.frostbolt'),true);
+  assert.equal(g.run('window.m1Cart.draft.spellReadyAt.frostbolt'),37.25);
+  const staged=g.json('window.m1Cart');assert.throws(()=>m1Stage(g,{type:'buy',rowId:'stock:12'}),/already learned/);
+  assert.deepEqual(g.json('window.m1Cart'),staged);assert.equal(s2Snapshot(g),before);
+  g.run('window.m1Cart=resetTradeDraft(window.m1Cart)');assert.deepEqual(g.json('window.m1Cart.draft'),g.json('window.m1Cart.original'));
+  assert.equal(g.run('window.m1Cart.draft.operations.length'),0);
+});
+
+test('M1 path-correct ring HP and Undo preserve clipping, same-bonus replacement and level-derived health', () => {
+  for(const [maxHp,hp,afterSell,afterBuy]of [[80,75,60,80],[80,20,20,40],[140,139,120,140]]) {
+    const g=game(713,true,'town');m1Setup(g,'[ITEM_TABLE[5]]');
+    g.run(`equipItem('ring',{...ITEM_TABLE[5]});state.player.maxHp=${maxHp};state.player.hp=${hp}`);
+    const before=s2Snapshot(g);m1Cart(g);m1Stage(g,{type:'buy',rowId:'stock:0'});
+    assert.equal(g.run('window.m1Cart.draft.player.hp'),hp);assert.equal(g.run('window.m1Cart.draft.player.maxHp'),maxHp);
+    g.run('window.m1Cart=resetTradeDraft(window.m1Cart)');m1Stage(g,{type:'sell',slot:'ring'});
+    assert.equal(g.run('window.m1Cart.draft.player.hp'),afterSell);assert.equal(g.run('window.m1Cart.draft.player.maxHp'),maxHp-20);
+    m1Stage(g,{type:'buy',rowId:'stock:0'});assert.equal(g.run('window.m1Cart.draft.player.hp'),afterBuy);
+    assert.equal(g.run('window.m1Cart.draft.player.maxHp'),maxHp);
+    g.run('window.m1Cart=undoTradeAction(window.m1Cart)');assert.equal(g.run('window.m1Cart.draft.player.hp'),afterSell);
+    g.run('window.m1Cart=undoTradeAction(window.m1Cart)');assert.equal(g.run('window.m1Cart.draft.player.hp'),hp);
+    assert.equal(s2Snapshot(g),before);
+  }
+});
+
+test('M1 god-mode preview freezes hero fields while equipment-derived bonuses follow proposed gear', () => {
+  const g=game(713,true,'town');m1Setup(g,'[ITEM_TABLE[5],ITEM_TABLE[1]]');
+  g.run(`equipItem('ring',{...ITEM_TABLE[5]});state.player.hp=75;state.godMode=true;state.godModeStats=snapshotPlayerStats()`);
+  const before=s2Snapshot(g);m1Cart(g);m1Stage(g,{type:'sell',slot:'ring'});m1Stage(g,{type:'buy',rowId:'stock:1'});
+  assert.equal(g.run('GOD_STAT_FIELDS.every(key=>window.m1Cart.draft.player[key]===state.godModeStats[key])'),true);
+  assert.deepEqual(g.json('equipmentStatsFor(window.m1Cart.draft.player,window.m1Cart.draft.equipment)'),{hp:75,maxHp:80,str:14,dex:10,atk:20,def:5});
+  assert.equal(g.run('window.m1Cart.rules.godModeStats!==state.godModeStats'),true);assert.equal(s2Snapshot(g),before);
+  g.run(`equipItem('ring',null);equipItem('weapon',{...ITEM_TABLE[1]})`);
+  assert.deepEqual(g.json('equipmentStatsFor(window.m1Cart.draft.player,window.m1Cart.draft.equipment)'),g.json('({hp:state.player.hp,maxHp:state.player.maxHp,str:effectiveStr(),dex:effectiveDex(),atk:effectiveAtk(),def:effectiveDef()})'));
+});
+
+test('M1 Undo and Reset retain only accepted operations including buy-then-sell and replacement notices', () => {
+  const g=game(713,true,'town');m1Setup(g,'[ITEM_TABLE[1],ITEM_TABLE[5],ITEM_TABLE[8]]');
+  g.run(`equipItem('weapon',{...ITEM_TABLE[2]})`);const before=s2Snapshot(g);m1Cart(g);
+  m1Stage(g,{type:'buy',rowId:'stock:0'});assert.equal(g.run('window.m1Cart.draft.operations[0].replaced.name'),'Bow');
+  assert.equal(g.run('window.m1Cart.draft.gold'),1940,'replacement does not automatically sell Bow');
+  m1Stage(g,{type:'buy',rowId:'stock:1'});m1Stage(g,{type:'sell',slot:'ring'});
+  assert.deepEqual(g.json('window.m1Cart.draft.operations.map(op=>op.type+":"+op.item.name)'),['buy:Sword','buy:Ring','sell:Ring']);
+  g.run('window.m1Cart=undoTradeAction(window.m1Cart)');assert.equal(g.run('window.m1Cart.draft.equipment.ring.name'),'Ring');
+  g.run('window.m1Cart=undoTradeAction(window.m1Cart)');assert.equal(g.run('window.m1Cart.draft.operations.length'),1);
+  assert.deepEqual(g.json('window.m1Cart.draft.stock.map(row=>row.rowId)'),['stock:1','stock:2']);
+  m1Stage(g,{type:'buy',rowId:'stock:2'});g.run('window.m1Cart=resetTradeDraft(window.m1Cart)');
+  assert.equal(g.run('window.m1Cart.draft===window.m1Cart.original&&window.m1Cart.history.length===0'),true);
+  g.run('window.m1Same=window.m1Cart;window.m1Cart=undoTradeAction(window.m1Cart)');assert.equal(g.run('window.m1Same===window.m1Cart'),true);
+  assert.equal(s2Snapshot(g),before);
+});
+
+test('M1 rejects invalid source values and overflowing actions without altering source or accepted history', () => {
+  for(const setup of ['state.gold=-1','state.gold=NaN','state.gold=Number.MAX_SAFE_INTEGER+1','state.townScrolls=Infinity',
+    'state.player.hp=NaN','state.merchant.stock[0].gold=-1','state.merchant.stock[0].gold=NaN',
+    'state.merchant.stock[0].atk=Number.MAX_SAFE_INTEGER+1','state.merchant.stock[0].extra={nested:true}',
+    'state.inventory[0].extra={nested:true}','state.spellReadyAt.extra={}']) {
+    const g=game(713,true,'town');m1Setup(g);g.run(setup);const before=s2Snapshot(g);
+    assert.throws(()=>m1Cart(g),/Invalid trade:/,setup);assert.equal(s2Snapshot(g),before,setup);
+  }
+  for(const [setup,action]of [
+    ['state.gold=Number.MAX_SAFE_INTEGER;equipItem("ring",{...ITEM_TABLE[5]})',{type:'sell',slot:'ring'}],
+    ['state.townScrolls=Number.MAX_SAFE_INTEGER',{type:'buy',rowId:'stock:11'}],
+    ['state.player.str=Number.MAX_SAFE_INTEGER',{type:'buy',rowId:'stock:1'}],
+    ['',{type:'sell',slot:'__proto__'}],['',{type:'sell',slot:'ring'}],['',{type:'buy',rowId:-1}],['',{type:'confirm'}]]) {
+    const g=game(713,true,'town');m1Setup(g);g.run(setup);m1Cart(g);const before=s2Snapshot(g),cart=g.json('window.m1Cart');
+    assert.throws(()=>m1Stage(g,action),/Invalid trade:/);assert.deepEqual(g.json('window.m1Cart'),cart);assert.equal(s2Snapshot(g),before);
+  }
+});
+
+test('M1 immutable captured depth/time/stock/spells keep a draft independent of later live changes', () => {
+  const g=game(713,true,'town');m1Setup(g,'[ITEM_TABLE[8]]');g.run('state.depth=50');m1Cart(g);
+  g.run('state.depth=1;state.activeTime=99;state.gold=0;state.merchant.stock.length=0;state.player.spells.frostbolt=true');
+  const before=s2Snapshot(g);m1Stage(g,{type:'buy',rowId:'stock:0'});
+  assert.equal(g.run('window.m1Cart.draft.gold'),1792);assert.equal(g.run('window.m1Cart.draft.spellReadyAt.frostbolt'),37.25);
+  assert.equal(g.run('window.m1Cart.rules.pricingDepth'),50);assert.equal(s2Snapshot(g),before);
+  // M2 must reject committing this stale cart; M1 deliberately has no live commit API.
+});
+
+function m2Setup(area='town') {
+  const g=game(713,true,area,true);if(area==='dungeon')g.run('enterFloor(2,false,true)');
+  g.run(`state.gold=1000;state.activeTime=37.25;state.merchant.stock=[ITEM_TABLE[0],ITEM_TABLE[1],ITEM_TABLE[5],ITEM_TABLE[8],ITEM_TABLE[11],ITEM_TABLE[6]].map((it,i)=>({...it,id:100+i}));
+    state.player.x=state.merchant.x;state.player.y=state.merchant.y;render();`);return g;
+}
+function m2Snapshot(g) {
+  return g.run(`JSON.stringify(state,(key,value)=>['trade','art','motion','audio','lastTick','helpFocus','loadSession'].includes(key)?undefined:value instanceof Set?[...value]:value)`);
+}
+function m2AssertSame(g, before, label='') {
+  const after=m2Snapshot(g);
+  function difference(a,b,path='state') {
+    if(JSON.stringify(a)===JSON.stringify(b))return '';
+    if(a&&b&&typeof a==='object'&&typeof b==='object')for(const key of new Set([...Object.keys(a),...Object.keys(b)])){
+      const found=difference(a[key],b[key],path+'.'+key);if(found)return found;
+    }
+    return path+': '+JSON.stringify(a)+' -> '+JSON.stringify(b);
+  }
+  assert.equal(after===before,true,label+' '+(after===before?'':difference(JSON.parse(before),JSON.parse(after))));
+}
+function m2Click(g,id) { return g.run(`document.getElementById('${id}').onclick()`); }
+
+test('M2 Space and X open Buy/Sell carts with nearby town and exact dungeon access, never an immediate trade', () => {
+  for(const area of ['town','dungeon']) {
+    const g=m2Setup(area);g.run('state.player.x++;render(true)');const before=m2Snapshot(g);
+    assert.equal(g.run('openTrade()'),area==='town');
+    if(area==='town') { assert.equal(g.run('state.trade.mode'),'buy');g.run('closeTrade(false)');m2AssertSame(g,before); }
+    g.run('state.player.x=state.merchant.x;render(true)');const exact=m2Snapshot(g);g.key('x');
+    assert.equal(g.run('state.trade.mode'),'sell');assert.equal(g.run('state.trade.cart.draft.operations.length'),0);
+    m2AssertSame(g,exact);g.key('Escape');m2AssertSame(g,exact);
+    g.key(' ');assert.equal(g.run('!!state.trade'),true);assert.equal(g.elements.tradeOverlay.hidden,false);
+    assert.equal(g.elements.gameLayout.inert,true);g.run('closeTrade(false)');assert.equal(g.elements.gameLayout.inert,false);
+  }
+  for(const setup of ['state.started=false','state.pause={kind:"health"}','state.consoleOpen=true','state.helpOpen=true','document.hidden=true','state.companionPicker={}','state.loadSession={}']) {
+    const g=m2Setup();g.run(setup);assert.equal(g.run('openTrade()'),false,setup);
+  }
+});
+
+test('M2 selecting rows and staging purchases/sales/Undo/Reset/Cancel leaves live state, aliases, HUD and notices unchanged', () => {
+  const g=m2Setup();g.run(`equipItem('ring',{...ITEM_TABLE[5]});state.player.hp=75;render();
+    window.m2Stock=state.merchant.stock;window.m2Spells=state.player.spells;
+    window.m2Calls=[];log=()=>window.m2Calls.push('log');playSound=()=>window.m2Calls.push('sound');Math.random=()=>{throw new Error('preview RNG');};`);
+  const before=m2Snapshot(g),hud=g.elements.hpText.textContent;g.run('openTrade()');
+  assert.equal(g.run('selectTradeRow(state.trade,"buy","stock:3")'),true);assert.equal(g.run('state.trade.cart.draft.operations.length'),0);
+  m2Click(g,'addTradePurchase');g.run(`tradeSell('ring');tradeBuy('stock:0');tradeBuy('stock:4')`);
+  assert.equal(g.run('state.trade.cart.draft.operations.length'),4);m2AssertSame(g,before);
+  assert.equal(g.elements.hpText.textContent,hud);assert.equal(g.run('state.merchant.stock===window.m2Stock&&state.player.spells===window.m2Spells'),true);
+  m2Click(g,'undoTrade');m2Click(g,'resetTrade');m2AssertSame(g,before);
+  g.run(`tradeBuy('stock:2');tradeSell('ring');tradeBuy('stock:3')`);m2Click(g,'cancelTrade');
+  m2AssertSame(g,before);assert.deepEqual(g.json('window.m2Calls'),[]);assert.equal(g.run('state.trade'),null);
+  assert.equal(g.elements.tradeBuyList.children.length,0);assert.equal(g.elements.confirmTrade.onclick,null);
+});
+
+test('M2 Confirm applies retained operations once, defers spell/purchase/sale notices and companion sold-out remarks', () => {
+  const g=m2Setup();g.run(`state.merchant.stock=[{...ITEM_TABLE[5]},{...ITEM_TABLE[8]},{...ITEM_TABLE[11]}];
+    Math.random=()=>{throw new Error('trade commit RNG');};window.m2Sounds=[];window.m2Comp=0;playSound=name=>window.m2Sounds.push(name);companionTalk=kind=>{if(kind==='merchant')window.m2Comp++;};`);
+  const originalMessages=g.json('state.messages');g.run(`openTrade();window.m2Session=state.trade;tradeBuy('stock:0');tradeSell('ring');tradeBuy('stock:1');tradeBuy('stock:2')`);
+  assert.deepEqual(g.json('state.messages'),originalMessages);assert.deepEqual(g.json('window.m2Sounds'),[]);
+  assert.equal(g.run('confirmTrade(window.m2Session)'),true);assert.equal(g.run('confirmTrade(window.m2Session)'),false);
+  assert.equal(g.run('state.gold'),732);assert.equal(g.run('state.player.maxHp'),60);assert.equal(g.run('state.equipment.ring'),null);
+  assert.equal(g.run('state.player.spells.frostbolt'),true);assert.equal(g.run('state.spellReadyAt.frostbolt'),37.25);
+  assert.equal(g.run('state.townScrolls'),1);assert.equal(g.run('state.merchant.stock.length'),0);
+  assert.equal(g.run('window.m2Sounds.length'),4);assert.equal(g.run('window.m2Comp'),1);
+  assert.equal(g.run('state.messages.filter(s=>s.includes("Bought Ring")).length'),1);
+  assert.equal(g.run('state.messages.filter(s=>s.includes("Sold Ring")).length'),1);
+  assert.equal(g.run('state.messages.filter(s=>s.includes("learned Frostbolt")).length'),1);
+  g.run('openTrade();confirmTrade()');assert.equal(g.run('window.m2Comp'),1);assert.equal(g.run('window.m2Sounds.length'),4);
+});
+
+test('M2 committed ring/god-mode HP equals the path-dependent preview including same-bonus replacements', () => {
+  for(const [maxHp,hp,god,sale]of [[80,75,false,true],[80,20,false,true],[140,139,false,true],[80,75,false,false],[80,75,true,true]]) {
+    const g=m2Setup();g.run(`equipItem('ring',{...ITEM_TABLE[5]});state.player.maxHp=${maxHp};state.player.hp=${hp};
+      state.godMode=${god};state.godModeStats=${god} ? snapshotPlayerStats() : null;openTrade()`);
+    if(sale)g.run(`tradeSell('ring')`);g.run(`tradeBuy('stock:2');window.m2Expected=state.trade.cart.draft.player`);
+    const expected=g.json('window.m2Expected');assert.equal(g.run('confirmTrade()'),true);
+    assert.equal(g.run('state.player.hp'),expected.hp);assert.equal(g.run('state.player.maxHp'),expected.maxHp);
+    assert.equal(g.run('state.equipment.ring.name'),'Ring');
+  }
+});
+
+test('M2 known/unaffordable/pending rows remain visible and disabled; no invalid or empty sale enters the cart', () => {
+  const g=m2Setup();g.run('state.player.spells.frostbolt=true;state.gold=0;openTrade()');
+  assert.equal(g.elements.tradeBuyList.children[3].children[0].disabled,true);
+  assert.equal(g.elements.tradeBuyList.children[3].children[1].textContent,'Already learned');
+  assert.equal(g.elements.tradeBuyList.children[0].children[1].textContent,'Not enough gold');
+  const before=m2Snapshot(g);assert.equal(g.run(`tradeBuy('stock:3')`),false);assert.equal(g.run(`tradeSell('ring')`),false);
+  assert.equal(g.run('state.trade.cart.history.length'),0);m2AssertSame(g,before);
+  g.run('confirmTrade()');m2AssertSame(g,before);
+});
+
+test('M2 staged sales fund selected purchases and removed/undone operations emit no notices', () => {
+  const g=m2Setup();g.run(`state.gold=30;equipItem('weapon',{...ITEM_TABLE[1]});equipItem('armor',{...ITEM_TABLE[3]});openTrade();
+    tradeSell('weapon');tradeSell('armor');tradeBuy('stock:0');editTradeCart(state.trade,false);tradeBuy('stock:1')`);
+  assert.equal(g.run('state.trade.cart.draft.gold'),13);
+  assert.equal(g.run('confirmTrade()'),true);assert.equal(g.run('state.gold'),13);assert.equal(g.run('state.equipment.armor'),null);
+  assert.equal(g.run('state.equipment.weapon.name'),'Sword');assert.equal(g.run('state.inventory.length'),0);
+  assert.equal(g.run('state.messages.some(s=>s.includes("Bought Potion"))'),false);
+});
+
+test('M2 Confirm rejects changed context, source values and forged cart results without overwriting newer progress', () => {
+  for(const change of ['state.gold++','state.player.hp--','state.inventory.push({name:"Potion",kind:"heal",heal:.5})',
+    'state.player.spells.frostbolt=true','state.spellReadyAt.heal++','state.merchant.stock[0].gold++',
+    'state.activeTime++','state.godMode=true;state.godModeStats=snapshotPlayerStats()',
+    'state.player.x+=3','state.map=state.map.map(row=>row.slice())','state.merchant={...state.merchant}',
+    'state.trade.cart={...state.trade.cart,draft:{...state.trade.cart.draft,gold:999999}}']) {
+    const g=m2Setup();g.run(`openTrade();tradeBuy('stock:0')`);g.run(change);g.run('render(true)');const before=m2Snapshot(g);
+    assert.equal(g.run('confirmTrade()'),false,change);m2AssertSame(g,before,change);
+    assert.equal(g.elements.confirmTrade.disabled,true);assert.match(g.elements.tradeStatus.textContent,/out of date/);
+    g.run('closeTrade(false)');m2AssertSame(g,before);
+  }
+});
+
+test('M2 callbacks capture session identity so stale select/add/Confirm/Cancel cannot affect another shop', () => {
+  const g=m2Setup();g.run(`openTrade();window.m2Old=state.trade;window.m2OldSelect=document.getElementById('tradeBuyList').children[1].children[0].onclick;
+    window.m2OldAdd=document.getElementById('addTradePurchase').onclick;window.m2OldConfirm=document.getElementById('confirmTrade').onclick;
+    window.m2OldCancel=document.getElementById('cancelTrade').onclick;closeTrade(false);openTrade();`);
+  const before=m2Snapshot(g);g.run('window.m2OldSelect();window.m2OldAdd();window.m2OldConfirm();window.m2OldCancel()');
+  m2AssertSame(g,before);assert.equal(g.run('state.trade!==window.m2Old'),true);assert.equal(g.run('state.trade.cart.draft.operations.length'),0);
+});
+
+test('M2 failed equipment application or save restores exact scoped values and cached town/floor aliases before notices', () => {
+  for(const area of ['town','dungeon'])for(const failure of ['equip','save','paint']) {
+    const g=m2Setup(area);g.run(`equipItem('ring',{...ITEM_TABLE[5]});state.player.hp=75;render();
+      window.m2Refs=[state.inventory,state.player.spells,state.spellReadyAt,state.merchant.stock,state.equipment,state.merchant];
+      window.m2Sounds=0;playSound=()=>window.m2Sounds++;openTrade();tradeSell('ring');tradeBuy('stock:3');tradeBuy('stock:0');`);
+    const before=m2Snapshot(g);
+    if(failure==='equip')g.run('window.m2Equip=equipItem;equipItem=(...args)=>{window.m2Equip(...args);throw new Error("equip failed");}');
+    if(failure==='save')g.run(area==='town'?'window.m2Save=saveTown;saveTown=()=>{window.m2Save();throw new Error("town save failed");}':'window.m2Save=saveFloor;saveFloor=()=>{window.m2Save();throw new Error("floor save failed");}');
+    if(failure==='paint')g.run('window.m2Render=render;window.m2Paint=0;render=(...args)=>{window.m2Render(...args);if(!window.m2Paint++)throw new Error("paint failed");}');
+    assert.equal(g.run('confirmTrade()'),false,area+failure);m2AssertSame(g,before,area+failure);
+    assert.equal(g.run('window.m2Refs.every((ref,i)=>ref===[state.inventory,state.player.spells,state.spellReadyAt,state.merchant.stock,state.equipment,state.merchant][i])'),true);
+    assert.equal(g.run('window.m2Sounds'),0);assert.match(g.elements.tradeStatus.textContent,/unchanged/);assert.equal(g.run('state.trade.invalid'),true);
+  }
+});
+
+test('M2 confirmed store/merchant stock, gear and spell knowledge persist across revisits and portable snapshots', () => {
+  for(const area of ['town','dungeon']) {
+    const g=m2Setup(area);g.run(`window.m2Merchant=state.merchant;openTrade();tradeBuy('stock:1');tradeBuy('stock:3');confirmTrade()`);
+    const expected=g.json('[state.gold,state.equipment,state.player.spells,state.merchant.stock]');
+    if(area==='town')g.run('enterDungeonFromTown();enterTown()');else g.run('enterFloor(4,false);enterFloor(2,false)');
+    assert.deepEqual(g.json('[state.gold,state.equipment,state.player.spells,state.merchant.stock]'),expected);
+    assert.equal(g.run('state.merchant===window.m2Merchant'),true);assert.equal('trade' in saveFixture(g).run,false);
+  }
+});
+
+test('M2 keyboard selection/shortcuts, trapped focus, audio, hidden retention and restart have guarded behavior', () => {
+  const g=m2Setup();g.run('openTrade()');g.key('ArrowDown');assert.equal(g.run('state.trade.selectedBuy'),'stock:1');
+  g.key('Enter');assert.equal(g.run('state.trade.cart.draft.operations.length'),0,'Enter is not global Confirm');
+  g.key('b');assert.equal(g.run('state.trade.cart.draft.operations.length'),1);g.key('u');assert.equal(g.run('state.trade.cart.draft.operations.length'),0);
+  g.key('b');g.key('u',{shiftKey:true});assert.equal(g.run('state.trade.cart.draft.operations.length'),0);
+  g.run('document.getElementById("closeTrade").focus()');g.key('Tab',{shiftKey:true});assert.equal(g.run('document.activeElement===document.getElementById("tradeAudioToggle")'),true);
+  const enabled=g.run('state.audio.enabled');g.key('m');assert.equal(g.run('state.audio.enabled'),!enabled);
+  g.key('?');g.key('~');assert.equal(g.run('state.helpOpen||state.consoleOpen'),false);
+  g.run(`tradeBuy('stock:0');document.hidden=true`);assert.equal(g.run('confirmTrade()'),false);assert.equal(g.run('state.trade.cart.draft.operations.length'),1);
+  g.run('document.hidden=false');g.visibility();assert.equal(g.run('state.inventory.length'),0);g.key('r');
+  assert.equal(g.run('state.trade'),null);assert.equal(g.elements.tradeOverlay.hidden,true);assert.equal(g.run('state.gold'),0);
+});
+
+test('M2 forced travel, death and restart discard drafts without spell/HP/item/currency effects or stale commits', () => {
+  for(const transition of ['enterFloor(4,false,true)','enterTown()','newGame()','gameOver(false)']) {
+    const g=m2Setup('dungeon');g.run(`openTrade();window.m2Old=state.trade;window.m2Stock=state.merchant.stock;tradeBuy('stock:2');tradeBuy('stock:3')`);
+    const before=g.json('[state.gold,state.player.hp,state.player.maxHp,state.inventory,state.player.spells]');g.run(transition);
+    assert.equal(g.run('state.trade'),null);assert.equal(g.elements.tradeOverlay.hidden,true);assert.equal(g.run('confirmTrade(window.m2Old)'),false);
+    if(transition==='enterFloor(4,false,true)'||transition==='enterTown()')assert.deepEqual(g.json('[state.gold,state.player.hp,state.player.maxHp,state.inventory,state.player.spells]'),before);
+    assert.equal(g.run('window.m2Stock.length'),6);
+  }
+});
+
+test('M2 item details warn about gear replacement, label elixir honestly and render names as plain text', () => {
+  const g=m2Setup();g.run(`equipItem('weapon',{...ITEM_TABLE[2]});state.merchant.stock[1].name='Sword <img src=x>';openTrade();selectTradeRow(state.trade,'buy','stock:1')`);
+  assert.match(g.elements.tradeBuyDetails.textContent,/Replaces Bow; sell it first/);assert.equal(g.elements.addTradePurchase.textContent,'Buy & equip (B)');
+  assert.match(g.elements.tradeBuyList.children[1].children[0].children[1].textContent,/<img src=x>/);
+  g.run(`selectTradeRow(state.trade,'buy','stock:5')`);assert.match(g.elements.tradeBuyDetails.textContent,/60 gold.*no stat bonus/);
+});
+
+test('M3 direct player/combat/portal helpers independently honor an open market without side effects', () => {
+  const g=m2Setup('dungeon');g.run(`equipItem('weapon',{...ITEM_TABLE[2]});state.player.hp=35;state.player.mp=10;state.townScrolls=3;openTrade();
+    window.m3Target=state.monsters[0];window.m3Random=Math.random;Math.random=()=>{throw new Error('blocked market RNG');};`);
+  const before=m2Snapshot(g);
+  for(const call of ['movePlayer(1,0)','attackMonster(window.m3Target)','enemyAttack(window.m3Target)','shootBow()',
+    'castSpell("heal")','hurtPlayer(3,"stale damage")','pickup()','rescuePrisoner()','rescuePrincess()',
+    'ascendStairs()','descendStairs()','useTownScroll()']) {
+    g.run(call);m2AssertSame(g,before,call);
+  }
+  g.run('Math.random=window.m3Random;closeTrade(false);enterTown();state.player.x=state.merchant.x;state.player.y=state.merchant.y;state.player.hp=30;render(true);openTrade()');
+  const town=m2Snapshot(g);for(const call of ['townInteract()','restAtInn()','townNpcTalk(state.town.npcs[0])','townEncounter()','returnThroughTownPortal()']){g.run(call);m2AssertSame(g,town,call);}
+});
+
+test('M3 market freezes every timed subsystem and resumes without charging menu or slow-paint time', () => {
+  for(const area of ['town','dungeon']) {
+    const clock=Date.now;try {
+    const g=m2Setup(area);g.run(`state.player.hp=35;state.player.mp=7;state.combatElapsed=10;state.healElapsed=1.75;state.retreatReadyAt=100;
+      state.manaRegenAt=1;render(true);openTrade();window.m3Date=Date.now;window.m3Now=window.m3Date();Date.now=()=>window.m3Now;
+      window.m3Random=Math.random;Math.random=()=>{throw new Error('paused RNG');};`);
+    const before=m2Snapshot(g);
+    g.run('window.m3Now+=120000;enemyTick();advanceActiveTime(120);townTick();hazardTick();recoveryTick(120);regenMana();companionTick()');
+    m2AssertSame(g,before,area);assert.equal(g.run('motionPlayable()'),false);
+    g.run(`Math.random=window.m3Random;window.m3Render=render;render=(...args)=>{window.m3Render(...args);window.m3Now+=2000;};closeTrade(false)`);
+    assert.equal(g.run('state.lastTick===window.m3Now'),true,'close paint earns no catch-up time');
+    g.run('render=window.m3Render;Date.now=window.m3Date');
+    } finally { Date.now=clock; }
+  }
+});
+
+test('M3 failed opening and closing paints release modal ownership, inert flags, callbacks and focus for retry', () => {
+  const g=m2Setup();g.run(`document.getElementById('game').focus();window.m3Render=render;render=()=>{throw new Error('open paint');}`);
+  const before=m2Snapshot(g);assert.equal(g.run('openTrade()'),false);m2AssertSame(g,before);
+  assert.equal(g.run('state.trade'),null);assert.equal(g.elements.tradeOverlay.hidden,true);assert.equal(g.elements.gameLayout.inert,false);
+  g.run('render=window.m3Render;openTrade();render=()=>{throw new Error("close paint");}');
+  assert.equal(g.run('closeTrade(false)'),true);assert.equal(g.run('state.trade'),null);assert.equal(g.run('document.activeElement===canvas'),true);
+  g.run('render=window.m3Render;openTrade()');assert.equal(g.run('!!state.trade'),true);
+});
+
+test('M3 shop/companion/Help/health/retreat/load dialogs exclude each other and preserve underlying warnings', () => {
+  const g=m2Setup();g.run('openTrade();window.m3Cart=state.trade;openCompanionBoard();openHelp();openConsole()');
+  assert.equal(g.run('state.trade===window.m3Cart&&!state.helpOpen&&!state.consoleOpen&&!state.companionPicker'),true);
+  assert.equal(g.run('beginSaveLoad()'),null);g.run('closeTrade(false)');
+  for(const kind of ['health','retreat']) {
+    g.run(`state.pause={kind:${JSON.stringify(kind)}};state.warnedLow=true;state.warnedCritical=true;`);
+    assert.equal(g.run('openTrade()'),false);g.run('openHelp();closeHelp()');
+    assert.equal(g.run('state.pause.kind'),kind);assert.equal(g.run('state.warnedLow&&state.warnedCritical'),true);
+  }
+});
+
+test('M3 scroll/debug/retreat returns survive shopping exactly once without changing companions or cooldowns', () => {
+  for(const reason of ['scroll','cheat','retreat']) {
+    const g=game(713,true,'town',true);g.run(`enterFloor(2,false,true);state.townScrolls=3;state.activeTime=50;state.player.mp=7;
+      state.retreatReadyAt=0;`);
+    if(reason==='scroll')g.run('useTownScroll()');
+    else if(reason==='cheat')g.run('teleportTown()');
+    else g.run('state.pause={kind:"retreat"};confirmRetreat()');
+    g.run(`state.gold=1000;state.player.x=state.merchant.x;state.player.y=state.merchant.y;render(true);
+      window.m3Return=JSON.stringify([state.townExit,state.townPortalOpen,state.retreatReadyAt,state.player.mp,state.companion,state.unlockedCompanions,state.companionAttackAt]);
+      openTrade();tradeBuy('stock:0');confirmTrade();`);
+    assert.equal(g.run('JSON.stringify([state.townExit,state.townPortalOpen,state.retreatReadyAt,state.player.mp,state.companion,state.unlockedCompanions,state.companionAttackAt])===window.m3Return'),true);
+    const scrolls=g.run('state.townScrolls');g.run('enterDungeonFromTown()');assert.equal(g.run('state.depth'),2);
+    assert.equal(g.run('state.townExit'),null);assert.equal(g.run('state.townPortalOpen'),false);assert.equal(g.run('state.townScrolls'),scrolls);
+    assert.equal(g.run('returnThroughTownPortal()'),false);
+  }
+});
+
+test('M3 every companion can shop without reselection, retirement, unlock or attack-time changes', () => {
+  const g=m2Setup();g.run('window.m3Ids=Object.keys(COMPANIONS)');
+  for(const id of g.json('window.m3Ids')) {
+    g.run(`unlockCompanion(${JSON.stringify(id)});activateCompanion(${JSON.stringify(id)});state.gold=1000;
+      state.merchant.stock=[{...ITEM_TABLE[0]},{...ITEM_TABLE[11]}];state.player.x=state.merchant.x;state.player.y=state.merchant.y;render(true)`);
+    const before=g.json('[state.companion,state.selectedCompanion,state.unlockedCompanions,state.entranceCat,state.companionEntryDone,state.companionAttackAt]');
+    g.run(`openTrade();tradeBuy('stock:0');confirmTrade()`);
+    assert.deepEqual(g.json('[state.companion,state.selectedCompanion,state.unlockedCompanions,state.entranceCat,state.companionEntryDone,state.companionAttackAt]'),before,id);
+  }
+});
+
+test('M3 successful market commit survives save/hydrate, god-mode freeze and once-only ordinary revisit rules', () => {
+  const g=m2Setup('dungeon');g.run(`equipItem('ring',{...ITEM_TABLE[5]});state.player.hp=75;state.godMode=true;state.godModeStats=snapshotPlayerStats();
+    openTrade();tradeSell('ring');tradeBuy('stock:3');confirmTrade()`);
+  assert.equal(g.run('state.player.hp'),75);assert.equal(g.run('state.player.maxHp'),80);assert.equal(g.run('state.player.spells.frostbolt'),true);
+  g.run('state.godMode=false;state.godModeStats=null');const dto=saveFixture(g);
+  const h=game();s2InstallDto(h,dto);assert.equal(h.run('commitSaveLoad(beginSaveLoad(),window.s2Dto)'),true);
+  assert.deepEqual(saveFixture(h),dto);h.run('enterFloor(4,false);enterFloor(2,false)');
+  assert.equal(h.run('state.player.spells.frostbolt'),true);assert.equal(h.run('state.merchant.stock.length'),5);assert.equal(h.run('state.equipment.ring'),null);
+});
+
+test('M3 forced boss-ending/debug transitions discard pending carts and reject all saved shop handlers', () => {
+  for(const transition of ['loadLevel("5")','enterTown()','gameOver(false)','newGame()']) {
+    const g=m2Setup('dungeon');g.run(`openTrade();tradeBuy('stock:3');window.m3Session=state.trade;
+      window.m3Callbacks=['confirmTrade','cancelTrade','addTradePurchase'].map(id=>document.getElementById(id).onclick)`);
+    g.run(transition);const before=m2Snapshot(g);g.run('window.m3Callbacks.forEach(fn=>fn())');m2AssertSame(g,before);
+    assert.equal(g.elements.tradeOverlay.hidden,true);assert.equal(g.elements.gameLayout.inert,false);assert.equal(g.run('!!state.player.spells.frostbolt'),false);
+  }
+});
+
+test('M3 forced transitions inside equipment/save/paint hooks roll back before switching context and stop stale commit work', () => {
+  for(const hook of ['equip','save','paint'])for(const transition of ['newGame()','enterFloor(4,false,true)']) {
+    const g=m2Setup('dungeon');g.run(`window.m3Merchant=state.merchant;openTrade();tradeBuy('stock:2');tradeBuy('stock:3');window.m3Confirm=document.getElementById('confirmTrade').onclick`);
+    if(hook==='equip')g.run(`window.m3Equip=equipItem;equipItem=(...args)=>{window.m3Equip(...args);equipItem=window.m3Equip;${transition};}`);
+    else if(hook==='save')g.run(`window.m3Save=saveFloor;saveFloor=()=>{window.m3Save();saveFloor=window.m3Save;${transition};}`);
+    else g.run(`window.m3Render=render;render=(...args)=>{window.m3Render(...args);render=window.m3Render;${transition};}`);
+    assert.equal(g.run('window.m3Confirm()'),false,hook+transition);
+    assert.equal(g.run('state.trade'),null);assert.equal(g.run('state.player.maxHp'),60);assert.equal(g.run('state.equipment.ring'),null);
+    assert.equal(g.run('!!state.player.spells.frostbolt'),false);assert.equal(g.run('window.m3Merchant.stock.length'),6);
+    assert.equal(g.run('state.gold'),transition==='newGame()'?0:1000);assert.equal(g.run('state.messages.some(s=>s.includes("Bought Ring")||s.includes("Bought Frostbolt"))'),false);
+    const before=m2Snapshot(g);g.run('window.m3Confirm()');m2AssertSame(g,before);
+  }
+});
+
+test('M3 stale backdrop callbacks and unavailable audio cannot cancel newer shops or repeat a successful trade', () => {
+  const g=m2Setup();g.run(`openTrade();window.m3Backdrop=document.getElementById('tradeOverlay').onclick;closeTrade(false);openTrade();`);
+  assert.equal(g.run('typeof window.m3Backdrop'),'function');g.run(`window.m3Backdrop({target:{id:'tradeOverlay'}})`);
+  assert.equal(g.run('!!state.trade'),true);
+  g.run(`tradeBuy('stock:0');window.m3Session=state.trade;playSound=()=>{throw new Error('audio device unavailable');}`);
+  assert.equal(g.run('confirmTrade()'),true);assert.equal(g.run('state.inventory.length'),1);assert.equal(g.run('state.gold'),977);
+  assert.equal(g.run('state.messages.filter(s=>s.includes("Bought Potion")).length'),1);assert.equal(g.run('confirmTrade(window.m3Session)'),false);
+  assert.equal(g.run('document.activeElement===canvas'),true);
+});
+
+test('M3 final ending discards a staged cart and cannot carry its session into ending skip or restart', () => {
+  const g=m2Setup('dungeon');g.run(`enterFloor(100,false,true);state.bossDefeated=true;state.princess.rescued=true;
+    state.merchant={x:state.player.x,y:state.player.y,stock:[{...ITEM_TABLE[8]}]};state.gold=1000;openTrade();
+    tradeBuy('stock:0');window.m3Old=state.trade;gameOver(true)`);
+  assert.equal(g.run('!!state.ending'),true);assert.equal(g.run('state.trade'),null);assert.equal(g.elements.tradeOverlay.hidden,true);
+  assert.equal(g.run('!!state.player.spells.frostbolt'),false);assert.equal(g.run('confirmTrade(window.m3Old)'),false);
+  g.run('skipEnding();newGame()');assert.equal(g.run('state.trade'),null);assert.equal(g.elements.gameLayout.inert,false);
 });

@@ -38,11 +38,12 @@ const SPELLS = {
   magicBarrier: { name: 'Magic Barrier', cost: 14, cooldown: 4, key: 'Z' },
 };
 const COMPANION_LINES = {
-  boss: ['I was much taller before our little arrangement.', 'Congratulations. I now years for a smaller office.', 'Technically, I still haunt this floor. Rent free.'],
+  boss: ['I was much taller before our little arrangement.', 'Congratulations. I now yearn for a smaller office.', 'Technically, I still haunt this floor. Rent free.'],
   trap: ['You walked into that with such confidence.', 'The floor warned you. I admired your commitment.', 'I died to one of those once. You are doing fine.'],
   retreat: ['A strategic retreat. A very noble word for jogging away.', 'Cowardice with excellent timing.', 'I approve. Mostly because I am not carrying you.'],
   merchant: ['Bought everything? The pouch is now a memorial.', 'That merchant smiled like you were the Quest.', 'You now own six things you cannot use. Character growth.'],
   rescue: ['Another prisoner rescued. My old union is impressed.', 'You cut the ropes. I will take the credit in small font.', 'Heroic. Expensive. Occasionally useful.'],
+  sidekick: ['I am here for backup and moral support. Mostly backup.', 'Keep moving. I have a reputation for bravery to maintain.', 'If this goes badly, I was never here.'],
 };
 const CAT_LINES = {
   intro: ['I am here for the meat and the money. The wife and children have standards.', 'Try to look heroic. I need material for the family ledger.'],
@@ -52,6 +53,22 @@ const CAT_LINES = {
   retreat: ['A strategic retreat. A noble word for jogging away.', 'I approve. Mostly because I am not carrying you.'],
   merchant: ['Bought everything? The pantry is now a memorial.', 'That merchant smiled like you were the Quest.'],
   rescue: ['Another prisoner rescued. My union is impressed.', 'You cut the ropes. I will take credit in small font.'],
+};
+
+const COMPANION_FOG_RADIUS = 2, CAT_COMPANION_SCALE = 1.5, CAT_BAT_BONUS = 1;
+
+const COMPANIONS = {
+  marmalade: { id: 'marmalade', name: 'Marmalade', sprite: 'catCompanion', scale: CAT_COMPANION_SCALE, kind: 'cat', behavior: 'cat', linePool: 'cat', damage: 1, batBonus: CAT_BAT_BONUS, unlock: 'start', townActor: 'isEntranceCat', desc: 'Gate cat. Prefers bats, talks about payroll.' },
+  pip: { id: 'pip', name: 'Pip', sprite: 'dog', scale: 0.7, kind: 'sidekick', behavior: 'sidekick', linePool: 'sidekick', damage: 1, unlock: 'start', townActor: 'Pip', desc: 'Town dog. Loyal, simple, hits for 1.' },
+  mimic: { id: 'mimic', name: 'Mimic', sprite: 'mimic', scale: 0.55, kind: 'boss', behavior: 'boss', linePool: 'boss', damage: 1, unlock: 'defeat', desc: 'Defeat Mimic to unlock.' },
+  hydra: { id: 'hydra', name: 'Hydra', sprite: 'hydra', scale: 0.55, kind: 'boss', behavior: 'boss', linePool: 'boss', damage: 1, unlock: 'defeat', desc: 'Defeat Hydra to unlock.' },
+  boar: { id: 'boar', name: 'Wild Boar', sprite: 'boar', scale: 0.55, kind: 'boss', behavior: 'boss', linePool: 'boss', damage: 1, unlock: 'defeat', desc: 'Defeat Wild Boar to unlock.' },
+  medusa: { id: 'medusa', name: 'Medusa', sprite: 'medusa', scale: 0.55, kind: 'boss', behavior: 'boss', linePool: 'boss', damage: 1, unlock: 'defeat', desc: 'Defeat Medusa to unlock.' },
+  wizard: { id: 'wizard', name: 'Dark Wizard', sprite: 'darkWizard', scale: 0.55, kind: 'boss', behavior: 'boss', linePool: 'boss', damage: 1, unlock: 'defeat', desc: 'Defeat Dark Wizard to unlock.' },
+  skeletonKing: { id: 'skeletonKing', name: 'Skeleton King', sprite: 'skeletonKing', scale: 0.55, kind: 'boss', behavior: 'boss', linePool: 'boss', damage: 1, unlock: 'defeat', desc: 'Defeat Skeleton King to unlock.' },
+  dragon: { id: 'dragon', name: 'Dragon', sprite: 'dragonBoss', scale: 0.55, kind: 'boss', behavior: 'boss', linePool: 'boss', damage: 1, unlock: 'defeat', desc: 'Defeat Dragon to unlock.' },
+  cook: { id: 'cook', name: 'Cook', sprite: 'cook', scale: 0.55, kind: 'boss', behavior: 'boss', linePool: 'boss', damage: 1, unlock: 'defeat', desc: 'Defeat Cook to unlock.' },
+  bartender: { id: 'bartender', name: 'Bartender', sprite: 'bartender', scale: 0.55, kind: 'boss', behavior: 'boss', linePool: 'boss', damage: 1, unlock: 'defeat', desc: 'Defeat Bartender to unlock.' },
 };
 const TOWN_NPC_LINES = [
   'The dungeon gets louder every year. I sell maps now. Mostly.',
@@ -86,11 +103,10 @@ const BOSSES = {
   90: { name: 'Dark Wizard', sprite: 'darkWizard', hp: 130, atk: 25, def: 6, xp: 230, gold: 170, magic: true, magicType: 'attack', magicRange: 5 },
   100: { name: 'Dragon', sprite: 'dragon', hp: 160, atk: 26, def: 6, xp: 250, gold: 200, dragon: true },
 };
-const GAME_VERSION = '2.0.0';
+const GAME_VERSION = '2.1.0';
 // Brief quotations from Monty Python and the Holy Grail; official sources in README.
 const MONSTER_QUOTES = ['Ni!', 'None shall pass!', "'Tis but a scratch.", 'Run away!'];
 const MONSTER_SPEECH_DURATION = 5, MONSTER_SPEECH_INTERVAL = 5;
-const COMPANION_FOG_RADIUS = 2, CAT_COMPANION_SCALE = 1.5, CAT_BAT_BONUS = 1;
 const ENDING_DURATION = 14;
 const MIMIC_DEFEAT_DURATION = 1.6, DRAGON_DEFEAT_DURATION = 2.6, BOSS_INTRO_DURATION = 1.6;
 const BOSS_ANIMATIONS = {
@@ -150,6 +166,8 @@ function bossKind(m) {
   if (m.isDragon || m.dragon) return 'dragon';
   if (m.isThemed) return m.themedType === 'pub' ? 'bartender' : 'cook';
   const name = String(m.name || '').toLowerCase();
+  if (name === 'cook') return 'cook';
+  if (name === 'bartender') return 'bartender';
   if (name.includes('mimic')) return 'mimic';
   if (name.includes('hydra')) return 'hydra';
   if (name.includes('boar')) return 'boar';
@@ -169,11 +187,11 @@ function lootPool(depth) {
 }
 
 function learnSpell(spellName) {
+  const learned = learnSpellState(state.player.spells, state.spellReadyAt, spellName, state.activeTime);
+  if (!learned) return false;
+  state.player.spells[spellName] = learned.spells[spellName];
+  state.spellReadyAt[spellName] = learned.spellReadyAt[spellName];
   const spell = SPELLS[spellName];
-  if (!spell) return false;
-  if (state.player.spells[spellName]) return false;
-  state.player.spells[spellName] = true;
-  state.spellReadyAt[spellName] = state.activeTime;
   log(`You learned ${spell.name}! Press ${spell.key} to cast it.`);
   return true;
 }
@@ -195,23 +213,111 @@ function entranceCatActor() {
   return state.town && (state.town.animals || []).find(actor => actor.isEntranceCat) || null;
 }
 
-function joinEntranceCat(auto) {
-  if (!state.entranceCat || state.entranceCat.recruited || state.entranceCat.retired || state.companion) return false;
-  const cat = entranceCatActor();
-  state.companion = { name: 'Marmalade', sprite: 'catCompanion', kind: 'cat', scale: CAT_COMPANION_SCALE, damage: 1, batBonus: CAT_BAT_BONUS,
-    x: cat ? cat.x : state.player.x, y: cat ? cat.y : state.player.y };
-  if (cat) cat.hidden = true;
-  state.entranceCat.recruited = true;
-  state.companionSpeech = null;
-  state.companionSpeechReadyAt = state.activeTime;
-  state.companionAttackAt = state.activeTime + 3;
-  placeCompanionNearPlayer();
-  log(auto ? 'Marmalade hops in before you can leave. "Someone has to buy the meat."' : 'Marmalade agrees to join you. "The wife and children are counting on this."');
+function companionDef(id) {
+  return COMPANIONS[id] || null;
+}
+
+function isCompanionUnlocked(id) {
+  return !!state.unlockedCompanions && state.unlockedCompanions.includes(id);
+}
+
+function unlockCompanion(id) {
+  if (!id || !COMPANIONS[id]) return false;
+  if (!state.unlockedCompanions) state.unlockedCompanions = ['marmalade', 'pip'];
+  if (state.unlockedCompanions.includes(id)) return false;
+  state.unlockedCompanions.push(id);
+  log(`${COMPANIONS[id].name} is now available at the companion board.`);
   return true;
 }
 
+function makeCompanion(id, x, y) {
+  const def = companionDef(id);
+  if (!def) return null;
+  return { id: def.id, name: def.name, sprite: def.sprite, kind: def.kind, behavior: def.behavior, linePool: def.linePool,
+    damage: def.damage || 1, batBonus: def.batBonus || 0, scale: def.scale, x, y };
+}
+
+function selectedCompanionActor() {
+  const id = state.selectedCompanion || 'marmalade';
+  if (id === 'marmalade') return entranceCatActor();
+  if (id === 'pip') return state.town && (state.town.animals || []).find(a => a.name === 'Pip') || null;
+  return null;
+}
+
+function clearCompanionMotion() {
+  if (!state.motion) return;
+  delete state.motion.moves.companion;
+  delete state.motion.directions.companion;
+  delete state.motion.facing.companion;
+}
+
+function syncStarterActors() {
+  if (!state.town) return;
+  const active = state.companion && state.companion.id;
+  for (const actor of state.town.animals || []) {
+    if (actor.isEntranceCat) actor.hidden = active === 'marmalade';
+    else if (actor.name === 'Pip') actor.hidden = active === 'pip';
+  }
+}
+
+function activateCompanion(id, x = state.player.x, y = state.player.y) {
+  if (!isCompanionUnlocked(id)) return false;
+  const companion = makeCompanion(id, x, y);
+  if (!companion) return false;
+  clearCompanionMotion();
+  state.companion = companion;
+  state.selectedCompanion = id;
+  state.companionSpeech = null;
+  state.companionSpeechReadyAt = state.activeTime;
+  state.companionAttackAt = state.activeTime + 3;
+  if (id === 'marmalade' && state.entranceCat) state.entranceCat.recruited = true;
+  syncStarterActors();
+  placeCompanionNearPlayer();
+  return true;
+}
+
+function resetCompanionRun() {
+  closeCompanionBoard(state && state.companionPicker, false);
+  clearCompanionMotion();
+  state.companion = null;
+  state.companionSpeech = null;
+  state.companionSpeechReadyAt = 0;
+  state.companionQuoteIndex = 0;
+  state.companionAttackAt = 0;
+  state.selectedCompanion = 'marmalade';
+  state.companionChoice = 'marmalade';
+  state.unlockedCompanions = ['marmalade', 'pip'];
+  state.companionEntryDone = false;
+  state.companionPicker = null;
+  state.entranceCat = freshEntranceCatState();
+  document.getElementById('companionOverlay').hidden = true;
+  syncStarterActors();
+}
+
+function joinSelectedCompanion(auto) {
+  if (state.companion || state.companionEntryDone) return false;
+  const selected = companionDef(state.selectedCompanion);
+  const id = selected && selected.unlock === 'start' && isCompanionUnlocked(selected.id) ? selected.id : 'marmalade';
+  state.selectedCompanion = id;
+  const actor = selectedCompanionActor();
+  if (!activateCompanion(id, actor ? actor.x : state.player.x, actor ? actor.y : state.player.y)) return false;
+  if (auto) {
+    state.companionEntryDone = true;
+    state.entranceCat.entered = true;
+  }
+  if (id === 'marmalade') {
+    log(auto ? 'Marmalade hops in before you can leave. "Someone has to buy the meat."' : 'Marmalade agrees to join you. "The wife and children are counting on this."');
+  } else {
+    log(auto ? `${state.companion.name} trots in before you can leave.` : `${state.companion.name} joins your party.`);
+  }
+  return true;
+}
+
+function joinEntranceCat(auto) { return joinSelectedCompanion(auto); }
+
 function talkToEntranceCat() {
-  if (!joinEntranceCat(false)) return false;
+  if (state.trade) return;
+  if (!joinSelectedCompanion(false)) return false;
   state.companionSpeechReadyAt = 0;
   companionTalk('intro');
   render();
@@ -245,17 +351,20 @@ function placeCompanionNearPlayer(dx = 0, dy = 0) {
 }
 
 function adoptBossCompanion(m) {
-  state.companion = { name: m.name, sprite: m.isDragon ? 'dragonBoss' : m.sprite || bossKind(m), kind: 'boss', x: state.player.x, y: state.player.y };
-  state.companionSpeech = null;
-  state.companionSpeechReadyAt = state.activeTime;
-  state.companionAttackAt = state.activeTime + 3;
-  placeCompanionNearPlayer();
+  if (!m || !m.isBoss) return false;
+  const id = bossKind(m);
+  unlockCompanion(id);
+  if (!activateCompanion(id)) return false;
   log(`${m.name} agrees to join you as a tiny, reluctant companion.`);
+  return true;
 }
 
 function companionTalk(kind) {
   if (!state.companion || state.gameOver || state.activeTime < state.companionSpeechReadyAt) return;
-  const pool = state.companion.kind === 'cat' ? (CAT_LINES[kind] || COMPANION_LINES[kind]) : COMPANION_LINES[kind];
+  const def = companionDef(state.companion.id);
+  const poolName = def ? def.linePool : state.companion.kind === 'cat' ? 'cat' : 'boss';
+  const pool = poolName === 'sidekick' ? COMPANION_LINES.sidekick
+    : poolName === 'cat' ? (CAT_LINES[kind] || COMPANION_LINES[kind]) : (COMPANION_LINES[kind] || CAT_LINES[kind]);
   if (!pool || !pool.length) return;
   const text = pool[state.companionQuoteIndex % pool.length];
   state.companionQuoteIndex++;
@@ -264,8 +373,13 @@ function companionTalk(kind) {
   log(`${state.companion.name}: “${text}”`);
 }
 
+function simulationBlocked() {
+  return !state.started || state.gameOver || state.helpOpen || state.consoleOpen || state.pause
+    || state.trade || state.companionPicker || state.loadSession || document.hidden || state.ending || bossCinematicActive();
+}
+
 function companionTick() {
-  if (state.area === 'town') return;
+  if (state.area === 'town' || simulationBlocked()) return;
   const companion = state.companion;
   if (!companion || state.gameOver) return;
   if (state.companionSpeech && state.activeTime >= state.companionSpeech.expiresAt) state.companionSpeech = null;
@@ -273,10 +387,12 @@ function companionTick() {
   state.companionAttackAt = state.activeTime + 3;
   const targets = visibleTargets(3, companion);
   if (!targets.length) return;
-  const target = companion.kind === 'cat' ? (targets.find(m => m.sprite === 'bat') || targets[0]) : targets[0];
-  if (companion.kind === 'cat' && target.sprite === 'bat') companionTalk('bat');
+  const behavior = companion.behavior || (companion.kind === 'cat' ? 'cat' : 'boss');
+  const target = behavior === 'cat' ? (targets.find(m => m.sprite === 'bat') || targets[0])
+    : behavior === 'sidekick' ? nearestVisibleTarget(3, companion) : targets[0];
+  if (behavior === 'cat' && target.sprite === 'bat') companionTalk('bat');
   spawnProjectile('bolt', companion, target, 0.25);
-  const damage = companion.kind === 'cat' && target.sprite === 'bat' ? 1 + (companion.batBonus || 0) : 1;
+  const damage = behavior === 'cat' && target.sprite === 'bat' ? (companion.damage || 1) + (companion.batBonus || 0) : (companion.damage || 1);
   damageMonster(target, damage);
 }
 
@@ -307,9 +423,969 @@ const GOD_STAT_FIELDS = ['hp', 'maxHp', 'mp', 'maxMp', 'str', 'dex', 'def', 'lvl
 const FLOOR_FIELDS = ['map', 'rooms', 'potions', 'stairs', 'upstairs', 'treasures', 'merchant', 'prisoner',
   'princess', 'visited', 'monsterSpawns', 'bossDefeated', 'floorKey', 'obstacles', 'hazards', 'hazardTime', 'biome', 'props'];
 
+// Portable save format v1: explicit DTO and strict validation; live commit/transport are separate below.
+const SAVE_FORMAT = 'dungeon-crawler-save', SAVE_FORMAT_VERSION = 1;
+const SAVE_MAX_BYTES = 32 * 1024 * 1024, SAVE_MAX_NODES = 4000000, SAVE_MAX_DEPTH = 16;
+const SAVE_RUN_FIELDS = ['depth','area','kills','turn','player','spellReadyAt','inventory','townScrolls','gold','equipment',
+  'warnedLow','warnedCritical','combatElapsed','healElapsed','activeTime','manaRegenAt','retreatReadyAt',
+  'selectedCompanion','unlockedCompanions','companionChoice','companionEntryDone','companion',
+  'companionSpeechReadyAt','companionQuoteIndex','companionAttackAt','entranceCat','townExit','townPortalOpen',
+  'monsterSpeechReadyAt','monsterQuoteIndex','messages'];
+const SAVE_MONSTER_FIELDS = ['name','sprite','x','y','hp','maxHp','atk','def','xp','gold','id','minDepth','range',
+  'ranged','projectile','magic','magicType','magicRange','isBoss','isThemed','themedType','throne','summons',
+  'dragon','isDragon','isThroneBoss','nextAttackAt','isGuard'];
+
+function saveRequire(condition, message) {
+  if (!condition) throw new Error(`Invalid save: ${message}`);
+}
+
+function saveFields(value, required, optional = []) {
+  saveRequire(value !== null && typeof value === 'object' && !Array.isArray(value), 'expected record');
+  const allowed = required.concat(optional);
+  saveRequire(Object.keys(value).every(key => allowed.includes(key)), 'unknown record field');
+  saveRequire(required.every(key => Object.prototype.hasOwnProperty.call(value, key)), 'missing record field');
+}
+
+function saveList(value, max, min = 0) {
+  saveRequire(Array.isArray(value) && value.length >= min && value.length <= max, 'array length/type');
+}
+
+function saveNumber(value, min = 0, max = Number.MAX_SAFE_INTEGER, integer = false) {
+  saveRequire(typeof value === 'number' && Number.isFinite(value) && value >= min && value <= max
+    && (!integer || Number.isInteger(value)), 'number range/type');
+}
+
+function saveCount(value, min = 0, max = Number.MAX_SAFE_INTEGER) { saveNumber(value, min, max, true); }
+function saveBoolean(value) { saveRequire(typeof value === 'boolean', 'expected boolean'); }
+function saveEnum(value, choices) { saveRequire(choices.includes(value), 'unknown identity'); }
+function saveText(value, max) { saveRequire(typeof value === 'string' && value.length <= max, 'text length/type'); }
+
+function savePoint(value, map = null) {
+  saveCount(value.x, 0, W - 1); saveCount(value.y, 0, H - 1);
+  if (map) saveRequire(map[value.y][value.x] === 0, 'actor/object on blocked tile');
+}
+
+function saveTile(value, map = null) { saveFields(value, ['x','y']); savePoint(value, map); }
+
+// UTF-8 accounting without a runtime TextEncoder dependency (also works in the no-DOM VM).
+function scanSaveText(text, scan, end) {
+  let i=scan.index, bytes=scan.bytes, depth=scan.depth, quoted=scan.quoted, escaped=scan.escaped;
+  for (;i<end;i++) {
+    const code=text.charCodeAt(i), char=text[i];
+    if (code<128) bytes++;
+    else if (code<2048) bytes+=2;
+    else if (code>=0xd800 && code<=0xdbff && text.charCodeAt(i+1)>=0xdc00 && text.charCodeAt(i+1)<=0xdfff) { bytes+=4;i++; }
+    else bytes+=3;
+    saveRequire(bytes<=SAVE_MAX_BYTES,'UTF-8 size exceeds 32 MiB');
+    if (quoted) { if (escaped) escaped=false; else if (char==='\\') escaped=true; else if (char==='"') quoted=false; }
+    else if (char==='"') quoted=true;
+    else if (char==='{' || char==='[') { depth++;saveRequire(depth<=SAVE_MAX_DEPTH,'nesting exceeds 16'); }
+    else if (char==='}' || char===']') depth--;
+  }
+  scan.index=i;scan.bytes=bytes;scan.depth=depth;scan.quoted=quoted;scan.escaped=escaped;
+}
+
+function* saveTextBudgetSteps(text) {
+  saveText(text,SAVE_MAX_BYTES);
+  const scan={index:0,bytes:0,depth:0,quoted:false,escaped:false};
+  while(scan.index<text.length) { scanSaveText(text,scan,Math.min(text.length,scan.index+65536));yield; }
+  return scan.bytes;
+}
+
+function drainSaveSteps(steps) {
+  let next;do { next=steps.next(); } while(!next.done);return next.value;
+}
+
+function saveTextBudget(text) { return drainSaveSteps(saveTextBudgetSteps(text)); }
+
+function saveScalarBytes(value) {
+  const text=JSON.stringify(value);
+  return /^[\x00-\x7f]*$/.test(text) ? text.length : saveTextBudget(text);
+}
+
+// Iterative preflight before stringify/typed validation: no getters, custom prototypes, cycles or coercion.
+function* saveStructureSteps(value) {
+  const stack = [{ value, depth: 0 }], ancestors = new WeakSet();
+  let nodes = 0, bytes = 0, work=0;
+  while (stack.length) {
+    if (++work%4096===0) yield;
+    const item = stack.pop(), v = item.value;
+    if (item.keys) {
+      if (item.index === item.keys.length) { ancestors.delete(v); continue; }
+      const key = item.keys[item.index++];
+      saveRequire(!['__proto__','prototype','constructor'].includes(key), 'dangerous field');
+      const descriptor = Object.getOwnPropertyDescriptor(v,key);
+      saveRequire(Object.prototype.hasOwnProperty.call(descriptor,'value'), 'accessor field');
+      if (!Array.isArray(v)) bytes += saveScalarBytes(key) + 1;
+      stack.push(item, { value:descriptor.value, depth:item.depth+1 });
+      continue;
+    }
+    saveRequire(++nodes <= SAVE_MAX_NODES, 'structure exceeds 4000000 nodes');
+    if (v === null || ['boolean','string','number'].includes(typeof v)) {
+      if (typeof v === 'number') saveRequire(Number.isFinite(v), 'nonfinite number');
+      if (typeof v === 'string') saveText(v,512);
+      bytes += saveScalarBytes(v);
+      saveRequire(bytes <= SAVE_MAX_BYTES, 'UTF-8 size exceeds 32 MiB');
+      continue;
+    }
+    saveRequire(typeof v === 'object', 'non-JSON value');
+    saveRequire(item.depth < SAVE_MAX_DEPTH && !ancestors.has(v), 'nesting/cycle');
+    const array = Array.isArray(v), prototype = Object.getPrototypeOf(v);
+    saveRequire(prototype === (array ? Array.prototype : Object.prototype) || (!array && prototype === null), 'custom prototype');
+    if (array) saveRequire(v.length<=65536,'array exceeds format limit');
+    const keys = Object.keys(v);
+    saveRequire(keys.length <= SAVE_MAX_NODES - nodes, 'structure exceeds 4000000 nodes');
+    saveRequire(array || keys.length<=128, 'record field limit');
+    saveRequire(Object.getOwnPropertySymbols(v).length === 0, 'symbol field');
+    saveRequire(Object.getOwnPropertyNames(v).length === keys.length+(array?1:0), 'non-enumerable field');
+    if (array) saveRequire(keys.length === v.length && keys.every((key,i) => key === String(i)), 'sparse/extended array');
+    bytes += 2 + Math.max(0,keys.length-1);
+    saveRequire(bytes <= SAVE_MAX_BYTES, 'UTF-8 size exceeds 32 MiB');
+    ancestors.add(v); stack.push({ value:v, keys, index:0, depth:item.depth });
+  }
+  return nodes;
+}
+
+function saveStructure(value) { return drainSaveSteps(saveStructureSteps(value)); }
+
+function saveMap(map) {
+  saveList(map, H, H);
+  for (const row of map) { saveList(row,W,W); for (const tile of row) saveCount(tile,0,2); }
+}
+
+function saveVisited(visited) {
+  saveList(visited,W*H);
+  const seen = new Set();
+  for (const key of visited) {
+    saveText(key,5); saveRequire(/^(0|[1-9][0-9]*),(0|[1-9][0-9]*)$/.test(key), 'noncanonical visited coordinate');
+    const [x,y] = key.split(',').map(Number); savePoint({x,y});
+    saveRequire(!seen.has(key),'duplicate visited coordinate'); seen.add(key);
+  }
+}
+
+function saveUniqueIds(rows) {
+  const ids = new Set();
+  for (const row of rows) {
+    saveRequire(row !== null && typeof row === 'object' && !Array.isArray(row),'ID record');
+    saveCount(row.id); saveRequire(!ids.has(row.id),'duplicate scoped ID'); ids.add(row.id);
+  }
+}
+
+function saveItem(item, map = null) {
+  saveFields(item,['name'],['sprite','gold','kind','heal','atk','str','range','def','dex','maxHp','spell','minDepth','scroll','lootWeight','x','y','id']);
+  const def = ITEM_TABLE.find(d => d.name === item.name);
+  saveRequire(!!def,'unknown item');
+  saveFields(item,Object.keys(def),['x','y','id']);
+  for (const key of Object.keys(def)) saveRequire(item[key] === def[key],'item identity/modifier mismatch');
+  if ('id' in item) saveCount(item.id);
+  saveRequire(('x' in item) === ('y' in item),'partial item position');
+  if ('x' in item) savePoint(item,map);
+}
+
+function saveMerchant(merchant, map, town = false) {
+  saveFields(merchant,['x','y','isMerchant','stock'].concat(town?['sprite']:[]));
+  savePoint(merchant,map); saveRequire(merchant.isMerchant === true,'merchant role');
+  if (town) saveRequire(merchant.sprite === 'store','town store role');
+  saveList(merchant.stock,6); saveUniqueIds(merchant.stock);
+  for (const item of merchant.stock) { saveItem(item); saveRequire('id' in item && !('x' in item),'stock placement'); }
+}
+
+function saveMonsterDefinition(monster, depth) {
+  if (monster.isBoss) {
+    const boss = bossForDepth(depth), themed = THEMED_FLOORS[depth];
+    if (boss) return { ...boss, maxHp:boss.hp, id:999, isBoss:true, isDragon:boss.dragon, isThroneBoss:!!boss.throne };
+    saveRequire(!!themed,'boss at wrong depth');
+    const scale = 1 + (depth-1)*0.35;
+    return {name:themed.name,sprite:themed.sprite,maxHp:Math.round(100*(1+(depth-1)*0.2)),
+      atk:Math.round(20*(1+(depth-1)*0.15)),def:6+Math.floor(depth/5),xp:Math.round(150*scale),
+      gold:Math.round(100*scale),id:999,isBoss:true,isThemed:true,themedType:themed.kind,
+      ranged:themed.kind==='pub',range:themed.kind==='pub'?4:0,projectile:'beer'};
+  }
+  const def = MONSTER_TYPES.find(d => d.name === monster.name);
+  saveRequire(!!def && depth >= (def.minDepth || 1),'ordinary monster identity/depth');
+  if (monster.isGuard) saveRequire(depth === 50 && def.name === 'Skeleton' && monster.id >= 1000,'guard identity/depth');
+  else saveCount(monster.id,0,39);
+  return {...def,maxHp:Math.round(def.hp*(1+(depth-1)*0.2)),
+    atk:Math.round(def.atk*(1+(depth-1)*(def.ranged||def.magic?0.1:0.15))),
+    def:def.def+Math.floor((depth-1)/2),xp:Math.round(def.xp*(1+(depth-1)*0.35)),
+    gold:Math.max(2,Math.round(5*(1+(depth-1)*0.35))),id:monster.id,...(monster.isGuard?{isGuard:true}:{})};
+}
+
+function saveMonster(monster, depth, map, current) {
+  saveFields(monster,['name','sprite','x','y','hp','maxHp','atk','def','xp','gold','id'].concat(current?['nextAttackAt']:[]),SAVE_MONSTER_FIELDS);
+  savePoint(monster,map); saveCount(monster.id); saveNumber(monster.hp,-Number.MAX_SAFE_INTEGER,monster.maxHp,true);
+  if (current) saveNumber(monster.nextAttackAt);
+  else saveRequire(monster.hp === monster.maxHp && !('nextAttackAt' in monster) && !('isGuard' in monster),'template mutable state');
+  const expected = saveMonsterDefinition(monster,depth);
+  for (const key of SAVE_MONSTER_FIELDS) {
+    if (['x','y','hp','nextAttackAt'].includes(key)) continue;
+    saveRequire(monster[key] === expected[key],`monster definition: ${key}`);
+  }
+}
+
+function saveFloorData(floor, depth) {
+  saveFields(floor,FLOOR_FIELDS.concat('descentRewarded'));
+  saveMap(floor.map); saveVisited(floor.visited); saveBoolean(floor.descentRewarded); saveBoolean(floor.bossDefeated);
+  saveRequire(floor.biome === biomeForDepth(depth),'floor biome/depth'); saveNumber(floor.hazardTime);
+  saveList(floor.rooms,32,1);
+  for (const room of floor.rooms) {
+    saveFields(room,['x','y','w','h','cx','cy'],['isArena','isThroneRoom']); savePoint(room);
+    saveCount(room.w,1,W-room.x); saveCount(room.h,1,H-room.y);
+    saveRequire(room.cx === room.x+(room.w>>1) && room.cy === room.y+(room.h>>1),'room center');
+    for (const key of ['isArena','isThroneRoom']) if (key in room) saveBoolean(room[key]);
+    if (room.isThroneRoom) saveRequire(depth === 50 && room.isArena,'throne room role');
+  }
+  const bossFloor = !!(BOSSES[depth] || THEMED_FLOORS[depth]);
+  saveRequire(floor.rooms.filter(r=>r.isArena).length === (bossFloor?1:0),'arena/depth');
+  saveList(floor.monsterSpawns,41); saveUniqueIds(floor.monsterSpawns);
+  for (const monster of floor.monsterSpawns) saveMonster(monster,depth,floor.map,false);
+  saveRequire(floor.monsterSpawns.filter(m=>m.isBoss).length === (bossFloor?1:0),'boss template/depth');
+  if (!bossFloor) saveRequire(!floor.bossDefeated,'defeat on non-boss floor');
+  saveTile(floor.stairs,floor.map); saveTile(floor.upstairs,floor.map);
+  saveList(floor.potions,4+Math.floor(depth/3));
+  for (const potion of floor.potions) { saveFields(potion,['x','y','heal']); savePoint(potion,floor.map); saveNumber(potion.heal,0.25,0.6); saveRequire(potion.heal<0.6,'potion fraction'); }
+  saveList(floor.treasures,4+Math.floor(depth/4)); saveUniqueIds(floor.treasures);
+  for (const item of floor.treasures) { saveItem(item,floor.map); saveRequire('x' in item && 'id' in item,'world item placement'); }
+  const merchantFloor = !bossFloor && depth%2 === 0;
+  saveRequire((floor.merchant !== null) === merchantFloor && (floor.prisoner !== null) === merchantFloor,'NPC/depth');
+  if (floor.merchant) saveMerchant(floor.merchant,floor.map);
+  if (floor.prisoner) { saveFields(floor.prisoner,['x','y','rescued','isPrisoner']); savePoint(floor.prisoner,floor.map); saveBoolean(floor.prisoner.rescued); saveRequire(floor.prisoner.isPrisoner === true,'prisoner role'); }
+  saveRequire((floor.princess !== null) === (depth === FINAL_DEPTH),'princess/depth');
+  if (floor.princess) { saveFields(floor.princess,['x','y','rescued','isPrincess']); savePoint(floor.princess,floor.map); saveRequire(floor.princess.isPrincess === true && floor.princess.rescued === false,'living princess state'); }
+  if (depth === FINAL_DEPTH) saveRequire(floor.floorKey === null,'final floor key');
+  else {
+    const key = floor.floorKey; saveFields(key,['carrierId','dropped','collected','drop']);
+    saveCount(key.carrierId); saveBoolean(key.dropped); saveBoolean(key.collected);
+    saveRequire(floor.monsterSpawns.some(m=>m.id===key.carrierId && !m.isBoss),'key carrier template');
+    saveRequire(key.collected ? key.dropped && key.drop === null : key.dropped === (key.drop !== null),'key drop/collection');
+    if (key.drop !== null) saveTile(key.drop,floor.map);
+  }
+  saveList(floor.obstacles,14+Math.floor(depth/2));
+  const blocked = new Set();
+  for (const obstacle of floor.obstacles) {
+    saveFields(obstacle,['x','y','type']); savePoint(obstacle); saveEnum(obstacle.type,['pillar','rubble']);
+    const key = `${obstacle.x},${obstacle.y}`;
+    saveRequire(floor.map[obstacle.y][obstacle.x] === 2 && !blocked.has(key),'obstacle/map'); blocked.add(key);
+  }
+  saveRequire(floor.map.reduce((n,row)=>n+row.filter(v=>v===2).length,0) === blocked.size,'unrecorded obstacle');
+  saveList(floor.props,76);
+  for (const prop of floor.props) { saveFields(prop,['x','y','sprite']); savePoint(prop,floor.map); saveEnum(prop.sprite,[BIOMES[floor.biome].prop,...(depth===50?['throne','torch','banner','tombstone']:[])]); }
+  saveList(floor.hazards,24+depth);
+  const hazardTiles = new Set();
+  for (const hazard of floor.hazards) {
+    saveFields(hazard,['x','y','type','revealed','triggered','stage','offset','nextDamageAt','impactAt']);
+    savePoint(hazard,floor.map); saveEnum(hazard.type,['spikes','flame','rocks']); saveEnum(hazard.stage,['idle','warning','spent']);
+    saveBoolean(hazard.revealed); saveBoolean(hazard.triggered); saveNumber(hazard.offset,0,6); saveRequire(hazard.offset<6,'hazard offset');
+    saveNumber(hazard.nextDamageAt);
+    const key = `${hazard.x},${hazard.y}`; saveRequire(!hazardTiles.has(key),'duplicate hazard'); hazardTiles.add(key);
+    if (hazard.type === 'rocks') {
+      saveRequire(hazard.revealed && hazard.triggered === (hazard.stage !== 'idle'),'rock state');
+      if (hazard.triggered) saveNumber(hazard.impactAt); else saveRequire(hazard.impactAt === null,'idle rock impact');
+    } else {
+      saveRequire(hazard.stage === 'idle' && hazard.impactAt === null,'hazard stage/impact');
+      if (hazard.type === 'spikes') saveRequire(hazard.revealed === hazard.triggered && hazard.nextDamageAt === 0,'spike secrecy/state');
+      else saveRequire(hazard.revealed && !hazard.triggered,'flame state');
+    }
+  }
+}
+
+function saveTownData(town) {
+  saveFields(town,['map','visited','props','npcs','animals','spawn','store','landmarks','tick','quoteIndex','nextTalkAt']);
+  saveMap(town.map); saveVisited(town.visited); saveTile(town.spawn,town.map);
+  saveCount(town.tick); saveCount(town.quoteIndex); saveNumber(town.nextTalkAt); saveMerchant(town.store,town.map,true);
+  saveList(town.props,104,104);
+  let boards = 0;
+  for (const prop of town.props) {
+    saveFields(prop,['x','y'],['isCompanionBoard','sprite','scale']);
+    if (prop.isCompanionBoard) { saveFields(prop,['x','y','isCompanionBoard']); savePoint(prop,town.map); saveRequire(prop.isCompanionBoard===true,'board role'); boards++; }
+    else { saveFields(prop,['x','y','sprite','scale']); savePoint(prop); saveEnum(prop.sprite,['water','bridge','tree','inn','store','hut','doorstep','townGate']); saveRequire(prop.scale === {water:1.6,bridge:2,tree:2,inn:3,store:3,hut:2,doorstep:1,townGate:2}[prop.sprite],'town prop scale/role'); }
+  }
+  saveRequire(boards === 1,'town board count');
+  saveFields(town.landmarks,['inn','gate','companionBoardIndex']);
+  for (const [key,sprite] of [['inn','inn'],['gate','townGate']]) {
+    const mark = town.landmarks[key]; saveFields(mark,['x','y','sprite']); savePoint(mark,town.map); saveRequire(mark.sprite===sprite,'landmark role');
+  }
+  saveCount(town.landmarks.companionBoardIndex,0,town.props.length-1);
+  saveRequire(town.props[town.landmarks.companionBoardIndex].isCompanionBoard === true,'board reference');
+  const roles = {Mira:['villager',5],Bran:['villager',7],Eda:['villager',6],Tobin:['villager',8],
+    Mochi:['cat',3],Pip:['dog',4],Hen:['chicken',2],Cluck:['chicken',3],Dot:['chicken',4],Marmalade:['catCompanion']};
+  for (const [field,names] of [['npcs',['Mira','Bran','Eda','Tobin']],['animals',['Mochi','Pip','Hen','Cluck','Dot','Marmalade']]]) {
+    saveList(town[field],names.length,names.length); const seen = new Set();
+    for (const actor of town[field]) {
+      saveFields(actor,['name','sprite','x','y'],['pathIndex','step','path','hidden','scale','isEntranceCat']);
+      saveEnum(actor.name,names); saveRequire(!seen.has(actor.name),'duplicate town actor'); seen.add(actor.name);
+      savePoint(actor,town.map); const [sprite,step] = roles[actor.name]; saveRequire(actor.sprite===sprite,'town actor role');
+      if (actor.name === 'Marmalade') { saveFields(actor,['name','sprite','x','y','scale','isEntranceCat'],['hidden']); saveRequire(actor.scale===CAT_COMPANION_SCALE && actor.isEntranceCat===true,'gate cat role'); }
+      else {
+        saveFields(actor,['name','sprite','x','y','step','pathIndex','path'],actor.name==='Pip'?['hidden']:[]);
+        saveRequire(actor.step===step,'patrol cadence'); saveList(actor.path,3,1); saveCount(actor.pathIndex,0,actor.path.length-1);
+        for (const tile of actor.path) saveTile(tile,town.map);
+      }
+      if ('hidden' in actor) saveBoolean(actor.hidden);
+    }
+  }
+}
+
+function* saveRunDataSteps(run) {
+  saveFields(run,SAVE_RUN_FIELDS.concat(['floors','town','encounter']));
+  saveCount(run.depth,1,FINAL_DEPTH); saveEnum(run.area,['town','dungeon']);
+  for (const key of ['kills','turn','townScrolls','gold','companionQuoteIndex','monsterQuoteIndex']) saveCount(run[key]);
+  for (const key of ['combatElapsed','healElapsed','activeTime','manaRegenAt','retreatReadyAt','companionSpeechReadyAt','companionAttackAt','monsterSpeechReadyAt']) saveNumber(run[key]);
+  for (const key of ['warnedLow','warnedCritical','companionEntryDone','townPortalOpen']) saveBoolean(run[key]);
+  saveFields(run.floors,[],Array.from({length:FINAL_DEPTH},(_,i)=>String(i+1)));
+  const depths = Object.keys(run.floors); saveRequire(depths.length>=1 && depths.length<=FINAL_DEPTH,'floor count');
+  for (const key of depths) { saveRequire(/^[1-9][0-9]*$/.test(key),'floor depth key'); saveCount(Number(key),1,FINAL_DEPTH); saveFloorData(run.floors[key],Number(key)); yield; }
+  saveRequire(!!run.floors[run.depth] && !!run.floors[1],'missing current/initial floor');
+  saveTownData(run.town);
+  const map = run.area === 'town' ? run.town.map : run.floors[run.depth].map, p = run.player;
+  saveFields(p,['x','y','hp','maxHp','mp','maxMp','str','dex','def','lvl','xp','xpNext','spells']); savePoint(p,map);
+  saveCount(p.maxHp,1); saveCount(p.hp,1,p.maxHp); saveCount(p.maxMp); saveCount(p.mp,0,p.maxMp);
+  for (const key of ['str','dex','def']) saveCount(p[key]);
+  saveCount(p.lvl,1,MAX_LEVEL);
+  let threshold = 40; for (let level=1;level<p.lvl;level++) threshold=Math.round(threshold*1.5);
+  if (p.lvl === MAX_LEVEL) threshold=1;
+  saveRequire(p.xpNext === threshold,'XP threshold/level');
+  saveNumber(p.xp,0,p.lvl===MAX_LEVEL?0:threshold,true); saveRequire(p.lvl===MAX_LEVEL || p.xp<threshold,'unapplied XP level');
+  saveFields(p.spells,['fireball','heal'],Object.keys(SPELLS));
+  for (const key of Object.keys(p.spells)) saveBoolean(p.spells[key]);
+  saveRequire(p.spells.fireball && p.spells.heal,'starter spells');
+  saveFields(run.spellReadyAt,Object.keys(SPELLS)); for (const value of Object.values(run.spellReadyAt)) saveNumber(value);
+  saveFields(run.equipment,['weapon','armor','ring']);
+  for (const slot of ['weapon','armor','ring']) if (run.equipment[slot] !== null) { saveItem(run.equipment[slot]); saveRequire(run.equipment[slot].kind===slot,'equipment slot'); }
+  saveList(run.inventory,65536);
+  let inventoryIndex=0;
+  for (const item of run.inventory) { saveFields(item,['name','kind','heal']); saveRequire(item.name==='Potion' && item.kind==='heal','inventory role'); saveNumber(item.heal,0.25,0.6); saveRequire(item.heal<0.6,'inventory heal'); if(++inventoryIndex%256===0)yield; }
+  saveList(run.messages,80); for (const line of run.messages) saveText(line,512);
+  saveEnum(run.selectedCompanion,Object.keys(COMPANIONS)); saveEnum(run.companionChoice,['marmalade','pip']);
+  saveList(run.unlockedCompanions,11,2); saveRequire(new Set(run.unlockedCompanions).size===run.unlockedCompanions.length,'duplicate companion unlock');
+  for (const id of run.unlockedCompanions) saveEnum(id,Object.keys(COMPANIONS));
+  saveRequire(['marmalade','pip',run.selectedCompanion].every(id=>run.unlockedCompanions.includes(id)),'selected/starter unlock');
+  saveFields(run.entranceCat,['recruited','entered','retired']); for (const value of Object.values(run.entranceCat)) saveBoolean(value);
+  saveRequire(run.entranceCat.entered===run.companionEntryDone && (!run.entranceCat.retired || run.entranceCat.recruited),'cat entry/retirement');
+  if (run.companion !== null) {
+    saveFields(run.companion,['id','x','y']); savePoint(run.companion,map);
+    saveRequire(run.companion.id===run.selectedCompanion,'active companion selection');
+    if (run.companion.id==='marmalade') saveRequire(run.entranceCat.recruited,'cat recruitment');
+  }
+  for (const actor of run.town.animals) if (actor.name==='Pip' || actor.name==='Marmalade') {
+    const active = !!run.companion && run.companion.id === (actor.name==='Pip'?'pip':'marmalade');
+    saveRequire(!!actor.hidden===active,'duplicate starter visibility');
+  }
+  if (run.townExit !== null) {
+    saveFields(run.townExit,['depth','x','y','reason']); saveCount(run.townExit.depth,1,FINAL_DEPTH); savePoint(run.townExit);
+    saveEnum(run.townExit.reason,['scroll','retreat','cheat']); saveRequire(!!run.floors[run.townExit.depth],'return floor absent');
+    saveRequire(run.townPortalOpen ? run.townExit.reason!=='retreat' : run.townExit.reason==='retreat','portal reason/open state');
+  } else saveRequire(!run.townPortalOpen,'portal missing return point');
+  if (run.area === 'town') saveRequire(run.encounter===null,'town encounter');
+  else {
+    const encounter=run.encounter, floor=run.floors[run.depth];
+    saveFields(encounter,['monsters','bossId','bossIntroSeen','bossSummonAt']);
+    saveBoolean(encounter.bossIntroSeen); saveNumber(encounter.bossSummonAt);
+    saveList(encounter.monsters,65536); saveUniqueIds(encounter.monsters);
+    let encounterIndex=0;
+    for (const monster of encounter.monsters) {
+      saveMonster(monster,run.depth,map,true);
+      if (!monster.isGuard) saveRequire(floor.monsterSpawns.some(m=>m.id===monster.id && m.name===monster.name),'encounter/template link');
+      if (floor.bossDefeated && (monster.isBoss || monster.isGuard)) saveRequire(monster.hp<=0,'defeated boss/guard alive');
+      if(++encounterIndex%128===0)yield;
+    }
+    const bosses=encounter.monsters.filter(m=>m.isBoss); saveRequire(bosses.length<=1,'multiple current bosses');
+    saveRequire(encounter.bossId === (bosses.length ? bosses[0].id : null),'boss link');
+    if ((BOSSES[run.depth] || THEMED_FLOORS[run.depth]) && !floor.bossDefeated) saveRequire(bosses.length===1 && bosses[0].hp>0,'missing living boss');
+  }
+}
+
+function* validateSaveDataSteps(value) {
+  yield* saveStructureSteps(value);
+  const text=JSON.stringify(value); yield;
+  yield* saveTextBudgetSteps(text);
+  const data=JSON.parse(text); yield; // Detached JSON data, never a hydrated runtime or untrusted merge.
+  saveFields(data,['format','formatVersion','gameVersion','createdAt','run']);
+  saveRequire(data.format===SAVE_FORMAT,'format'); saveRequire(data.formatVersion===SAVE_FORMAT_VERSION,'unsupported format version');
+  saveText(data.gameVersion,128); saveRequire(/^[0-9]+\.[0-9]+\.[0-9]+(?:[-+][a-zA-Z0-9.-]+)?$/.test(data.gameVersion),'game version metadata');
+  saveText(data.createdAt,64); saveRequire(/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z$/.test(data.createdAt)
+    && Number.isFinite(Date.parse(data.createdAt)) && new Date(data.createdAt).toISOString()===data.createdAt,'createdAt metadata');
+  yield* saveRunDataSteps(data.run);
+  return data;
+}
+
+function* parseSaveDataSteps(text) {
+  yield* saveTextBudgetSteps(text);
+  let data;
+  try { data=JSON.parse(text); } catch (error) { throw new Error('Invalid save: malformed JSON'); }
+  yield;
+  return yield* validateSaveDataSteps(data);
+}
+
+function saveRunData(run) { return drainSaveSteps(saveRunDataSteps(run)); }
+function validateSaveData(value) { return drainSaveSteps(validateSaveDataSteps(value)); }
+function parseSaveData(text) { return drainSaveSteps(parseSaveDataSteps(text)); }
+
+function savePick(source, fields) {
+  saveRequire(source !== null && typeof source === 'object','missing source record');
+  const copy={}; for (const key of fields) if (source[key] !== undefined) copy[key]=source[key];
+  return copy;
+}
+
+function saveCaptureVisited(visited) {
+  saveRequire(visited instanceof Set && visited.size<=W*H,'source exploration Set'); return [...visited];
+}
+
+function projectSaveData(source, context) {
+  saveFields(context,['createdAt','hidden','tradeOpen','companionOpen']);
+  for (const key of ['hidden','tradeOpen','companionOpen']) saveBoolean(context[key]);
+  saveRequire(source && source.started && !source.gameOver && !source.won && source.player.hp>0
+    && !source.loadSession && !source.godMode && !source.consoleOpen && !source.pause && !source.trade && !source.companionPicker
+    && !source.ending && !(source.bossIntro && !source.bossIntro.completed) && !(source.bossDefeat && !source.bossDefeat.completed)
+    && !context.hidden && !context.tradeOpen && !context.companionOpen,'snapshot context is not stable living play');
+  const run=savePick(source,SAVE_RUN_FIELDS);
+  run.companion=source.companion === null ? null : savePick(source.companion,['id','x','y']);
+  run.floors={};
+  saveRequire(source.floors && Object.keys(source.floors).length<=FINAL_DEPTH,'source floor count');
+  for (const depth of Object.keys(source.floors)) {
+    saveRequire(/^[1-9][0-9]*$/.test(depth) && Number(depth)<=FINAL_DEPTH,'source floor depth');
+    const cached=source.floors[depth], active=source.area==='dungeon' && Number(depth)===source.depth;
+    const floor=savePick(active?source:cached,FLOOR_FIELDS);
+    floor.descentRewarded=cached.descentRewarded;
+    floor.visited=saveCaptureVisited(floor.visited);
+    saveList(floor.monsterSpawns,41);
+    floor.monsterSpawns=floor.monsterSpawns.map(m=>savePick(m,SAVE_MONSTER_FIELDS));
+    run.floors[depth]=floor;
+  }
+  const town=source.town, active=source.area==='town';
+  run.town=savePick(town,['map','visited','props','npcs','animals','spawn','store','tick','quoteIndex','nextTalkAt']);
+  if (active) { run.town.map=source.map; run.town.visited=source.visited; run.town.props=source.props; run.town.store=source.merchant; }
+  run.town.visited=saveCaptureVisited(run.town.visited);
+  saveList(run.town.props,104);
+  run.town.landmarks={inn:town.landmarks.inn,gate:town.landmarks.gate,
+    companionBoardIndex:run.town.props.indexOf(town.landmarks.companionBoard)};
+  run.encounter=null;
+  if (source.area==='dungeon') {
+    saveList(source.monsters,65536);
+    run.encounter={monsters:source.monsters.map(m=>savePick(m,SAVE_MONSTER_FIELDS)),
+      bossId:source.boss?source.boss.id:null,bossIntroSeen:source.bossIntroSeen,bossSummonAt:source.bossSummonAt};
+  }
+  return {format:SAVE_FORMAT,formatVersion:SAVE_FORMAT_VERSION,gameVersion:GAME_VERSION,createdAt:context.createdAt,run};
+}
+
+function captureSaveData(source,context) { return validateSaveData(projectSaveData(source,context)); }
+
+function serializeSaveData(source, context) { return JSON.stringify(captureSaveData(source,context)); }
+
+// Cooperative UI driver. Synchronous model APIs drain the exact same validators.
+function cancelSaveWork(session) {
+  const work=session && session.work;
+  if (!work) return;
+  session.work=null;
+  if (work.timer!==null) window.clearTimeout?.(work.timer);
+  try { work.steps.return?.(); } catch (ignored) { /* No live state belongs to a detached pipeline. */ }
+  work.done=null;work.fail=null;work.guard=null;
+}
+
+function saveWorkNow() { return window.performance && typeof window.performance.now==='function' ? window.performance.now() : Date.now(); }
+
+function startSaveWork(session,steps,guard,done,fail) {
+  cancelSaveWork(session);
+  const work={steps,guard,done,fail,timer:null};session.work=work;
+  work.timer=window.setTimeout(()=>advanceSaveWork(session,work),0);
+  return work;
+}
+
+function advanceSaveWork(session,work) {
+  if (session.work!==work) return;
+  if (!saveLoadSessionBound(session) || !work.guard()) { cancelSaveWork(session);return; }
+  work.timer=null;
+  const deadline=saveWorkNow()+8;
+  try {
+    for(let count=0;count<32;count++) {
+      const next=work.steps.next();
+      if (next.done) { session.work=null;work.done(next.value);return; }
+      if (saveWorkNow()>=deadline) break;
+    }
+    work.timer=window.setTimeout(()=>advanceSaveWork(session,work),0);
+  } catch(error) {
+    if (session.work===work) session.work=null;
+    if (saveLoadSessionBound(session) && work.guard()) work.fail(error);
+  }
+}
+
+function* serializeSaveDataSteps(projected) {
+  const data=yield* validateSaveDataSteps(projected);
+  return JSON.stringify(data);
+}
+
+function saveNeedsCooperation(value) {
+  return Object.keys(value.run.floors).length>2 || value.run.inventory.length>256
+    || (value.run.encounter && value.run.encounter.monsters.length>256);
+}
+
+function saveGameFileCooperatively(owner,context) {
+  const projected=projectSaveData(owner,context); // Logical boundary; no event can interleave before freeze.
+  const session=beginSaveLoad();
+  if (!session) return false;
+  session.exporting=true;
+  fileActionMessage('Preparing save… Cancel or Esc keeps your adventure unchanged.');updateSaveFileButtons();
+  startSaveWork(session,serializeSaveDataSteps(projected),()=>!!session.exporting,
+    text=>{
+      const visible=saveLoadSessionCurrent(session);
+      session.exporting=false;cancelSaveLoad(session);
+      if (visible && state===owner) deliverSaveGameFile(owner,text,context);
+      else if (state===owner) fileActionMessage('Save canceled. Return to the game and try again.');
+    },error=>{
+      session.exporting=false;cancelSaveLoad(session);
+      if(state===owner) fileActionMessage('Could not prepare this save. Your adventure is unchanged or exceeds the supported limits.');
+    });
+  return true;
+}
+
+function finishSaveFileValidation(session,read,data) {
+  if (!saveFileReadCurrent(session,read)) return;
+  const ui=session.ui;
+  ui.reader=null;ui.data=data;ui.phase='ready';ui.message='Save checked. Load replaces your current adventure; Cancel keeps it.';
+  renderSaveLoadUI(session);
+}
+
+function commitSaveFileData(session,ui,data,candidate) {
+  if (!saveLoadSessionBound(session) || session.ui!==ui || ui.data!==data || ui.phase!=='loading') return;
+  if (!saveLoadSessionCurrent(session)) {
+    ui.phase='ready';ui.message='Loading is unavailable right now. Return to the game, or Cancel.';renderSaveLoadUI(session);return;
+  }
+  try {
+    const loaded=candidate ? commitHydratedSaveLoad(session,candidate) : commitSaveLoad(session,data);
+    if(!loaded && session.ui===ui && saveLoadSessionBound(session)) {
+      ui.phase='ready';ui.message='Loading is unavailable right now. Return to the game, or Cancel.';renderSaveLoadUI(session);
+    }
+  } catch(error) { failSaveFileCommit(session,ui); }
+}
+
+function failSaveFileCommit(session,ui) {
+  if(session.ui===ui && saveLoadSessionBound(session)) {
+    ui.data=null;ui.phase='error';ui.message='Could not load this save. Your adventure is unchanged. Choose a file or Cancel.';renderSaveLoadUI(session);
+  } else if(state===session.owner) fileActionMessage('Could not load this save. Your adventure is unchanged. Choose Load to try again.');
+}
+
+// S3 transport/UI is transient and belongs to the existing identity-bound load session.
+function fileActionMessage(text) {
+  for (const id of ['saveGameStatus','launchFileStatus','deathFileStatus']) document.getElementById(id).textContent=text;
+}
+
+function canSaveGameFile() {
+  return saveLoadAllowed() && state.started && !state.gameOver && !state.godMode && !state.loadSession;
+}
+
+function fileSnapshotContext() {
+  return {createdAt:new Date().toISOString(),hidden:!!document.hidden,
+    tradeOpen:!document.getElementById('tradeOverlay').hidden,companionOpen:!document.getElementById('companionOverlay').hidden};
+}
+
+function saveGameFile() {
+  if (!canSaveGameFile()) return false;
+  const owner=state, context=fileSnapshotContext();
+  try {
+    if (Object.keys(state.floors).length>2 || state.inventory.length>256 || state.monsters.length>256)
+      return saveGameFileCooperatively(owner,context);
+    return deliverSaveGameFile(owner,serializeSaveData(owner,context),context);
+  } catch(error) {
+    fileActionMessage('Could not prepare this save. Your adventure is unchanged or exceeds the supported limits.');resetHelpClock();return false;
+  }
+}
+
+function deliverSaveGameFile(owner,text,context) {
+  let url=null, link=null;
+  try {
+    if (typeof window.Blob!=='function' || !window.URL || typeof window.URL.createObjectURL!=='function'
+      || typeof window.URL.revokeObjectURL!=='function' || typeof window.setTimeout!=='function') throw new Error('File API unavailable');
+    const blob=new window.Blob([text],{type:'application/json;charset=utf-8'});
+    url=window.URL.createObjectURL(blob);
+    link=document.createElement('a'); link.href=url;
+    link.download=`dungeon-crawler-${context.createdAt.replace(/[:.]/g,'-')}.json`;
+    document.body.appendChild(link); link.click();
+    const downloadUrl=url;
+    window.setTimeout(()=>window.URL.revokeObjectURL(downloadUrl),30000);
+    url=null; // This timer only releases its own URL; it never touches a later run/UI.
+    if (state===owner) fileActionMessage('Download requested. Keep the .json file to continue this adventure later.');
+    return true;
+  } catch (error) {
+    if (state===owner) fileActionMessage(error.message.includes('32 MiB') || error.message.includes('limit') || error.message.includes('array')
+      ? 'This adventure exceeds the supported save limits. Nothing was changed.'
+      : 'Could not prepare a save file. Nothing was changed. Try again in a supported browser.');
+    return false;
+  } finally {
+    link?.remove?.();
+    if (url!==null) { try { window.URL.revokeObjectURL(url); } catch (ignored) { /* No game/UI callback depends on URL cleanup. */ } }
+    if (state===owner) resetHelpClock();
+  }
+}
+
+function updateSaveFileButtons() {
+  document.getElementById('saveGameButton').disabled=!canSaveGameFile();
+  document.getElementById('cancelSavePreparation').hidden=!(state.loadSession && state.loadSession.exporting);
+  for (const id of ['loadGameButton','launchLoadGame','deathLoadGame']) document.getElementById(id).disabled=!saveLoadAllowed() || !!state.loadSession;
+  if (state.loadSession && state.loadSession.ui) renderSaveLoadUI(state.loadSession);
+}
+
+function disposeSaveLoadUI(session, restoreBackground, restoreFocus) {
+  const ui=session && session.ui;
+  if (!ui) return;
+  session.ui=null;
+  const reader=ui.reader;
+  ui.read=null; ui.data=null; ui.reader=null;
+  if (ui.task!==null) { window.clearTimeout?.(ui.task); ui.task=null; }
+  if (reader && reader.readyState===1) { try { reader.abort(); } catch (error) { /* The invalidated read cannot update UI. */ } }
+  if (state.loadSession && state.loadSession!==session && state.loadSession.ui) return;
+  if (document.getElementById('saveLoadFile')===ui.input) {
+    ui.input.value=''; document.getElementById('saveLoadFileHost').innerHTML='';
+    document.getElementById('saveLoadOverlay').hidden=true;
+    document.getElementById('saveLoadPreview').textContent='';
+    document.getElementById('saveLoadPreview').hidden=true;
+    document.getElementById('confirmSaveLoad').disabled=true;
+    document.getElementById('saveLoadSelectedFile').textContent='';
+    document.getElementById('saveLoadStatus').textContent='';
+  }
+  if (restoreBackground) {
+    document.getElementById('gameLayout').inert=ui.gameInert;
+    document.getElementById('launchScreen').inert=ui.launchInert;
+    document.getElementById('helpOverlay').inert=ui.helpInert;
+    updateSaveFileButtons(); // Re-enable the origin control before trying to focus it.
+    if (restoreFocus) (ui.focus && ui.focus.isConnected!==false ? ui.focus
+      : state.helpOpen ? document.getElementById('closeHelp') : state.started ? canvas : document.getElementById('startGame')).focus?.();
+  }
+}
+
+function openLoadGame() {
+  if (state.loadSession) return null;
+  const session=beginSaveLoad();
+  if (!session) return null;
+  const ui={focus:document.activeElement,gameInert:!!document.getElementById('gameLayout').inert,
+    launchInert:!!document.getElementById('launchScreen').inert,helpInert:!!document.getElementById('helpOverlay').inert,
+    input:null,reader:null,read:null,task:null,data:null,phase:'choose',message:'Choose a save file. Your current adventure stays unchanged until you load.'};
+  session.ui=ui;
+  try {
+    const input=document.createElement('input');
+    input.id='saveLoadFile'; input.type='file'; input.accept='.json,application/json';
+    input.disabled=typeof window.FileReader!=='function';
+    input.onchange=()=>{
+      const file=input.files && input.files[0];
+      input.value=''; // Also handles selecting the exact same file again using keyboard/native controls.
+      readSaveGameFile(session,input,file);
+    };
+    input.onclick=()=>{ if (saveLoadSessionBound(session) && session.ui===ui) { input.value=''; resetSaveFileRead(session); } };
+    input.oncancel=()=>{
+      if (!saveLoadSessionBound(session) || session.ui!==ui) return;
+      resetSaveFileRead(session);
+      ui.message='File selection canceled. Choose another file, or Cancel to resume.'; renderSaveLoadUI(session);
+    };
+    ui.input=input;
+    const host=document.getElementById('saveLoadFileHost'); host.innerHTML=''; host.appendChild(input);
+    if (input.disabled) ui.message='This browser cannot read save files. Cancel to resume.';
+    document.getElementById('gameLayout').inert=true;
+    document.getElementById('launchScreen').inert=true;
+    document.getElementById('helpOverlay').inert=true;
+    document.getElementById('saveLoadOverlay').hidden=false;
+    fileActionMessage(''); updateSaveFileButtons();
+    (input.disabled?document.getElementById('cancelSaveLoad'):input).focus?.();
+    return session;
+  } catch (error) {
+    cancelSaveLoad(session);
+    fileActionMessage('Could not open the file chooser. Your adventure is unchanged.');
+    return null;
+  }
+}
+
+function resetSaveFileRead(session) {
+  cancelSaveWork(session);
+  const ui=session.ui;
+  if (!ui) return;
+  const reader=ui.reader;
+  ui.read=null; ui.data=null; ui.reader=null; ui.phase='choose';
+  if (ui.task!==null) { window.clearTimeout?.(ui.task); ui.task=null; }
+  if (reader && reader.readyState===1) { try { reader.abort(); } catch (error) { /* Replaced selection is already invalid. */ } }
+  document.getElementById('saveLoadSelectedFile').textContent='';
+  ui.message='Choose a save file. Cancel keeps your current adventure.';
+  renderSaveLoadUI(session);
+}
+
+function saveFileReadCurrent(session, read) {
+  const ui=session && session.ui;
+  return saveLoadSessionBound(session) && !!ui && ui.read===read && ui.input===read.input
+    && document.getElementById('saveLoadFile')===read.input && read.input.isConnected!==false;
+}
+
+function renderSaveLoadUI(session) {
+  if (!saveLoadSessionBound(session) || !session.ui) return;
+  const ui=session.ui;
+  document.getElementById('saveLoadStatus').textContent=ui.message;
+  const preview=document.getElementById('saveLoadPreview');
+  preview.hidden=!ui.data;
+  if (ui.data) {
+    const d=ui.data, run=d.run, p=run.player;
+    preview.textContent=`${run.area==='town'?'Town':`Dungeon depth ${run.depth}`} · Hero level ${p.lvl}\nHP ${p.hp}/${p.maxHp} · MP ${p.mp}/${p.maxMp} · Gold ${run.gold}\nSaved ${new Date(d.createdAt).toLocaleString()} · Game v${d.gameVersion}`;
+  } else preview.textContent='';
+  document.getElementById('confirmSaveLoad').disabled=ui.phase!=='ready' || !ui.data || !saveLoadSessionCurrent(session);
+  const confirm=document.getElementById('confirmSaveLoad');
+  confirm.onclick=()=>confirmSaveGameLoad(session);
+  document.getElementById('cancelSaveLoad').onclick=()=>cancelSaveLoad(session);
+  document.getElementById('saveLoadAudioToggle').textContent=`Sound: ${state.audio.enabled?'On':'Off'} (M)`;
+}
+
+function saveFileReadError(session, read, message) {
+  if (!saveFileReadCurrent(session,read)) return;
+  session.ui.data=null; session.ui.phase='error'; session.ui.message=message;
+  renderSaveLoadUI(session);
+}
+
+function readSaveGameFile(session, input, file) {
+  if (!saveLoadSessionBound(session) || !session.ui || session.ui.input!==input) return;
+  resetSaveFileRead(session);
+  const ui=session.ui, read={input}; ui.read=read;
+  if (!file) { saveFileReadError(session,read,'No file selected. Choose a file, or Cancel to resume.'); return; }
+  if (!Number.isSafeInteger(file.size) || file.size<0 || file.size>SAVE_MAX_BYTES) {
+    saveFileReadError(session,read,'This file is larger than 32 MiB or cannot be read. Choose a smaller save.'); return;
+  }
+  document.getElementById('saveLoadSelectedFile').textContent=`Selected: ${String(file.name || 'save file').slice(0,128)}`;
+  ui.phase='reading'; ui.message='Reading and checking your save… Cancel keeps your current adventure.';
+  renderSaveLoadUI(session);
+  try {
+    const reader=new window.FileReader(); ui.reader=reader;
+    reader.onload=()=>{
+      if (!saveFileReadCurrent(session,read)) return;
+      const text=reader.result;
+      // Yield a task so progress/cancel controls can paint before bounded synchronous validation.
+      ui.task=window.setTimeout(()=>{
+        if (!saveFileReadCurrent(session,read)) return;
+        ui.task=null;
+        try {
+          if (typeof text==='string' && text.length>65536) {
+            startSaveWork(session,parseSaveDataSteps(text),()=>saveFileReadCurrent(session,read),
+              data=>finishSaveFileValidation(session,read,data),
+              error=>saveFileReadError(session,read,error.message.includes('unsupported format version')
+                ? 'This save version is not supported by this game.' : 'This file is not a supported saved adventure. Choose another file or Cancel.'));
+          } else finishSaveFileValidation(session,read,parseSaveData(text));
+        } catch (error) {
+          saveFileReadError(session,read,error.message.includes('unsupported format version')
+            ? 'This save version is not supported by this game.' : 'This file is not a supported saved adventure. Choose another file or Cancel.');
+        }
+      },0);
+    };
+    reader.onerror=()=>saveFileReadError(session,read,'Could not read this file. Choose it again, or Cancel to resume.');
+    reader.onabort=()=>saveFileReadError(session,read,'File reading stopped. Choose a file, or Cancel to resume.');
+    reader.readAsText(file,'UTF-8');
+  } catch (error) { saveFileReadError(session,read,'Could not read this file. Choose it again, or Cancel to resume.'); }
+}
+
+function confirmSaveGameLoad(session) {
+  if (!saveLoadSessionCurrent(session) || !session.ui || session.ui.phase!=='ready' || !session.ui.data) return false;
+  const ui=session.ui, data=ui.data;
+  ui.phase='loading'; ui.message='Loading adventure…'; renderSaveLoadUI(session);
+  ui.task=window.setTimeout(()=>{
+    if (!saveLoadSessionBound(session) || session.ui!==ui || ui.data!==data || ui.phase!=='loading') return;
+    ui.task=null;
+    if (!saveLoadSessionCurrent(session)) {
+      ui.phase='ready'; ui.message='Loading is unavailable right now. Return to the game, or Cancel.'; renderSaveLoadUI(session); return;
+    }
+    if (saveNeedsCooperation(data)) {
+      startSaveWork(session,hydrateSaveDataSteps(data),()=>session.ui===ui && ui.data===data && ui.phase==='loading',
+        candidate=>commitSaveFileData(session,ui,data,candidate),()=>failSaveFileCommit(session,ui));
+    } else commitSaveFileData(session,ui,data,null);
+  },0);
+  return true; // Confirmation queued; only S2 commit's result means a run was replaced.
+
+}
+
+// S2 model hydration: validated detached data only; resources are attached at the commit boundary.
+function* hydrateSaveDataSteps(value) {
+  const run = (yield* validateSaveDataSteps(value)).run;
+  const town = run.town;
+  for (const floor of Object.values(run.floors)) { floor.visited = new Set(floor.visited);yield; }
+  town.visited = new Set(town.visited); town.speech = null;
+  town.landmarks = { inn:town.landmarks.inn, store:town.store, gate:town.landmarks.gate,
+    companionBoard:town.props[town.landmarks.companionBoardIndex] };
+  const candidate = {
+    ...savePick(run,SAVE_RUN_FIELDS), floors:run.floors, town,
+    companion:run.companion ? makeCompanion(run.companion.id,run.companion.x,run.companion.y) : null,
+    inn:town.landmarks.inn, townGate:town.landmarks.gate,
+    started:true, gameOver:false, won:false, helpOpen:false, helpFocus:null,
+    consoleOpen:false, consoleLines:[], consoleHistory:[], consoleHistoryIndex:0,
+    godMode:false, godModeStats:null, trade:null, companionPicker:null, loadSession:null, pause:null,
+    ending:null, bossIntro:null, bossDefeat:null, bubble:null, monsterSpeech:null, companionSpeech:null,
+    lastTick:0, audio:null, art:null, motion:freshMotionState(),
+    camera:{ x:Math.max(0,Math.min(W-VIEW_W,run.player.x-Math.floor(VIEW_W/2))),
+      y:Math.max(0,Math.min(H-VIEW_H,run.player.y-Math.floor(VIEW_H/2))) },
+  };
+  if (run.area === 'dungeon') {
+    for (const field of FLOOR_FIELDS) candidate[field] = run.floors[run.depth][field];
+    candidate.monsters = run.encounter.monsters;
+    candidate.boss = candidate.monsters.find(m=>m.id===run.encounter.bossId) || null;
+    candidate.bossIntroSeen = run.encounter.bossIntroSeen;
+    candidate.bossSummonAt = run.encounter.bossSummonAt;
+  } else {
+    candidate.map=town.map; candidate.visited=town.visited; candidate.props=town.props;
+    candidate.merchant=town.store; candidate.rooms=[]; candidate.potions=[]; candidate.treasures=[];
+    candidate.stairs=null; candidate.upstairs=null; candidate.prisoner=null; candidate.princess=null;
+    candidate.monsterSpawns=[]; candidate.monsters=[]; candidate.boss=null; candidate.bossDefeated=false;
+    candidate.floorKey=null; candidate.obstacles=[]; candidate.hazards=[]; candidate.hazardTime=0;
+    candidate.biome='town'; candidate.bossIntroSeen=false; candidate.bossSummonAt=0;
+  }
+  return candidate;
+}
+
+function hydrateSaveData(value) { return drainSaveSteps(hydrateSaveDataSteps(value)); }
+
+function saveLoadAllowed() {
+  const roster=document.getElementById('companionOverlay'), trade=document.getElementById('tradeOverlay');
+  if (!state || document.hidden || state.won || state.ending || state.pause || state.consoleOpen
+    || state.trade || state.companionPicker || bossCinematicActive()
+    || (roster && !roster.hidden) || (trade && !trade.hidden)) return false;
+  return state.gameOver ? state.started && state.player.hp<=0 : state.player.hp>0;
+}
+
+function beginSaveLoad() {
+  if (!saveLoadAllowed()) return null;
+  if (state.loadSession) cancelSaveLoad(state.loadSession,false);
+  const session={ owner:state, map:state.map, area:state.area, depth:state.depth,
+    started:state.started, gameOver:state.gameOver };
+  state.loadSession=session; // Replacing this identity invalidates every older read/confirmation.
+  stopMotionAnimation();
+  return session;
+}
+
+function saveLoadSessionBound(session) {
+  return !!session && state.loadSession===session && session.owner===state && session.map===state.map
+    && session.area===state.area && session.depth===state.depth && session.started===state.started
+    && session.gameOver===state.gameOver;
+}
+
+function saveLoadSessionCurrent(session) { return saveLoadSessionBound(session) && saveLoadAllowed(); }
+
+function cancelSaveLoad(session = state && state.loadSession, resume = true) {
+  if (!session || !state || state.loadSession!==session) return false;
+  state.loadSession=null;
+  const exporting=!!session.exporting;session.exporting=false;cancelSaveWork(session);
+  if (exporting) fileActionMessage('Save canceled. Your adventure is unchanged.');
+  updateSaveFileButtons();
+  disposeSaveLoadUI(session,true,resume);
+  resetHelpClock();
+  if (resume) requestMotionFrame();
+  return true;
+}
+
+// Only existing presentation nodes are touched. Snapshots retain nodes/listeners and canvas pixels.
+const SAVE_LOAD_UI_IDS = ['launchScreen','gameLayout','overlay','pauseOverlay','helpOverlay','helpToggle',
+  'tradeOverlay','companionOverlay','devConsole','consoleInput','consoleOutput','endingControls','skipEnding',
+  'log','hpText','hpfill','mpText','mpfill','lvl','xpfill','depth','kills','turn','gold','potions','scrolls',
+  'keyStatus','posText','retreatStatus','companionStat','companionName','companionPostAction','companionAudioToggle',
+  'godModeStat','objective','musicVolume','musicVolumeText','effectsVolume','effectsVolumeText','audioToggle',
+  'weaponSlot','weaponName','weaponBonuses','armorSlot','armorName','armorBonuses','ringSlot','ringName','ringBonuses',
+  'gearHpBonus','gearStrBonus','heroMaxHp','heroStrength','heroAttack','heroDefense','heroDexterity','spellList',
+  'merchantStock','minimapDepth','saveLoadOverlay','saveLoadFile','saveLoadStatus','saveLoadPreview','saveLoadSelectedFile',
+  'confirmSaveLoad','cancelSaveLoad','saveLoadAudioToggle','saveGameButton','loadGameButton','launchLoadGame','deathLoadGame',
+  'saveGameStatus','launchFileStatus','deathFileStatus','cancelSavePreparation'];
+
+function captureLoadPresentation() {
+  const nodes=SAVE_LOAD_UI_IDS.map(id=>{
+    const node=document.getElementById(id);
+    if (!node) return null;
+    return {node, text:node.children && node.children.length ? null : node.textContent,
+      hidden:node.hidden, disabled:node.disabled, inert:node.inert, value:node.value,
+      ariaPressed:node.ariaPressed, ariaExpanded:node.ariaExpanded, className:node.className,
+      css:node.style.cssText, display:node.style.display, width:node.style.width, scrollTop:node.scrollTop};
+  }).filter(Boolean);
+  const canvases=[];
+  for (const id of ['game','minimap','weaponIcon','armorIcon','ringIcon']) {
+    const surface=document.getElementById(id);
+    if (surface.width && surface.height) canvases.push({surface,width:surface.width,height:surface.height,
+      pixels:surface.getContext('2d').getImageData(0,0,surface.width,surface.height)});
+  }
+  return {nodes,canvases,focus:document.activeElement};
+}
+
+function restoreLoadPresentation(saved) {
+  for (const row of saved.nodes) {
+    const node=row.node;
+    if (row.text!==null) node.textContent=row.text;
+    for (const key of ['hidden','disabled','inert','value','ariaPressed','ariaExpanded','className','scrollTop']) {
+      if (key!=='value' || node.type!=='file') node[key]=row[key];
+    }
+    if (row.css!==undefined) node.style.cssText=row.css;
+    else { node.style.display=row.display; node.style.width=row.width; }
+  }
+  for (const row of saved.canvases) {
+    // Width reset also unwinds any canvas transform/save stack left by a failed painter.
+    row.surface.width=row.width; row.surface.height=row.height;
+    const context=row.surface.getContext('2d'); context.imageSmoothingEnabled=false;
+    context.putImageData(row.pixels,0,0);
+  }
+  saved.focus?.focus?.();
+}
+
+function cancelSaveLoadFrames(owner) {
+  for (const item of [owner.motion,owner.ending,owner.bossIntro,owner.bossDefeat]) {
+    if (!item) continue;
+    if (item.frameId!==null && typeof window.cancelAnimationFrame==='function') {
+      try { window.cancelAnimationFrame(item.frameId); } catch (error) { /* Identity guards still reject stale frames. */ }
+    }
+    item.frameId=null;
+  }
+}
+
+function commitSaveLoad(session, value) {
+  if (!saveLoadSessionCurrent(session)) return false;
+  const candidate=hydrateSaveData(value); // All validation/allocation happens before changing the old run/UI.
+  return commitHydratedSaveLoad(session,candidate);
+}
+
+// Private boundary: only the validated hydration pipelines call this; never pass raw file objects here.
+function commitHydratedSaveLoad(session,candidate) {
+  if (!saveLoadSessionCurrent(session)) return false;
+  const previous=state, presentation=captureLoadPresentation();
+  if (!saveLoadSessionCurrent(session)) return false;
+  candidate.audio=previous.audio; candidate.art=previous.art;
+  candidate.lastTick=Date.now();
+  previous.loadSession=null; // Invalidate the confirmation before swapping; a consumed token never retries.
+  state=candidate;
+  try {
+    for (const id of ['helpOverlay','tradeOverlay','companionOverlay','devConsole','endingControls','saveLoadOverlay']) document.getElementById(id).hidden=true;
+    document.getElementById('overlay').style.display='none';
+    document.getElementById('pauseOverlay').style.display='none';
+    document.getElementById('helpToggle').ariaExpanded='false';
+    document.getElementById('helpOverlay').inert=false;
+    document.getElementById('gameLayout').inert=false;
+    document.getElementById('launchScreen').inert=false;
+    document.getElementById('launchScreen').hidden=true;
+    document.getElementById('gameLayout').hidden=false;
+    document.getElementById('consoleInput').value='';
+    document.getElementById('consoleOutput').textContent='';
+    const journal=document.getElementById('log');
+    journal.textContent=[...candidate.messages].reverse().join('\n\n'); journal.scrollTop=0;
+    render(true); // Presentation-only: preserve saved warning latches/HP rather than running checkHealth.
+    if (state!==candidate) return false;
+    canvas.focus?.();
+    if (state!==candidate) return false;
+    candidate.lastTick=Date.now();
+    cancelSaveLoadFrames(previous);
+    disposeSaveLoadUI(session,false,false);
+    fileActionMessage('');
+    return true;
+  } catch (error) {
+    cancelSaveLoadFrames(candidate);
+    if (state===candidate) {
+      state=previous;
+      state.lastTick=Date.now(); // Failed presentation/cancel time earns no active-time credit.
+      restoreLoadPresentation(presentation);
+      disposeSaveLoadUI(session,true,true);
+      try { requestMotionFrame(); } catch (ignored) { /* Original render error remains the reported failure. */ }
+    }
+    throw error;
+  }
+}
+
 let state;
 
 function newGame() {
+  dismissTrade(state && state.trade, false);
+  cancelSaveLoad(state && state.loadSession, false);
+  fileActionMessage('');
+  closeCompanionBoard(state && state.companionPicker, false);
   stopMotionAnimation();
   stopEndingAnimation();
   stopBossIntroAnimation();
@@ -321,6 +1397,10 @@ function newGame() {
   state = {
     depth: 1, area: 'dungeon', town: null, townExit: null, townPortalOpen: false, inn: null, townGate: null, kills: 0, turn: 0, started, messages: [], helpOpen: false, helpFocus: null,
     consoleOpen: false, consoleLines: [], consoleHistory: [], consoleHistoryIndex: 0, godMode: false, godModeStats: null,
+    selectedCompanion: 'marmalade',
+    unlockedCompanions: ['marmalade', 'pip'],
+    companionChoice: 'marmalade', companionEntryDone: false, companionPicker: null,
+    trade: null, loadSession: null,
     player: { x: 0, y: 0, hp: 60, maxHp: 60, mp: 20, maxMp: 20, str: 12, dex: 10, def: 3, lvl: 1, xp: 0, xpNext: 40, spells: { fireball: true, heal: true } },
     spellReadyAt: { fireball: 0, heal: 0, frostbolt: 0, greaterHeal: 0, magicBarrier: 0 },
     inventory: [], townScrolls: 0,
@@ -338,6 +1418,7 @@ function newGame() {
   };
   document.getElementById('endingControls').hidden = true;
   document.getElementById('helpOverlay').hidden = true;
+  document.getElementById('companionOverlay').hidden = true;
   document.getElementById('helpToggle').ariaExpanded = 'false';
   document.getElementById('gameLayout').inert = false;
   document.getElementById('launchScreen').inert = false;
@@ -347,11 +1428,27 @@ function newGame() {
   genLevel();
   genTown();
   revealAroundPlayer();
+  setCompanionChoice('marmalade');
   log('You arrive in the village. Rest at the Inn, visit the Store, or enter the dungeon.');
 }
 
+function setCompanionChoice(id) {
+  if (state.loadSession) return;
+  const def = companionDef(id);
+  if (!def || def.unlock !== 'start' || state.companionEntryDone) return false;
+  state.companionChoice = id;
+  state.selectedCompanion = id;
+  (document.querySelectorAll?.('[data-companion-choice]')||[]).forEach(btn => {
+    const on = btn.dataset.companionChoice === id;
+    btn.classList.toggle('selected', on);
+    btn.setAttribute('aria-pressed', String(on));
+  });
+}
+
 function startGame() {
+  if (state.loadSession) return;
   if (state.started) return;
+  state.selectedCompanion = state.companionChoice || state.selectedCompanion || 'marmalade';
   state.started = true;
   state.lastTick = Date.now();
   document.getElementById('launchScreen').hidden = true;
@@ -530,6 +1627,22 @@ function townStoreStock() {
     .map((item, index) => ({ ...item, id: 200 + index }));
 }
 
+function companionPostTile(map, props, actors, spawn, landmarks) {
+  const reachable = floorDistances(map, spawn), reserved = new Set();
+  for (const item of [...props, ...actors]) {
+    reserved.add(`${item.x},${item.y}`);
+    for (const tile of item.path || []) reserved.add(`${tile.x},${tile.y}`);
+  }
+  const candidates = [];
+  for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+    if (!reachable.has(`${x},${y}`) || map[y][x] !== 0 || reserved.has(`${x},${y}`)) continue;
+    if (landmarks.some(o => nearbyTile(x,y,o))) continue;
+    candidates.push({x,y});
+  }
+  candidates.sort((a,b) => (Math.abs(a.x-34)+Math.abs(a.y-26))-(Math.abs(b.x-34)+Math.abs(b.y-26)) || a.y-b.y || a.x-b.x);
+  return candidates[0] || null;
+}
+
 function genTown() {
   const map = [];
   for (let y = 0; y < H; y++) map.push(new Array(W).fill(1));
@@ -603,9 +1716,12 @@ function genTown() {
   state.merchant = store;
   state.inn = inn;
   state.townGate = gate;
+  const postTile = companionPostTile(map, props, [...npcs,...animals], spawn, [inn,store,gate,spawn]);
+  const companionBoard = postTile && { ...postTile, isCompanionBoard: true };
+  if (companionBoard) props.push(companionBoard);
   state.town = {
     map, visited: state.visited, props, npcs, animals, spawn, store,
-    landmarks: { inn, store, gate }, tick: 0, quoteIndex: 0, nextTalkAt: 0, speech: null,
+    landmarks: { inn, store, gate, companionBoard }, tick: 0, quoteIndex: 0, nextTalkAt: 0, speech: null,
   };
   state.monsters = [];
   state.monsterSpawns = [];
@@ -639,6 +1755,9 @@ function saveTown() {
 }
 
 function enterTown() {
+  dismissTrade(state && state.trade, false);
+  cancelSaveLoad(state && state.loadSession, false);
+  closeCompanionBoard(state && state.companionPicker, false);
   if (state.area === 'town' || !state.town) return;
   saveFloor();
   clearBossIntro();
@@ -717,7 +1836,11 @@ function enterDungeonFromTown(depth = state.depth, arrival = null) {
     if (tile) {
       enterFloor(exit.depth, false, false, tile);
       clearTownReturn();
-      log(exit.reason === 'scroll' ? 'You step back through the town portal.' : `You return to depth ${exit.depth} where you retreated.`);
+      log(exit.reason === 'scroll'
+        ? 'You step back through the town portal.'
+        : exit.reason === 'cheat'
+          ? 'You step back through the debug portal.'
+          : `You return to depth ${exit.depth} where you retreated.`);
       return;
     }
     clearTownReturn();
@@ -727,6 +1850,7 @@ function enterDungeonFromTown(depth = state.depth, arrival = null) {
 }
 
 function returnThroughTownPortal() {
+  if (state.trade) return false;
   if (state.area !== 'town' || !state.townPortalOpen || !state.townExit) return false;
   playSound('magic');
   enterDungeonFromTown();
@@ -734,7 +1858,9 @@ function returnThroughTownPortal() {
 }
 
 function useTownScroll() {
-  if (state.gameOver || state.helpOpen || state.consoleOpen || state.pause || state.ending || bossCinematicActive()) return;
+  if (state.loadSession) return;
+  if (state.companionPicker) return;
+  if (state.gameOver || state.helpOpen || state.consoleOpen || state.trade || state.pause || state.ending || bossCinematicActive()) return;
   if (state.area === 'town') {
     if (!returnThroughTownPortal()) { log('No town portal is open.'); render(); }
     return;
@@ -757,7 +1883,9 @@ function useTownScroll() {
 }
 
 function townTick() {
-  if (!state.started || state.gameOver || state.helpOpen || state.consoleOpen || state.pause || document.hidden) return false;
+  if (state.loadSession) return;
+  const companionOverlayOpen = typeof document !== 'undefined' && document.getElementById && document.getElementById('companionOverlay') && !document.getElementById('companionOverlay').hidden;
+  if (!state.started || state.gameOver || state.helpOpen || state.consoleOpen || state.trade || companionOverlayOpen || state.pause || document.hidden) return false;
   const town = state.town;
   if (!town) return false;
   town.tick++;
@@ -781,6 +1909,7 @@ function nearbyTile(x, y, target) {
 }
 
 function townEncounter() {
+  if (state.trade) return;
   const town = state.town;
   if (!town || town.tick < town.nextTalkAt) return;
   const npc = town.npcs.find(n => nearbyTile(state.player.x, state.player.y, n));
@@ -790,6 +1919,7 @@ function townEncounter() {
 }
 
 function townNpcTalk(npc) {
+  if (state.trade) return;
   const town = state.town;
   if (!town || !npc) return;
   const line = TOWN_NPC_LINES[town.quoteIndex % TOWN_NPC_LINES.length];
@@ -799,10 +1929,13 @@ function townNpcTalk(npc) {
 }
 
 function townInteract() {
+  if (state.trade) return;
+  if (state.loadSession) return;
+  if (state.companionPicker) return;
   if (state.area !== 'town') return false;
   const p = state.player;
-  const cat = entranceCatActor();
-  if (cat && !cat.hidden && state.entranceCat && !state.entranceCat.recruited && nearbyTile(p.x, p.y, cat)) return talkToEntranceCat();
+  const starter = selectedCompanionActor();
+  if (!state.companion && !state.companionEntryDone && starter && !starter.hidden && nearbyTile(p.x,p.y,starter)) return talkToEntranceCat();
   if (nearbyTile(p.x, p.y, state.townGate)) {
     if (!state.townPortalOpen || !returnThroughTownPortal()) enterDungeonFromTown();
     return true;
@@ -812,7 +1945,12 @@ function townInteract() {
     return true;
   }
   if (nearbyTile(p.x, p.y, state.merchant)) {
-    buyFromMerchant();
+    openTrade();
+    return true;
+  }
+  const board = state.town && state.town.landmarks && state.town.landmarks.companionBoard;
+  if (board && nearbyTile(p.x, p.y, board)) {
+    openCompanionBoard();
     return true;
   }
   const npc = state.town.npcs.find(n => nearbyTile(p.x, p.y, n));
@@ -827,6 +1965,8 @@ function townInteract() {
 }
 
 function restAtInn() {
+  if (state.trade) return;
+  if (state.companionPicker) return;
   if (state.area !== 'town') return;
   state.player.hp = state.player.maxHp;
   state.player.mp = state.player.maxMp;
@@ -867,9 +2007,13 @@ function drawTownNpcs() {
 }
 
 function drawTownSpeech() {
-  const cat = entranceCatActor();
-  if (cat && !cat.hidden && state.entranceCat && !state.entranceCat.recruited && nearbyTile(state.player.x, state.player.y, cat) && inRenderCamera(cat.x, cat.y)) {
-    drawBubble('Space: talk to Marmalade', cat.x * TILE + TILE / 2, cat.y * TILE - 16);
+  const starter = selectedCompanionActor();
+  if (!state.companion && !state.companionEntryDone && starter && !starter.hidden && nearbyTile(state.player.x,state.player.y,starter) && inRenderCamera(starter.x,starter.y)) {
+    drawBubble(`Space: recruit ${starter.name}`, (starter.x+.5)*TILE, starter.y*TILE-10);
+  }
+  const board = state.town && state.town.landmarks.companionBoard;
+  if (board && nearbyTile(state.player.x,state.player.y,board) && inRenderCamera(board.x,board.y)) {
+    drawBubble('Space: companions', (board.x+.5)*TILE, board.y*TILE-10);
   }
   if (state.townPortalOpen && state.townGate && inRenderCamera(state.townGate.x, state.townGate.y)) {
     drawBubble('Portal ready (J)', state.townGate.x * TILE + TILE / 2, state.townGate.y * TILE - 12);
@@ -1079,7 +2223,7 @@ function moveActorTo(actor, x, y) {
 }
 
 function motionPlayable() {
-  return state.started && !state.gameOver && !state.helpOpen && !state.consoleOpen && !state.pause && !document.hidden && !bossCinematicActive();
+  return !simulationBlocked();
 }
 
 function actorIsMoving(actor) {
@@ -1148,7 +2292,8 @@ function flameActive(hazard) {
 }
 
 function applyPlayerHazards() {
-  if (!state.started || state.gameOver || state.helpOpen || state.pause || document.hidden) return;
+  const companionOverlayOpen = typeof document !== 'undefined' && document.getElementById && document.getElementById('companionOverlay') && !document.getElementById('companionOverlay').hidden;
+  if (state.area === 'town' || simulationBlocked() || companionOverlayOpen) return;
   const p = state.player;
   const hazard = state.hazards.find(h => h.x === p.x && h.y === p.y);
   if (!hazard) return;
@@ -1170,8 +2315,7 @@ function applyPlayerHazards() {
 }
 
 function hazardTick() {
-  if (state.area === 'town') return;
-  if (!state.started || state.gameOver || state.helpOpen || state.consoleOpen || state.pause || document.hidden) return;
+  if (state.area === 'town' || simulationBlocked()) return;
   for (const hazard of state.hazards) {
     if (hazard.type !== 'rocks' || hazard.stage !== 'warning' || state.hazardTime < hazard.impactAt) continue;
     hazard.stage = 'spent';
@@ -1202,30 +2346,18 @@ function potionAt(x, y) {
 function treasureAt(x, y) {
   return state.treasures.find(t => t.x === x && t.y === y);
 }
-function equipmentBonus(stat) {
-  return Object.values(state.equipment).reduce((sum, item) => sum + (item ? item[stat] || 0 : 0), 0);
-}
+function equipmentBonus(stat) { return equipmentBonusFor(state.equipment, stat); }
 function equipItem(slot, item) {
-  const oldHealthBonus = equipmentBonus('maxHp');
-  state.equipment[slot] = item;
-  const healthChange = equipmentBonus('maxHp') - oldHealthBonus;
-  state.player.maxHp += healthChange;
-  state.player.hp = Math.min(state.player.maxHp, state.player.hp + Math.max(0, healthChange));
+  const change = equipmentTransition(state.player, state.equipment, slot, item);
+  state.equipment[slot] = change.equipment[slot];
+  state.player.maxHp = change.maxHp; state.player.hp = change.hp;
   freezePlayerStats();
 }
 
-function effectiveStr() {
-  return state.player.str + equipmentBonus('str');
-}
-function effectiveDex() {
-  return state.player.dex + equipmentBonus('dex');
-}
-function effectiveAtk() {
-  return effectiveStr() + equipmentBonus('atk');
-}
-function effectiveDef() {
-  return state.player.def + equipmentBonus('def') + Math.floor(effectiveDex() / 5);
-}
+function effectiveStr() { return equipmentStatsFor(state.player, state.equipment).str; }
+function effectiveDex() { return equipmentStatsFor(state.player, state.equipment).dex; }
+function effectiveAtk() { return equipmentStatsFor(state.player, state.equipment).atk; }
+function effectiveDef() { return equipmentStatsFor(state.player, state.equipment).def; }
 function dodgeChance() {
   return Math.min(0.45, Math.max(0, (effectiveDex() - 10) * 0.02));
 }
@@ -1317,6 +2449,8 @@ function damageMonster(m, dmg) {
 }
 
 function attackMonster(m) {
+  if (state.trade) return;
+  if (state.loadSession) return;
   if (state.gameOver || state.helpOpen || state.pause) return;
   markCombat();
   playSound('slash');
@@ -1368,6 +2502,9 @@ function spawnProjectile(kind, source, target, duration = 0.35) {
 }
 
 function shootBow() {
+  if (state.trade) return;
+  if (state.loadSession) return;
+  if (state.companionPicker) return;
   if (state.area === 'town') return;
   if (!state.started || state.gameOver || state.helpOpen || state.pause || bossCinematicActive()) return;
   const weapon = rangedWeapon();
@@ -1388,6 +2525,9 @@ function shootBow() {
 }
 
 function castSpell(spellName) {
+  if (state.trade) return;
+  if (state.loadSession) return;
+  if (state.companionPicker) return;
   if (state.area === 'town') return;
   if (!state.started || state.gameOver || state.helpOpen || state.pause || bossCinematicActive()) return;
   const spell = SPELLS[spellName];
@@ -1459,7 +2599,7 @@ function castSpell(spellName) {
 }
 
 function regenMana() {
-  if (state.area === 'town' || state.godMode) return;
+  if (state.area === 'town' || state.godMode || simulationBlocked()) return;
   const p = state.player;
   if (state.combatElapsed < 4) return;
   if (state.monsters.some(m => m.hp > 0 && Math.max(Math.abs(m.x - p.x), Math.abs(m.y - p.y)) <= 3)) return;
@@ -1469,6 +2609,7 @@ function regenMana() {
 }
 
 function enemyAttack(m) {
+  if (state.trade) return;
   if (state.gameOver || state.helpOpen || state.pause || m.hp <= 0 || state.activeTime < (m.nextAttackAt || 0)) return;
   m.nextAttackAt = state.activeTime + ENEMY_ATTACK_INTERVAL;
   monsterTalk(m);
@@ -1593,15 +2734,15 @@ function drawMonsterSpeech() {
 }
 
 function gameOver(won) {
+  dismissTrade(state && state.trade, false);
+  cancelSaveLoad(state.loadSession, false);
   if (won) { startEnding(); return; }
   clearBossIntro();
   clearBossDefeat();
   clearMonsterSpeech();
   clearMovementAnimation();
   clearTownReturn();
-  state.companion = null;
-  state.companionSpeech = null;
-  state.entranceCat = freshEntranceCatState();
+  resetCompanionRun();
   state.gameOver = true; state.won = won; state.pause = null;
   const ov = document.getElementById('overlay');
   document.getElementById('ovTitle').textContent = 'GAME OVER';
@@ -1703,6 +2844,7 @@ function playBossIntroSound(kind) {
 }
 
 function checkBossIntro() {
+  if (state.loadSession) return;
   if (state.area === 'town') return;
   const m = state && state.boss;
   if (!m || m.hp <= 0 || state.bossIntroSeen || !state.started || state.gameOver || state.helpOpen || state.pause || bossCinematicActive()) return;
@@ -1945,6 +3087,9 @@ function bossDefeatScene() {
 }
 
 function movePlayer(dx, dy) {
+  if (state.trade) return;
+  if (state.loadSession) return;
+  if (state.companionPicker) return;
   if (state.gameOver || state.helpOpen || state.pause || bossCinematicActive()) return;
   const p = state.player;
   const nx = p.x + dx, ny = p.y + dy;
@@ -2031,12 +3176,16 @@ function recreateMonsters() {
 
 function enterFloor(depth, fromBelow, fresh = false, arrivalTile = null) {
   if (depth < 1 || depth > FINAL_DEPTH) return;
+  dismissTrade(state.trade, false);
+  cancelSaveLoad(state.loadSession, false);
+  closeCompanionBoard(state.companionPicker, false);
   clearBossIntro();
   clearBossDefeat();
   state.bossIntroSeen = false;
   state.bossSummonAt = state.activeTime + 4;
-  if (state.area === 'town' && state.entranceCat && !state.entranceCat.entered) {
-    joinEntranceCat(true);
+  if (state.area === 'town' && !state.companionEntryDone) {
+    if (!state.companion) joinSelectedCompanion(true);
+    state.companionEntryDone = true;
     state.entranceCat.entered = true;
   }
   if (state.area === 'town') saveTown(); else saveFloor();
@@ -2059,6 +3208,8 @@ function enterFloor(depth, fromBelow, fresh = false, arrivalTile = null) {
 }
 
 function descendStairs() {
+  if (state.trade) return;
+  if (state.loadSession) return;
   if (state.gameOver || state.helpOpen || state.pause) return;
   const p = state.player;
   if (p.x !== state.stairs.x || p.y !== state.stairs.y) return;
@@ -2082,6 +3233,8 @@ function descendStairs() {
 }
 
 function ascendStairs() {
+  if (state.trade) return;
+  if (state.loadSession) return;
   if (state.gameOver || state.helpOpen || state.pause) return;
   const p = state.player;
   if (!state.upstairs || p.x !== state.upstairs.x || p.y !== state.upstairs.y) {
@@ -2112,71 +3265,522 @@ function merchantStock() {
 function merchantAt(x, y) {
   return state.merchant && state.merchant.x === x && state.merchant.y === y ? state.merchant : null;
 }
-function buyFromMerchant() {
-  if (state.gameOver || state.helpOpen || state.pause) return;
-  const p = state.player;
-  const m = merchantAt(p.x, p.y);
-  if (!m || !m.stock || m.stock.length === 0) { log('Nothing for sale here.'); render(); return; }
-  const it = m.stock[0];
-  if (it.kind === 'spellbook' && state.player.spells[it.spell]) {
-    log(`You already know ${SPELLS[it.spell].name}.`);
-    m.stock.shift(); render(); return;
-  }
-  const priceScale = 1.5 + Math.max(0, state.depth - 1) * 0.03;
-  const cost = Math.round(it.gold * priceScale);
-  if (state.gold < cost) { log(`Not enough gold (${cost} needed).`); render(); return; }
-  state.gold -= cost;
-  m.stock.shift();
-  state.bubble = { text: 'Pleasure doing business!', ttl: 90 };
-  if (it.kind === 'heal') {
-    storePotion(it);
-    log(`Bought ${it.name}! Press H to drink.`);
-  } else if (it.kind === 'weapon' || it.kind === 'armor' || it.kind === 'ring') {
-    const slot = it.kind === 'weapon' ? 'weapon' : it.kind === 'armor' ? 'armor' : 'ring';
-    const prev = state.equipment[slot];
-    equipItem(slot, it);
-    log(`Bought ${it.name}!${prev ? ` (replaced ${prev.name})` : ''}`);
-  } else if (it.kind === 'elixir') {
-    state.gold += it.gold;
-    log(`Bought ${it.name}! +${it.gold} gold`);
-  } else if (it.kind === 'spellbook') {
-    learnSpell(it.spell);
-    log(`Bought ${it.name}!`);
-  } else if (it.kind === 'scroll') {
-    state.townScrolls++;
-    log(`Bought ${it.name}! Press J in the dungeon to open a portal home.`);
-  } else {
-    log(`Bought ${it.name}!`);
-  }
-  if (!m.stock.length) companionTalk('merchant');
-  render();
+// M1 model only: no DOM, live-state writes, RNG, notices, saving or commit here.
+function tradeRequire(condition, message) {
+  if (!condition) throw new Error(`Invalid trade: ${message}`);
 }
-function sellToMerchant() {
-  if (state.gameOver || state.helpOpen || state.pause) return;
-  const p = state.player;
-  const m = merchantAt(p.x, p.y);
-  if (!m) { log('No merchant here.'); render(); return; }
-  const slots = ['weapon', 'armor', 'ring'];
-  let sold = false;
-  for (const slot of slots) {
-    const it = state.equipment[slot];
-    if (!it) continue;
-    const price = Math.round(it.gold * 0.5);
-    state.gold += price;
-    equipItem(slot, null);
-    log(`Sold ${it.name} for ${price} gold.`);
-    state.bubble = { text: 'Fair trade!', ttl: 90 };
-    sold = true;
-  }
-  if (!sold) log('You have no gear to sell.');
-  render();
+
+function tradeAmount(value, name = 'amount') {
+  tradeRequire(Number.isSafeInteger(value) && value >= 0, `${name} must be a nonnegative safe integer`);
+  return value;
 }
+
+function buyPrice(item, depth) {
+  tradeRequire(item && typeof item === 'object', 'missing item');
+  tradeAmount(item.gold, 'item gold');
+  tradeRequire(Number.isInteger(depth) && depth >= 1 && depth <= FINAL_DEPTH, 'pricing depth');
+  return tradeAmount(Math.round(item.gold * (1.5 + Math.max(0, depth - 1) * 0.03)), 'buy price');
+}
+
+function sellPrice(item) {
+  tradeRequire(item && typeof item === 'object', 'missing item');
+  return tradeAmount(Math.round(tradeAmount(item.gold, 'item gold') * 0.5), 'sell price');
+}
+
+function equipmentBonusFor(equipment, stat) {
+  return Object.values(equipment).reduce((sum, item) =>
+    tradeAmount(sum + (item && item[stat] !== undefined ? tradeAmount(item[stat], stat) : 0), stat), 0);
+}
+
+function equipmentStatsFor(player, equipment) {
+  const str = tradeAmount(player.str + equipmentBonusFor(equipment, 'str'), 'strength');
+  const dex = tradeAmount(player.dex + equipmentBonusFor(equipment, 'dex'), 'dexterity');
+  return { hp: player.hp, maxHp: player.maxHp, str, dex,
+    atk: tradeAmount(str + equipmentBonusFor(equipment, 'atk'), 'attack'),
+    def: tradeAmount(player.def + equipmentBonusFor(equipment, 'def') + Math.floor(dex / 5), 'defense') };
+}
+
+function equipmentTransition(player, equipment, slot, item) {
+  tradeRequire(['weapon','armor','ring'].includes(slot) && (item === null || item.kind === slot), 'equipment slot');
+  const next = { ...equipment, [slot]:item };
+  const delta = equipmentBonusFor(next, 'maxHp') - equipmentBonusFor(equipment, 'maxHp');
+  const maxHp = tradeAmount(player.maxHp + delta, 'maximum HP');
+  tradeRequire(maxHp > 0, 'maximum HP');
+  return { equipment:next, maxHp, hp:Math.min(maxHp, tradeAmount(player.hp + Math.max(0, delta), 'HP')) };
+}
+
+function learnSpellState(spells, spellReadyAt, name, activeTime) {
+  if (!Object.prototype.hasOwnProperty.call(SPELLS, name) || spells[name]) return null;
+  tradeRequire(Number.isFinite(activeTime) && activeTime >= 0, 'spell time');
+  return { spells:{ ...spells, [name]:true }, spellReadyAt:{ ...spellReadyAt, [name]:activeTime } };
+}
+
+function freezeTradeData(value) {
+  if (value && typeof value === 'object' && !Object.isFrozen(value)) {
+    for (const child of Object.values(value)) freezeTradeData(child);
+    Object.freeze(value);
+  }
+  return value;
+}
+
+function validateTradeItem(item) {
+  tradeRequire(item && typeof item === 'object' && !Array.isArray(item), 'missing item');
+  tradeRequire(typeof item.name === 'string' && item.name.length > 0, 'item name');
+  tradeRequire(['heal','weapon','armor','ring','elixir','spellbook','scroll'].includes(item.kind), 'item kind');
+  tradeAmount(item.gold, 'item gold');
+  // Source items are flat records. Reject nested/executable values instead of retaining live references.
+  for (const value of Object.values(item)) tradeRequire(value === null || ['string','boolean','number'].includes(typeof value), 'item field');
+  for (const value of Object.values(item)) if (typeof value === 'number') tradeRequire(Number.isFinite(value), 'item number');
+  for (const stat of ['atk','def','str','dex','maxHp','range']) if (item[stat] !== undefined) tradeAmount(item[stat], stat);
+  if (item.kind === 'heal') tradeRequire(Number.isFinite(item.heal) && item.heal > 0 && item.heal <= 1, 'potion healing');
+  if (item.kind === 'spellbook') tradeRequire(Object.prototype.hasOwnProperty.call(SPELLS, item.spell), 'spellbook');
+  if (item.kind === 'scroll') tradeRequire(item.scroll === 'town', 'scroll');
+}
+
+function validateTradeDraft(draft) {
+  tradeAmount(draft.gold, 'gold'); tradeAmount(draft.townScrolls, 'Town Scrolls');
+  const p = draft.player;
+  for (const field of GOD_STAT_FIELDS) tradeRequire(Number.isFinite(p[field]) && p[field] >= 0, `player ${field}`);
+  for (const field of ['hp','maxHp','mp','maxMp','str','dex','def','lvl']) tradeAmount(p[field], field);
+  tradeRequire(p.maxHp > 0 && p.hp <= p.maxHp && p.mp <= p.maxMp, 'player health/mana');
+  tradeRequire(p.lvl >= 1 && p.lvl <= MAX_LEVEL, 'player level');
+  for (const [name, known] of Object.entries(p.spells)) tradeRequire(Object.prototype.hasOwnProperty.call(SPELLS,name) && typeof known === 'boolean', 'spell knowledge');
+  for (const [name, time] of Object.entries(draft.spellReadyAt)) tradeRequire(Object.prototype.hasOwnProperty.call(SPELLS,name) && Number.isFinite(time) && time >= 0, 'spell readiness');
+  for (const name of Object.keys(SPELLS)) tradeRequire(Number.isFinite(draft.spellReadyAt[name]), 'missing spell readiness');
+  for (const slot of ['weapon','armor','ring']) {
+    const item = draft.equipment[slot];
+    if (item !== null) { validateTradeItem(item); tradeRequire(item.kind === slot, 'equipped item'); }
+  }
+  equipmentStatsFor(p, draft.equipment);
+  for (const potion of draft.inventory) tradeRequire(Object.keys(potion).length === 3 && potion.name === 'Potion' && potion.kind === 'heal'
+    && Number.isFinite(potion.heal) && potion.heal > 0 && potion.heal <= 1, 'stored potion');
+  const rows = new Set();
+  for (const row of draft.stock) {
+    tradeRequire(typeof row.rowId === 'string' && !rows.has(row.rowId), 'stock row identity');
+    rows.add(row.rowId); validateTradeItem(row.item);
+  }
+}
+
+function createTradeDraft(source, merchant) {
+  tradeRequire(source && merchant && Array.isArray(merchant.stock), 'trade source');
+  const player = Object.fromEntries(GOD_STAT_FIELDS.map(key => [key, source.player[key]]));
+  player.spells = { ...source.player.spells };
+  const original = { gold:source.gold, townScrolls:source.townScrolls, player,
+    spellReadyAt:{ ...source.spellReadyAt }, inventory:source.inventory.map(item => ({ ...item })),
+    equipment:Object.fromEntries(['weapon','armor','ring'].map(slot => [slot, source.equipment[slot] === null ? null : { ...source.equipment[slot] }])),
+    stock:merchant.stock.map((item, index) => ({ rowId:`stock:${index}`, item:{ ...item } })), operations:[] };
+  validateTradeDraft(original);
+  const rules = { pricingDepth:source.depth, activeTime:source.activeTime,
+    godModeStats:source.godMode && source.godModeStats ? Object.fromEntries(GOD_STAT_FIELDS.map(key => [key, source.godModeStats[key]])) : null };
+  tradeRequire(Number.isInteger(rules.pricingDepth) && rules.pricingDepth >= 1 && rules.pricingDepth <= FINAL_DEPTH, 'pricing depth');
+  tradeRequire(Number.isFinite(rules.activeTime) && rules.activeTime >= 0, 'trade time');
+  if (rules.godModeStats) {
+    const frozen = { ...original, player:{ ...player, ...rules.godModeStats } };
+    validateTradeDraft(frozen);
+  }
+  // Opening values/rules/history are immutable; no live item, spell, potion or stock reference escapes.
+  return freezeTradeData({ original, draft:original, rules, history:[] });
+}
+
+function equipDraft(draft, slot, item, rules) {
+  const change = equipmentTransition(draft.player, draft.equipment, slot, item);
+  const player = { ...draft.player, hp:change.hp, maxHp:change.maxHp };
+  if (rules.godModeStats) Object.assign(player, rules.godModeStats);
+  return { ...draft, player, equipment:change.equipment };
+}
+
+// Returns a new immutable draft or throws Invalid trade; rejected actions never enter the journal.
+function applyTradeAction(draft, action, rules) {
+  tradeRequire(action && typeof action === 'object', 'action');
+  let next = { ...draft }, operation;
+  if (action.type === 'buy') {
+    const index = draft.stock.findIndex(row => row.rowId === action.rowId);
+    tradeRequire(index >= 0, 'stock row is unavailable');
+    const row = draft.stock[index], item = row.item, price = buyPrice(item, rules.pricingDepth);
+    validateTradeItem(item);
+    tradeRequire(item.kind !== 'spellbook' || !draft.player.spells[item.spell], 'spell already learned');
+    tradeRequire(draft.gold >= price, 'not enough gold');
+    next.gold = tradeAmount(draft.gold - price, 'gold');
+    next.stock = draft.stock.filter((_, i) => i !== index);
+    const replaced = ['weapon','armor','ring'].includes(item.kind) ? draft.equipment[item.kind] : null;
+    if (item.kind === 'heal') next.inventory = [...draft.inventory, { name:'Potion', kind:'heal', heal:item.heal }];
+    else if (['weapon','armor','ring'].includes(item.kind)) next = equipDraft(next, item.kind, item, rules);
+    else if (item.kind === 'elixir') next.gold = tradeAmount(next.gold + item.gold, 'gold');
+    else if (item.kind === 'scroll') next.townScrolls = tradeAmount(next.townScrolls + 1, 'Town Scrolls');
+    else if (item.kind === 'spellbook') {
+      const learned = learnSpellState(draft.player.spells, draft.spellReadyAt, item.spell, rules.activeTime);
+      next.player = { ...draft.player, spells:learned.spells }; next.spellReadyAt = learned.spellReadyAt;
+    }
+    operation = { type:'buy', rowId:row.rowId, item, price, replaced };
+  } else if (action.type === 'sell') {
+    tradeRequire(['weapon','armor','ring'].includes(action.slot), 'sell slot');
+    const item = draft.equipment[action.slot];
+    tradeRequire(!!item, 'slot is empty');
+    validateTradeItem(item);
+    const price = sellPrice(item);
+    next = equipDraft(next, action.slot, null, rules);
+    next.gold = tradeAmount(draft.gold + price, 'gold');
+    operation = { type:'sell', slot:action.slot, item, price };
+  } else tradeRequire(false, 'unknown action');
+  next.operations = [...draft.operations, operation];
+  validateTradeDraft(next);
+  return freezeTradeData(next);
+}
+
+function stageTradeAction(cart, action) {
+  const draft = applyTradeAction(cart.draft, action, cart.rules);
+  return freezeTradeData({ ...cart, draft, history:[...cart.history, cart.draft] });
+}
+
+function undoTradeAction(cart) {
+  if (!cart.history.length) return cart;
+  return freezeTradeData({ ...cart, draft:cart.history[cart.history.length - 1], history:cart.history.slice(0,-1) });
+}
+
+function resetTradeDraft(cart) {
+  return freezeTradeData({ ...cart, draft:cart.original, history:[] });
+}
+
+function tradePrice(it) { return buyPrice(it, state.depth); }
+function tradeSellPrice(it) { return sellPrice(it); }
+function companionPostContext() {
+  if (!state.started || state.area !== 'town' || state.gameOver || state.player.hp <= 0 || document.hidden
+    || state.helpOpen || state.consoleOpen || state.trade || state.pause || state.ending || bossCinematicActive()) return null;
+  const trade = document.getElementById('tradeOverlay');
+  if (trade && !trade.hidden) return null;
+  const board = state.town && state.town.landmarks.companionBoard;
+  return board && state.map === state.town.map && state.map[board.y][board.x] === 0
+    && nearbyTile(state.player.x,state.player.y,board) ? board : null;
+}
+
+function restoreCompanionFocus(session) {
+  const focus = session.focus;
+  if (focus && focus.isConnected && !focus.disabled && !focus.hidden && !focus.closest?.('[inert], [hidden]')) focus.focus?.();
+  else canvas.focus?.();
+}
+
+function openCompanionBoard() {
+  if (state.loadSession) return;
+  const board = companionPostContext();
+  if (!board || state.companionPicker) return false;
+  const overlay = document.getElementById('companionOverlay'), list = document.getElementById('companionBoardList');
+  if (!overlay || !list || typeof document.createElement !== 'function') return false;
+  const session = { town:state.town, map:state.map, board, focus:document.activeElement,
+    gameInert:!!document.getElementById('gameLayout').inert, launchInert:!!document.getElementById('launchScreen').inert };
+  state.companionPicker = session;
+  list.innerHTML = '';
+  for (const id of Object.keys(COMPANIONS)) {
+    const def = COMPANIONS[id], unlocked = isCompanionUnlocked(id), active = state.companion && state.companion.id === id;
+    const row = document.createElement('div'); row.className = 'companion-card';
+    const details = document.createElement('div'), name = document.createElement('strong'), hint = document.createElement('p');
+    name.textContent = `${def.name}${active ? ' · Active' : ''}`;
+    hint.textContent = unlocked ? def.desc : `Locked. ${def.desc}`;
+    details.appendChild(name); details.appendChild(hint);
+    const btn = document.createElement('button'); btn.type='button'; btn.dataset.companionId=id;
+    btn.textContent = active ? 'Keep' : unlocked ? 'Choose' : 'Locked'; btn.disabled = !unlocked;
+    btn.setAttribute('aria-label', `${active ? 'Keep' : unlocked ? 'Choose' : 'Locked:'} ${def.name}`);
+    btn.onclick = () => selectCompanion(id, session);
+    row.appendChild(details); row.appendChild(btn); list.appendChild(row);
+  }
+  overlay.hidden = false;
+  document.getElementById('gameLayout').inert = true;
+  document.getElementById('launchScreen').inert = true;
+  resetHelpClock(); stopMotionAnimation(); render();
+  document.getElementById('closeCompanionBoard').focus?.();
+  return true;
+}
+
+function closeCompanionBoard(session = state && state.companionPicker, restoreFocus = true) {
+  if (!state || !session || state.companionPicker !== session) return false;
+  state.companionPicker = null;
+  document.getElementById('companionOverlay').hidden = true;
+  document.getElementById('gameLayout').inert = session.gameInert || false;
+  document.getElementById('launchScreen').inert = session.launchInert || false;
+  resetHelpClock();
+  if (restoreFocus) { render(); requestMotionFrame(); restoreCompanionFocus(session); }
+  return true;
+}
+
+function selectCompanion(id, session) {
+  if (!session || state.companionPicker !== session || session.town !== state.town || session.map !== state.map
+    || companionPostContext() !== session.board || !isCompanionUnlocked(id) || !companionDef(id)) return false;
+  if (state.companion && state.companion.id === id) return closeCompanionBoard(session);
+  closeCompanionBoard(session, false);
+  if (!activateCompanion(id)) return false;
+  log(`${companionDef(id).name} is now your active companion.`);
+  render(); requestMotionFrame(); restoreCompanionFocus(session);
+  return true;
+}
+
+function tradeMerchant() {
+  const m = state.merchant;
+  if (!m) return null;
+  if (state.area === 'town') return state.town && state.map === state.town.map && m === state.town.store
+    && nearbyTile(state.player.x,state.player.y,m) ? m : null;
+  return merchantAt(state.player.x,state.player.y);
+}
+
+function tradeAccessAllowed() {
+  return state.started && !state.gameOver && !state.won && state.player.hp > 0 && !document.hidden
+    && !state.helpOpen && !state.consoleOpen && !state.pause && !state.ending && !bossCinematicActive()
+    && !state.companionPicker && !state.loadSession && document.getElementById('companionOverlay').hidden;
+}
+
+function tradeSessionBound(session) {
+  return !!session && state.trade === session && session.owner === state && session.map === state.map
+    && session.area === state.area && session.depth === state.depth && session.actor === tradeMerchant();
+}
+
+function tradeSessionCurrent(session) {
+  return tradeSessionBound(session) && tradeAccessAllowed() && !session.committing && !session.invalid;
+}
+
+function openTrade(mode = 'buy') {
+  if (state.trade || !tradeAccessAllowed() || !document.getElementById('tradeOverlay').hidden) return false;
+  const actor = tradeMerchant();
+  if (!actor) { log('No merchant here.'); render(); return false; }
+  let cart;
+  try { cart = createTradeDraft(state,actor);for (const row of cart.original.stock) buyPrice(row.item,cart.rules.pricingDepth); } catch (error) { return false; }
+  const session = { owner:state, actor, map:state.map, area:state.area, depth:state.depth,
+    cart, opening:cart.original, rules:cart.rules, selectedBuy:cart.original.stock[0]?.rowId || null,
+    selectedSell:['weapon','armor','ring'].find(slot=>cart.original.equipment[slot]) || null,
+    mode:mode === 'sell' ? 'sell' : 'buy', message:'Choose items, then add purchases or sales. Confirm applies your cart.',
+    focus:document.activeElement, gameInert:!!document.getElementById('gameLayout').inert,
+    launchInert:!!document.getElementById('launchScreen').inert };
+  state.trade = session;
+  document.getElementById('tradeOverlay').hidden = false;
+  document.getElementById('gameLayout').inert = true;
+  document.getElementById('launchScreen').inert = true;
+  resetHelpClock(); stopMotionAnimation();
+  try {
+    renderTrade(session); render(true);
+    const list=document.getElementById(mode === 'sell' ? 'tradeSellList' : 'tradeBuyList');
+    ([...(list.querySelectorAll?.('button') || [])].find(button=>!button.disabled) || document.getElementById('closeTrade')).focus?.();
+    return true;
+  } catch (error) {
+    dismissTrade(session,false);resumeAfterTrade(session);return false;
+  }
+}
+
+function resumeAfterTrade(session) {
+  try { render(true); } catch (ignored) { /* A failed paint must not strand input in the closed dialog. */ }
+  try {
+    requestMotionFrame();
+    const focus=session.focus;
+    if (focus && focus.isConnected && !focus.disabled && !focus.hidden && !focus.closest?.('[inert], [hidden]')) focus.focus?.();
+    else canvas.focus?.();
+  } finally { resetHelpClock(); } // Painting/focus time must not become active gameplay time.
+}
+
+function dismissTrade(session, resume = true) {
+  if (!session || state.trade !== session) return false;
+  if (session.rollback) session.rollback(); // Forced teardown during a helper must precede the new world/run.
+  state.trade = null;
+  document.getElementById('tradeOverlay').hidden = true;
+  // Release captured owner/cart references instead of retaining the previous run in hidden controls.
+  for (const id of ['tradeOverlay','closeTrade','cancelTrade','confirmTrade','addTradePurchase','addTradeSale','undoTrade','resetTrade','tradeAudioToggle']) document.getElementById(id).onclick=null;
+  for (const id of ['tradeBuyList','tradeSellList','tradeOrder']) document.getElementById(id).innerHTML='';
+  document.getElementById('gameLayout').inert = session.gameInert || false;
+  document.getElementById('launchScreen').inert = session.launchInert || false;
+  resetHelpClock();
+  if (resume) resumeAfterTrade(session);
+  return true;
+}
+
+function closeTrade(confirm, session = state.trade) {
+  return confirm ? confirmTrade(session) : dismissTrade(session);
+}
+
+function tradeItemDetails(item) {
+  if (item.kind === 'heal') return `Stores a potion (${Math.round(item.heal*100)}% healing).`;
+  if (item.kind === 'scroll') return 'Adds one Town Scroll.';
+  if (item.kind === 'spellbook') return `Learn ${SPELLS[item.spell].name}.`;
+  if (item.kind === 'elixir') return `Returns ${item.gold} gold after payment; no stat bonus.`;
+  return ['maxHp','str','atk','def','dex'].filter(stat=>item[stat]).map(stat=>`${stat === 'maxHp' ? 'HP' : stat.toUpperCase()} +${item[stat]}`).join(' · ');
+}
+
+function drawTradeItemIcon(surface, item) {
+  const target=surface.getContext('2d'); target.imageSmoothingEnabled=false;
+  const decoded=artDecoded(item.sprite,0,'front');
+  if (decoded) {
+    const b=decoded.bounds || {x:0,y:0,width:decoded.w,height:decoded.h}, ratio=Math.min(28/b.width,28/b.height);
+    drawArtDecoded(target,decoded,(32-b.width*ratio)/2-b.x*ratio,(32-b.height*ratio)/2-b.y*ratio,decoded.w*ratio,decoded.h*ratio);
+  } else if (!artCovered(item.sprite) && SPRITES[item.sprite]) {
+    const size=spriteDimensions(item.sprite), ratio=Math.min(28/size.width,28/size.height);
+    paintLegacySprite(target,item.sprite,(32-size.width*ratio)/2,(32-size.height*ratio)/2,ratio/ART_DENSITY);
+  }
+}
+
+function tradeRowReason(session, row) {
+  const draft=session.cart.draft;
+  if (!draft.stock.some(current=>current.rowId===row.rowId)) return 'Pending purchase';
+  if (row.item.kind === 'spellbook' && draft.player.spells[row.item.spell]) return 'Already learned';
+  try { if (buyPrice(row.item,session.rules.pricingDepth)>draft.gold) return 'Not enough gold'; }
+  catch (error) { return 'Unavailable price'; }
+  return '';
+}
+
+function selectTradeRow(session, mode, key) {
+  if (!tradeSessionCurrent(session)) return false;
+  session.mode=mode;
+  if (mode === 'buy') session.selectedBuy=key; else session.selectedSell=key;
+  renderTrade(session);
+  const list=document.getElementById(mode === 'buy' ? 'tradeBuyList' : 'tradeSellList');
+  [...(list.querySelectorAll?.('button') || [])].find(b=>b.dataset.tradeKey===key)?.focus?.();
+  return true;
+}
+
+function renderTrade(session = state.trade) {
+  if (!session || state.trade !== session || !session.cart) return;
+  document.getElementById('tradeOverlay').onclick=e=>{if(e.target.id==='tradeOverlay')closeTrade(false,session);};
+  for (const id of ['closeTrade','cancelTrade']) document.getElementById(id).onclick=()=>closeTrade(false,session);
+  document.getElementById('confirmTrade').onclick=()=>confirmTrade(session);
+  document.getElementById('addTradePurchase').onclick=()=>tradeBuy(session.selectedBuy,session);
+  document.getElementById('addTradeSale').onclick=()=>tradeSell(session.selectedSell,session);
+  document.getElementById('undoTrade').onclick=()=>editTradeCart(session,false);
+  document.getElementById('resetTrade').onclick=()=>editTradeCart(session,true);
+  document.getElementById('tradeAudioToggle').onclick=()=>{ if(state.trade===session) { startAudio();toggleAudio(); } };
+  const draft=session.cart.draft, selected=session.cart.original.stock.find(row=>row.rowId===session.selectedBuy);
+  const selectedGear=draft.equipment[session.selectedSell];
+  document.getElementById('tradeTitle').textContent=session.area === 'town' ? 'Village Store' : 'Dungeon Merchant';
+  document.getElementById('tradeStatus').textContent=session.message;
+  document.getElementById('tradeGold').textContent=`Gold: ${session.opening.gold} → ${draft.gold}`;
+  const stats=equipmentStatsFor(draft.player,draft.equipment);
+  document.getElementById('tradeStats').textContent=`After trade: HP ${stats.hp}/${stats.maxHp} · STR ${stats.str} · ATK ${stats.atk} · DEF ${stats.def} · DEX ${stats.dex} · Potions ${draft.inventory.length} · Scrolls ${draft.townScrolls}`;
+  let details=selected ? `${selected.item.name}: ${tradeItemDetails(selected.item)}` : 'No stock to select.';
+  if (selected && ['weapon','armor','ring'].includes(selected.item.kind) && draft.equipment[selected.item.kind])
+    details+=` Replaces ${draft.equipment[selected.item.kind].name}; sell it first to receive its sale value.`;
+  document.getElementById('tradeBuyDetails').textContent=details;
+  document.getElementById('tradeSellDetails').textContent=selectedGear ? `${selectedGear.name}: ${tradeItemDetails(selectedGear)}` : 'Select an equipped item to sell.';
+  document.getElementById('addTradePurchase').textContent=selected && ['weapon','armor','ring'].includes(selected.item.kind) ? 'Buy & equip (B)' : 'Add purchase (B)';
+  document.getElementById('addTradePurchase').disabled=!!session.invalid || !selected || !!tradeRowReason(session,selected);
+  document.getElementById('addTradeSale').disabled=!!session.invalid || !selectedGear;
+  for (const id of ['undoTrade','resetTrade']) document.getElementById(id).disabled=!!session.invalid || !draft.operations.length;
+  document.getElementById('confirmTrade').disabled=!!session.invalid || !!session.committing;
+  document.getElementById('tradeAudioToggle').textContent=state.audio.enabled ? 'Sound: On (M)' : 'Sound: Off (M)';
+  if (typeof document.createElement !== 'function') return; // Static no-DOM test harness: never trade immediately.
+  const buy=document.getElementById('tradeBuyList'), sell=document.getElementById('tradeSellList'), order=document.getElementById('tradeOrder');
+  buy.innerHTML=''; sell.innerHTML=''; order.innerHTML='';
+  const appendRow=(host,item,key,mode,label,reason,active)=>{
+    const row=document.createElement('div'); row.className='trade-item';
+    const button=document.createElement('button'); button.type='button'; button.dataset.tradeMode=mode; button.dataset.tradeKey=key;
+    button.setAttribute('aria-pressed',String(active)); button.disabled=!!reason || !!session.invalid;
+    const icon=document.createElement('canvas'); icon.width=32; icon.height=32; icon.setAttribute('aria-hidden','true'); drawTradeItemIcon(icon,item);
+    const text=document.createElement('span'); text.textContent=label;
+    button.appendChild(icon); button.appendChild(text); button.onclick=()=>selectTradeRow(session,mode,key);
+    const hint=document.createElement('p'); hint.className='meta'; hint.textContent=reason || tradeItemDetails(item);
+    row.appendChild(button); row.appendChild(hint); host.appendChild(row);
+  };
+  for (const row of session.cart.original.stock) appendRow(buy,row.item,row.rowId,'buy',`${row.item.name} · ${buyPrice(row.item,session.rules.pricingDepth)} gold`,tradeRowReason(session,row),session.selectedBuy===row.rowId);
+  for (const slot of ['weapon','armor','ring']) if (draft.equipment[slot]) {
+    const item=draft.equipment[slot];appendRow(sell,item,slot,'sell',`${item.name} · ${slot} · ${sellPrice(item)} gold`,'',session.selectedSell===slot);
+  }
+  if (!session.cart.original.stock.length) buy.textContent='Sold out. Nothing to buy.';
+  if (!Object.values(draft.equipment).some(Boolean)) sell.textContent='No equipped gear to sell.';
+  for (const op of draft.operations) { const row=document.createElement('li');row.textContent=`${op.type === 'buy' ? 'Buy' : 'Sell'} ${op.item.name} · ${op.type === 'buy' ? '−' : '+'}${op.price} gold`;order.appendChild(row); }
+  if (!draft.operations.length) order.textContent='Cart is empty.';
+}
+
+function stageMarketAction(session, action) {
+  if (!tradeSessionCurrent(session)) return false;
+  try { session.cart=stageTradeAction(session.cart,action); session.message='Added to cart. Your adventure changes only on Confirm.'; }
+  catch (error) { session.message=error.message; renderTrade(session); document.getElementById('cancelTrade').focus?.();return false; }
+  renderTrade(session);document.getElementById('undoTrade').focus?.();return true;
+}
+function tradeBuy(rowId, session = state.trade) { return stageMarketAction(session,{type:'buy',rowId}); }
+function tradeSell(slot, session = state.trade) { return stageMarketAction(session,{type:'sell',slot}); }
+function editTradeCart(session, reset) {
+  if (!tradeSessionCurrent(session)) return false;
+  session.cart=reset ? resetTradeDraft(session.cart) : undoTradeAction(session.cart);
+  session.message=reset ? 'Cart reset. Nothing has changed in your adventure.' : 'Last action undone.';
+  renderTrade(session);document.getElementById('cancelTrade').focus?.();return true;
+}
+
+function tradeCommitNotices(operations) {
+  for (const op of operations) {
+    const item=op.item;
+    if (op.type === 'sell') log(`Sold ${item.name} for ${op.price} gold.`);
+    else {
+      if (item.kind === 'spellbook') { const spell=SPELLS[item.spell];log(`You learned ${spell.name}! Press ${spell.key} to cast it.`); }
+      const effect=item.kind === 'heal' ? ' Press H to drink.' : item.kind === 'scroll' ? ' Press J in the dungeon to open a portal home.'
+        : item.kind === 'elixir' ? ` +${item.gold} gold` : op.replaced ? ` (replaced ${op.replaced.name})` : '';
+      log(`Bought ${item.name}!${effect}`);
+    }
+    try { playSound('pickup'); } catch (ignored) { /* Optional audio cannot invalidate a committed trade. */ }
+  }
+}
+
+function confirmTrade(session = state.trade) {
+  if (!session || state.trade !== session || session.committing || session.invalid) return false;
+  if (document.hidden) { session.message='Return to the game before confirming.';renderTrade(session);return false; }
+  let draft;
+  try {
+    tradeRequire(tradeSessionCurrent(session),'shop context changed; cancel and reopen');
+    const fresh=createTradeDraft(state,session.actor);
+    tradeRequire(JSON.stringify(fresh.original)===JSON.stringify(session.opening) && JSON.stringify(fresh.rules)===JSON.stringify(session.rules),'adventure changed; cancel and reopen');
+    let replay=fresh;
+    for (const op of session.cart.draft.operations) replay=stageTradeAction(replay,op.type === 'buy' ? {type:'buy',rowId:op.rowId} : {type:op.type,slot:op.slot});
+    tradeRequire(JSON.stringify(replay.draft)===JSON.stringify(session.cart.draft),'cart changed; cancel and reopen');
+    draft=replay.draft;
+  } catch (error) {
+    session.invalid=true;session.message='Trade is out of date. Cancel and reopen the shop; your adventure was not changed.';renderTrade(session);document.getElementById('cancelTrade').focus?.();return false;
+  }
+  if (!draft.operations.length) return dismissTrade(session);
+  const owner=state, actor=session.actor, equipment=state.equipment, player=state.player;
+  const prior={ gold:state.gold, inventory:state.inventory, townScrolls:state.townScrolls, slots:{...equipment},
+    hp:player.hp, maxHp:player.maxHp, spells:player.spells, ready:state.spellReadyAt, stock:actor.stock,
+    floor:state.floors[state.depth], floorFields:state.floors[state.depth] ? {...state.floors[state.depth]} : null,
+    town:state.town, townFields:state.town ? {...state.town} : null };
+  session.committing=true;
+  session.rollback=()=>{
+    session.rollback=null;session.committing=false;
+    owner.gold=prior.gold;owner.inventory=prior.inventory;owner.townScrolls=prior.townScrolls;
+    Object.assign(equipment,prior.slots);player.hp=prior.hp;player.maxHp=prior.maxHp;player.spells=prior.spells;owner.spellReadyAt=prior.ready;actor.stock=prior.stock;
+    if (prior.floor) { for (const key of Object.keys(prior.floor)) if (!Object.hasOwn(prior.floorFields,key)) delete prior.floor[key];Object.assign(prior.floor,prior.floorFields);owner.floors[session.depth]=prior.floor; }
+    else delete owner.floors[session.depth];
+    if (prior.town) Object.assign(prior.town,prior.townFields);
+  };
+  try {
+    for (const slot of ['weapon','armor','ring']) if (JSON.stringify(equipment[slot])!==JSON.stringify(draft.equipment[slot])) {
+      equipItem(slot,draft.equipment[slot] ? {...draft.equipment[slot]} : null);
+      tradeRequire(tradeSessionBound(session),'application context changed');
+    }
+    state.gold=draft.gold;state.inventory=draft.inventory.map(item=>({...item}));state.townScrolls=draft.townScrolls;
+    player.hp=draft.player.hp;player.maxHp=draft.player.maxHp;player.spells={...draft.player.spells};state.spellReadyAt={...draft.spellReadyAt};
+    actor.stock=draft.stock.map(row=>({...row.item}));freezePlayerStats();
+    tradeRequire(tradeSessionBound(session),'application context changed');
+    if (state.area === 'town') saveTown(); else saveFloor();
+    tradeRequire(tradeSessionBound(session),'save context changed');
+    render(true);
+    tradeRequire(tradeSessionBound(session),'presentation context changed');
+  } catch (error) {
+    if (state === owner && state.trade === session) {
+      session.rollback?.();
+      session.committing=false;session.invalid=true;session.message='Could not confirm trade. Your adventure is unchanged. Cancel and reopen to retry.';
+      try { render(true); } catch (ignored) { /* Preserve the model and error controls if painting still fails. */ }
+      renderTrade(session);document.getElementById('cancelTrade').focus?.();
+    }
+    return false;
+  }
+  session.rollback=null;
+  dismissTrade(session,false); // Consume identity before notices or any repeat activation.
+  tradeCommitNotices(draft.operations);
+  state.bubble={text:'Pleasure doing business!',ttl:90};
+  if (session.opening.stock.length && !actor.stock.length && draft.operations.some(op=>op.type==='buy')) companionTalk('merchant');
+  resumeAfterTrade(session);
+  return true;
+}
+
+function buyFromMerchant() { return openTrade('buy'); }
+function sellToMerchant() { return openTrade('sell'); }
 
 
 function prisonerAt(x, y) {
   return state.prisoner && state.prisoner.x === x && state.prisoner.y === y ? state.prisoner : null;
 }
 function rescuePrisoner() {
+  if (state.trade) return;
+  if (state.loadSession) return;
   if (state.gameOver || state.helpOpen || state.pause) return;
   const p = state.player;
   const pr = prisonerAt(p.x, p.y);
@@ -2197,6 +3801,8 @@ function princessAt(x, y) {
   return state.princess && state.princess.x === x && state.princess.y === y ? state.princess : null;
 }
 function rescuePrincess() {
+  if (state.trade) return;
+  if (state.loadSession) return;
   if (state.gameOver || state.helpOpen || state.pause) return;
   const p = state.player;
   const pr = princessAt(p.x, p.y);
@@ -2216,6 +3822,9 @@ function rescuePrincess() {
 }
 
 function pickup() {
+  if (state.trade) return;
+  if (state.loadSession) return;
+  if (state.companionPicker) return;
   if (state.gameOver || state.helpOpen || state.pause) return;
   if (state.area === 'town') { townInteract(); return; }
   const p = state.player;
@@ -2228,7 +3837,7 @@ function pickup() {
     render(); return;
   }
   if (state.stairs && p.x === state.stairs.x && p.y === state.stairs.y) { descendStairs(); return; }
-  if (merchantAt(p.x, p.y)) { buyFromMerchant(); return; }
+  if (merchantAt(p.x, p.y)) { openTrade(); return; }
   const pr = prisonerAt(p.x, p.y);
   if (pr) { rescuePrisoner(); return; }
   const prin = princessAt(p.x, p.y);
@@ -2278,7 +3887,9 @@ function storePotion(item) {
 }
 
 function drinkPotion() {
-  if (state.gameOver || state.helpOpen || (state.pause && state.pause.kind !== 'health')) return;
+  if (state.loadSession) return;
+  if (state.companionPicker) return;
+  if (state.gameOver || state.helpOpen || state.trade || (state.pause && state.pause.kind !== 'health')) return;
   const p = state.player;
   if (state.godMode) { log('God mode holds your health steady; the potion stays stored.'); render(); return; }
   if (!state.inventory.length) { log('No potions stored.'); return; }
@@ -2298,6 +3909,7 @@ function markCombat() {
 }
 
 function hurtPlayer(damage, message) {
+  if (state.trade) return;
   if (state.gameOver || state.helpOpen || state.pause) return;
   if (state.godMode) {
     markCombat();
@@ -2313,8 +3925,9 @@ function hurtPlayer(damage, message) {
 }
 
 function checkHealth() {
+  if (state.loadSession) return;
   freezePlayerStats();
-  if (state.area === 'town' || state.gameOver || state.helpOpen || state.godMode) return;
+  if (state.area === 'town' || state.gameOver || state.helpOpen || state.trade || state.godMode) return;
   const ratio = state.player.hp / state.player.maxHp;
   if (ratio >= 0.2) state.warnedLow = false;
   if (ratio >= 0.1) state.warnedCritical = false;
@@ -2329,6 +3942,7 @@ function checkHealth() {
 }
 
 function continueGame() {
+  if (state.trade) return;
   if (state.helpOpen || !state.pause || state.pause.kind !== 'health') return;
   state.pause = null;
   state.lastTick = Date.now();
@@ -2340,14 +3954,15 @@ function retreatRemaining() {
 }
 
 function advanceActiveTime(elapsed) {
-  if (state.area === 'town') return;
-  if (!state.started || state.gameOver || state.helpOpen || state.consoleOpen || state.pause || document.hidden || bossCinematicActive()) return;
+  if (state.area === 'town' || simulationBlocked()) return;
   state.activeTime += Math.max(0, elapsed);
   state.hazardTime += Math.max(0, elapsed);
   updateMonsterSpeech();
 }
 
 function retreat() {
+  if (state.loadSession) return;
+  if (!state.started || state.companionPicker || state.trade || state.consoleOpen || state.helpOpen || document.hidden || state.ending || bossCinematicActive()) return;
   if (state.area === 'town') { log('No need to retreat while you are in town.'); render(); return; }
   if (state.gameOver || state.helpOpen || (state.pause && state.pause.kind === 'retreat')) return;
   if (retreatRemaining() > 0) { log(`Retreat recovers in ${Math.ceil(retreatRemaining())} active seconds.`); render(); return; }
@@ -2356,6 +3971,7 @@ function retreat() {
 }
 
 function cancelRetreat() {
+  if (state.trade) return;
   if (state.helpOpen || !state.pause || state.pause.kind !== 'retreat') return;
   state.pause = state.pause.previous;
   state.lastTick = Date.now();
@@ -2363,6 +3979,7 @@ function cancelRetreat() {
 }
 
 function confirmRetreat() {
+  if (state.trade) return;
   if (state.gameOver || state.helpOpen || !state.pause || state.pause.kind !== 'retreat' || retreatRemaining() > 0) return;
   const exit = { depth: state.depth, x: state.player.x, y: state.player.y, reason: 'retreat' };
   const portalClosed = state.townPortalOpen;
@@ -2383,8 +4000,7 @@ function confirmRetreat() {
 }
 
 function recoveryTick(elapsed) {
-  if (state.area === 'town') return;
-  if (!state.started || state.gameOver || state.helpOpen || state.pause) return;
+  if (state.area === 'town' || simulationBlocked()) return;
   freezePlayerStats();
   if (state.godMode) { state.combatElapsed += elapsed; return; }
   const before = state.combatElapsed;
@@ -2465,13 +4081,12 @@ function enemyTick() {
   const elapsed = Math.min(0.5, Math.max(0, (now - state.lastTick) / 1000));
   state.lastTick = now;
   freezePlayerStats();
+  if (simulationBlocked()) return;
   if (state.area === 'town') {
-    if (!state.started || state.gameOver || state.helpOpen || state.consoleOpen || state.pause || document.hidden) return;
     musicTick();
     if (townTick()) render();
     return;
   }
-  if (!state.started || state.gameOver || state.helpOpen || state.consoleOpen || state.pause || document.hidden || bossCinematicActive()) return;
   checkHealth();
   if (state.pause) { render(); return; }
   advanceActiveTime(elapsed);
@@ -2484,6 +4099,7 @@ function enemyTick() {
   const p = state.player;
   regenMana();
   companionTick();
+  if (simulationBlocked()) { render(); return; }
   if (state.bubble && state.bubble.ttl > 0) state.bubble.ttl--;
   for (const m of state.monsters) {
     if (m.hp <= 0) continue;
@@ -2556,6 +4172,19 @@ function faceActor(actor, dx, dy) {
   if(dx)state.motion.facing[key]=Math.sign(dx);
   if(dx || dy)state.motion.directions[key]=Math.abs(dx)>=Math.abs(dy) ? (dx<0?'left':'right') : (dy<0?'back':'front');
 }
+function drawCompanionPost(prop) {
+  if (!inRenderCamera(prop.x,prop.y)) return;
+  const x=prop.x*TILE, y=prop.y*TILE;
+  ctx.fillStyle='#1b1714'; ctx.fillRect(x+7,y+28,21,3);
+  ctx.fillStyle='#38281d'; ctx.fillRect(x+14,y+13,6,17);
+  ctx.fillStyle='#957047'; ctx.fillRect(x+15,y+13,2,16);
+  ctx.fillStyle='#251d19'; ctx.fillRect(x+3,y+4,26,17);
+  ctx.fillStyle='#8a6036'; ctx.fillRect(x+5,y+6,22,13);
+  ctx.fillStyle='#d5ad63'; ctx.fillRect(x+5,y+6,22,2);
+  ctx.fillStyle='#f1d593';
+  for (const [dx,dy,w,h] of [[12,12,8,5],[9,9,3,3],[14,8,3,3],[19,9,3,3],[22,12,2,3]]) ctx.fillRect(x+dx,y+dy,w,h);
+}
+
 function townBuildingBounds(prop) {
   const art=graphicsCache();
   if(!art.townBuildings || art.townBuildings.map!==state.map) art.townBuildings={map:state.map,bounds:{}};
@@ -2653,6 +4282,7 @@ function drawFloorDetails() {
     }
   }
   for (const prop of [...state.props].sort((a,b)=>a.y-b.y)) {
+    if (state.area==='town' && prop.isCompanionBoard) { drawCompanionPost(prop); continue; }
     if(state.area==='town' && ['inn','store','hut'].includes(prop.sprite)){drawTownBuilding(prop);continue;}
     // Water is already painted tile-aligned, including beneath the bridge.
     if(state.area==='town' && prop.sprite==='water') continue;
@@ -3069,6 +4699,8 @@ function endingCaption() {
 }
 
 function startEnding() {
+  dismissTrade(state && state.trade, false);
+  cancelSaveLoad(state && state.loadSession, false);
   if (state.ending || state.depth !== FINAL_DEPTH || !state.bossDefeated || !state.princess || !state.princess.rescued) return;
   const dragon = state.boss || state.monsterSpawns.find(m => m.isDragon);
   state.ending = { elapsed: 0, phase: 'reveal', completed: false, frameId: null,
@@ -3078,9 +4710,7 @@ function startEnding() {
   clearMonsterSpeech();
   clearMovementAnimation();
   clearTownReturn();
-  state.companion = null;
-  state.companionSpeech = null;
-  state.entranceCat = freshEntranceCatState();
+  resetCompanionRun();
   state.gameOver = true; state.won = true; state.pause = null; state.bubble = null;
   document.getElementById('overlay').style.display = 'none';
   log('At last, you reach the princess.');
@@ -3363,10 +4993,12 @@ function objectiveText() {
   if (state.ending) return endingCaption();
   if (state.area === 'town') {
     if (state.townPortalOpen) return 'A Town Scroll portal waits at the gate. Press J there for a one-way return.';
-    if (state.entranceCat && !state.entranceCat.recruited && !state.entranceCat.retired && !state.companion) return 'A huge cat waits by the gate. Press Space beside it to recruit it.';
+    const selected = state.selectedCompanion || 'marmalade';
+    if (selected === 'marmalade' && state.entranceCat && !state.entranceCat.recruited && !state.entranceCat.retired && !state.companion) return 'A huge cat waits by the gate. Press Space beside it to recruit it.';
+    if (selected === 'pip' && state.entranceCat && !state.entranceCat.recruited && !state.companion) return 'Pip waits in town. Enter the dungeon to bring your dog companion.';
     return state.townExit
-      ? 'Rest at the Inn, trade at the Store, or return to the dungeon at the gate.'
-      : 'Rest at the Inn, trade at the Store, or enter the dungeon at the gate.';
+      ? 'Rest at the Inn, trade at the Store, use the companion board, or return to the dungeon at the gate.'
+      : 'Rest at the Inn, trade at the Store, use the companion board, or enter the dungeon at the gate.';
   }
   let campaign;
   if (state.boss && bossGateAt(state.depth) && !state.bossDefeated) {
@@ -3459,14 +5091,15 @@ function consoleMessage(text) {
 }
 
 function openConsole() {
-  if (state.consoleOpen || state.helpOpen) return;
+  if (state.loadSession) return;
+  if (state.consoleOpen || state.helpOpen || state.trade || state.companionPicker) return;
   state.consoleOpen = true;
   state.consoleLines = [];
   state.consoleHistoryIndex = state.consoleHistory.length;
   document.getElementById('devConsole').hidden = false;
   const input = document.getElementById('consoleInput');
   input.value = '';
-  consoleMessage('Commands: loadLevel <1-100> · godMode 0|1 · help · clear');
+  consoleMessage('Commands: loadLevel <1-100> · godMode 0|1 · teleportTown · addScrolls <n> · goldADD <amount> · help · clear');
   stopMotionAnimation();
   input.focus?.();
 }
@@ -3493,6 +5126,8 @@ function loadLevel(raw) {
     consoleMessage(`Usage: loadLevel <1-${FINAL_DEPTH}>`);
     return;
   }
+  cancelSaveLoad(state.loadSession, false);
+  closeCompanionBoard(state.companionPicker, false);
   if (!state.started) startGame();
   clearBossIntro();
   clearBossDefeat();
@@ -3517,6 +5152,7 @@ function loadLevel(raw) {
 }
 
 function setGodMode(raw) {
+  if (state.loadSession) return;
   const value = String(raw ?? '').toLowerCase();
   const enabled = value === '1' || value === 'on' || value === 'true' ? true
     : value === '0' || value === 'off' || value === 'false' ? false
@@ -3528,6 +5164,70 @@ function setGodMode(raw) {
   freezePlayerStats();
   consoleMessage(`God mode ${state.godMode ? 'enabled' : 'disabled'}; hero stats are frozen.`);
   render();
+}
+
+function teleportTown(...args) {
+  if (args.length) { consoleMessage('Usage: teleportTown'); return; }
+  // The console itself is allowed; player menus and hidden simulation are not.
+  // Check DOM visibility too while the companion prototype has no session state.
+  const roster = document.getElementById('companionOverlay');
+  const trade = document.getElementById('tradeOverlay');
+  if (!state.started || state.gameOver || state.player.hp <= 0 || document.hidden
+    || state.ending || state.helpOpen || state.pause || bossCinematicActive()
+    || state.trade || state.companionPicker || state.loadSession || (roster && !roster.hidden) || (trade && !trade.hidden)) {
+    consoleMessage('Cannot teleport now.'); return;
+  }
+  if (state.area === 'town') { consoleMessage('Already in town.'); return; }
+  if (state.townPortalOpen) { consoleMessage('A town portal is already open; return through it first.'); return; }
+  state.townExit = { depth: state.depth, x: state.player.x, y: state.player.y, reason: 'cheat' };
+  state.townPortalOpen = true;
+  playSound('magic');
+  enterTown();
+  log('A debug portal snaps open at the town gate.');
+  consoleMessage('Teleported to town; debug portal open.');
+  render();
+}
+
+function addScrolls(...args) {
+  const raw = args[0];
+  const count = typeof raw === 'string' && /^[0-9]+$/.test(raw) ? Number(raw) : NaN;
+  if (args.length !== 1 || !Number.isSafeInteger(count) || count <= 0
+    || !Number.isSafeInteger(state.townScrolls) || state.townScrolls < 0
+    || !Number.isSafeInteger(state.townScrolls + count)) {
+    consoleMessage('Usage: addScrolls <positive integer>'); return;
+  }
+  const roster = document.getElementById('companionOverlay');
+  const trade = document.getElementById('tradeOverlay');
+  if (!state.started || state.gameOver || state.player.hp <= 0 || document.hidden
+    || state.ending || state.helpOpen || state.pause || bossCinematicActive()
+    || state.trade || state.companionPicker || state.loadSession || (roster && !roster.hidden) || (trade && !trade.hidden)) {
+    consoleMessage('Cannot add scrolls now.'); return;
+  }
+  state.townScrolls += count;
+  render();
+  consoleMessage(`Added ${count} Town Scroll(s); total ${state.townScrolls}.`);
+}
+
+function addGold(...args) {
+  const raw = args[0];
+  const amount = typeof raw === 'string' && raw.length > 0 && !/[^0-9]/.test(raw) ? Number(raw) : NaN;
+  if (args.length !== 1 || !Number.isSafeInteger(amount) || amount <= 0
+    || !Number.isSafeInteger(state.gold) || state.gold < 0
+    || !Number.isSafeInteger(state.gold + amount)) {
+    consoleMessage('Usage: goldADD <positive integer>'); return;
+  }
+  // Allow the console and god mode, but never change a pending player transaction.
+  const roster = document.getElementById('companionOverlay');
+  const trade = document.getElementById('tradeOverlay');
+  if (!state.started || state.gameOver || state.player.hp <= 0 || document.hidden
+    || (state.area !== 'town' && state.area !== 'dungeon')
+    || state.ending || state.helpOpen || state.pause || bossCinematicActive()
+    || state.trade || state.companionPicker || state.loadSession || (roster && !roster.hidden) || (trade && !trade.hidden)) {
+    consoleMessage('Cannot add gold now.'); return;
+  }
+  state.gold += amount;
+  render();
+  consoleMessage(`Added ${amount} gold; total ${state.gold}.`);
 }
 
 function submitConsole() {
@@ -3542,8 +5242,11 @@ function submitConsole() {
   const command = name.toLowerCase();
   if (command === 'loadlevel') loadLevel(args[0]);
   else if (command === 'godmode') setGodMode(args[0]);
+  else if (command === 'teleporttown') teleportTown(...args);
+  else if (command === 'addscrolls') addScrolls(...args);
+  else if (command === 'goldadd') addGold(...args);
   else if (command === 'clear') { state.consoleLines = []; document.getElementById('consoleOutput').textContent = ''; }
-  else if (command === 'help') consoleMessage('loadLevel <1-100> · godMode 0|1 · help · clear');
+  else if (command === 'help') consoleMessage('loadLevel <1-100> · godMode 0|1 · teleportTown · addScrolls <n> · goldADD <amount> · help · clear');
   else consoleMessage(`Unknown command: ${name}`);
 }
 
@@ -3554,7 +5257,8 @@ function consoleHistoryStep(delta) {
 }
 
 function openHelp() {
-  if (state.helpOpen) return;
+  if (state.loadSession) return;
+  if (state.helpOpen || state.trade || state.companionPicker) return;
   state.helpFocus = document.activeElement;
   state.helpOpen = true;
   resetHelpClock();
@@ -3567,6 +5271,7 @@ function openHelp() {
 }
 
 function closeHelp() {
+  cancelSaveLoad(state.loadSession, false);
   if (!state.helpOpen) return;
   const focus = state.helpFocus;
   state.helpOpen = false; state.helpFocus = null;
@@ -3585,9 +5290,8 @@ function toggleHelp() {
   if (state.helpOpen) closeHelp(); else openHelp();
 }
 
-function render() {
-  freezePlayerStats();
-  checkHealth();
+function render(preserveSaveState = false) {
+  if (!preserveSaveState && !state.loadSession) { freezePlayerStats(); checkHealth(); }
   renderPause();
   const p = state.player;
   draw();
@@ -3609,6 +5313,9 @@ function render() {
   document.getElementById('retreatStatus').textContent = retreatRemaining() > 0 ? `${Math.ceil(retreatRemaining())}s` : 'Ready';
   document.getElementById('companionStat').hidden = !state.companion;
   document.getElementById('companionName').textContent = state.companion ? state.companion.name : '';
+  const postAction=document.getElementById('companionPostAction');
+  postAction.hidden=!companionPostContext(); postAction.ariaExpanded=String(!!state.companionPicker);
+  document.getElementById('companionAudioToggle').textContent=`Sound: ${state.audio.enabled?'On':'Off'} (M)`;
   document.getElementById('godModeStat').hidden = !state.godMode;
   const objective = objectiveText();
   if (document.getElementById('objective').textContent !== objective) document.getElementById('objective').textContent = objective;
@@ -3619,6 +5326,7 @@ function render() {
   }
   document.getElementById('audioToggle').textContent = state.audio.enabled ? 'Sound: on (M)' : 'Sound: off (M)';
   document.getElementById('audioToggle').ariaPressed = String(state.audio.enabled);
+  document.getElementById('tradeAudioToggle').textContent=state.audio.enabled ? 'Sound: On (M)' : 'Sound: Off (M)';
   document.getElementById('endingControls').hidden = !state.ending;
   document.getElementById('skipEnding').disabled = !!(state.ending && state.ending.completed);
   renderEquipment();
@@ -3626,10 +5334,28 @@ function render() {
   const stock = m && m.stock && m.stock.length ? m.stock.map(i => i.name).join(', ') : '(sold out)';
   document.getElementById('merchantStock').textContent = m ? `${state.area === 'town' ? 'Store' : 'Merchant'}: ${stock}` : '';
   document.getElementById('merchantStock').hidden = !m;
+  updateSaveFileButtons();
 }
 
 document.addEventListener('keydown', e => {
   const k = e.key.toLowerCase();
+  if (state.loadSession) {
+    const fileUI=state.loadSession.ui;
+    if (fileUI && k==='tab') {
+      const controls=[fileUI.input,document.getElementById('confirmSaveLoad'),document.getElementById('cancelSaveLoad'),document.getElementById('saveLoadAudioToggle')].filter(el=>el&&!el.disabled&&!el.hidden);
+      const index=controls.indexOf(document.activeElement);
+      const next=index<0?(e.shiftKey?controls.length-1:0):(index+(e.shiftKey?-1:1)+controls.length)%controls.length;
+      e.preventDefault();controls[next]?.focus?.();return;
+    }
+    if (fileUI && e.target===fileUI.input && ['enter',' '].includes(k)) return;
+    if (k==='escape') { e.preventDefault(); cancelSaveLoad(); return; }
+    if (k==='r' && !e.repeat) { e.preventDefault(); restartFromEnding(); return; }
+    if (k==='m' && !e.repeat) { e.preventDefault(); toggleAudio(); return; }
+    if (k!=='tab') {
+      if (!(e.target && e.target.tagName==='BUTTON' && ['enter',' '].includes(k))) e.preventDefault();
+      return;
+    }
+  }
   const consoleInput = document.getElementById('consoleInput');
   if (state.consoleOpen) {
     if (k === '`' || k === '~' || k === 'escape') { e.preventDefault(); closeConsole(); return; }
@@ -3644,6 +5370,28 @@ document.addEventListener('keydown', e => {
     if (k === 'enter' || k === 'tab') consoleInput.focus?.();
     return;
   }
+  if (state.companionPicker) {
+    const overlay = document.getElementById('companionOverlay');
+    if (k === 'escape') { e.preventDefault(); closeCompanionBoard(); }
+    else if (k === 'm' && !e.repeat) { e.preventDefault(); toggleAudio(); }
+    else if (k === 'r' && !e.repeat) { e.preventDefault(); restartFromEnding(); }
+    else if (k === 'tab') {
+      const controls = [...overlay.querySelectorAll('button')].filter(el => !el.disabled && !el.hidden);
+      if (controls.length) {
+        const index=controls.indexOf(document.activeElement), step=e.shiftKey?-1:1;
+        const next=index<0 ? (e.shiftKey?controls.length-1:0) : (index+step+controls.length)%controls.length;
+        e.preventDefault(); controls[next].focus();
+      }
+    } else if (['arrowup','arrowdown','home','end'].includes(k)) {
+      const choices=[...overlay.querySelectorAll('[data-companion-id]')].filter(el=>!el.disabled);
+      if (choices.length) {
+        const index=choices.indexOf(document.activeElement), step=k==='arrowup'?-1:1;
+        const next=k==='home'?0:k==='end'?choices.length-1:index<0?0:(index+step+choices.length)%choices.length;
+        e.preventDefault(); choices[next].focus();
+      }
+    }
+    return;
+  }
   if (k === '`' || k === '~') {
     e.preventDefault();
     if (!e.repeat) toggleConsole();
@@ -3652,6 +5400,31 @@ document.addEventListener('keydown', e => {
   if (k === '?') {
     e.preventDefault();
     if (!e.repeat) toggleHelp();
+    return;
+  }
+  if (state.trade) {
+    const session=state.trade, overlay=document.getElementById('tradeOverlay');
+    if (k === 'escape') { e.preventDefault(); closeTrade(false,session); }
+    else if (k === 'm' && !e.repeat) { e.preventDefault();toggleAudio(); }
+    else if (k === 'r' && !e.repeat) { e.preventDefault();restartFromEnding(); }
+    else if (k === 'tab') {
+      const controls=[...(overlay.querySelectorAll?.('button') || [])].filter(el=>!el.disabled&&!el.hidden);
+      const index=controls.indexOf(document.activeElement),next=index<0?(e.shiftKey?controls.length-1:0):(index+(e.shiftKey?-1:1)+controls.length)%controls.length;
+      e.preventDefault();controls[next]?.focus?.();
+    } else if (['arrowup','arrowdown','home','end'].includes(k)) {
+      e.preventDefault();
+      const mode=document.activeElement?.dataset?.tradeMode || session.mode;
+      const list=document.getElementById(mode === 'sell' ? 'tradeSellList' : 'tradeBuyList');
+      const rows=[...(list.querySelectorAll?.('button') || [])].filter(el=>!el.disabled);
+      const index=rows.indexOf(document.activeElement),step=k === 'arrowup' ? -1 : 1;
+      const next=k === 'home' ? 0 : k === 'end' ? rows.length-1 : index<0 ? 0 : (index+step+rows.length)%rows.length;
+      if (rows[next]) selectTradeRow(session,mode,rows[next].dataset.tradeKey);
+    } else if (!e.repeat && ['b','s','u'].includes(k)) {
+      e.preventDefault();
+      if (k === 'b') tradeBuy(session.selectedBuy,session);
+      else if (k === 's') tradeSell(session.selectedSell,session);
+      else editTradeCart(session,!!e.shiftKey);
+    } else if (!['enter',' '].includes(k) || e.target?.tagName !== 'BUTTON') e.preventDefault();
     return;
   }
   if (state.helpOpen) {
@@ -3664,6 +5437,16 @@ document.addEventListener('keydown', e => {
       e.preventDefault(); controls[next].focus();
     }
     return;
+  }
+  if (!state.started && ['arrowup','arrowdown','arrowleft','arrowright','home','end'].includes(k)) {
+    e.preventDefault();
+    const next = k==='home' ? 'marmalade' : k==='end' ? 'pip' : state.companionChoice==='pip' ? 'marmalade' : 'pip';
+    setCompanionChoice(next);
+    document.querySelector?.(`[data-companion-choice="${next}"]`)?.focus?.();
+    return;
+  }
+  if (!state.started && e.target && e.target.dataset && e.target.dataset.companionChoice && ['enter',' '].includes(k)) {
+    e.preventDefault(); setCompanionChoice(e.target.dataset.companionChoice); startGame(); return;
   }
   if (e.target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;
   if (e.target && e.target.tagName === 'BUTTON' && [' ', 'enter'].includes(k)) return;
@@ -3729,13 +5512,21 @@ document.addEventListener('visibilitychange', () => {
   if (state.bossIntro) state.bossIntro.lastTimestamp = null;
   if (state.bossDefeat) state.bossDefeat.lastTimestamp = null;
   stopMotionAnimation(); requestMotionFrame();
+  updateSaveFileButtons();
 });
 
 for (const [id, action] of [
   ['skipEnding', skipEnding], ['restartEnding', restartFromEnding], ['startGame', startGame], ['drinkPotion', drinkPotion], ['continueGame', continueGame], ['retreatChoice', retreat],
   ['confirmRetreat', confirmRetreat], ['cancelRetreat', cancelRetreat], ['audioToggle', toggleAudio],
   ['helpToggle', toggleHelp], ['closeHelp', closeHelp], ['consoleClose', closeConsole],
+  ['closeCompanionBoard', () => closeCompanionBoard()], ['companionPostAction', openCompanionBoard], ['companionAudioToggle', toggleAudio],
 ]) document.getElementById(id).addEventListener('click', () => { startAudio(); action(); });
+for (const id of ['loadGameButton','launchLoadGame','deathLoadGame']) document.getElementById(id).addEventListener('click',openLoadGame);
+document.getElementById('saveGameButton').addEventListener('click',saveGameFile);
+document.getElementById('cancelSavePreparation').addEventListener('click',()=>cancelSaveLoad());
+document.getElementById('saveLoadAudioToggle').addEventListener('click',()=>{ startAudio();toggleAudio(); });
+document.getElementById('companionOverlay').addEventListener('click', e => { if (e.target.id === 'companionOverlay') closeCompanionBoard(); });
+document.querySelectorAll?.('[data-companion-choice]')?.forEach?.(btn => btn.addEventListener('click', () => { setCompanionChoice(btn.dataset.companionChoice); }));
 
 for (const channel of ['music', 'effects']) {
   document.getElementById(`${channel}Volume`).addEventListener('input', e => {

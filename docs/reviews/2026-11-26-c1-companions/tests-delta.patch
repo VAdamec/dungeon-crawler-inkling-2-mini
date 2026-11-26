@@ -1,0 +1,158 @@
+--- before/tests/game.test.cjs
++++ after/tests/game.test.cjs
+@@ -2005,7 +2005,7 @@
+     state.monsters = [{ id: 99, name: 'Cook', sprite: 'orc', hp: 1, maxHp: 1,
+       atk: 1, def: 0, xp: 1, gold: 0, x: state.player.x + 1, y: state.player.y, isBoss: true }]`);
+   g.key('f');
+-  assert.deepEqual(g.json('[state.companion.name, state.companion.sprite]'), ['Cook', 'orc']);
++  assert.deepEqual(g.json('[state.companion.name, state.companion.sprite]'), ['Cook', 'cook']);
+   assert.equal(g.run(`Math.max(Math.abs(state.companion.x - state.player.x), Math.abs(state.companion.y - state.player.y)) <= 1 &&
+     state.map[state.companion.y][state.companion.x] === 0 &&
+     !(state.companion.x === state.player.x && state.companion.y === state.player.y)`), true);
+@@ -2633,6 +2633,146 @@
+ });
+ 
+ 
++test('C1 registry roles and string-ID actor poses resolve authored frames for every companion', () => {
++  const g=game();enableMotion(g);
++  const rows=g.json(`(()=>{const rows=[];for(const id of Object.keys(COMPANIONS)){
++    const c=makeCompanion(id,5,5);state.companion=c;
++    for(const direction of ['front','back','left','right'])for(const time of [0,.125,.5,1.5]){
++      state.motion.time=time;state.motion.directions.companion=direction;
++      const pose=actorAnimationPose(c.sprite,c),frame=artFrame(c.sprite,pose.frame,direction);
++      rows.push({id,sprite:c.sprite,scale:c.scale,frame:pose.frame,valid:!!frame&&typeof frame.r==='string'});
++    }}return rows;})()`);
++  const roles={marmalade:'catCompanion',pip:'dog',mimic:'mimic',hydra:'hydra',boar:'boar',medusa:'medusa',
++    wizard:'darkWizard',skeletonKing:'skeletonKing',dragon:'dragonBoss',cook:'cook',bartender:'bartender'};
++  for(const row of rows){assert.equal(row.sprite,roles[row.id]);assert.equal(row.valid,true,JSON.stringify(row));
++    assert.ok(Number.isInteger(row.frame)&&row.frame>=0&&row.frame<4,JSON.stringify(row));
++    assert.equal(row.scale,row.id==='marmalade'?1.5:row.id==='pip'?.7:.55);}
++  assert.equal(g.run("makeCompanion('missing',5,5)"),null);
++  assert.equal(g.run("actorAnimationPose('dragonBoss',{id:7}).frame"),3,'numeric monster phase stays unchanged at time 1.5');
++});
++
++test('C1 restart, death and ending reset companion run progress without reopening branding', () => {
++  for(const end of ['restart','death','ending']){
++    const g=game();
++    g.run(`unlockCompanion('mimic');activateCompanion('mimic');state.companionChoice='pip';
++      state.companionPicker={old:true};document.getElementById('companionOverlay').hidden=false;`);
++    if(end==='restart')g.run('newGame()');
++    else if(end==='death')g.run('gameOver(false)');
++    else reachEnding(g);
++    assert.deepEqual(g.json('[state.selectedCompanion,state.companionChoice,state.unlockedCompanions,state.companionEntryDone,state.companionPicker,state.companion]'),
++      ['marmalade','marmalade',['marmalade','pip'],false,null,null],end);
++    assert.equal(g.elements.companionOverlay.hidden,true,end);
++    assert.equal(g.run('state.started'),true);
++    assert.equal(g.elements.launchScreen.hidden,true);
++  }
++});
++
++test('C1 both starters join once across manual recruitment, first descent and town returns', () => {
++  for(const id of ['marmalade','pip'])for(const manual of [false,true]){
++    const g=game(42,true,'town');
++    g.run(`setCompanionChoice('${id}')`);
++    if(manual){assert.equal(g.run('joinSelectedCompanion(false)'),true);g.run('window.c1First=state.companion');}
++    g.run('enterDungeonFromTown()');
++    assert.equal(g.run('state.companion.id'),id);
++    assert.equal(g.run('state.companionEntryDone&&state.entranceCat.entered'),true);
++    if(manual)assert.equal(g.run('state.companion===window.c1First'),true,'first descent preserves manually recruited actor');
++    const before=g.json('[state.companion.id,state.companionAttackAt,state.companionQuoteIndex]');
++    g.run('enterTown();enterDungeonFromTown()');
++    assert.deepEqual(g.json('[state.companion.id,state.companionAttackAt,state.companionQuoteIndex]'),before);
++    assert.equal(g.run('joinSelectedCompanion(true)'),false);
++    assert.equal(g.run("!!entranceCatActor().hidden"),id==='marmalade');
++    assert.equal(g.run("!!state.town.animals.find(a=>a.name==='Pip').hidden"),id==='pip');
++  }
++  const g=game(42,true,'town');
++  g.run("setCompanionChoice('pip');state.entranceCat={recruited:true,entered:true,retired:true}");
++  assert.equal(g.run('joinSelectedCompanion(false)'),true,'Pip does not depend on cat lifecycle latches');
++  assert.equal(g.run('state.companion.id'),'pip');
++});
++
++test('C1 all nine boss species unlock once, adopt correct art and preserve rewards and defeated floors', () => {
++  const g=game();
++  for(const [depth,id] of [[3,'cook'],[5,'mimic'],[7,'bartender'],[10,'hydra'],[20,'boar'],[30,'medusa'],[40,'wizard'],[50,'skeletonKing'],[100,'dragon']]){
++    g.run(`enterFloor(${depth},false,true);clearBossIntro();state.player.xpNext=10000000;
++      window.c1Boss=state.boss;window.c1Before=[state.gold,state.player.xp,state.kills];
++      damageMonster(state.boss,state.boss.hp);`);
++    assert.equal(g.run('state.companion.id'),id);
++    assert.equal(g.run('state.selectedCompanion'),id);
++    assert.equal(g.run(`state.unlockedCompanions.filter(x=>x==='${id}').length`),1);
++    assert.equal(g.run('state.gold-window.c1Before[0]'),g.run('window.c1Boss.gold||0'));
++    assert.equal(g.run('state.player.xp-window.c1Before[1]'),g.run('window.c1Boss.xp'));
++    assert.equal(g.run('state.kills-window.c1Before[2]'),1);
++    const before=g.json('[state.gold,state.player.xp,state.kills,state.unlockedCompanions,state.messages]');
++    g.run('damageMonster(window.c1Boss,1000)');
++    assert.deepEqual(g.json('[state.gold,state.player.xp,state.kills,state.unlockedCompanions,state.messages]'),before);
++    assert.equal(g.run(`state.floors[${depth}].bossDefeated`),true);
++    g.run(`enterTown();enterFloor(${depth},false)`);
++    assert.equal(g.run('state.boss'),null);
++    assert.equal(g.run('state.companion.id'),id);
++    assert.equal(g.run('state.unlockedCompanions.length'),new Set(g.json('state.unlockedCompanions')).size);
++    for(const field of ['companion','selectedCompanion','companionChoice','unlockedCompanions','companionEntryDone','companionPicker']){
++      assert.equal(g.run(`FLOOR_FIELDS.includes('${field}')||Object.hasOwn(state.floors[${depth}],'${field}')||Object.hasOwn(state.town,'${field}')`),false,field);
++    }
++  }
++});
++
++test('C1 activation clears follower motion and restores town starter actors without moving their patrols', () => {
++  const g=game(42,true,'town');enableMotion(g);
++  g.run(`window.c1Animals=JSON.stringify(state.town.animals.map(({hidden,...a})=>a));
++    joinSelectedCompanion(false);state.activeTime=20;state.companionSpeech={text:'old'};
++    state.motion.moves.companion={fromX:100,fromY:100,x:100,y:100,at:0,duration:99};
++    window.c1Move=state.motion.moves.companion;state.motion.directions.companion='back';
++    state.motion.facing.companion=-1;activateCompanion('pip');`);
++  assert.equal(g.run('state.motion.moves.companion===window.c1Move'),false);
++  assert.notEqual(g.run('state.motion.directions.companion'),'back');
++  assert.deepEqual(g.json('[state.companionSpeech,state.companionSpeechReadyAt,state.companionAttackAt]'),[null,20,23]);
++  assert.equal(g.run('!!entranceCatActor().hidden'),false);
++  assert.equal(g.run("!!state.town.animals.find(a=>a.name==='Pip').hidden"),true);
++  g.run("unlockCompanion('cook');activateCompanion('cook')");
++  assert.equal(g.run('!!entranceCatActor().hidden'),false);
++  assert.equal(g.run("!!state.town.animals.find(a=>a.name==='Pip').hidden"),false);
++  assert.equal(g.run('JSON.stringify(state.town.animals.map(({hidden,...a})=>a))===window.c1Animals'),true);
++});
++
++test('C1 invalid or locked selection cannot silently create Marmalade or unlock a boss', () => {
++  const g=game(42,true,'town');
++  const before=g.json('[state.selectedCompanion,state.companionChoice,state.unlockedCompanions,state.companion,state.messages]');
++  g.run("setCompanionChoice('mimic');setCompanionChoice('missing');activateCompanion('mimic');adoptBossCompanion({name:'Mimic'})");
++  assert.deepEqual(g.json('[state.selectedCompanion,state.companionChoice,state.unlockedCompanions,state.companion,state.messages]'),before);
++  assert.equal(g.run("unlockCompanion('missing')"),false);
++  assert.equal(g.run("unlockCompanion('mimic')"),true);
++  const logs=g.run('state.messages.length');
++  assert.equal(g.run("unlockCompanion('mimic')"),false);
++  assert.equal(g.run('state.messages.length'),logs);
++});
++
++test('C1 Marmalade may be reselected after retirement without repeating its once-only remark', () => {
++  const g=game();
++  g.run('enterFloor(5,false,true);damageMonster(state.boss,state.boss.hp);enterTown();selectCompanion("marmalade")');
++  assert.equal(g.run('state.companion.id'),'marmalade');
++  assert.equal(g.run('state.entranceCat.retired'),true);
++  g.run('enterFloor(7,false,true);damageMonster(state.boss,state.boss.hp)');
++  assert.equal(g.run('state.companion.id'),'bartender');
++  assert.equal(g.run('state.messages.filter(m=>/household budget/i.test(m)).length'),1);
++});
++
++test('C1 Pip uses sidekick remarks and nearest deterministic targeting while preserving three-second cadence', () => {
++  const g=game(42,true,'town');
++  g.run(`setCompanionChoice('pip');enterDungeonFromTown();state.player.x=4;state.player.y=5;
++    state.companion.x=5;state.companion.y=5;state.hazards=[];
++    for(let y=3;y<9;y++)for(let x=3;x<10;x++)state.map[y][x]=0;
++    state.monsters=[{id:9,x:8,y:5},{id:6,x:6,y:5},{id:2,x:5,y:6}].map(m=>({...m,name:'Slime',sprite:'slime',hp:10,maxHp:10,def:0,xp:0}));
++    updateCamera();revealAroundPlayer();state.activeTime=20;state.companionAttackAt=0;
++    state.companionSpeechReadyAt=0;Math.random=()=>{throw new Error('companion choice consumed RNG');};
++    companionTalk('boss');companionTick();`);
++  assert.equal(g.run('COMPANION_LINES.sidekick.includes(state.companionSpeech.text)'),true);
++  assert.deepEqual(g.json('state.monsters.map(m=>[m.id,m.hp])'),[[9,10],[6,10],[2,9]]);
++  assert.equal(g.run('state.companionAttackAt'),23);
++  g.run('state.activeTime=22.99;companionTick()');
++  assert.equal(g.run('state.monsters[2].hp'),9);
++  g.run('state.activeTime=23;companionTick()');
++  assert.equal(g.run('state.monsters[2].hp'),8);
++});
++
+ test('a twice-size talking cat waits by the dungeon gate', () => {
+   const g = game(42, true, 'town');
+   const html = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');

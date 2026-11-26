@@ -1,0 +1,50 @@
+[
+  {
+    "file": "js/game.js",
+    "sha256": "a2fe33e603297f6681d3bf6c9d201456f1453f35f220c5427f7efaef22ffa909"
+  },
+  {
+    "file": "tests/game.test.cjs",
+    "sha256": "73655293a5fd646df6a799557c762ba01da88dbba700c3c803c087dbc3107c08"
+  },
+  {
+    "file": "js/sprites.js",
+    "sha256": "0f9a18356afa369a1b2912caf80e589109a379fc3e019e32ee214e4b002301d2"
+  },
+  {
+    "file": "js/art-runtime.js",
+    "sha256": "ac12a9d1d03226eb16473922efc189ed0b601a784d5051be9d9587c9621d0ae9"
+  },
+  {
+    "file": "index.html",
+    "sha256": "cc35fafde6200d5ce3f3b9d07fd2a5244a0933c52a8aa558b3159998387bb7c5"
+  },
+  {
+    "file": "style.css",
+    "sha256": "7d612d8ec2da57e56adca730837f040dd7f68aa1263c30691fc955068d1ee28f"
+  },
+  {
+    "file": "README.md",
+    "sha256": "cc4c5efb1906438a5bb265de3c1eb4966f7f5df1bf958a5494671efc6724a68e"
+  },
+  {
+    "file": "CREDITS.md",
+    "sha256": "6e0ef5f41588367df184e73c18e28d570a06b5f4d2cad8385fb9b74d87b7e952"
+  },
+  {
+    "file": "CHANGELOG.md",
+    "sha256": "ad8d92900f688939628b425c0b992b0ad44a65dd7e9330fac0eb0bb46abd2b82"
+  },
+  {
+    "file": "DOCUMENTATION.md",
+    "sha256": "03d7eaf01415016f1a72e7b388c774867c96fcc99eb63b0b7eb1ec82cca7e918"
+  },
+  {
+    "file": "tasks.md",
+    "sha256": "f786fdc25cd2c2db18a0ebd51abfaabd4ed7659ef580c42b0ca6bea437b84a1e"
+  },
+  {
+    "file": "handover.md",
+    "sha256": "bc18f42d16cdbd69ebdfb1d8439d21a3be15b772931488d8f21c88cae6ccc6a1"
+  }
+]

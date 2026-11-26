@@ -1,0 +1,136 @@
+--- /tmp/dungeon-m3-before/game.test.cjs	2026-11-26 18:10:06
++++ tests/game.test.cjs	2026-11-26 18:22:41
+@@ -5354,4 +5354,133 @@
+   assert.match(g.elements.tradeBuyDetails.textContent,/Replaces Bow; sell it first/);assert.equal(g.elements.addTradePurchase.textContent,'Buy & equip (B)');
+   assert.match(g.elements.tradeBuyList.children[1].children[0].children[1].textContent,/<img src=x>/);
+   g.run(`selectTradeRow(state.trade,'buy','stock:5')`);assert.match(g.elements.tradeBuyDetails.textContent,/60 gold.*no stat bonus/);
++});
++
++test('M3 direct player/combat/portal helpers independently honor an open market without side effects', () => {
++  const g=m2Setup('dungeon');g.run(`equipItem('weapon',{...ITEM_TABLE[2]});state.player.hp=35;state.player.mp=10;state.townScrolls=3;openTrade();
++    window.m3Target=state.monsters[0];window.m3Random=Math.random;Math.random=()=>{throw new Error('blocked market RNG');};`);
++  const before=m2Snapshot(g);
++  for(const call of ['movePlayer(1,0)','attackMonster(window.m3Target)','enemyAttack(window.m3Target)','shootBow()',
++    'castSpell("heal")','hurtPlayer(3,"stale damage")','pickup()','rescuePrisoner()','rescuePrincess()',
++    'ascendStairs()','descendStairs()','useTownScroll()']) {
++    g.run(call);m2AssertSame(g,before,call);
++  }
++  g.run('Math.random=window.m3Random;closeTrade(false);enterTown();state.player.x=state.merchant.x;state.player.y=state.merchant.y;state.player.hp=30;render(true);openTrade()');
++  const town=m2Snapshot(g);for(const call of ['townInteract()','restAtInn()','townNpcTalk(state.town.npcs[0])','townEncounter()','returnThroughTownPortal()']){g.run(call);m2AssertSame(g,town,call);}
++});
++
++test('M3 market freezes every timed subsystem and resumes without charging menu or slow-paint time', () => {
++  for(const area of ['town','dungeon']) {
++    const clock=Date.now;try {
++    const g=m2Setup(area);g.run(`state.player.hp=35;state.player.mp=7;state.combatElapsed=10;state.healElapsed=1.75;state.retreatReadyAt=100;
++      state.manaRegenAt=1;render(true);openTrade();window.m3Date=Date.now;window.m3Now=window.m3Date();Date.now=()=>window.m3Now;
++      window.m3Random=Math.random;Math.random=()=>{throw new Error('paused RNG');};`);
++    const before=m2Snapshot(g);
++    g.run('window.m3Now+=120000;enemyTick();advanceActiveTime(120);townTick();hazardTick();recoveryTick(120);regenMana();companionTick()');
++    m2AssertSame(g,before,area);assert.equal(g.run('motionPlayable()'),false);
++    g.run(`Math.random=window.m3Random;window.m3Render=render;render=(...args)=>{window.m3Render(...args);window.m3Now+=2000;};closeTrade(false)`);
++    assert.equal(g.run('state.lastTick===window.m3Now'),true,'close paint earns no catch-up time');
++    g.run('render=window.m3Render;Date.now=window.m3Date');
++    } finally { Date.now=clock; }
++  }
++});
++
++test('M3 failed opening and closing paints release modal ownership, inert flags, callbacks and focus for retry', () => {
++  const g=m2Setup();g.run(`document.getElementById('game').focus();window.m3Render=render;render=()=>{throw new Error('open paint');}`);
++  const before=m2Snapshot(g);assert.equal(g.run('openTrade()'),false);m2AssertSame(g,before);
++  assert.equal(g.run('state.trade'),null);assert.equal(g.elements.tradeOverlay.hidden,true);assert.equal(g.elements.gameLayout.inert,false);
++  g.run('render=window.m3Render;openTrade();render=()=>{throw new Error("close paint");}');
++  assert.equal(g.run('closeTrade(false)'),true);assert.equal(g.run('state.trade'),null);assert.equal(g.run('document.activeElement===canvas'),true);
++  g.run('render=window.m3Render;openTrade()');assert.equal(g.run('!!state.trade'),true);
+ });
++
++test('M3 shop/companion/Help/health/retreat/load dialogs exclude each other and preserve underlying warnings', () => {
++  const g=m2Setup();g.run('openTrade();window.m3Cart=state.trade;openCompanionBoard();openHelp();openConsole()');
++  assert.equal(g.run('state.trade===window.m3Cart&&!state.helpOpen&&!state.consoleOpen&&!state.companionPicker'),true);
++  assert.equal(g.run('beginSaveLoad()'),null);g.run('closeTrade(false)');
++  for(const kind of ['health','retreat']) {
++    g.run(`state.pause={kind:${JSON.stringify(kind)}};state.warnedLow=true;state.warnedCritical=true;`);
++    assert.equal(g.run('openTrade()'),false);g.run('openHelp();closeHelp()');
++    assert.equal(g.run('state.pause.kind'),kind);assert.equal(g.run('state.warnedLow&&state.warnedCritical'),true);
++  }
++});
++
++test('M3 scroll/debug/retreat returns survive shopping exactly once without changing companions or cooldowns', () => {
++  for(const reason of ['scroll','cheat','retreat']) {
++    const g=game(713,true,'town',true);g.run(`enterFloor(2,false,true);state.townScrolls=3;state.activeTime=50;state.player.mp=7;
++      state.retreatReadyAt=0;`);
++    if(reason==='scroll')g.run('useTownScroll()');
++    else if(reason==='cheat')g.run('teleportTown()');
++    else g.run('state.pause={kind:"retreat"};confirmRetreat()');
++    g.run(`state.gold=1000;state.player.x=state.merchant.x;state.player.y=state.merchant.y;render(true);
++      window.m3Return=JSON.stringify([state.townExit,state.townPortalOpen,state.retreatReadyAt,state.player.mp,state.companion,state.unlockedCompanions,state.companionAttackAt]);
++      openTrade();tradeBuy('stock:0');confirmTrade();`);
++    assert.equal(g.run('JSON.stringify([state.townExit,state.townPortalOpen,state.retreatReadyAt,state.player.mp,state.companion,state.unlockedCompanions,state.companionAttackAt])===window.m3Return'),true);
++    const scrolls=g.run('state.townScrolls');g.run('enterDungeonFromTown()');assert.equal(g.run('state.depth'),2);
++    assert.equal(g.run('state.townExit'),null);assert.equal(g.run('state.townPortalOpen'),false);assert.equal(g.run('state.townScrolls'),scrolls);
++    assert.equal(g.run('returnThroughTownPortal()'),false);
++  }
++});
++
++test('M3 every companion can shop without reselection, retirement, unlock or attack-time changes', () => {
++  const g=m2Setup();g.run('window.m3Ids=Object.keys(COMPANIONS)');
++  for(const id of g.json('window.m3Ids')) {
++    g.run(`unlockCompanion(${JSON.stringify(id)});activateCompanion(${JSON.stringify(id)});state.gold=1000;
++      state.merchant.stock=[{...ITEM_TABLE[0]},{...ITEM_TABLE[11]}];state.player.x=state.merchant.x;state.player.y=state.merchant.y;render(true)`);
++    const before=g.json('[state.companion,state.selectedCompanion,state.unlockedCompanions,state.entranceCat,state.companionEntryDone,state.companionAttackAt]');
++    g.run(`openTrade();tradeBuy('stock:0');confirmTrade()`);
++    assert.deepEqual(g.json('[state.companion,state.selectedCompanion,state.unlockedCompanions,state.entranceCat,state.companionEntryDone,state.companionAttackAt]'),before,id);
++  }
++});
++
++test('M3 successful market commit survives save/hydrate, god-mode freeze and once-only ordinary revisit rules', () => {
++  const g=m2Setup('dungeon');g.run(`equipItem('ring',{...ITEM_TABLE[5]});state.player.hp=75;state.godMode=true;state.godModeStats=snapshotPlayerStats();
++    openTrade();tradeSell('ring');tradeBuy('stock:3');confirmTrade()`);
++  assert.equal(g.run('state.player.hp'),75);assert.equal(g.run('state.player.maxHp'),80);assert.equal(g.run('state.player.spells.frostbolt'),true);
++  g.run('state.godMode=false;state.godModeStats=null');const dto=saveFixture(g);
++  const h=game();s2InstallDto(h,dto);assert.equal(h.run('commitSaveLoad(beginSaveLoad(),window.s2Dto)'),true);
++  assert.deepEqual(saveFixture(h),dto);h.run('enterFloor(4,false);enterFloor(2,false)');
++  assert.equal(h.run('state.player.spells.frostbolt'),true);assert.equal(h.run('state.merchant.stock.length'),5);assert.equal(h.run('state.equipment.ring'),null);
++});
++
++test('M3 forced boss-ending/debug transitions discard pending carts and reject all saved shop handlers', () => {
++  for(const transition of ['loadLevel("5")','enterTown()','gameOver(false)','newGame()']) {
++    const g=m2Setup('dungeon');g.run(`openTrade();tradeBuy('stock:3');window.m3Session=state.trade;
++      window.m3Callbacks=['confirmTrade','cancelTrade','addTradePurchase'].map(id=>document.getElementById(id).onclick)`);
++    g.run(transition);const before=m2Snapshot(g);g.run('window.m3Callbacks.forEach(fn=>fn())');m2AssertSame(g,before);
++    assert.equal(g.elements.tradeOverlay.hidden,true);assert.equal(g.elements.gameLayout.inert,false);assert.equal(g.run('!!state.player.spells.frostbolt'),false);
++  }
++});
++
++test('M3 forced transitions inside equipment/save/paint hooks roll back before switching context and stop stale commit work', () => {
++  for(const hook of ['equip','save','paint'])for(const transition of ['newGame()','enterFloor(4,false,true)']) {
++    const g=m2Setup('dungeon');g.run(`window.m3Merchant=state.merchant;openTrade();tradeBuy('stock:2');tradeBuy('stock:3');window.m3Confirm=document.getElementById('confirmTrade').onclick`);
++    if(hook==='equip')g.run(`window.m3Equip=equipItem;equipItem=(...args)=>{window.m3Equip(...args);equipItem=window.m3Equip;${transition};}`);
++    else if(hook==='save')g.run(`window.m3Save=saveFloor;saveFloor=()=>{window.m3Save();saveFloor=window.m3Save;${transition};}`);
++    else g.run(`window.m3Render=render;render=(...args)=>{window.m3Render(...args);render=window.m3Render;${transition};}`);
++    assert.equal(g.run('window.m3Confirm()'),false,hook+transition);
++    assert.equal(g.run('state.trade'),null);assert.equal(g.run('state.player.maxHp'),60);assert.equal(g.run('state.equipment.ring'),null);
++    assert.equal(g.run('!!state.player.spells.frostbolt'),false);assert.equal(g.run('window.m3Merchant.stock.length'),6);
++    assert.equal(g.run('state.gold'),transition==='newGame()'?0:1000);assert.equal(g.run('state.messages.some(s=>s.includes("Bought Ring")||s.includes("Bought Frostbolt"))'),false);
++    const before=m2Snapshot(g);g.run('window.m3Confirm()');m2AssertSame(g,before);
++  }
++});
++
++test('M3 stale backdrop callbacks and unavailable audio cannot cancel newer shops or repeat a successful trade', () => {
++  const g=m2Setup();g.run(`openTrade();window.m3Backdrop=document.getElementById('tradeOverlay').onclick;closeTrade(false);openTrade();`);
++  assert.equal(g.run('typeof window.m3Backdrop'),'function');g.run(`window.m3Backdrop({target:{id:'tradeOverlay'}})`);
++  assert.equal(g.run('!!state.trade'),true);
++  g.run(`tradeBuy('stock:0');window.m3Session=state.trade;playSound=()=>{throw new Error('audio device unavailable');}`);
++  assert.equal(g.run('confirmTrade()'),true);assert.equal(g.run('state.inventory.length'),1);assert.equal(g.run('state.gold'),977);
++  assert.equal(g.run('state.messages.filter(s=>s.includes("Bought Potion")).length'),1);assert.equal(g.run('confirmTrade(window.m3Session)'),false);
++  assert.equal(g.run('document.activeElement===canvas'),true);
++});
++
++test('M3 final ending discards a staged cart and cannot carry its session into ending skip or restart', () => {
++  const g=m2Setup('dungeon');g.run(`enterFloor(100,false,true);state.bossDefeated=true;state.princess.rescued=true;
++    state.merchant={x:state.player.x,y:state.player.y,stock:[{...ITEM_TABLE[8]}]};state.gold=1000;openTrade();
++    tradeBuy('stock:0');window.m3Old=state.trade;gameOver(true)`);
++  assert.equal(g.run('!!state.ending'),true);assert.equal(g.run('state.trade'),null);assert.equal(g.elements.tradeOverlay.hidden,true);
++  assert.equal(g.run('!!state.player.spells.frostbolt'),false);assert.equal(g.run('confirmTrade(window.m3Old)'),false);
++  g.run('skipEnding();newGame()');assert.equal(g.run('state.trade'),null);assert.equal(g.elements.gameLayout.inert,false);
++});

@@ -1,0 +1,7 @@
+{
+  "nativeGR09": "unverified",
+  "nativeChooserCancellation": "not observed",
+  "nativeAttempt": "CUA native app bound existing user Chrome, not the isolated test process. No actions taken in user content. Creating a new file:// acceptance tab was rejected by browser URL security policy (http/https only). No workaround attempted; isolated native driver stopped.",
+  "syntheticVisibilityUsed": false,
+  "stateVisibilityOverrideUsed": false
+}

@@ -1,0 +1,253 @@
+--- before/js/game.js
++++ after/js/game.js
+@@ -60,15 +60,15 @@
+ const COMPANIONS = {
+   marmalade: { id: 'marmalade', name: 'Marmalade', sprite: 'catCompanion', scale: CAT_COMPANION_SCALE, kind: 'cat', behavior: 'cat', linePool: 'cat', damage: 1, batBonus: CAT_BAT_BONUS, unlock: 'start', townActor: 'isEntranceCat', desc: 'Gate cat. Prefers bats, talks about payroll.' },
+   pip: { id: 'pip', name: 'Pip', sprite: 'dog', scale: 0.7, kind: 'sidekick', behavior: 'sidekick', linePool: 'sidekick', damage: 1, unlock: 'start', townActor: 'Pip', desc: 'Town dog. Loyal, simple, hits for 1.' },
+-  mimic: { id: 'mimic', name: 'Mimic', sprite: 'mimic', kind: 'boss', behavior: 'boss', linePool: 'boss', damage: 1, unlock: 'defeat', desc: 'Defeat Mimic to unlock.' },
+-  hydra: { id: 'hydra', name: 'Hydra', sprite: 'hydra', kind: 'boss', behavior: 'boss', linePool: 'boss', damage: 1, unlock: 'defeat', desc: 'Defeat Hydra to unlock.' },
+-  boar: { id: 'boar', name: 'Wild Boar', sprite: 'boar', kind: 'boss', behavior: 'boss', linePool: 'boss', damage: 1, unlock: 'defeat', desc: 'Defeat Wild Boar to unlock.' },
+-  medusa: { id: 'medusa', name: 'Medusa', sprite: 'medusa', kind: 'boss', behavior: 'boss', linePool: 'boss', damage: 1, unlock: 'defeat', desc: 'Defeat Medusa to unlock.' },
+-  wizard: { id: 'wizard', name: 'Dark Wizard', sprite: 'darkWizard', kind: 'boss', behavior: 'boss', linePool: 'boss', damage: 1, unlock: 'defeat', desc: 'Defeat Dark Wizard to unlock.' },
+-  skeletonKing: { id: 'skeletonKing', name: 'Skeleton King', sprite: 'skeletonKing', kind: 'boss', behavior: 'boss', linePool: 'boss', damage: 1, unlock: 'defeat', desc: 'Defeat Skeleton King to unlock.' },
+-  dragon: { id: 'dragon', name: 'Dragon', sprite: 'dragonBoss', kind: 'boss', behavior: 'boss', linePool: 'boss', damage: 1, unlock: 'defeat', desc: 'Defeat Dragon to unlock.' },
+-  cook: { id: 'cook', name: 'Cook', sprite: 'orc', kind: 'boss', behavior: 'boss', linePool: 'boss', damage: 1, unlock: 'defeat', desc: 'Defeat Cook to unlock.' },
+-  bartender: { id: 'bartender', name: 'Bartender', sprite: 'skeleton', kind: 'boss', behavior: 'boss', linePool: 'boss', damage: 1, unlock: 'defeat', desc: 'Defeat Bartender to unlock.' },
++  mimic: { id: 'mimic', name: 'Mimic', sprite: 'mimic', scale: 0.55, kind: 'boss', behavior: 'boss', linePool: 'boss', damage: 1, unlock: 'defeat', desc: 'Defeat Mimic to unlock.' },
++  hydra: { id: 'hydra', name: 'Hydra', sprite: 'hydra', scale: 0.55, kind: 'boss', behavior: 'boss', linePool: 'boss', damage: 1, unlock: 'defeat', desc: 'Defeat Hydra to unlock.' },
++  boar: { id: 'boar', name: 'Wild Boar', sprite: 'boar', scale: 0.55, kind: 'boss', behavior: 'boss', linePool: 'boss', damage: 1, unlock: 'defeat', desc: 'Defeat Wild Boar to unlock.' },
++  medusa: { id: 'medusa', name: 'Medusa', sprite: 'medusa', scale: 0.55, kind: 'boss', behavior: 'boss', linePool: 'boss', damage: 1, unlock: 'defeat', desc: 'Defeat Medusa to unlock.' },
++  wizard: { id: 'wizard', name: 'Dark Wizard', sprite: 'darkWizard', scale: 0.55, kind: 'boss', behavior: 'boss', linePool: 'boss', damage: 1, unlock: 'defeat', desc: 'Defeat Dark Wizard to unlock.' },
++  skeletonKing: { id: 'skeletonKing', name: 'Skeleton King', sprite: 'skeletonKing', scale: 0.55, kind: 'boss', behavior: 'boss', linePool: 'boss', damage: 1, unlock: 'defeat', desc: 'Defeat Skeleton King to unlock.' },
++  dragon: { id: 'dragon', name: 'Dragon', sprite: 'dragonBoss', scale: 0.55, kind: 'boss', behavior: 'boss', linePool: 'boss', damage: 1, unlock: 'defeat', desc: 'Defeat Dragon to unlock.' },
++  cook: { id: 'cook', name: 'Cook', sprite: 'cook', scale: 0.55, kind: 'boss', behavior: 'boss', linePool: 'boss', damage: 1, unlock: 'defeat', desc: 'Defeat Cook to unlock.' },
++  bartender: { id: 'bartender', name: 'Bartender', sprite: 'bartender', scale: 0.55, kind: 'boss', behavior: 'boss', linePool: 'boss', damage: 1, unlock: 'defeat', desc: 'Defeat Bartender to unlock.' },
+ };
+ const TOWN_NPC_LINES = [
+   'The dungeon gets louder every year. I sell maps now. Mostly.',
+@@ -166,6 +166,8 @@
+   if (m.isDragon || m.dragon) return 'dragon';
+   if (m.isThemed) return m.themedType === 'pub' ? 'bartender' : 'cook';
+   const name = String(m.name || '').toLowerCase();
++  if (name === 'cook') return 'cook';
++  if (name === 'bartender') return 'bartender';
+   if (name.includes('mimic')) return 'mimic';
+   if (name.includes('hydra')) return 'hydra';
+   if (name.includes('boar')) return 'boar';
+@@ -212,7 +214,7 @@
+ }
+ 
+ function companionDef(id) {
+-  return COMPANIONS[id] || COMPANIONS.marmalade;
++  return COMPANIONS[id] || null;
+ }
+ 
+ function isCompanionUnlocked(id) {
+@@ -230,6 +232,7 @@
+ 
+ function makeCompanion(id, x, y) {
+   const def = companionDef(id);
++  if (!def) return null;
+   return { id: def.id, name: def.name, sprite: def.sprite, kind: def.kind, behavior: def.behavior, linePool: def.linePool,
+     damage: def.damage || 1, batBonus: def.batBonus || 0, scale: def.scale, x, y };
+ }
+@@ -241,18 +244,66 @@
+   return null;
+ }
+ 
+-function joinSelectedCompanion(auto) {
+-  if (!state.entranceCat || state.entranceCat.recruited || state.companion) return false;
+-  const id = state.selectedCompanion || 'marmalade';
+-  const actor = selectedCompanionActor();
+-  state.companion = makeCompanion(id, actor ? actor.x : state.player.x, actor ? actor.y : state.player.y);
+-  if (actor) actor.hidden = true;
+-  state.entranceCat.recruited = true;
+-  if (auto) state.entranceCat.entered = true;
++function clearCompanionMotion() {
++  if (!state.motion) return;
++  delete state.motion.moves.companion;
++  delete state.motion.directions.companion;
++  delete state.motion.facing.companion;
++}
++
++function syncStarterActors() {
++  if (!state.town) return;
++  const active = state.companion && state.companion.id;
++  for (const actor of state.town.animals || []) {
++    if (actor.isEntranceCat) actor.hidden = active === 'marmalade';
++    else if (actor.name === 'Pip') actor.hidden = active === 'pip';
++  }
++}
++
++function activateCompanion(id, x = state.player.x, y = state.player.y) {
++  if (!isCompanionUnlocked(id)) return false;
++  const companion = makeCompanion(id, x, y);
++  if (!companion) return false;
++  clearCompanionMotion();
++  state.companion = companion;
++  state.selectedCompanion = id;
+   state.companionSpeech = null;
+   state.companionSpeechReadyAt = state.activeTime;
+   state.companionAttackAt = state.activeTime + 3;
++  if (id === 'marmalade' && state.entranceCat) state.entranceCat.recruited = true;
++  syncStarterActors();
+   placeCompanionNearPlayer();
++  return true;
++}
++
++function resetCompanionRun() {
++  clearCompanionMotion();
++  state.companion = null;
++  state.companionSpeech = null;
++  state.companionSpeechReadyAt = 0;
++  state.companionQuoteIndex = 0;
++  state.companionAttackAt = 0;
++  state.selectedCompanion = 'marmalade';
++  state.companionChoice = 'marmalade';
++  state.unlockedCompanions = ['marmalade', 'pip'];
++  state.companionEntryDone = false;
++  state.companionPicker = null;
++  state.entranceCat = freshEntranceCatState();
++  document.getElementById('companionOverlay').hidden = true;
++  syncStarterActors();
++}
++
++function joinSelectedCompanion(auto) {
++  if (state.companion || state.companionEntryDone) return false;
++  const selected = companionDef(state.selectedCompanion);
++  const id = selected && selected.unlock === 'start' && isCompanionUnlocked(selected.id) ? selected.id : 'marmalade';
++  state.selectedCompanion = id;
++  const actor = selectedCompanionActor();
++  if (!activateCompanion(id, actor ? actor.x : state.player.x, actor ? actor.y : state.player.y)) return false;
++  if (auto) {
++    state.companionEntryDone = true;
++    state.entranceCat.entered = true;
++  }
+   if (id === 'marmalade') {
+     log(auto ? 'Marmalade hops in before you can leave. "Someone has to buy the meat."' : 'Marmalade agrees to join you. "The wife and children are counting on this."');
+   } else {
+@@ -298,25 +349,20 @@
+ }
+ 
+ function adoptBossCompanion(m) {
++  if (!m || !m.isBoss) return false;
+   const id = bossKind(m);
+   unlockCompanion(id);
+-  const base = COMPANIONS[id] || { id, name: m.name, sprite: m.isDragon ? 'dragonBoss' : m.sprite || id, kind: 'boss', behavior: 'boss', linePool: 'boss', damage: 1 };
+-  state.companion = makeCompanion(base.id || id, state.player.x, state.player.y);
+-  if (m.isDragon) state.companion.sprite = 'dragonBoss';
+-  if (id === 'cook' || id === 'bartender') state.companion.sprite = base.sprite;
+-  state.selectedCompanion = state.companion.id;
+-  state.companionSpeech = null;
+-  state.companionSpeechReadyAt = state.activeTime;
+-  state.companionAttackAt = state.activeTime + 3;
+-  placeCompanionNearPlayer();
++  if (!activateCompanion(id)) return false;
+   log(`${m.name} agrees to join you as a tiny, reluctant companion.`);
++  return true;
+ }
+ 
+ function companionTalk(kind) {
+   if (!state.companion || state.gameOver || state.activeTime < state.companionSpeechReadyAt) return;
+-  const def = companionDef(state.companion.id || (state.companion.kind === 'cat' ? 'marmalade' : null));
+-  const poolName = def && def.linePool === 'cat' ? 'cat' : (def && def.linePool) || (state.companion.kind === 'cat' ? 'cat' : 'boss');
+-  const pool = poolName === 'cat' ? (CAT_LINES[kind] || COMPANION_LINES[kind]) : (COMPANION_LINES[kind] || CAT_LINES[kind]);
++  const def = companionDef(state.companion.id);
++  const poolName = def ? def.linePool : state.companion.kind === 'cat' ? 'cat' : 'boss';
++  const pool = poolName === 'sidekick' ? COMPANION_LINES.sidekick
++    : poolName === 'cat' ? (CAT_LINES[kind] || COMPANION_LINES[kind]) : (COMPANION_LINES[kind] || CAT_LINES[kind]);
+   if (!pool || !pool.length) return;
+   const text = pool[state.companionQuoteIndex % pool.length];
+   state.companionQuoteIndex++;
+@@ -335,7 +381,8 @@
+   const targets = visibleTargets(3, companion);
+   if (!targets.length) return;
+   const behavior = companion.behavior || (companion.kind === 'cat' ? 'cat' : 'boss');
+-  const target = behavior === 'cat' ? (targets.find(m => m.sprite === 'bat') || targets[0]) : targets[0];
++  const target = behavior === 'cat' ? (targets.find(m => m.sprite === 'bat') || targets[0])
++    : behavior === 'sidekick' ? nearestVisibleTarget(3, companion) : targets[0];
+   if (behavior === 'cat' && target.sprite === 'bat') companionTalk('bat');
+   spawnProjectile('bolt', companion, target, 0.25);
+   const damage = behavior === 'cat' && target.sprite === 'bat' ? (companion.damage || 1) + (companion.batBonus || 0) : (companion.damage || 1);
+@@ -383,9 +430,9 @@
+   state = {
+     depth: 1, area: 'dungeon', town: null, townExit: null, townPortalOpen: false, inn: null, townGate: null, kills: 0, turn: 0, started, messages: [], helpOpen: false, helpFocus: null,
+     consoleOpen: false, consoleLines: [], consoleHistory: [], consoleHistoryIndex: 0, godMode: false, godModeStats: null,
+-    selectedCompanion: state && state.selectedCompanion ? state.selectedCompanion : 'marmalade',
++    selectedCompanion: 'marmalade',
+     unlockedCompanions: ['marmalade', 'pip'],
+-    companionChoice: state && state.companionChoice ? state.companionChoice : 'marmalade',
++    companionChoice: 'marmalade', companionEntryDone: false, companionPicker: null,
+     trade: null,
+     player: { x: 0, y: 0, hp: 60, maxHp: 60, mp: 20, maxMp: 20, str: 12, dex: 10, def: 3, lvl: 1, xp: 0, xpNext: 40, spells: { fireball: true, heal: true } },
+     spellReadyAt: { fireball: 0, heal: 0, frostbolt: 0, greaterHeal: 0, magicBarrier: 0 },
+@@ -404,6 +451,7 @@
+   };
+   document.getElementById('endingControls').hidden = true;
+   document.getElementById('helpOverlay').hidden = true;
++  document.getElementById('companionOverlay').hidden = true;
+   document.getElementById('helpToggle').ariaExpanded = 'false';
+   document.getElementById('gameLayout').inert = false;
+   document.getElementById('launchScreen').inert = false;
+@@ -413,11 +461,13 @@
+   genLevel();
+   genTown();
+   revealAroundPlayer();
++  setCompanionChoice('marmalade');
+   log('You arrive in the village. Rest at the Inn, visit the Store, or enter the dungeon.');
+ }
+ 
+ function setCompanionChoice(id) {
+-  if (!COMPANIONS[id]) return;
++  const def = companionDef(id);
++  if (!def || def.unlock !== 'start' || state.companionEntryDone) return false;
+   state.companionChoice = id;
+   state.selectedCompanion = id;
+   (document.querySelectorAll?.('[data-companion-choice]')||[]).forEach(btn => {
+@@ -1690,9 +1740,7 @@
+   clearMonsterSpeech();
+   clearMovementAnimation();
+   clearTownReturn();
+-  state.companion = null;
+-  state.companionSpeech = null;
+-  state.entranceCat = freshEntranceCatState();
++  resetCompanionRun();
+   state.gameOver = true; state.won = won; state.pause = null;
+   const ov = document.getElementById('overlay');
+   document.getElementById('ovTitle').textContent = 'GAME OVER';
+@@ -2126,8 +2174,10 @@
+   clearBossDefeat();
+   state.bossIntroSeen = false;
+   state.bossSummonAt = state.activeTime + 4;
+-  if (state.area === 'town' && state.entranceCat && !state.entranceCat.entered) {
+-    joinSelectedCompanion(true);
++  if (state.area === 'town' && !state.companionEntryDone) {
++    if (!state.companion) joinSelectedCompanion(true);
++    state.companionEntryDone = true;
++    state.entranceCat.entered = true;
+   }
+   if (state.area === 'town') saveTown(); else saveFloor();
+   state.area = 'dungeon';
+@@ -2241,10 +2291,7 @@
+ }
+ function selectCompanion(id) {
+   if (!isCompanionUnlocked(id) || state.area !== 'town') return;
+-  state.selectedCompanion = id;
+-  state.companion = makeCompanion(id, state.player.x, state.player.y);
+-  placeCompanionNearPlayer();
+-  state.companionSpeech = null; state.companionAttackAt = state.activeTime + 3;
++  if (!activateCompanion(id)) return;
+   log(`${companionDef(id).name} is now your active companion.`);
+   closeCompanionBoard();
+ }
+@@ -3281,9 +3328,7 @@
+   clearMonsterSpeech();
+   clearMovementAnimation();
+   clearTownReturn();
+-  state.companion = null;
+-  state.companionSpeech = null;
+-  state.entranceCat = freshEntranceCatState();
++  resetCompanionRun();
+   state.gameOver = true; state.won = true; state.pause = null; state.bubble = null;
+   document.getElementById('overlay').style.display = 'none';
+   log('At last, you reach the princess.');

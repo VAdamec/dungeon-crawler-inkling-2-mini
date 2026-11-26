@@ -1,0 +1,214 @@
+{
+  "results": [
+    {
+      "width": 1440,
+      "mobileTouch": false,
+      "secrecy": [
+        {
+          "id": "marmalade",
+          "hiddenSpikes": true,
+          "unknownEntities": true,
+          "minimapSecret": true,
+          "companionLight": true,
+          "darkBoundary": true
+        },
+        {
+          "id": "pip",
+          "hiddenSpikes": true,
+          "unknownEntities": true,
+          "minimapSecret": true,
+          "companionLight": true,
+          "darkBoundary": true
+        },
+        {
+          "id": "mimic",
+          "hiddenSpikes": true,
+          "unknownEntities": true,
+          "minimapSecret": true,
+          "companionLight": true,
+          "darkBoundary": true
+        },
+        {
+          "id": "hydra",
+          "hiddenSpikes": true,
+          "unknownEntities": true,
+          "minimapSecret": true,
+          "companionLight": true,
+          "darkBoundary": true
+        },
+        {
+          "id": "boar",
+          "hiddenSpikes": true,
+          "unknownEntities": true,
+          "minimapSecret": true,
+          "companionLight": true,
+          "darkBoundary": true
+        },
+        {
+          "id": "medusa",
+          "hiddenSpikes": true,
+          "unknownEntities": true,
+          "minimapSecret": true,
+          "companionLight": true,
+          "darkBoundary": true
+        },
+        {
+          "id": "wizard",
+          "hiddenSpikes": true,
+          "unknownEntities": true,
+          "minimapSecret": true,
+          "companionLight": true,
+          "darkBoundary": true
+        },
+        {
+          "id": "skeletonKing",
+          "hiddenSpikes": true,
+          "unknownEntities": true,
+          "minimapSecret": true,
+          "companionLight": true,
+          "darkBoundary": true
+        },
+        {
+          "id": "dragon",
+          "hiddenSpikes": true,
+          "unknownEntities": true,
+          "minimapSecret": true,
+          "companionLight": true,
+          "darkBoundary": true
+        },
+        {
+          "id": "cook",
+          "hiddenSpikes": true,
+          "unknownEntities": true,
+          "minimapSecret": true,
+          "companionLight": true,
+          "darkBoundary": true
+        },
+        {
+          "id": "bartender",
+          "hiddenSpikes": true,
+          "unknownEntities": true,
+          "minimapSecret": true,
+          "companionLight": true,
+          "darkBoundary": true
+        }
+      ],
+      "retirementReselectionOnce": true,
+      "companionBossKillStopsCurrentTick": true,
+      "realScrollAndStairs": true,
+      "helpPreservesHealthAndRetreatCancel": true,
+      "retreatPreservesActorDeadline": true,
+      "hiddenPicker": "explicit document.hidden + visibilitychange fixture",
+      "forcedTravelAndEndingTeardown": true,
+      "oldRunCallbackRejected": true,
+      "errors": [],
+      "remote": []
+    },
+    {
+      "width": 390,
+      "mobileTouch": true,
+      "secrecy": [
+        {
+          "id": "marmalade",
+          "hiddenSpikes": true,
+          "unknownEntities": true,
+          "minimapSecret": true,
+          "companionLight": true,
+          "darkBoundary": true
+        },
+        {
+          "id": "pip",
+          "hiddenSpikes": true,
+          "unknownEntities": true,
+          "minimapSecret": true,
+          "companionLight": true,
+          "darkBoundary": true
+        },
+        {
+          "id": "mimic",
+          "hiddenSpikes": true,
+          "unknownEntities": true,
+          "minimapSecret": true,
+          "companionLight": true,
+          "darkBoundary": true
+        },
+        {
+          "id": "hydra",
+          "hiddenSpikes": true,
+          "unknownEntities": true,
+          "minimapSecret": true,
+          "companionLight": true,
+          "darkBoundary": true
+        },
+        {
+          "id": "boar",
+          "hiddenSpikes": true,
+          "unknownEntities": true,
+          "minimapSecret": true,
+          "companionLight": true,
+          "darkBoundary": true
+        },
+        {
+          "id": "medusa",
+          "hiddenSpikes": true,
+          "unknownEntities": true,
+          "minimapSecret": true,
+          "companionLight": true,
+          "darkBoundary": true
+        },
+        {
+          "id": "wizard",
+          "hiddenSpikes": true,
+          "unknownEntities": true,
+          "minimapSecret": true,
+          "companionLight": true,
+          "darkBoundary": true
+        },
+        {
+          "id": "skeletonKing",
+          "hiddenSpikes": true,
+          "unknownEntities": true,
+          "minimapSecret": true,
+          "companionLight": true,
+          "darkBoundary": true
+        },
+        {
+          "id": "dragon",
+          "hiddenSpikes": true,
+          "unknownEntities": true,
+          "minimapSecret": true,
+          "companionLight": true,
+          "darkBoundary": true
+        },
+        {
+          "id": "cook",
+          "hiddenSpikes": true,
+          "unknownEntities": true,
+          "minimapSecret": true,
+          "companionLight": true,
+          "darkBoundary": true
+        },
+        {
+          "id": "bartender",
+          "hiddenSpikes": true,
+          "unknownEntities": true,
+          "minimapSecret": true,
+          "companionLight": true,
+          "darkBoundary": true
+        }
+      ],
+      "retirementReselectionOnce": true,
+      "companionBossKillStopsCurrentTick": true,
+      "realScrollAndStairs": true,
+      "helpPreservesHealthAndRetreatCancel": true,
+      "retreatPreservesActorDeadline": true,
+      "hiddenPicker": "explicit document.hidden + visibilitychange fixture",
+      "forcedTravelAndEndingTeardown": true,
+      "oldRunCallbackRejected": true,
+      "errors": [],
+      "remote": []
+    }
+  ],
+  "nativeBackgroundVerified": false,
+  "method": "normal file:// Chrome; keyboard/touch picker, J/Q/Space/retreat/Help/R; staged positions/unlocks/boss kills and pixel fixtures, intervals stopped for deterministic state"
+}

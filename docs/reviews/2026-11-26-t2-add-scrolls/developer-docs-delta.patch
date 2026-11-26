@@ -1,0 +1,32 @@
+--- before/DOCUMENTATION.md
++++ after/DOCUMENTATION.md
+@@ -1,6 +1,6 @@
+ # Dungeon Crawler development documentation
+ 
+-Updated 2026-11-25 for the integrated graphics worktree. See [agent conventions](agents.md), [tasks](tasks.md), [handover](handover.md) and [credits/provenance](CREDITS.md). Release version: 2.0.0. **GR-09 native background-tab/minimize observation remains unverified**; an explicit visibility-handler fixture is not a native transition test.
++Updated 2026-11-26 for integrated graphics and developer travel commands. See [agent conventions](agents.md), [tasks](tasks.md), [handover](handover.md) and [credits/provenance](CREDITS.md). Release version: 2.0.0. **GR-09 native background-tab/minimize observation remains unverified**; an explicit visibility-handler fixture is not a native transition test.
+ 
+ ## Project background
+ 
+@@ -63,4 +63,20 @@
+ 
+ ## Developer console
+ 
+-Use **~ / `** to open the console; it pauses play. `loadLevel <1-100>` generates a fresh floor with its boss and refills HP/MP. `godMode 0|1` toggles frozen hero stats and one-hit player attacks while monsters remain mutable. `help` and `clear` are also available. These testing commands intentionally stay out of player Help.
++Use **~ / `** to open the console; it pauses play. Type a command and press Enter; Esc closes it. Command names are case-insensitive. Startup hints and `help` list the commands. These testing commands stay out of player README/Help.
++
++| Command | Effect |
++| --- | --- |
++| `loadLevel <1-100>` | Generate a fresh floor with its boss and refill HP/MP; this intentionally recreates that floor for testing. |
++| `godMode 0\|1` | Toggle frozen hero stats and one-hit player attacks; monsters remain mutable. |
++| `teleportTown` | Open a free debug return portal from the dungeon. Takes no arguments; preserve the exact saved floor/tile, scroll count, HP/MP and retreat cooldown. Refuse if already in town or another portal is open. |
++| `addScrolls <count>` | Add Town Scrolls in town or dungeon, without gold cost, healing, travel or portal changes. Requires exactly one positive decimal integer. |
++| `help` / `clear` | Show commands / clear console output. |
++
++For `addScrolls`, use ASCII digits only: `addScrolls 3` is valid; leading zeros are interpreted as decimal (`0003` adds 3). Zero, negative/signed values, fractions, exponent/hex/binary notation, separators, missing values and extra tokens are rejected. Both the count and resulting total must be safe integers, at most `9007199254740991` (`Number.MAX_SAFE_INTEGER`). Invalid input, overflow or an invalid current count leaves inventory/world state unchanged and prints usage. A successful command updates the count, HUD and spell list once; an already-open portal retains its existing return point and “Portal ready” label.
++
++Both travel commands require a started, living, visible run with no Help, health/retreat pause, boss intro/defeat, ending or player shop/companion menu. The developer console itself is allowed; `addScrolls` also works with god mode. Blocked commands leave inventory/world state unchanged and report that they cannot run now. Closing the console resumes normal play.
++
++Example: open the console, run `loadLevel 2`, `addScrolls 3`, then `teleportTown`. Close it and press J to return through the saved portal; Space at the town gate also returns. Debug travel consumes no scroll. A normal J cast in the dungeon still consumes one Town Scroll. Debug commands do not change the single-return-point rule or clear the existing retreat cooldown.
++
++Implementation evidence: [T1 debug portal](docs/reviews/2026-11-26-t1-debug-portal/README.md) and [T2 scroll command](docs/reviews/2026-11-26-t2-add-scrolls/README.md). These phase checks do not close the existing companion/cinematic suite failures or the unverified native GR-09 check.

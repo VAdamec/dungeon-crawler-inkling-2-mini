@@ -1,0 +1,125 @@
+{
+  "method": "existing VM fixture copied to /tmp; no production replacements except throw-on-RNG/sound sentinels after setup",
+  "rows": [
+    {
+      "area": "town",
+      "godMode": false,
+      "consoleAllowedForExistingCommands": true,
+      "simulationBlockedWithConsole": true,
+      "addGoldType": "undefined",
+      "startupHasGold": false,
+      "helpHasGold": false,
+      "hudGold": "40",
+      "commands": [
+        {
+          "text": "goldADD 250",
+          "reply": "Unknown command: goldADD",
+          "gold": 40,
+          "semanticStateUnchanged": true
+        },
+        {
+          "text": "GOLDADD 0003",
+          "reply": "Unknown command: GOLDADD",
+          "gold": 40,
+          "semanticStateUnchanged": true
+        },
+        {
+          "text": "goldadd 10 extra",
+          "reply": "Unknown command: goldadd",
+          "gold": 40,
+          "semanticStateUnchanged": true
+        }
+      ]
+    },
+    {
+      "area": "town",
+      "godMode": true,
+      "consoleAllowedForExistingCommands": true,
+      "simulationBlockedWithConsole": true,
+      "addGoldType": "undefined",
+      "startupHasGold": false,
+      "helpHasGold": false,
+      "hudGold": "40",
+      "commands": [
+        {
+          "text": "goldADD 250",
+          "reply": "Unknown command: goldADD",
+          "gold": 40,
+          "semanticStateUnchanged": true
+        },
+        {
+          "text": "GOLDADD 0003",
+          "reply": "Unknown command: GOLDADD",
+          "gold": 40,
+          "semanticStateUnchanged": true
+        },
+        {
+          "text": "goldadd 10 extra",
+          "reply": "Unknown command: goldadd",
+          "gold": 40,
+          "semanticStateUnchanged": true
+        }
+      ]
+    },
+    {
+      "area": "dungeon",
+      "godMode": false,
+      "consoleAllowedForExistingCommands": true,
+      "simulationBlockedWithConsole": true,
+      "addGoldType": "undefined",
+      "startupHasGold": false,
+      "helpHasGold": false,
+      "hudGold": "40",
+      "commands": [
+        {
+          "text": "goldADD 250",
+          "reply": "Unknown command: goldADD",
+          "gold": 40,
+          "semanticStateUnchanged": true
+        },
+        {
+          "text": "GOLDADD 0003",
+          "reply": "Unknown command: GOLDADD",
+          "gold": 40,
+          "semanticStateUnchanged": true
+        },
+        {
+          "text": "goldadd 10 extra",
+          "reply": "Unknown command: goldadd",
+          "gold": 40,
+          "semanticStateUnchanged": true
+        }
+      ]
+    },
+    {
+      "area": "dungeon",
+      "godMode": true,
+      "consoleAllowedForExistingCommands": true,
+      "simulationBlockedWithConsole": true,
+      "addGoldType": "undefined",
+      "startupHasGold": false,
+      "helpHasGold": false,
+      "hudGold": "40",
+      "commands": [
+        {
+          "text": "goldADD 250",
+          "reply": "Unknown command: goldADD",
+          "gold": 40,
+          "semanticStateUnchanged": true
+        },
+        {
+          "text": "GOLDADD 0003",
+          "reply": "Unknown command: GOLDADD",
+          "gold": 40,
+          "semanticStateUnchanged": true
+        },
+        {
+          "text": "goldadd 10 extra",
+          "reply": "Unknown command: goldadd",
+          "gold": 40,
+          "semanticStateUnchanged": true
+        }
+      ]
+    }
+  ]
+}

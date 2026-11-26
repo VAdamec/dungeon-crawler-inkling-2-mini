@@ -1,0 +1,5 @@
+js/art-runtime.js: syntax OK
+js/sprites.js: syntax OK
+js/game.js: syntax OK
+tests/game.test.cjs: syntax OK
+docs/reviews/2026-11-26-s2-save-load/check-browser.cjs: syntax OK

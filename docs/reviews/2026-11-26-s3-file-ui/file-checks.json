@@ -1,0 +1,52 @@
+{
+  "index.html": {
+    "afterS2": "f1a34474040fe77b8e556cc123f9de4446985a6ab02dc5f0401168265194e5a6",
+    "afterS3": "147286665d6699be7bd0ac3bc166822c8b29fdac61379bb69e07475df95de0ab",
+    "changed": true
+  },
+  "style.css": {
+    "afterS2": "c70de6c9b99e77cef1b68d6f759f1b027c4190369eb7ae1b9cf52f8edb7372b2",
+    "afterS3": "7d612d8ec2da57e56adca730837f040dd7f68aa1263c30691fc955068d1ee28f",
+    "changed": true
+  },
+  "js/game.js": {
+    "afterS2": "f88102fc511edcd8783101b125d67483c6a8b512a1eb46d2685b03dc04b2f5e9",
+    "afterS3": "3be6cbdbe054fde1f0cc0cc73804255d8bd63ea35e6fd75648d1d6035e102e56",
+    "changed": true
+  },
+  "js/sprites.js": {
+    "afterS2": "0f9a18356afa369a1b2912caf80e589109a379fc3e019e32ee214e4b002301d2",
+    "afterS3": "0f9a18356afa369a1b2912caf80e589109a379fc3e019e32ee214e4b002301d2",
+    "changed": false
+  },
+  "js/art-runtime.js": {
+    "afterS2": "ac12a9d1d03226eb16473922efc189ed0b601a784d5051be9d9587c9621d0ae9",
+    "afterS3": "ac12a9d1d03226eb16473922efc189ed0b601a784d5051be9d9587c9621d0ae9",
+    "changed": false
+  },
+  "tests/game.test.cjs": {
+    "afterS2": "38c99a424b775ec6eaed8a6e31e8efbfdc4e38b2d5b84409701d3ef2fcb14f08",
+    "afterS3": "a5fcf75f582dde751dc969e47b4b6c8336b57a006f118bd3258e0d73446b610a",
+    "changed": true
+  },
+  "DOCUMENTATION.md": {
+    "afterS2": "21af151fc22ae4a271f76e0cea5fcdf744cdcdf7164403cab93b6428139fd841",
+    "afterS3": "d612af1ac0b6a2885805183758e7aca9940cf17bc21b3b79fe293c36076185ce",
+    "changed": true
+  },
+  "README.md": {
+    "afterS2": "1669a8c1179fcaebd1350edd9f66fb0f6b85397181150b01c037a429a5b3e535",
+    "afterS3": "1669a8c1179fcaebd1350edd9f66fb0f6b85397181150b01c037a429a5b3e535",
+    "changed": false
+  },
+  "CREDITS.md": {
+    "afterS2": "7c4c22f30e289b84a15531d4421c3c76bcce9b9db2f5795b64c4a7f8f5149dba",
+    "afterS3": "7c4c22f30e289b84a15531d4421c3c76bcce9b9db2f5795b64c4a7f8f5149dba",
+    "changed": false
+  },
+  "agents.md": {
+    "afterS2": "4da7157235d625f6372417dcc396e92334fb233c4c9328837c1c6430a660505b",
+    "afterS3": "4da7157235d625f6372417dcc396e92334fb233c4c9328837c1c6430a660505b",
+    "changed": false
+  }
+}

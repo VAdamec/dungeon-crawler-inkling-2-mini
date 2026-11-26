@@ -1,0 +1,20 @@
+{
+  "full": {
+    "pass": 224,
+    "fail": 0
+  },
+  "focused": {
+    "pass": 75,
+    "fail": 0
+  },
+  "preview": {
+    "pass": 27,
+    "fail": 0
+  },
+  "seededMatches": 9,
+  "browserSecrecyRoles": 11,
+  "browserViewports": 2,
+  "nativeBackgroundVerified": false,
+  "localLinksCheckedIncludingPlanning": 59,
+  "brokenLinks": []
+}

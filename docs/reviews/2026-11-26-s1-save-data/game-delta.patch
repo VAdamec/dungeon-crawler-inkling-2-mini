@@ -1,0 +1,429 @@
+diff --git a/tmp/dungeon-s1-before/game.js b/js/game.js
+index 3641516..8dd3023 100644
+--- a/tmp/dungeon-s1-before/game.js
++++ b/js/game.js
+@@ -422,6 +422,424 @@ const GOD_STAT_FIELDS = ['hp', 'maxHp', 'mp', 'maxMp', 'str', 'dex', 'def', 'lvl
+ const FLOOR_FIELDS = ['map', 'rooms', 'potions', 'stairs', 'upstairs', 'treasures', 'merchant', 'prisoner',
+   'princess', 'visited', 'monsterSpawns', 'bossDefeated', 'floorKey', 'obstacles', 'hazards', 'hazardTime', 'biome', 'props'];
+ 
++// Portable save format v1: pure DTO APIs only. No hydration, UI, storage or live-state writes.
++const SAVE_FORMAT = 'dungeon-crawler-save', SAVE_FORMAT_VERSION = 1;
++const SAVE_MAX_BYTES = 32 * 1024 * 1024, SAVE_MAX_NODES = 4000000, SAVE_MAX_DEPTH = 16;
++const SAVE_RUN_FIELDS = ['depth','area','kills','turn','player','spellReadyAt','inventory','townScrolls','gold','equipment',
++  'warnedLow','warnedCritical','combatElapsed','healElapsed','activeTime','manaRegenAt','retreatReadyAt',
++  'selectedCompanion','unlockedCompanions','companionChoice','companionEntryDone','companion',
++  'companionSpeechReadyAt','companionQuoteIndex','companionAttackAt','entranceCat','townExit','townPortalOpen',
++  'monsterSpeechReadyAt','monsterQuoteIndex','messages'];
++const SAVE_MONSTER_FIELDS = ['name','sprite','x','y','hp','maxHp','atk','def','xp','gold','id','minDepth','range',
++  'ranged','projectile','magic','magicType','magicRange','isBoss','isThemed','themedType','throne','summons',
++  'dragon','isDragon','isThroneBoss','nextAttackAt','isGuard'];
++
++function saveRequire(condition, message) {
++  if (!condition) throw new Error(`Invalid save: ${message}`);
++}
++
++function saveFields(value, required, optional = []) {
++  saveRequire(value !== null && typeof value === 'object' && !Array.isArray(value), 'expected record');
++  const allowed = required.concat(optional);
++  saveRequire(Object.keys(value).every(key => allowed.includes(key)), 'unknown record field');
++  saveRequire(required.every(key => Object.prototype.hasOwnProperty.call(value, key)), 'missing record field');
++}
++
++function saveList(value, max, min = 0) {
++  saveRequire(Array.isArray(value) && value.length >= min && value.length <= max, 'array length/type');
++}
++
++function saveNumber(value, min = 0, max = Number.MAX_SAFE_INTEGER, integer = false) {
++  saveRequire(typeof value === 'number' && Number.isFinite(value) && value >= min && value <= max
++    && (!integer || Number.isInteger(value)), 'number range/type');
++}
++
++function saveCount(value, min = 0, max = Number.MAX_SAFE_INTEGER) { saveNumber(value, min, max, true); }
++function saveBoolean(value) { saveRequire(typeof value === 'boolean', 'expected boolean'); }
++function saveEnum(value, choices) { saveRequire(choices.includes(value), 'unknown identity'); }
++function saveText(value, max) { saveRequire(typeof value === 'string' && value.length <= max, 'text length/type'); }
++
++function savePoint(value, map = null) {
++  saveCount(value.x, 0, W - 1); saveCount(value.y, 0, H - 1);
++  if (map) saveRequire(map[value.y][value.x] === 0, 'actor/object on blocked tile');
++}
++
++function saveTile(value, map = null) { saveFields(value, ['x','y']); savePoint(value, map); }
++
++// UTF-8 accounting without a runtime TextEncoder dependency (also works in the no-DOM VM).
++function saveTextBudget(text) {
++  saveText(text, SAVE_MAX_BYTES);
++  let bytes = 0, depth = 0, quoted = false, escaped = false;
++  for (let i = 0; i < text.length; i++) {
++    const code = text.charCodeAt(i), char = text[i];
++    if (code < 128) bytes++;
++    else if (code < 2048) bytes += 2;
++    else if (code >= 0xd800 && code <= 0xdbff && text.charCodeAt(i+1) >= 0xdc00 && text.charCodeAt(i+1) <= 0xdfff) { bytes += 4; i++; }
++    else bytes += 3;
++    saveRequire(bytes <= SAVE_MAX_BYTES, 'UTF-8 size exceeds 32 MiB');
++    if (quoted) { if (escaped) escaped = false; else if (char === '\\') escaped = true; else if (char === '"') quoted = false; }
++    else if (char === '"') quoted = true;
++    else if (char === '{' || char === '[') { depth++; saveRequire(depth <= SAVE_MAX_DEPTH, 'nesting exceeds 16'); }
++    else if (char === '}' || char === ']') depth--;
++  }
++  return bytes;
++}
++
++// Iterative preflight before stringify/typed validation: no getters, custom prototypes, cycles or coercion.
++function saveStructure(value) {
++  const stack = [{ value, depth: 0 }], ancestors = new WeakSet();
++  let nodes = 0, bytes = 0;
++  while (stack.length) {
++    const item = stack.pop(), v = item.value;
++    if (item.keys) {
++      if (item.index === item.keys.length) { ancestors.delete(v); continue; }
++      const key = item.keys[item.index++];
++      saveRequire(!['__proto__','prototype','constructor'].includes(key), 'dangerous field');
++      const descriptor = Object.getOwnPropertyDescriptor(v,key);
++      saveRequire(Object.prototype.hasOwnProperty.call(descriptor,'value'), 'accessor field');
++      if (!Array.isArray(v)) bytes += saveTextBudget(JSON.stringify(key)) + 1;
++      stack.push(item, { value:descriptor.value, depth:item.depth+1 });
++      continue;
++    }
++    saveRequire(++nodes <= SAVE_MAX_NODES, 'structure exceeds 4000000 nodes');
++    if (v === null || ['boolean','string','number'].includes(typeof v)) {
++      if (typeof v === 'number') saveRequire(Number.isFinite(v), 'nonfinite number');
++      if (typeof v === 'string') saveText(v,512);
++      bytes += saveTextBudget(JSON.stringify(v));
++      saveRequire(bytes <= SAVE_MAX_BYTES, 'UTF-8 size exceeds 32 MiB');
++      continue;
++    }
++    saveRequire(typeof v === 'object', 'non-JSON value');
++    saveRequire(item.depth < SAVE_MAX_DEPTH && !ancestors.has(v), 'nesting/cycle');
++    const array = Array.isArray(v), prototype = Object.getPrototypeOf(v);
++    saveRequire(prototype === (array ? Array.prototype : Object.prototype) || (!array && prototype === null), 'custom prototype');
++    if (array) saveRequire(v.length<=65536,'array exceeds format limit');
++    const keys = Object.keys(v);
++    saveRequire(keys.length <= SAVE_MAX_NODES - nodes, 'structure exceeds 4000000 nodes');
++    saveRequire(array || keys.length<=128, 'record field limit');
++    saveRequire(Object.getOwnPropertySymbols(v).length === 0, 'symbol field');
++    saveRequire(Object.getOwnPropertyNames(v).length === keys.length+(array?1:0), 'non-enumerable field');
++    if (array) saveRequire(keys.length === v.length && keys.every((key,i) => key === String(i)), 'sparse/extended array');
++    bytes += 2 + Math.max(0,keys.length-1);
++    saveRequire(bytes <= SAVE_MAX_BYTES, 'UTF-8 size exceeds 32 MiB');
++    ancestors.add(v); stack.push({ value:v, keys, index:0, depth:item.depth });
++  }
++  return nodes;
++}
++
++function saveMap(map) {
++  saveList(map, H, H);
++  for (const row of map) { saveList(row,W,W); for (const tile of row) saveCount(tile,0,2); }
++}
++
++function saveVisited(visited) {
++  saveList(visited,W*H);
++  const seen = new Set();
++  for (const key of visited) {
++    saveText(key,5); saveRequire(/^(0|[1-9][0-9]*),(0|[1-9][0-9]*)$/.test(key), 'noncanonical visited coordinate');
++    const [x,y] = key.split(',').map(Number); savePoint({x,y});
++    saveRequire(!seen.has(key),'duplicate visited coordinate'); seen.add(key);
++  }
++}
++
++function saveUniqueIds(rows) {
++  const ids = new Set();
++  for (const row of rows) {
++    saveRequire(row !== null && typeof row === 'object' && !Array.isArray(row),'ID record');
++    saveCount(row.id); saveRequire(!ids.has(row.id),'duplicate scoped ID'); ids.add(row.id);
++  }
++}
++
++function saveItem(item, map = null) {
++  saveFields(item,['name'],['sprite','gold','kind','heal','atk','str','range','def','dex','maxHp','spell','minDepth','scroll','lootWeight','x','y','id']);
++  const def = ITEM_TABLE.find(d => d.name === item.name);
++  saveRequire(!!def,'unknown item');
++  saveFields(item,Object.keys(def),['x','y','id']);
++  for (const key of Object.keys(def)) saveRequire(item[key] === def[key],'item identity/modifier mismatch');
++  if ('id' in item) saveCount(item.id);
++  saveRequire(('x' in item) === ('y' in item),'partial item position');
++  if ('x' in item) savePoint(item,map);
++}
++
++function saveMerchant(merchant, map, town = false) {
++  saveFields(merchant,['x','y','isMerchant','stock'].concat(town?['sprite']:[]));
++  savePoint(merchant,map); saveRequire(merchant.isMerchant === true,'merchant role');
++  if (town) saveRequire(merchant.sprite === 'store','town store role');
++  saveList(merchant.stock,6); saveUniqueIds(merchant.stock);
++  for (const item of merchant.stock) { saveItem(item); saveRequire('id' in item && !('x' in item),'stock placement'); }
++}
++
++function saveMonsterDefinition(monster, depth) {
++  if (monster.isBoss) {
++    const boss = bossForDepth(depth), themed = THEMED_FLOORS[depth];
++    if (boss) return { ...boss, maxHp:boss.hp, id:999, isBoss:true, isDragon:boss.dragon, isThroneBoss:!!boss.throne };
++    saveRequire(!!themed,'boss at wrong depth');
++    const scale = 1 + (depth-1)*0.35;
++    return {name:themed.name,sprite:themed.sprite,maxHp:Math.round(100*(1+(depth-1)*0.2)),
++      atk:Math.round(20*(1+(depth-1)*0.15)),def:6+Math.floor(depth/5),xp:Math.round(150*scale),
++      gold:Math.round(100*scale),id:999,isBoss:true,isThemed:true,themedType:themed.kind,
++      ranged:themed.kind==='pub',range:themed.kind==='pub'?4:0,projectile:'beer'};
++  }
++  const def = MONSTER_TYPES.find(d => d.name === monster.name);
++  saveRequire(!!def && depth >= (def.minDepth || 1),'ordinary monster identity/depth');
++  if (monster.isGuard) saveRequire(depth === 50 && def.name === 'Skeleton' && monster.id >= 1000,'guard identity/depth');
++  else saveCount(monster.id,0,39);
++  return {...def,maxHp:Math.round(def.hp*(1+(depth-1)*0.2)),
++    atk:Math.round(def.atk*(1+(depth-1)*(def.ranged||def.magic?0.1:0.15))),
++    def:def.def+Math.floor((depth-1)/2),xp:Math.round(def.xp*(1+(depth-1)*0.35)),
++    gold:Math.max(2,Math.round(5*(1+(depth-1)*0.35))),id:monster.id,...(monster.isGuard?{isGuard:true}:{})};
++}
++
++function saveMonster(monster, depth, map, current) {
++  saveFields(monster,['name','sprite','x','y','hp','maxHp','atk','def','xp','gold','id'].concat(current?['nextAttackAt']:[]),SAVE_MONSTER_FIELDS);
++  savePoint(monster,map); saveCount(monster.id); saveNumber(monster.hp,-Number.MAX_SAFE_INTEGER,monster.maxHp,true);
++  if (current) saveNumber(monster.nextAttackAt);
++  else saveRequire(monster.hp === monster.maxHp && !('nextAttackAt' in monster) && !('isGuard' in monster),'template mutable state');
++  const expected = saveMonsterDefinition(monster,depth);
++  for (const key of SAVE_MONSTER_FIELDS) {
++    if (['x','y','hp','nextAttackAt'].includes(key)) continue;
++    saveRequire(monster[key] === expected[key],`monster definition: ${key}`);
++  }
++}
++
++function saveFloorData(floor, depth) {
++  saveFields(floor,FLOOR_FIELDS.concat('descentRewarded'));
++  saveMap(floor.map); saveVisited(floor.visited); saveBoolean(floor.descentRewarded); saveBoolean(floor.bossDefeated);
++  saveRequire(floor.biome === biomeForDepth(depth),'floor biome/depth'); saveNumber(floor.hazardTime);
++  saveList(floor.rooms,32,1);
++  for (const room of floor.rooms) {
++    saveFields(room,['x','y','w','h','cx','cy'],['isArena','isThroneRoom']); savePoint(room);
++    saveCount(room.w,1,W-room.x); saveCount(room.h,1,H-room.y);
++    saveRequire(room.cx === room.x+(room.w>>1) && room.cy === room.y+(room.h>>1),'room center');
++    for (const key of ['isArena','isThroneRoom']) if (key in room) saveBoolean(room[key]);
++    if (room.isThroneRoom) saveRequire(depth === 50 && room.isArena,'throne room role');
++  }
++  const bossFloor = !!(BOSSES[depth] || THEMED_FLOORS[depth]);
++  saveRequire(floor.rooms.filter(r=>r.isArena).length === (bossFloor?1:0),'arena/depth');
++  saveList(floor.monsterSpawns,41); saveUniqueIds(floor.monsterSpawns);
++  for (const monster of floor.monsterSpawns) saveMonster(monster,depth,floor.map,false);
++  saveRequire(floor.monsterSpawns.filter(m=>m.isBoss).length === (bossFloor?1:0),'boss template/depth');
++  if (!bossFloor) saveRequire(!floor.bossDefeated,'defeat on non-boss floor');
++  saveTile(floor.stairs,floor.map); saveTile(floor.upstairs,floor.map);
++  saveList(floor.potions,4+Math.floor(depth/3));
++  for (const potion of floor.potions) { saveFields(potion,['x','y','heal']); savePoint(potion,floor.map); saveNumber(potion.heal,0.25,0.6); saveRequire(potion.heal<0.6,'potion fraction'); }
++  saveList(floor.treasures,4+Math.floor(depth/4)); saveUniqueIds(floor.treasures);
++  for (const item of floor.treasures) { saveItem(item,floor.map); saveRequire('x' in item && 'id' in item,'world item placement'); }
++  const merchantFloor = !bossFloor && depth%2 === 0;
++  saveRequire((floor.merchant !== null) === merchantFloor && (floor.prisoner !== null) === merchantFloor,'NPC/depth');
++  if (floor.merchant) saveMerchant(floor.merchant,floor.map);
++  if (floor.prisoner) { saveFields(floor.prisoner,['x','y','rescued','isPrisoner']); savePoint(floor.prisoner,floor.map); saveBoolean(floor.prisoner.rescued); saveRequire(floor.prisoner.isPrisoner === true,'prisoner role'); }
++  saveRequire((floor.princess !== null) === (depth === FINAL_DEPTH),'princess/depth');
++  if (floor.princess) { saveFields(floor.princess,['x','y','rescued','isPrincess']); savePoint(floor.princess,floor.map); saveRequire(floor.princess.isPrincess === true && floor.princess.rescued === false,'living princess state'); }
++  if (depth === FINAL_DEPTH) saveRequire(floor.floorKey === null,'final floor key');
++  else {
++    const key = floor.floorKey; saveFields(key,['carrierId','dropped','collected','drop']);
++    saveCount(key.carrierId); saveBoolean(key.dropped); saveBoolean(key.collected);
++    saveRequire(floor.monsterSpawns.some(m=>m.id===key.carrierId && !m.isBoss),'key carrier template');
++    saveRequire(key.collected ? key.dropped && key.drop === null : key.dropped === (key.drop !== null),'key drop/collection');
++    if (key.drop !== null) saveTile(key.drop,floor.map);
++  }
++  saveList(floor.obstacles,14+Math.floor(depth/2));
++  const blocked = new Set();
++  for (const obstacle of floor.obstacles) {
++    saveFields(obstacle,['x','y','type']); savePoint(obstacle); saveEnum(obstacle.type,['pillar','rubble']);
++    const key = `${obstacle.x},${obstacle.y}`;
++    saveRequire(floor.map[obstacle.y][obstacle.x] === 2 && !blocked.has(key),'obstacle/map'); blocked.add(key);
++  }
++  saveRequire(floor.map.reduce((n,row)=>n+row.filter(v=>v===2).length,0) === blocked.size,'unrecorded obstacle');
++  saveList(floor.props,76);
++  for (const prop of floor.props) { saveFields(prop,['x','y','sprite']); savePoint(prop,floor.map); saveEnum(prop.sprite,[BIOMES[floor.biome].prop,...(depth===50?['throne','torch','banner','tombstone']:[])]); }
++  saveList(floor.hazards,24+depth);
++  const hazardTiles = new Set();
++  for (const hazard of floor.hazards) {
++    saveFields(hazard,['x','y','type','revealed','triggered','stage','offset','nextDamageAt','impactAt']);
++    savePoint(hazard,floor.map); saveEnum(hazard.type,['spikes','flame','rocks']); saveEnum(hazard.stage,['idle','warning','spent']);
++    saveBoolean(hazard.revealed); saveBoolean(hazard.triggered); saveNumber(hazard.offset,0,6); saveRequire(hazard.offset<6,'hazard offset');
++    saveNumber(hazard.nextDamageAt);
++    const key = `${hazard.x},${hazard.y}`; saveRequire(!hazardTiles.has(key),'duplicate hazard'); hazardTiles.add(key);
++    if (hazard.type === 'rocks') {
++      saveRequire(hazard.revealed && hazard.triggered === (hazard.stage !== 'idle'),'rock state');
++      if (hazard.triggered) saveNumber(hazard.impactAt); else saveRequire(hazard.impactAt === null,'idle rock impact');
++    } else {
++      saveRequire(hazard.stage === 'idle' && hazard.impactAt === null,'hazard stage/impact');
++      if (hazard.type === 'spikes') saveRequire(hazard.revealed === hazard.triggered && hazard.nextDamageAt === 0,'spike secrecy/state');
++      else saveRequire(hazard.revealed && !hazard.triggered,'flame state');
++    }
++  }
++}
++
++function saveTownData(town) {
++  saveFields(town,['map','visited','props','npcs','animals','spawn','store','landmarks','tick','quoteIndex','nextTalkAt']);
++  saveMap(town.map); saveVisited(town.visited); saveTile(town.spawn,town.map);
++  saveCount(town.tick); saveCount(town.quoteIndex); saveNumber(town.nextTalkAt); saveMerchant(town.store,town.map,true);
++  saveList(town.props,104,104);
++  let boards = 0;
++  for (const prop of town.props) {
++    saveFields(prop,['x','y'],['isCompanionBoard','sprite','scale']);
++    if (prop.isCompanionBoard) { saveFields(prop,['x','y','isCompanionBoard']); savePoint(prop,town.map); saveRequire(prop.isCompanionBoard===true,'board role'); boards++; }
++    else { saveFields(prop,['x','y','sprite','scale']); savePoint(prop); saveEnum(prop.sprite,['water','bridge','tree','inn','store','hut','doorstep','townGate']); saveRequire(prop.scale === {water:1.6,bridge:2,tree:2,inn:3,store:3,hut:2,doorstep:1,townGate:2}[prop.sprite],'town prop scale/role'); }
++  }
++  saveRequire(boards === 1,'town board count');
++  saveFields(town.landmarks,['inn','gate','companionBoardIndex']);
++  for (const [key,sprite] of [['inn','inn'],['gate','townGate']]) {
++    const mark = town.landmarks[key]; saveFields(mark,['x','y','sprite']); savePoint(mark,town.map); saveRequire(mark.sprite===sprite,'landmark role');
++  }
++  saveCount(town.landmarks.companionBoardIndex,0,town.props.length-1);
++  saveRequire(town.props[town.landmarks.companionBoardIndex].isCompanionBoard === true,'board reference');
++  const roles = {Mira:['villager',5],Bran:['villager',7],Eda:['villager',6],Tobin:['villager',8],
++    Mochi:['cat',3],Pip:['dog',4],Hen:['chicken',2],Cluck:['chicken',3],Dot:['chicken',4],Marmalade:['catCompanion']};
++  for (const [field,names] of [['npcs',['Mira','Bran','Eda','Tobin']],['animals',['Mochi','Pip','Hen','Cluck','Dot','Marmalade']]]) {
++    saveList(town[field],names.length,names.length); const seen = new Set();
++    for (const actor of town[field]) {
++      saveFields(actor,['name','sprite','x','y'],['pathIndex','step','path','hidden','scale','isEntranceCat']);
++      saveEnum(actor.name,names); saveRequire(!seen.has(actor.name),'duplicate town actor'); seen.add(actor.name);
++      savePoint(actor,town.map); const [sprite,step] = roles[actor.name]; saveRequire(actor.sprite===sprite,'town actor role');
++      if (actor.name === 'Marmalade') { saveFields(actor,['name','sprite','x','y','scale','isEntranceCat'],['hidden']); saveRequire(actor.scale===CAT_COMPANION_SCALE && actor.isEntranceCat===true,'gate cat role'); }
++      else {
++        saveFields(actor,['name','sprite','x','y','step','pathIndex','path'],actor.name==='Pip'?['hidden']:[]);
++        saveRequire(actor.step===step,'patrol cadence'); saveList(actor.path,3,1); saveCount(actor.pathIndex,0,actor.path.length-1);
++        for (const tile of actor.path) saveTile(tile,town.map);
++      }
++      if ('hidden' in actor) saveBoolean(actor.hidden);
++    }
++  }
++}
++
++function saveRunData(run) {
++  saveFields(run,SAVE_RUN_FIELDS.concat(['floors','town','encounter']));
++  saveCount(run.depth,1,FINAL_DEPTH); saveEnum(run.area,['town','dungeon']);
++  for (const key of ['kills','turn','townScrolls','gold','companionQuoteIndex','monsterQuoteIndex']) saveCount(run[key]);
++  for (const key of ['combatElapsed','healElapsed','activeTime','manaRegenAt','retreatReadyAt','companionSpeechReadyAt','companionAttackAt','monsterSpeechReadyAt']) saveNumber(run[key]);
++  for (const key of ['warnedLow','warnedCritical','companionEntryDone','townPortalOpen']) saveBoolean(run[key]);
++  saveFields(run.floors,[],Array.from({length:FINAL_DEPTH},(_,i)=>String(i+1)));
++  const depths = Object.keys(run.floors); saveRequire(depths.length>=1 && depths.length<=FINAL_DEPTH,'floor count');
++  for (const key of depths) { saveRequire(/^[1-9][0-9]*$/.test(key),'floor depth key'); saveCount(Number(key),1,FINAL_DEPTH); saveFloorData(run.floors[key],Number(key)); }
++  saveRequire(!!run.floors[run.depth] && !!run.floors[1],'missing current/initial floor');
++  saveTownData(run.town);
++  const map = run.area === 'town' ? run.town.map : run.floors[run.depth].map, p = run.player;
++  saveFields(p,['x','y','hp','maxHp','mp','maxMp','str','dex','def','lvl','xp','xpNext','spells']); savePoint(p,map);
++  saveCount(p.maxHp,1); saveCount(p.hp,1,p.maxHp); saveCount(p.maxMp); saveCount(p.mp,0,p.maxMp);
++  for (const key of ['str','dex','def']) saveCount(p[key]);
++  saveCount(p.lvl,1,MAX_LEVEL);
++  let threshold = 40; for (let level=1;level<p.lvl;level++) threshold=Math.round(threshold*1.5);
++  if (p.lvl === MAX_LEVEL) threshold=1;
++  saveRequire(p.xpNext === threshold,'XP threshold/level');
++  saveNumber(p.xp,0,p.lvl===MAX_LEVEL?0:threshold,true); saveRequire(p.lvl===MAX_LEVEL || p.xp<threshold,'unapplied XP level');
++  saveFields(p.spells,['fireball','heal'],Object.keys(SPELLS));
++  for (const key of Object.keys(p.spells)) saveBoolean(p.spells[key]);
++  saveRequire(p.spells.fireball && p.spells.heal,'starter spells');
++  saveFields(run.spellReadyAt,Object.keys(SPELLS)); for (const value of Object.values(run.spellReadyAt)) saveNumber(value);
++  saveFields(run.equipment,['weapon','armor','ring']);
++  for (const slot of ['weapon','armor','ring']) if (run.equipment[slot] !== null) { saveItem(run.equipment[slot]); saveRequire(run.equipment[slot].kind===slot,'equipment slot'); }
++  saveList(run.inventory,65536);
++  for (const item of run.inventory) { saveFields(item,['name','kind','heal']); saveRequire(item.name==='Potion' && item.kind==='heal','inventory role'); saveNumber(item.heal,0.25,0.6); saveRequire(item.heal<0.6,'inventory heal'); }
++  saveList(run.messages,80); for (const line of run.messages) saveText(line,512);
++  saveEnum(run.selectedCompanion,Object.keys(COMPANIONS)); saveEnum(run.companionChoice,['marmalade','pip']);
++  saveList(run.unlockedCompanions,11,2); saveRequire(new Set(run.unlockedCompanions).size===run.unlockedCompanions.length,'duplicate companion unlock');
++  for (const id of run.unlockedCompanions) saveEnum(id,Object.keys(COMPANIONS));
++  saveRequire(['marmalade','pip',run.selectedCompanion].every(id=>run.unlockedCompanions.includes(id)),'selected/starter unlock');
++  saveFields(run.entranceCat,['recruited','entered','retired']); for (const value of Object.values(run.entranceCat)) saveBoolean(value);
++  saveRequire(run.entranceCat.entered===run.companionEntryDone && (!run.entranceCat.retired || run.entranceCat.recruited),'cat entry/retirement');
++  if (run.companion !== null) {
++    saveFields(run.companion,['id','x','y']); savePoint(run.companion,map);
++    saveRequire(run.companion.id===run.selectedCompanion,'active companion selection');
++    if (run.companion.id==='marmalade') saveRequire(run.entranceCat.recruited,'cat recruitment');
++  }
++  for (const actor of run.town.animals) if (actor.name==='Pip' || actor.name==='Marmalade') {
++    const active = !!run.companion && run.companion.id === (actor.name==='Pip'?'pip':'marmalade');
++    saveRequire(!!actor.hidden===active,'duplicate starter visibility');
++  }
++  if (run.townExit !== null) {
++    saveFields(run.townExit,['depth','x','y','reason']); saveCount(run.townExit.depth,1,FINAL_DEPTH); savePoint(run.townExit);
++    saveEnum(run.townExit.reason,['scroll','retreat','cheat']); saveRequire(!!run.floors[run.townExit.depth],'return floor absent');
++    saveRequire(run.townPortalOpen ? run.townExit.reason!=='retreat' : run.townExit.reason==='retreat','portal reason/open state');
++  } else saveRequire(!run.townPortalOpen,'portal missing return point');
++  if (run.area === 'town') saveRequire(run.encounter===null,'town encounter');
++  else {
++    const encounter=run.encounter, floor=run.floors[run.depth];
++    saveFields(encounter,['monsters','bossId','bossIntroSeen','bossSummonAt']);
++    saveBoolean(encounter.bossIntroSeen); saveNumber(encounter.bossSummonAt);
++    saveList(encounter.monsters,65536); saveUniqueIds(encounter.monsters);
++    for (const monster of encounter.monsters) {
++      saveMonster(monster,run.depth,map,true);
++      if (!monster.isGuard) saveRequire(floor.monsterSpawns.some(m=>m.id===monster.id && m.name===monster.name),'encounter/template link');
++      if (floor.bossDefeated && (monster.isBoss || monster.isGuard)) saveRequire(monster.hp<=0,'defeated boss/guard alive');
++    }
++    const bosses=encounter.monsters.filter(m=>m.isBoss); saveRequire(bosses.length<=1,'multiple current bosses');
++    saveRequire(encounter.bossId === (bosses.length ? bosses[0].id : null),'boss link');
++    if ((BOSSES[run.depth] || THEMED_FLOORS[run.depth]) && !floor.bossDefeated) saveRequire(bosses.length===1 && bosses[0].hp>0,'missing living boss');
++  }
++}
++
++function validateSaveData(value) {
++  saveStructure(value);
++  const text=JSON.stringify(value); saveTextBudget(text);
++  const data=JSON.parse(text); // Detached JSON data, never a hydrated runtime or untrusted merge.
++  saveFields(data,['format','formatVersion','gameVersion','createdAt','run']);
++  saveRequire(data.format===SAVE_FORMAT,'format'); saveRequire(data.formatVersion===SAVE_FORMAT_VERSION,'unsupported format version');
++  saveText(data.gameVersion,128); saveRequire(/^[0-9]+\.[0-9]+\.[0-9]+(?:[-+][a-zA-Z0-9.-]+)?$/.test(data.gameVersion),'game version metadata');
++  saveText(data.createdAt,64); saveRequire(/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z$/.test(data.createdAt)
++    && Number.isFinite(Date.parse(data.createdAt)) && new Date(data.createdAt).toISOString()===data.createdAt,'createdAt metadata');
++  saveRunData(data.run);
++  return data;
++}
++
++function parseSaveData(text) {
++  saveTextBudget(text);
++  let data;
++  try { data=JSON.parse(text); } catch (error) { throw new Error('Invalid save: malformed JSON'); }
++  return validateSaveData(data);
++}
++
++function savePick(source, fields) {
++  saveRequire(source !== null && typeof source === 'object','missing source record');
++  const copy={}; for (const key of fields) if (source[key] !== undefined) copy[key]=source[key];
++  return copy;
++}
++
++function saveCaptureVisited(visited) {
++  saveRequire(visited instanceof Set && visited.size<=W*H,'source exploration Set'); return [...visited];
++}
++
++function captureSaveData(source, context) {
++  saveFields(context,['createdAt','hidden','tradeOpen','companionOpen']);
++  for (const key of ['hidden','tradeOpen','companionOpen']) saveBoolean(context[key]);
++  saveRequire(source && source.started && !source.gameOver && !source.won && source.player.hp>0
++    && !source.godMode && !source.consoleOpen && !source.pause && !source.trade && !source.companionPicker
++    && !source.ending && !(source.bossIntro && !source.bossIntro.completed) && !(source.bossDefeat && !source.bossDefeat.completed)
++    && !context.hidden && !context.tradeOpen && !context.companionOpen,'snapshot context is not stable living play');
++  const run=savePick(source,SAVE_RUN_FIELDS);
++  run.companion=source.companion === null ? null : savePick(source.companion,['id','x','y']);
++  run.floors={};
++  saveRequire(source.floors && Object.keys(source.floors).length<=FINAL_DEPTH,'source floor count');
++  for (const depth of Object.keys(source.floors)) {
++    saveRequire(/^[1-9][0-9]*$/.test(depth) && Number(depth)<=FINAL_DEPTH,'source floor depth');
++    const cached=source.floors[depth], active=source.area==='dungeon' && Number(depth)===source.depth;
++    const floor=savePick(active?source:cached,FLOOR_FIELDS);
++    floor.descentRewarded=cached.descentRewarded;
++    floor.visited=saveCaptureVisited(floor.visited);
++    saveList(floor.monsterSpawns,41);
++    floor.monsterSpawns=floor.monsterSpawns.map(m=>savePick(m,SAVE_MONSTER_FIELDS));
++    run.floors[depth]=floor;
++  }
++  const town=source.town, active=source.area==='town';
++  run.town=savePick(town,['map','visited','props','npcs','animals','spawn','store','tick','quoteIndex','nextTalkAt']);
++  if (active) { run.town.map=source.map; run.town.visited=source.visited; run.town.props=source.props; run.town.store=source.merchant; }
++  run.town.visited=saveCaptureVisited(run.town.visited);
++  saveList(run.town.props,104);
++  run.town.landmarks={inn:town.landmarks.inn,gate:town.landmarks.gate,
++    companionBoardIndex:run.town.props.indexOf(town.landmarks.companionBoard)};
++  run.encounter=null;
++  if (source.area==='dungeon') {
++    saveList(source.monsters,65536);
++    run.encounter={monsters:source.monsters.map(m=>savePick(m,SAVE_MONSTER_FIELDS)),
++      bossId:source.boss?source.boss.id:null,bossIntroSeen:source.bossIntroSeen,bossSummonAt:source.bossSummonAt};
++  }
++  return validateSaveData({format:SAVE_FORMAT,formatVersion:SAVE_FORMAT_VERSION,gameVersion:GAME_VERSION,createdAt:context.createdAt,run});
++}
++
++function serializeSaveData(source, context) { return JSON.stringify(captureSaveData(source,context)); }
++
+ let state;
+ 
+ function newGame() {

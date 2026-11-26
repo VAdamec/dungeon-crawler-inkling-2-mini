@@ -1,0 +1,33 @@
+✔ retreat confirms/cancels, returns to town with full HP, and preserves progression and loot (698.732375ms)
+✔ depth 1 retreat returns to town and lethal damage wins over health pause (408.171833ms)
+✔ retreat closes an open portal and blocked return points resolve safely (341.507292ms)
+✔ retreat cooldown counts only active time, pauses in town, and cancellation does not consume it (1052.245959ms)
+✔ help on launch does not start play and preserves health or retreat dialogs underneath (570.876875ms)
+✔ Town Scroll can be bought, found, and counted without mixing with potions (244.619042ms)
+✔ J opens a one-shot Town Scroll portal and returns to the exact dungeon tile (343.145667ms)
+✔ Town Scroll return reuses the saved floor instead of regenerating it (359.821583ms)
+✔ Town Scroll return resolves blocked exit tiles safely (312.963083ms)
+✔ Town Scroll portal survives dungeon travel but clears on retreat, death, ending, and restart (470.224708ms)
+✔ help and HUD describe Town Scroll availability and portal state (242.729959ms)
+✔ teleportTown creates a debug portal without consuming scrolls and returns through it (311.1695ms)
+✔ teleportTown rejects when portal open, in town, or blocked states (352.998833ms)
+✔ T1 debug portal rejects extra arguments atomically and accepts case-insensitive zero-argument commands (295.557708ms)
+✔ T1 debug portal rejects hidden, dead, paused, cinematic and player-menu contexts without changing gameplay (2767.038875ms)
+✔ T1 debug travel saves the current floor without healing, RNG, rewards or resource changes (309.018458ms)
+✔ T1 debug portal cannot replace a return point after loadLevel or repeated town commands (361.020334ms)
+✔ T1 J and Space return through the saved debug portal once without regenerating its floor (631.564584ms)
+✔ T1 debug portal uses the existing safe fallback when its return tile becomes blocked (294.137125ms)
+✔ addScrolls validates input and updates HUD (241.834958ms)
+✔ T2 addScrolls rejects non-decimal text and wrong arity without changing gameplay (205.462625ms)
+✔ T2 addScrolls rejects unsafe totals without losing the exact safe-integer boundary (287.572334ms)
+✔ T2 addScrolls rejects inactive, hidden, dead, paused, cinematic and player-menu contexts (2433.476583ms)
+✔ T2 addScrolls changes only the count in town or dungeon, including with an existing portal and god mode (524.190334ms)
+✔ console help lists teleportTown and addScrolls (201.771667ms)
+ℹ tests 25
+ℹ suites 0
+ℹ pass 25
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 14407.500375

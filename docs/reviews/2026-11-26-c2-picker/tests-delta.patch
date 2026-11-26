@@ -1,0 +1,214 @@
+--- before/tests/game.test.cjs
++++ after/tests/game.test.cjs
+@@ -48,7 +48,7 @@
+   });
+ }
+ 
+-function game(seed = 42, start = true, area = 'dungeon') {
++function game(seed = 42, start = true, area = 'dungeon', withDom = false) {
+   const listeners = {};
+   const elements = {};
+   const calls = makeRecorder();
+@@ -82,13 +82,51 @@
+   const minimapCtx = new Proxy(minimapCtxBase, {
+     set: (t, name, value) => { t[name] = value; recordCall(minimapCalls, 'set', [name, value]); return true; },
+   });
++  let fixtureDocument;
++  const nodes=[];
++  function enhance(el,tag='DIV') {
++    el.tagName=tag;el.children=[];el.dataset={};el.attributes={};el.isConnected=true;
++    el.classList={toggle:noop};el.appendChild=child=>{el.children.push(child);child.parentElement=el;return child;};
++    el.contains=node=>{for(let n=node;n;n=n.parentElement)if(n===el)return true;return false;};
++    el.setAttribute=(name,value)=>{el.attributes[name]=String(value);};el.getAttribute=name=>el.attributes[name]??null;
++    Object.defineProperty(el,'innerHTML',{get:()=>'',set:()=>{for(const child of el.children)child.isConnected=false;el.children=[];}});
++    const matches=(node,selector)=>selector.split(',').some(part=>{
++      part=part.trim();if(part==='button')return node.tagName==='BUTTON';
++      if(part==='[inert]')return !!node.inert;if(part==='[hidden]')return !!node.hidden;
++      if(part.startsWith('[data-companion-')){
++        const field=part.includes('choice')?'companionChoice':'companionId',value=part.match(/="([^"\]]+)"/);
++        return node.dataset[field]!==undefined&&(!value||node.dataset[field]===value[1]);
++      }return false;
++    });
++    el.querySelectorAll=selector=>{const found=[];function visit(node){for(const child of node.children){if(matches(child,selector))found.push(child);visit(child);}}visit(el);return found;};
++    el.closest=selector=>{for(let n=el;n;n=n.parentElement)if(matches(n,selector))return n;return null;};
++    el.focus=()=>{if(!el.disabled&&!el.closest('[hidden], [inert]'))fixtureDocument.activeElement=el;};
++    nodes.push(el);return el;
++  }
+   function element(id) {
+-    return elements[id] ||= { style: {}, hidden: ['tradeOverlay', 'companionOverlay'].includes(id), disabled: false,
++    const el=elements[id] ||= { style: {}, hidden: ['tradeOverlay', 'companionOverlay'].includes(id), disabled: false,
+       textContent: '', value: '', ariaPressed: '', addEventListener: (name, fn) => { listeners[`${id}:${name}`] = fn; },
+       getContext: () => id === 'minimap' ? minimapCtx : ctx, focus: noop };
++    if(withDom&&!el.children)enhance(el,id==='consoleInput'?'INPUT':/startGame|closeCompanionBoard|companionPostAction|companionAudioToggle/.test(id)?'BUTTON':'DIV');
++    return el;
++  }
++  fixtureDocument={getElementById:element,addEventListener:(name,fn)=>{listeners[name]=fn;}};
++  if(withDom){
++    fixtureDocument.createElement=tag=>{const node=enhance({style:{},hidden:false,disabled:false,textContent:'',value:''},tag.toUpperCase());if(tag==='canvas')node.getContext=()=>ctx;return node;};
++    for(const id of ['marmalade','pip']){const btn=enhance({style:{},hidden:false,disabled:false,textContent:'',value:'',addEventListener:(name,fn)=>{listeners[`choice_${id}:${name}`]=fn;}},'BUTTON');
++      btn.dataset.companionChoice=id;element('launchScreen').appendChild(btn);}
++    fixtureDocument.querySelectorAll=selector=>{
++      if(selector.startsWith('[data-companion-choice'))return element('launchScreen').querySelectorAll(selector);
++      return [];
++    };
++    fixtureDocument.querySelector=selector=>fixtureDocument.querySelectorAll(selector)[0]||null;
++    element('gameLayout').appendChild(element('game'));
++    element('gameLayout').appendChild(element('companionPostAction'));
++    const overlay=element('companionOverlay');
++    for(const id of ['closeCompanionBoard','companionBoardList','companionAudioToggle'])overlay.appendChild(element(id));
+   }
+   const sandbox = vm.createContext({
+-    document: { getElementById: element, addEventListener: (name, fn) => { listeners[name] = fn; } },
++    document: fixtureDocument,
+     window: {}, Date, setInterval: noop, console,
+     Math: Object.assign(Object.create(Math), { random: () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 2 ** 32) }),
+   });
+@@ -100,7 +138,7 @@
+   return {
+     run: code => vm.runInContext(code, sandbox),
+     json: code => JSON.parse(vm.runInContext(`JSON.stringify(${code})`, sandbox)),
+-    key: (key, extra = {}) => listeners.keydown({ key, preventDefault: noop, ...extra }),
++    key: (key, extra = {}) => listeners.keydown({ key, target:withDom?fixtureDocument.activeElement:undefined, preventDefault: noop, ...extra }),
+     click: id => listeners[`${id}:click`](),
+     visibility: () => listeners.visibilitychange(), elements, calls, minimapCalls,
+   };
+@@ -2746,8 +2784,8 @@
+ });
+ 
+ test('C1 Marmalade may be reselected after retirement without repeating its once-only remark', () => {
+-  const g=game();
+-  g.run('enterFloor(5,false,true);damageMonster(state.boss,state.boss.hp);enterTown();selectCompanion("marmalade")');
++  const g=game(42,true,'dungeon',true);
++  g.run('enterFloor(5,false,true);damageMonster(state.boss,state.boss.hp);enterTown();state.player.x=state.town.landmarks.companionBoard.x;state.player.y=state.town.landmarks.companionBoard.y;openCompanionBoard();selectCompanion("marmalade",state.companionPicker)');
+   assert.equal(g.run('state.companion.id'),'marmalade');
+   assert.equal(g.run('state.entranceCat.retired'),true);
+   g.run('enterFloor(7,false,true);damageMonster(state.boss,state.boss.hp)');
+@@ -2771,6 +2809,128 @@
+   assert.equal(g.run('state.monsters[2].hp'),9);
+   g.run('state.activeTime=23;companionTick()');
+   assert.equal(g.run('state.monsters[2].hp'),8);
++});
++
++function c2AtPost(g) {
++  g.run(`{const c2Post=state.town.landmarks.companionBoard;state.player.x=c2Post.x;state.player.y=c2Post.y;
++    updateCamera();render();document.getElementById('companionPostAction').focus();}`);
++}
++
++test('C2 launch arrows select and focus without starting; Enter or Space explicitly starts with that card', () => {
++  for(const key of ['Enter',' ']){
++    const g=game(42,false,'town',true);
++    g.key('ArrowRight');assert.equal(g.run('state.started'),false);
++    assert.equal(g.run('state.companionChoice'),'pip');
++    assert.equal(g.run('document.activeElement.dataset.companionChoice'),'pip');
++    g.key('ArrowLeft');assert.equal(g.run('state.companionChoice'),'marmalade');
++    g.key('End');assert.equal(g.run('state.companionChoice'),'pip');
++    g.key('Tab');assert.equal(g.run('state.started'),false);
++    g.key(key);assert.equal(g.run('state.started'),true);
++    assert.equal(g.run('state.selectedCompanion'),'pip');
++  }
++  const g=game(42,false,'town',true);g.click('choice_pip');
++  assert.equal(g.run('state.started'),false);assert.equal(g.run('state.companionChoice'),'pip');
++  g.click('startGame');assert.equal(g.run('state.selectedCompanion'),'pip');
++});
++
++test('C2 post is reachable, clear of landmarks and actor paths, and drawn without missing artwork', () => {
++  for(const seed of [1,42,713]){
++    const g=game(seed,true,'town');
++    assert.equal(g.run(`(()=>{const b=state.town.landmarks.companionBoard;
++      return !!b&&state.map[b.y][b.x]===0&&floorDistances(state.map,state.town.spawn).has(b.x+','+b.y)
++      &&![state.inn,state.merchant,state.townGate,state.town.spawn].some(p=>nearbyTile(b.x,b.y,p))
++      &&![...state.town.npcs,...state.town.animals].some(a=>[a,...(a.path||[])].some(p=>p.x===b.x&&p.y===b.y))
++      &&state.props.filter(p=>p.isCompanionBoard).length===1&&!b.sprite;})()`),true);
++    g.run('state.player.x=state.town.landmarks.companionBoard.x;state.player.y=state.town.landmarks.companionBoard.y;updateCamera();clearMovementAnimation()');
++    g.calls.clear();g.run('drawCompanionPost(state.town.landmarks.companionBoard)');
++    assert.ok(g.calls.filter(c=>c[0]==='fillRect').length>=10);
++  }
++});
++
++test('C2 Space recruits either selected starter and never swaps to the other town animal', () => {
++  for(const id of ['pip','marmalade']){
++    const g=game(42,true,'town');
++    g.run(`setCompanionChoice('${id}');const c2Starter=selectedCompanionActor();state.player.x=c2Starter.x;state.player.y=c2Starter.y`);
++    g.key(' ');assert.equal(g.run('state.companion.id'),id);
++    g.run('window.c2Starter=state.companion;enterDungeonFromTown()');
++    assert.equal(g.run('state.companion===window.c2Starter'),true);
++    assert.equal(g.run("!!entranceCatActor().hidden"),id==='marmalade');
++    assert.equal(g.run("!!state.town.animals.find(a=>a.name==='Pip').hidden"),id==='pip');
++  }
++  const g=game(42,true,'town');g.run("setCompanionChoice('marmalade');const c2Other=state.town.animals.find(a=>a.name==='Pip');state.player.x=c2Other.x;state.player.y=c2Other.y");
++  g.key(' ');assert.equal(g.run('state.selectedCompanion'),'marmalade');assert.equal(g.run('state.companion'),null);
++});
++
++test('C2 picker traps focus, preserves cancel and same-choice state, and labels locked companions', () => {
++  const g=game(42,true,'town',true);g.run('joinSelectedCompanion(false)');c2AtPost(g);
++  const before=debugPortalSnapshot(g);g.click('companionPostAction');
++  assert.equal(g.run('!!state.companionPicker'),true);assert.equal(g.elements.gameLayout.inert,true);
++  assert.equal(g.elements.launchScreen.inert,true);assert.equal(g.run('document.activeElement===document.getElementById("closeCompanionBoard")'),true);
++  assert.equal(g.run("document.getElementById('companionOverlay').querySelectorAll('[data-companion-id]').length"),11);
++  assert.equal(g.run("document.getElementById('companionOverlay').querySelectorAll('[data-companion-id]').filter(b=>b.disabled).length"),9);
++  g.key('Tab',{shiftKey:true});assert.equal(g.run('document.activeElement===document.getElementById("companionAudioToggle")'),true);
++  g.key('Tab');assert.equal(g.run('document.activeElement===document.getElementById("closeCompanionBoard")'),true);
++  g.key('ArrowDown');g.key('ArrowDown');assert.equal(g.run('document.activeElement.dataset.companionId'),'pip');
++  assert.deepEqual(debugPortalSnapshot(g),before,'focus is only a preview');
++  g.key('Escape');assert.deepEqual(debugPortalSnapshot(g),before);
++  assert.equal(g.run('state.companionPicker'),null);assert.equal(g.elements.gameLayout.inert,false);
++  assert.equal(g.run('document.activeElement===document.getElementById("companionPostAction")'),true);
++  g.click('companionPostAction');
++  g.run("document.getElementById('companionBoardList').querySelectorAll('[data-companion-id]').find(b=>b.dataset.companionId==='marmalade').onclick()");
++  assert.deepEqual(debugPortalSnapshot(g),before,'keeping the active companion cannot reset attack/speech readiness');
++});
++
++test('C2 confirmed choice applies once; locked, stale, moved and closed-session callbacks cannot select', () => {
++  const g=game(42,true,'town',true);c2AtPost(g);g.click('companionPostAction');
++  g.run("window.c2Old=state.companionPicker;window.c2OldChoose=document.getElementById('companionBoardList').querySelectorAll('[data-companion-id]').find(b=>b.dataset.companionId==='pip').onclick");
++  let before=debugPortalSnapshot(g);
++  assert.equal(g.run("selectCompanion('mimic',state.companionPicker)"),false);
++  assert.deepEqual(debugPortalSnapshot(g),before);
++  g.key('Escape');g.click('companionPostAction');before=debugPortalSnapshot(g);
++  g.run('window.c2OldChoose();closeCompanionBoard(window.c2Old)');assert.deepEqual(debugPortalSnapshot(g),before);
++  assert.equal(g.run('!!state.companionPicker'),true);
++  g.run('state.player.x+=5');before=debugPortalSnapshot(g);
++  assert.equal(g.run("selectCompanion('pip',state.companionPicker)"),false);
++  assert.deepEqual(debugPortalSnapshot(g),before);g.key('Escape');c2AtPost(g);g.click('companionPostAction');
++  g.run("window.c2Choose=document.getElementById('companionBoardList').querySelectorAll('[data-companion-id]').find(b=>b.dataset.companionId==='pip').onclick;window.c2Choose()");
++  assert.equal(g.run('state.companion.id'),'pip');assert.equal(g.run('state.companionPicker'),null);
++  before=debugPortalSnapshot(g);g.run('window.c2Choose();window.c2OldChoose()');assert.deepEqual(debugPortalSnapshot(g),before);
++});
++
++test('C2 picker rejects launch, dungeon, distance, hidden and conflicting overlays', () => {
++  const cases=['state.started=false',"state.area='dungeon'",'state.player.x+=5','state.gameOver=true','state.player.hp=0',
++    'document.hidden=true','state.helpOpen=true','state.consoleOpen=true','state.trade={}',
++    'state.pause={kind:"health"}','state.pause={kind:"retreat"}','state.ending={completed:false}',
++    'state.bossIntro={completed:false}','state.bossDefeat={completed:false}'];
++  for(const setup of cases){const g=game(42,true,'town',true);c2AtPost(g);g.run(setup);
++    const before=debugPortalSnapshot(g);assert.equal(g.run('openCompanionBoard()'),false,setup);
++    assert.deepEqual(debugPortalSnapshot(g),before,setup);assert.equal(g.run('state.companionPicker'),null);}
++});
++
++test('C2 picker freezes actions and town motion, blocks nested overlays and supports M and R', () => {
++  const g=game(42,true,'town',true);enableMotion(g);c2AtPost(g);g.click('companionPostAction');
++  const before=debugPortalSnapshot(g),town=g.json('[state.town.tick,state.town.npcs,state.town.animals,state.motion.time]');
++  g.key('?');g.key('`');g.key('ArrowRight');g.key('f');g.key('j');
++  g.run('openHelp();openConsole();openTrade();townTick();enemyTick();advanceMotion(50);advanceActiveTime(50);movePlayer(1,0);pickup();useTownScroll();castSpell("heal");restAtInn()');
++  assert.deepEqual(debugPortalSnapshot(g),before);
++  assert.deepEqual(g.json('[state.town.tick,state.town.npcs,state.town.animals,state.motion.time]'),town);
++  assert.deepEqual(g.json('[state.helpOpen,state.consoleOpen]'),[false,false]);
++  const enabled=g.run('state.audio.enabled');g.key('m');assert.equal(g.run('state.audio.enabled'),!enabled);
++  assert.equal(g.run('!!state.companionPicker'),true);
++  g.key('r');assert.equal(g.run('state.companionPicker'),null);assert.equal(g.elements.companionOverlay.hidden,true);
++  assert.equal(g.elements.launchScreen.hidden,true);assert.equal(g.elements.gameLayout.inert,false);
++  assert.equal(g.run('state.audio.enabled'),!enabled);assert.equal(g.run('state.selectedCompanion'),'marmalade');
++});
++
++test('C2 forced travel, loadLevel and death discard a picker before old choices can act', () => {
++  for(const action of ['enterFloor(2,false)','loadLevel("2")','gameOver(false)']){
++    const g=game(42,true,'town',true);c2AtPost(g);g.click('companionPostAction');
++    g.run(`window.c2Stale=state.companionPicker;${action}`);
++    const before=debugPortalSnapshot(g);g.run("selectCompanion('pip',window.c2Stale)");
++    assert.deepEqual(debugPortalSnapshot(g),before,action);
++    assert.equal(g.run('state.companionPicker'),null);assert.equal(g.elements.companionOverlay.hidden,true);
++    assert.equal(g.elements.gameLayout.inert,false);
++  }
+ });
+ 
+ test('a twice-size talking cat waits by the dungeon gate', () => {

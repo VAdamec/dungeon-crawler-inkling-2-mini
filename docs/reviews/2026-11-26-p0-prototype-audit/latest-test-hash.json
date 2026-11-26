@@ -1,0 +1,5 @@
+{
+  "path": "tests/game.test.cjs",
+  "sha256": "e29062934892af3603f1d9767b4c4deef6f23190ed9b323bb6ec9d336c7cc03f",
+  "note": "Second test copy after concurrent Pip assertion correction; runtime hashes remain those of snapshot-hashes.json."
+}

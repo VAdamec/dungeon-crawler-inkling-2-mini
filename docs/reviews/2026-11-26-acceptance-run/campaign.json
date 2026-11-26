@@ -1,0 +1,494 @@
+{
+  "seed": 20261126,
+  "rows": [
+    {
+      "depth": 1,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 2,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 3,
+      "realCarrierDeathAndKeyCollection": true,
+      "boss": "Cook",
+      "onceOnlyBossRewards": true
+    },
+    {
+      "depth": 4,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 5,
+      "realCarrierDeathAndKeyCollection": true,
+      "boss": "Mimic",
+      "onceOnlyBossRewards": true
+    },
+    {
+      "depth": 6,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 7,
+      "realCarrierDeathAndKeyCollection": true,
+      "boss": "Bartender",
+      "onceOnlyBossRewards": true
+    },
+    {
+      "depth": 8,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 9,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 10,
+      "realCarrierDeathAndKeyCollection": true,
+      "boss": "Hydra",
+      "onceOnlyBossRewards": true
+    },
+    {
+      "depth": 11,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 12,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 13,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 14,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 15,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 16,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 17,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 18,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 19,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 20,
+      "realCarrierDeathAndKeyCollection": true,
+      "boss": "Wild Boar",
+      "onceOnlyBossRewards": true
+    },
+    {
+      "depth": 21,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 22,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 23,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 24,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 25,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 26,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 27,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 28,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 29,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 30,
+      "realCarrierDeathAndKeyCollection": true,
+      "boss": "Medusa",
+      "onceOnlyBossRewards": true
+    },
+    {
+      "depth": 31,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 32,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 33,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 34,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 35,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 36,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 37,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 38,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 39,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 40,
+      "realCarrierDeathAndKeyCollection": true,
+      "boss": "Dark Wizard",
+      "onceOnlyBossRewards": true
+    },
+    {
+      "depth": 41,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 42,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 43,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 44,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 45,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 46,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 47,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 48,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 49,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 50,
+      "realCarrierDeathAndKeyCollection": true,
+      "boss": "Skeleton King",
+      "onceOnlyBossRewards": true
+    },
+    {
+      "depth": 51,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 52,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 53,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 54,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 55,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 56,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 57,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 58,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 59,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 60,
+      "realCarrierDeathAndKeyCollection": true,
+      "boss": "Hydra",
+      "onceOnlyBossRewards": true
+    },
+    {
+      "depth": 61,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 62,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 63,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 64,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 65,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 66,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 67,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 68,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 69,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 70,
+      "realCarrierDeathAndKeyCollection": true,
+      "boss": "Wild Boar",
+      "onceOnlyBossRewards": true
+    },
+    {
+      "depth": 71,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 72,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 73,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 74,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 75,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 76,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 77,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 78,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 79,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 80,
+      "realCarrierDeathAndKeyCollection": true,
+      "boss": "Medusa",
+      "onceOnlyBossRewards": true
+    },
+    {
+      "depth": 81,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 82,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 83,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 84,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 85,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 86,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 87,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 88,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 89,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 90,
+      "realCarrierDeathAndKeyCollection": true,
+      "boss": "Dark Wizard",
+      "onceOnlyBossRewards": true
+    },
+    {
+      "depth": 91,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 92,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 93,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 94,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 95,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 96,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 97,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 98,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 99,
+      "realCarrierDeathAndKeyCollection": true
+    },
+    {
+      "depth": 100,
+      "boss": "Dragon",
+      "onceOnlyBossRewards": true
+    }
+  ],
+  "checkpoints": [
+    {
+      "depth": 1,
+      "bytes": 43816,
+      "exact": true,
+      "floors": 1
+    },
+    {
+      "depth": 5,
+      "bytes": 140554,
+      "exact": true,
+      "floors": 5
+    },
+    {
+      "depth": 50,
+      "bytes": 1556367,
+      "exact": true,
+      "floors": 50
+    },
+    {
+      "depth": 100,
+      "bytes": 3607698,
+      "exact": true,
+      "floors": 100
+    }
+  ],
+  "endingScenes": [
+    {
+      "elapsed": 0,
+      "phase": "reveal",
+      "dragonHp": 0
+    },
+    {
+      "elapsed": 2.2,
+      "phase": "heal",
+      "dragonHp": 0
+    },
+    {
+      "elapsed": 4,
+      "phase": "heal",
+      "dragonHp": 589
+    },
+    {
+      "elapsed": 6,
+      "phase": "escape",
+      "dragonHp": 2061
+    },
+    {
+      "elapsed": 9,
+      "phase": "sunset",
+      "dragonHp": 2061
+    },
+    {
+      "elapsed": 14,
+      "phase": "done",
+      "dragonHp": 2061
+    }
+  ],
+  "noDepth101": true,
+  "onceOnlyRescue": true,
+  "restart": true,
+  "elapsedMs": 7251.057292,
+  "nativeGR09": "unverified",
+  "scope": "Staged VM mechanics: teleported positions/direct lethal damage; render/audio disabled. Not a human campaign, balance, visible animation, audible quality or native background test."
+}

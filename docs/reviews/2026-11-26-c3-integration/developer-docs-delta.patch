@@ -1,0 +1,10 @@
+--- before/DOCUMENTATION.md
++++ after/DOCUMENTATION.md
+@@ -87,4 +87,6 @@
+ 
+ `state.companionPicker` is a transient identity-bound session containing town/map/post identity, prior focus and inert flags. Row handlers capture their opening session and call `selectCompanion(id, session)`; a missing, closed, stale, distant or ineligible session cannot select. Open/close reset existing clocks and restore focus/inert state; forced travel/loadLevel/reset/death dismiss before context switches. No picker data enters floor/town saves. `companionPostTile` validates reachability and avoids actors/patrol tiles and other interaction landmarks; `drawCompanionPost` paints directly without a missing sprite or art bake.
+ 
+-[C2 verification and screenshots](docs/reviews/2026-11-26-c2-picker/README.md) covers desktop and touch-emulated mobile interactions. C3's broader integration audit, market cart work and native GR-09 visibility verification remain separate.
++[C2 verification and screenshots](docs/reviews/2026-11-26-c2-picker/README.md) covers desktop and touch-emulated mobile interactions. [C3 integration audit](docs/reviews/2026-11-26-c3-integration/README.md) is complete; market cart work and native GR-09 visibility verification remain separate.
++
++C3 uses `simulationBlocked()` for timed companion/hazard/recovery/mana/active-time and motion paths. `enemyTick` rechecks it immediately after a companion attack, so starting a boss-defeat scene cannot leave surviving monsters an extra action in that tick. Forced travel and health-dialog actions keep their own eligibility rules.

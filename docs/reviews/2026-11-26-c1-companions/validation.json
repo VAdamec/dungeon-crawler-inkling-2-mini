@@ -1,0 +1,22 @@
+{
+  "full": {
+    "pass": 207,
+    "fail": 0
+  },
+  "focused": {
+    "pass": 48,
+    "fail": 0
+  },
+  "sixFixedAndNew": {
+    "pass": 14,
+    "fail": 0
+  },
+  "preview": {
+    "pass": 27,
+    "fail": 0
+  },
+  "seededScenariosMatch": 9,
+  "localLinksChecked": 38,
+  "brokenLinks": [],
+  "nativeBackgroundVerified": false
+}

@@ -27,8 +27,17 @@
     </svg>
     <h1 id="launchTitle"><span>Dungeon</span><span>Crawler</span></h1>
     <p class="launch-tagline">A hundred floors. A legion of bosses. One princess to save.</p>
+    <div id="companionChoice" role="group" aria-label="Choose starting companion">
+      <p class="companion-choice-title">Choose your companion</p>
+      <div class="companion-choice-cards">
+        <button type="button" class="companion-choice selected" data-companion-choice="marmalade" aria-pressed="true"><b>Marmalade</b><span>Gate cat. Prefers bats.</span></button>
+        <button type="button" class="companion-choice" data-companion-choice="pip" aria-pressed="false"><b>Pip</b><span>Town dog. Loyal sidekick.</span></button>
+      </div>
+    </div>
     <button id="startGame" type="button">Enter the dungeon <span aria-hidden="true">◆</span></button>
-    <p class="launch-hint">Press any key to begin</p>
+    <button id="launchLoadGame" type="button">Load adventure</button>
+    <p id="launchFileStatus" class="file-status" role="status" aria-live="polite"></p>
+    <p class="launch-hint">Arrow keys choose a companion · Enter starts</p>
     <p id="launchVersion" class="launch-version"></p>
   </div>
 </section>
@@ -51,6 +60,7 @@
   <div class="stat">Retreat <b id="retreatStatus"></b></div>
   <div class="stat" id="companionStat" hidden>Companion <b id="companionName"></b></div>
   <div class="stat cheat" id="godModeStat" hidden>GOD</div>
+  <button id="companionPostAction" type="button" aria-controls="companionOverlay" aria-expanded="false" hidden>Companions</button>
   <button id="helpToggle" type="button" aria-label="Help and settings (?)" aria-controls="helpOverlay" aria-expanded="false" title="Help and settings (?)">?</button>
 </div>
 <div id="objective" aria-live="polite"></div>
@@ -90,6 +100,8 @@
     <h2 id="ovTitle">GAME OVER</h2>
     <p id="ovText"></p>
     <p>Press <b>R</b> to restart</p>
+    <button id="deathLoadGame" type="button">Load adventure</button>
+    <p id="deathFileStatus" class="file-status" role="status" aria-live="polite"></p>
   </div>
 <div id="endingControls" hidden><button id="skipEnding" type="button">Skip to sunset (Esc)</button><button id="restartEnding" type="button">New adventure (R)</button></div>
 </div>
@@ -126,19 +138,48 @@
 
 </main>
 
+<div id="companionOverlay" role="dialog" aria-modal="true" aria-labelledby="companionTitle" aria-describedby="companionHint" hidden>
+  <section class="help-dialog companion-dialog">
+    <header class="help-header"><div><h2 id="companionTitle">Companions</h2><p id="companionHint">Choose a companion for this adventure. Cancel keeps your current companion.</p></div><button id="closeCompanionBoard" type="button">Cancel (Esc)</button></header>
+    <div class="help-content"><div id="companionBoardList" class="companion-list"></div></div>
+    <footer class="companion-footer"><button id="companionAudioToggle" type="button">Sound: On (M)</button><span>Esc cancels · R starts a new adventure</span></footer>
+  </section>
+</div>
+<div id="tradeOverlay" role="dialog" aria-modal="true" aria-labelledby="tradeTitle" aria-describedby="tradeHint" hidden>
+  <section class="help-dialog trade-dialog">
+    <header class="help-header"><div><h2 id="tradeTitle">Trade</h2><p id="tradeHint">Choose purchases and sales. Confirm applies them; Cancel keeps your adventure unchanged.</p></div><button id="closeTrade" type="button">Close (Esc)</button></header>
+    <div class="help-content trade-content">
+      <div class="trade-columns">
+        <section class="trade-section"><h3>Buy</h3><div id="tradeBuyList" class="trade-list" aria-label="Items for sale"></div><p id="tradeBuyDetails" class="trade-details"></p><button id="addTradePurchase" type="button">Add purchase (B)</button></section>
+        <section class="trade-section"><h3>Sell equipped gear</h3><div id="tradeSellList" class="trade-list" aria-label="Equipped items"></div><p id="tradeSellDetails" class="trade-details"></p><button id="addTradeSale" type="button">Add sale (S)</button></section>
+      </div>
+      <section><h3>Your cart</h3><ol id="tradeOrder"></ol></section>
+    </div>
+    <footer class="trade-footer">
+      <div id="tradeGold"></div><p id="tradeStats"></p><p id="tradeStatus" role="status" aria-live="polite"></p>
+      <div class="trade-actions"><button id="undoTrade" type="button">Undo last (U)</button><button id="resetTrade" type="button">Reset cart (Shift+U)</button><button id="confirmTrade" type="button">Confirm trade</button><button id="cancelTrade" type="button">Cancel</button><button id="tradeAudioToggle" type="button">Sound: On (M)</button></div>
+    </footer>
+  </section>
+</div>
 <div id="helpOverlay" role="dialog" aria-modal="true" aria-labelledby="helpTitle" aria-describedby="helpHint" hidden>
   <section class="help-dialog">
     <header class="help-header"><div><h2 id="helpTitle">Help &amp; settings</h2><p id="helpHint">Time pauses while this window is open.</p></div><button id="closeHelp" type="button" aria-label="Close help">Close (Esc)</button></header>
     <div class="help-content">
       <h3>Controls</h3>
 <div id="help">
-  <p><strong>Move / attack:</strong> Arrows or WASD. <strong>Interact:</strong> Space to talk, collect, buy or use stairs.</p>
-  <p><strong>Supplies:</strong> H drinks a stored potion. E shoots your bow. X sells equipped gear at a merchant.</p>
+  <p><strong>Move / attack:</strong> Arrows or WASD. <strong>Interact:</strong> Space to talk, collect, open a shop or use stairs.</p>
+  <p><strong>Supplies:</strong> H drinks a stored potion. E shoots your bow. X opens a shop’s Sell list. Choose purchases/sales, then Confirm; Cancel discards the cart. U undoes; Shift+U resets.</p>
   <p><strong>Magic:</strong> F Fireball · G Heal · V Frostbolt · B Greater Heal · Z Magic Barrier. Learn spells from tomes.</p>
   <p><strong>Travel:</strong> Q/Backspace goes up at ▲. J: Town Scroll / return portal. Enter requests retreat; Y confirms, Esc cancels.</p>
-  <p><strong>Tips:</strong> Rest at the Inn. Recruit Marmalade by the gate. Collect a monster’s key before descending at ▼. Low health pauses the action; critical health offers retreat.</p>
+  <p><strong>Tips:</strong> Rest at the Inn. Recruit your starter with Space. Switch at the companion post near the Inn. Collect a monster’s key before descending at ▼. Low health pauses the action; critical health offers retreat.</p>
   <p><strong>R</strong> starts a new adventure. <strong>Esc</strong> skips a boss scene or ending.</p>
 </div>
+<section id="saveFileControls" aria-labelledby="saveFileTitle">
+  <h3 id="saveFileTitle">Your adventure</h3>
+  <p>Save to a file. Choose that file later to continue.</p>
+  <div class="file-actions"><button id="saveGameButton" type="button">Save game</button><button id="loadGameButton" type="button">Load game</button><button id="cancelSavePreparation" type="button" hidden>Cancel save (Esc)</button></div>
+  <p id="saveGameStatus" class="file-status" role="status" aria-live="polite"></p>
+</section>
 <div id="audioControls">
   <button id="audioToggle" type="button" aria-pressed="true">Sound: on (M)</button>
   <label for="musicVolume">Music <input id="musicVolume" type="range" min="0" max="100" value="45"> <output id="musicVolumeText" for="musicVolume">45%</output></label>
@@ -147,6 +188,23 @@
 
       <p class="help-shortcuts">? opens or closes Help · M mutes sound · Esc closes Help</p>
     </div>
+  </section>
+</div>
+<div id="saveLoadOverlay" role="dialog" aria-modal="true" aria-labelledby="saveLoadTitle" aria-describedby="saveLoadHint" hidden>
+  <section class="help-dialog save-load-dialog">
+    <header class="help-header"><div><h2 id="saveLoadTitle">Load adventure</h2><p id="saveLoadHint">Choose a save file, review it, then load. Cancel keeps your current adventure.</p></div></header>
+    <div class="help-content save-load-content">
+      <label for="saveLoadFile">Choose a saved adventure (.json)</label>
+      <div id="saveLoadFileHost"></div>
+      <p id="saveLoadSelectedFile" class="file-status"></p>
+      <p id="saveLoadStatus" class="file-status" role="status" aria-live="polite"></p>
+      <p id="saveLoadPreview" tabindex="-1" hidden></p>
+    </div>
+    <footer class="save-load-footer">
+      <button id="confirmSaveLoad" type="button" disabled>Load adventure</button>
+      <button id="cancelSaveLoad" type="button">Cancel (Esc)</button>
+      <button id="saveLoadAudioToggle" type="button">Sound (M)</button>
+    </footer>
   </section>
 </div>
 <div id="devConsole" role="dialog" aria-label="Developer console" hidden>

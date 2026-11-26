@@ -1,0 +1,21 @@
+✔ launch screen freezes play, first key only starts, and restart keeps launch branding hidden (315.098541ms)
+✔ hazard clocks and warnings freeze during pauses, hidden tabs, launch, and absence from the floor (500.337584ms)
+✔ help toggles by question mark and button, freezes gameplay and timers, and retains audio changes (533.811084ms)
+✔ help on launch does not start play and preserves health or retreat dialogs underneath (554.247166ms)
+✔ help freezes cinematic progression and resets their timestamps without consuming Escape (560.170625ms)
+✔ help traps Tab and Shift-Tab, closes from an input, and restores keyboard focus (281.809833ms)
+✔ visual animation freezes during help, health pauses, hidden tabs and cinematics without advancing game clocks or RNG (280.193667ms)
+✔ projectiles launch at attack time, advance only with active motion, and clear on recreation (199.183708ms)
+✔ help and HUD describe Town Scroll availability and portal state (244.456667ms)
+✔ addScrolls validates input and updates HUD (243.702458ms)
+✔ console help lists teleportTown and addScrolls (202.455958ms)
+✔ C2 launch arrows select and focus without starting; Enter or Space explicitly starts with that card (158.379791ms)
+✔ C2 picker rejects launch, dungeon, distance, hidden and conflicting overlays (765.970417ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4949.207917

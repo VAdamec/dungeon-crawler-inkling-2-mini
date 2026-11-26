@@ -1,0 +1,116 @@
+{
+  "syntax": [
+    {
+      "file": "js/art-runtime.js",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "file": "js/sprites.js",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "file": "js/game.js",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "file": "tests/game.test.cjs",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "file": "docs/reviews/2026-11-26-m2-market/check-seeded.cjs",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "file": "docs/reviews/2026-11-26-m2-market/check-browser.cjs",
+      "exit": 0,
+      "output": ""
+    }
+  ],
+  "files": [
+    {
+      "file": "js/game.js",
+      "beforeM2": "da29130b9561244d01b122ec024f15d246ddea5cbeba5570e6e760c9bc8acc06",
+      "afterM2": "165bdd93c40cb2934115ce018354ac9a045df928187009fa2b1a6af706dc7b6c",
+      "unchanged": false
+    },
+    {
+      "file": "tests/game.test.cjs",
+      "beforeM2": "62c91d9a6884d1a10eff415c03b16abc8a744ff6bc0107f91580bce7cc58c724",
+      "afterM2": "9c9dab68edb26c9a50ae402bcef735cc149329d3225b6386d5d14a97f49c4fb1",
+      "unchanged": false
+    },
+    {
+      "file": "index.html",
+      "beforeM2": "cc35fafde6200d5ce3f3b9d07fd2a5244a0933c52a8aa558b3159998387bb7c5",
+      "afterM2": "8a5fad45fd219bd4f2e017ece4f209758ecb72b6ed7852d0a93f03ea921999b1",
+      "unchanged": false
+    },
+    {
+      "file": "style.css",
+      "beforeM2": "7d612d8ec2da57e56adca730837f040dd7f68aa1263c30691fc955068d1ee28f",
+      "afterM2": "295668ca48e608c71dee020030e3d2bedc3bc11b45c86de995a4af351ace2acb",
+      "unchanged": false
+    },
+    {
+      "file": "js/art-runtime.js",
+      "beforeM2": "ac12a9d1d03226eb16473922efc189ed0b601a784d5051be9d9587c9621d0ae9",
+      "afterM2": "ac12a9d1d03226eb16473922efc189ed0b601a784d5051be9d9587c9621d0ae9",
+      "unchanged": true
+    },
+    {
+      "file": "js/sprites.js",
+      "beforeM2": "0f9a18356afa369a1b2912caf80e589109a379fc3e019e32ee214e4b002301d2",
+      "afterM2": "0f9a18356afa369a1b2912caf80e589109a379fc3e019e32ee214e4b002301d2",
+      "unchanged": true
+    },
+    {
+      "file": "README.md",
+      "beforeM2": "cc4c5efb1906438a5bb265de3c1eb4966f7f5df1bf958a5494671efc6724a68e",
+      "afterM2": "2714b55c7e0ddf27cc03c2b3c773ba1cfa6e24bb17b5750d8384d8c2c5936b0f",
+      "unchanged": false
+    },
+    {
+      "file": "CREDITS.md",
+      "beforeM2": "6e0ef5f41588367df184e73c18e28d570a06b5f4d2cad8385fb9b74d87b7e952",
+      "afterM2": "6e0ef5f41588367df184e73c18e28d570a06b5f4d2cad8385fb9b74d87b7e952",
+      "unchanged": true
+    },
+    {
+      "file": "CHANGELOG.md",
+      "beforeM2": "ad8d92900f688939628b425c0b992b0ad44a65dd7e9330fac0eb0bb46abd2b82",
+      "afterM2": "ad8d92900f688939628b425c0b992b0ad44a65dd7e9330fac0eb0bb46abd2b82",
+      "unchanged": true
+    },
+    {
+      "file": "DOCUMENTATION.md",
+      "beforeM2": "08957a93166da632751b6236b823414d85c0bdf13c2ebe02e5c18e819a878fea",
+      "afterM2": "da6ec6f8a3d164090f288a15ed34c5789be99fcac8f2e91b94b0ee8abe6be0b2",
+      "unchanged": false
+    },
+    {
+      "file": "tasks.md",
+      "beforeM2": "a63a3e57b01183f3508c19d68d7e5b3f1944cf0274136b1631ef7d78271a5f3e",
+      "afterM2": "c8c0035040bb51c243b42d5af58bf8b99e9b002de09dafd2f9ebead71e1aa5cb",
+      "unchanged": false
+    },
+    {
+      "file": "handover.md",
+      "beforeM2": "68e0b01d94348082d9bd4fd5278f3e2645ab6635d19f761978c9dd4ba0f88457",
+      "afterM2": "4607225af89f5b16af1cf976dc72808cdc370e09c28c91eef1bbaedaef6e9f0e",
+      "unchanged": false
+    }
+  ],
+  "localMarkdownMissing": [],
+  "diffCheck": 0,
+  "stateKeys": 83,
+  "saveFormatVersion": 1,
+  "nativeGR09": "unverified",
+  "pending": [
+    "M3 comprehensive market integration/recovery"
+  ]
+}

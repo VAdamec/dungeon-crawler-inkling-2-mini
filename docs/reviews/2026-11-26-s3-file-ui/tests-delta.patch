@@ -1,0 +1,201 @@
+diff --git a/tmp/dungeon-s3-before/game.test.cjs b/tests/game.test.cjs
+index 9dc6b0f..687dafe 100644
+--- a/tmp/dungeon-s3-before/game.test.cjs
++++ b/tests/game.test.cjs
+@@ -86,7 +86,7 @@ function game(seed = 42, start = true, area = 'dungeon', withDom = false) {
+   const nodes=[];
+   function enhance(el,tag='DIV') {
+     el.tagName=tag;el.children=[];el.dataset={};el.attributes={};el.isConnected=true;
+-    el.classList={toggle:noop};el.appendChild=child=>{el.children.push(child);child.parentElement=el;return child;};
++    el.classList={toggle:noop};el.appendChild=child=>{el.children.push(child);child.parentElement=el;if(child.id)elements[child.id]=child;return child;};
+     el.contains=node=>{for(let n=node;n;n=n.parentElement)if(n===el)return true;return false;};
+     el.setAttribute=(name,value)=>{el.attributes[name]=String(value);};el.getAttribute=name=>el.attributes[name]??null;
+     Object.defineProperty(el,'innerHTML',{get:()=>'',set:()=>{for(const child of el.children)child.isConnected=false;el.children=[];}});
+@@ -104,10 +104,10 @@ function game(seed = 42, start = true, area = 'dungeon', withDom = false) {
+     nodes.push(el);return el;
+   }
+   function element(id) {
+-    const el=elements[id] ||= { style: {}, hidden: ['tradeOverlay', 'companionOverlay'].includes(id), disabled: false,
++    const el=elements[id] ||= { style: {}, hidden: ['tradeOverlay', 'companionOverlay', 'saveLoadOverlay'].includes(id), disabled: false,
+       textContent: '', value: '', ariaPressed: '', addEventListener: (name, fn) => { listeners[`${id}:${name}`] = fn; },
+       getContext: () => id === 'minimap' ? minimapCtx : ctx, focus: noop };
+-    if(withDom&&!el.children)enhance(el,id==='consoleInput'?'INPUT':/startGame|closeCompanionBoard|companionPostAction|companionAudioToggle/.test(id)?'BUTTON':'DIV');
++    if(withDom&&!el.children)enhance(el,id==='consoleInput'?'INPUT':/startGame|closeCompanionBoard|companionPostAction|companionAudioToggle|saveGameButton|loadGameButton|launchLoadGame|deathLoadGame|confirmSaveLoad|cancelSaveLoad|saveLoadAudioToggle/.test(id)?'BUTTON':'DIV');
+     return el;
+   }
+   fixtureDocument={getElementById:element,addEventListener:(name,fn)=>{listeners[name]=fn;}};
+@@ -4765,3 +4765,174 @@ test('S2 hydrates and atomically loads the final fully explored 100-floor DTO wi
+   assert.equal(g.run('commitSaveLoad(beginSaveLoad(),window.s2Dto)'),true);
+   assert.equal(s2Aliases(g),true);assert.deepEqual(saveFixture(g),dto);
+ });
++
++function s3Files(g) {
++  g.run(`var s3=window.s3={readers:[],jobs:new Map(),next:0,revoked:[],blobs:[],downloads:[]};
++    window.setTimeout=(fn,delay)=>{const id=++s3.next;s3.jobs.set(id,{fn,delay});return id;};
++    window.clearTimeout=id=>s3.jobs.delete(id);
++    var s3Flush=window.s3Flush=()=>{for(const [id,job]of [...s3.jobs])if(job.delay===0){s3.jobs.delete(id);job.fn();}};
++    var s3Finish=window.s3Finish=(index,text)=>{const r=s3.readers[index];r.readyState=2;r.result=text;r.onload?.();};
++    window.FileReader=class{constructor(){this.readyState=0;s3.readers.push(this);}readAsText(file,encoding){this.file=file;this.encoding=encoding;this.readyState=1;if(s3.readError)throw new Error('read failed');}
++      abort(){this.aborted=true;this.readyState=2;this.onabort?.();}};
++    window.Blob=class{constructor(parts,options){if(s3.blobError)throw new Error('blob failed');this.parts=parts;this.options=options;s3.blobs.push(this);}};
++    window.URL={createObjectURL:blob=>'blob:test-'+s3.blobs.indexOf(blob),revokeObjectURL:url=>s3.revoked.push(url)};
++    var s3Create=window.s3Create=document.createElement;
++    document.createElement=tag=>{const el=s3Create(tag);if(tag==='a'){el.click=()=>{if(s3.clickError)throw new Error('click failed');s3.downloads.push({url:el.href,name:el.download});};
++      el.remove=()=>{el.isConnected=false;if(el.parentElement)el.parentElement.children=el.parentElement.children.filter(c=>c!==el);};}return el;};
++    document.body=document.createElement('body');
++    const host=document.getElementById('saveLoadOverlay');
++    for(const id of ['saveLoadFileHost','saveLoadStatus','saveLoadSelectedFile','saveLoadPreview','confirmSaveLoad','cancelSaveLoad','saveLoadAudioToggle'])host.appendChild(document.getElementById(id));
++    for(const id of ['loadGameButton','saveGameButton'])document.getElementById('helpOverlay').appendChild(document.getElementById(id));
++    document.getElementById('launchScreen').appendChild(document.getElementById('launchLoadGame'));
++    document.getElementById('overlay').appendChild(document.getElementById('deathLoadGame'));
++    updateSaveFileButtons();`);
++}
++function s3Select(g,dto,name='adventure.json') {
++  const text=typeof dto==='string'?dto:JSON.stringify(dto);
++  g.run(`document.getElementById('saveLoadFile').files=[{name:${JSON.stringify(name)},size:${Buffer.byteLength(text)}}];document.getElementById('saveLoadFile').onchange()`);
++  return text;
++}
++function s3Ready(g,dto,name) {
++  const index=g.run('s3.readers.length'),text=s3Select(g,dto,name);
++  g.run(`s3Finish(${index},${JSON.stringify(text)});s3Flush()`);
++}
++
++test('S3 save requests portable JSON without progress/RNG/audio changes and cleans each URL independently', () => {
++  const g=game(42,true,'town',true);s3Files(g);
++  g.run(`openHelp();state.gold=293;state.player.hp=37;Math.random=()=>{throw new Error('save RNG');};playSound=()=>{throw new Error('save sound');};`);
++  const before=s2Snapshot(g);assert.equal(g.run('saveGameFile()'),true);assert.equal(s2Snapshot(g),before);
++  assert.equal(g.run('s3.downloads.length'),1);assert.match(g.run('s3.downloads[0].name'),/^dungeon-crawler-.*\.json$/);
++  assert.equal(g.run('s3.blobs[0].options.type'),'application/json;charset=utf-8');
++  assert.equal(g.run('parseSaveData(s3.blobs[0].parts[0]).run.gold'),293);
++  assert.equal(g.run('document.body.children.length'),0);assert.deepEqual(g.json('s3.revoked'),[]);
++  assert.match(g.elements.saveGameStatus.textContent,/Download requested/);
++  g.run(`window.s3Cleanup=[...s3.jobs.values()][0].fn;state.gold=9;`);const later=s2Snapshot(g);
++  g.run('window.s3Cleanup()');assert.deepEqual(g.json('s3.revoked'),['blob:test-0']);assert.equal(s2Snapshot(g),later);
++});
++
++test('S3 unsupported/failed export leaves adventure and URLs intact or cleaned with honest feedback', () => {
++  for(const setup of ['delete window.Blob','s3.blobError=true','s3.clickError=true']) {
++    const g=game(42,true,'town',true);s3Files(g);g.run(setup);const before=s2Snapshot(g);
++    assert.equal(g.run('saveGameFile()'),false);assert.equal(s2Snapshot(g),before);
++    assert.match(g.elements.saveGameStatus.textContent,/Could not prepare/);
++    if(setup.includes('clickError'))assert.deepEqual(g.json('s3.revoked'),['blob:test-0']);
++    assert.equal(g.run('document.body.children.length'),0);
++  }
++  const g=game(42,true,'town',true);s3Files(g);g.run('state.godMode=true;updateSaveFileButtons()');
++  assert.equal(g.elements.saveGameButton.disabled,true);assert.equal(g.run('saveGameFile()'),false);
++});
++
++test('S3 Help/launch/death Load opens one frozen accessible dialog and Cancel restores focus/inert context', () => {
++  for(const origin of ['launch','help','death']) {
++    const g=game(42,origin!=='launch','town',true);s3Files(g);
++    if(origin==='help')g.run('openHelp()');if(origin==='death')g.run('die()');
++    const id=origin==='launch'?'launchLoadGame':origin==='help'?'loadGameButton':'deathLoadGame';
++    g.run(`document.getElementById('${id}').focus()`);const before=s2Snapshot(g);
++    g.click(id);assert.equal(g.elements.saveLoadOverlay.hidden,false);
++    assert.equal(g.run('!!state.loadSession.ui'),true);assert.equal(g.run('document.activeElement===state.loadSession.ui.input'),true);
++    assert.equal(g.elements.gameLayout.inert,true);assert.equal(g.elements.launchScreen.inert,true);assert.equal(g.elements.helpOverlay.inert,true);
++    assert.equal(g.run('openLoadGame()'),null);assert.equal(g.elements.confirmSaveLoad.disabled,true);
++    g.key('Tab');assert.equal(g.run('document.activeElement===document.getElementById("cancelSaveLoad")'),true);
++    g.key('Tab',{shiftKey:true});assert.equal(g.run('document.activeElement===state.loadSession.ui.input'),true);
++    assert.equal(g.elements[id].disabled,true);
++    g.key('Escape');assert.equal(g.run('state.loadSession'),null);assert.equal(g.elements.saveLoadOverlay.hidden,true);
++    assert.equal(g.elements[id].disabled,false);
++    assert.equal(s2Snapshot(g),before);assert.equal(g.run(`document.activeElement===document.getElementById('${id}')`),true);
++    assert.equal(!!g.elements.helpOverlay.inert,false);
++  }
++});
++
++test('S3 real read phases validate before preview and only explicit deferred confirmation loads', () => {
++  const dto=saveFixture(game(713,true,'town')),g=game(42,true,'town',true);s3Files(g);
++  g.run('openHelp();openLoadGame()');const before=s2Snapshot(g),text=s3Select(g,dto,'<img src=x>.json');
++  assert.equal(g.run('state.loadSession.ui.phase'),'reading');assert.equal(g.elements.confirmSaveLoad.disabled,true);
++  assert.equal(g.run('s3.readers[0].encoding'),'UTF-8');assert.equal(g.run('state.loadSession.ui.input.value'),'');
++  assert.equal(g.elements.saveLoadSelectedFile.textContent,'Selected: <img src=x>.json');
++  g.run(`s3Finish(0,${JSON.stringify(text)})`);assert.equal(g.run('state.loadSession.ui.data'),null);
++  g.run('s3Flush()');assert.equal(g.run('state.loadSession.ui.phase'),'ready');assert.equal(g.elements.confirmSaveLoad.disabled,false);
++  assert.match(g.elements.saveLoadPreview.textContent,/Town · Hero level 1/);assert.equal(s2Snapshot(g),before);
++  g.run('document.getElementById("confirmSaveLoad").onclick()');assert.equal(g.run('state.loadSession.ui.phase'),'loading');
++  assert.equal(s2Snapshot(g),before,'confirmation yields before replacing state');
++  g.run('s3Flush()');assert.equal(g.run('state.loadSession'),null);assert.equal(g.elements.saveLoadOverlay.hidden,true);
++  assert.deepEqual(saveFixture(g),dto);assert.equal(g.run('document.activeElement===canvas'),true);
++  assert.equal(g.run('document.getElementById("saveLoadFileHost").children.length'),0);
++});
++
++test('S3 file size is checked before reading and corrupt/future/read errors remain reversible', () => {
++  const g=game(42,true,'town',true);s3Files(g);g.run('openHelp();openLoadGame()');const before=s2Snapshot(g);
++  g.run('readSaveGameFile(state.loadSession,state.loadSession.ui.input,{name:"large.json",size:SAVE_MAX_BYTES+1})');
++  assert.equal(g.run('s3.readers.length'),0);assert.match(g.elements.saveLoadStatus.textContent,/32 MiB/);
++  for(const text of ['{bad','{"formatVersion":100}','null']) {
++    const index=g.run('s3.readers.length'),body=s3Select(g,text);g.run(`s3Finish(${index},${JSON.stringify(body)});s3Flush()`);
++    assert.equal(g.run('state.loadSession.ui.phase'),'error');assert.equal(g.elements.confirmSaveLoad.disabled,true);assert.equal(s2Snapshot(g),before);
++  }
++  const future=saveFixture(game());future.formatVersion=100;s3Ready(g,future);
++  assert.match(g.elements.saveLoadStatus.textContent,/save version is not supported/);
++  g.run('s3.readError=true');s3Select(g,'{}');assert.match(g.elements.saveLoadStatus.textContent,/Could not read/);
++  assert.equal(s2Snapshot(g),before);g.key('Escape');assert.equal(g.run('state.loadSession'),null);
++});
++
++test('S3 replacement reads, same-file reselection and native cancel ignore old results', () => {
++  const a=saveFixture(game(713,true,'town')),b=structuredClone(a);b.run.gold=123;
++  const g=game(42,true,'town',true);s3Files(g);g.run('openLoadGame()');
++  const first=s3Select(g,a,'same.json');const second=s3Select(g,b,'same.json');
++  assert.equal(g.run('s3.readers[0].aborted'),true);
++  g.run(`s3Finish(0,${JSON.stringify(first)});s3Flush()`);assert.equal(g.run('state.loadSession.ui.data'),null);
++  g.run(`s3Finish(1,${JSON.stringify(second)});s3Flush()`);assert.equal(g.run('state.loadSession.ui.data.run.gold'),123);
++  g.run('state.loadSession.ui.input.oncancel()');assert.equal(g.run('state.loadSession.ui.phase'),'choose');
++  assert.equal(g.run('state.loadSession.ui.data'),null);assert.equal(g.elements.confirmSaveLoad.disabled,true);
++  assert.match(g.elements.saveLoadStatus.textContent,/selection canceled/);
++  s3Ready(g,b,'same.json');assert.equal(g.run('state.loadSession.ui.data.run.gold'),123);
++});
++
++test('S3 stale file events and queued validation/confirmation cannot affect a newer session or run', () => {
++  const dto=saveFixture(game(713,true,'town'));
++  for(const transition of ['cancelSaveLoad()','newGame()','enterFloor(2,false,true)','die()','closeHelp()','beginSaveLoad()']) {
++    const g=game(42,true,'town',true);s3Files(g);g.run('openHelp();window.s3Old=openLoadGame();window.s3Input=window.s3Old.ui.input');
++    const text=s3Select(g,dto);g.run(transition);const before=s2Snapshot(g);
++    g.run(`s3Finish(0,${JSON.stringify(text)});window.s3Input.oncancel();s3Flush()`);
++    assert.equal(s2Snapshot(g),before,transition);assert.equal(g.run('confirmSaveGameLoad(window.s3Old)'),false);
++  }
++  const g=game(42,true,'town',true);s3Files(g);g.run('window.s3Old=openLoadGame()');s3Ready(g,dto);
++  g.run('window.s3OldConfirm=document.getElementById("confirmSaveLoad").onclick;window.s3OldConfirm();window.s3Queued=[...s3.jobs.values()][0].fn;cancelSaveLoad();openLoadGame()');
++  const before=s2Snapshot(g);g.run('window.s3Queued();window.s3OldConfirm()');assert.equal(s2Snapshot(g),before);
++  assert.equal(g.run('!!state.loadSession.ui'),true);
++  // A newly selected file in the same modal must also invalidate a queued confirmation.
++  s3Ready(g,dto);g.run('confirmSaveGameLoad(state.loadSession);window.s3PreviousCommit=[...s3.jobs.values()][0].fn');
++  const latest=structuredClone(dto);latest.run.gold=123;s3Ready(g,latest);
++  const unchanged=s2Snapshot(g);g.run('window.s3PreviousCommit()');
++  assert.equal(s2Snapshot(g),unchanged);assert.equal(g.run('state.loadSession.ui.phase'),'ready');
++  assert.equal(g.run('state.loadSession.ui.data.run.gold'),123);
++});
++
++test('S3 deferred validation while hidden stays owned and permits confirmation only after visibility returns', () => {
++  const g=game(42,true,'town',true),dto=saveFixture(game(713,true,'town'));s3Files(g);g.run('openLoadGame()');
++  const text=s3Select(g,dto);g.run(`document.hidden=true;s3Finish(0,${JSON.stringify(text)});s3Flush()`);
++  assert.equal(g.run('state.loadSession.ui.phase'),'ready');assert.equal(g.elements.confirmSaveLoad.disabled,true);
++  assert.equal(g.run('confirmSaveGameLoad(state.loadSession)'),false);
++  g.run('document.hidden=false');g.visibility();assert.equal(g.elements.confirmSaveLoad.disabled,false);
++  const before=s2Snapshot(g);g.run('confirmSaveGameLoad(state.loadSession);document.hidden=true;s3Flush()');
++  assert.equal(g.run('state.loadSession.ui.phase'),'ready');assert.equal(s2Snapshot(g),before);
++  g.run('document.hidden=false');g.visibility();
++  g.key('Escape');assert.equal(g.run('state.loadSession'),null);
++});
++
++test('S3 failed commit returns to the origin with error feedback and releases read/UI resources', () => {
++  const dto=saveFixture(game(713)),g=game(42,true,'town',true);s3Files(g);
++  g.run('openHelp();document.getElementById("loadGameButton").focus();openLoadGame()');s3Ready(g,dto);
++  const before=s2Snapshot(g);g.run('window.s3Render=render;render=()=>{throw new Error("paint fail");};document.getElementById("confirmSaveLoad").onclick();s3Flush()');
++  assert.equal(s2Snapshot(g),before);assert.equal(g.run('state.loadSession'),null);
++  assert.equal(g.elements.saveLoadOverlay.hidden,true);assert.equal(g.elements.helpOverlay.hidden,false);
++  assert.equal(g.elements.helpOverlay.inert,false);assert.equal(g.run('document.activeElement===document.getElementById("loadGameButton")'),true);
++  assert.match(g.elements.saveGameStatus.textContent,/adventure is unchanged/);
++  g.run('render=window.s3Render;openLoadGame()');assert.equal(g.elements.saveLoadOverlay.hidden,false);
++});
++
++test('S3 cancel aborts an active reader and R clears dialog/status without serializing UI', () => {
++  const g=game(42,true,'town',true);s3Files(g);g.run('openLoadGame()');s3Select(g,'{}');
++  g.run('window.s3Old=state.loadSession;fileActionMessage("Old status")');g.key('r');
++  assert.equal(g.run('state.loadSession'),null);assert.equal(g.run('window.s3Old.ui'),null);
++  assert.equal(g.run('s3.readers[0].aborted'),true);assert.equal(g.elements.saveLoadOverlay.hidden,true);
++  assert.equal(g.elements.saveGameStatus.textContent,'');assert.equal(g.run('Object.keys(state).length'),83);
++  assert.equal('loadSession' in saveFixture(g).run,false);
++});

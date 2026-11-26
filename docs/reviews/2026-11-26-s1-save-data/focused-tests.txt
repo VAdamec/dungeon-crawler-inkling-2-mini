@@ -1,0 +1,20 @@
+✔ S1 snapshot is detached, deterministic and pure in town/dungeon, overlaying stale caches (662.614542ms)
+✔ S1 XP round trips preserve levels 1 through 100 including unsafe integer thresholds (3678.593875ms)
+✔ S1 current encounter keeps corpse order, dead guard history, boss links and negative HP (554.743958ms)
+✔ S1 all eleven companions, ring stats, portals and exact town patrol state round trip (2445.395ms)
+✔ S1 snapshot refuses conflicting contexts but allows own Help and leaves state unchanged (2264.185209ms)
+✔ S1 validator rejects malformed, unknown and cross-field data without mutating DTO or game (1154.417292ms)
+✔ S1 parser bounds bytes and nesting, rejecting non-JSON object hazards without executing code (1279.647292ms)
+✔ S1 valid revealed/spent hazards, key collection, rescue and final boss defeat retain once-only data (676.298167ms)
+✔ S1 structural validator rejects null/wrong record types and hidden executable array properties (4645.813042ms)
+✔ S1 actual DTO accepts a fully explored 100-floor content-retention fixture below format limits (9478.083334ms)
+✔ S1 over-limit histories and inventory refuse losslessly rather than pruning live data (740.164708ms)
+✔ S1 keeps the S0 state inventory explicit and Unicode journal text lossless (1297.169459ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 29014.332917

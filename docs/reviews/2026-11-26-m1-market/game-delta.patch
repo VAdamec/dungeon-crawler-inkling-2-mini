@@ -1,0 +1,244 @@
+--- /tmp/dungeon-m1-before/game.js	2026-11-26 17:35:41
++++ js/game.js	2026-11-26 17:44:34
+@@ -187,11 +187,11 @@
+ }
+ 
+ function learnSpell(spellName) {
++  const learned = learnSpellState(state.player.spells, state.spellReadyAt, spellName, state.activeTime);
++  if (!learned) return false;
++  state.player.spells[spellName] = learned.spells[spellName];
++  state.spellReadyAt[spellName] = learned.spellReadyAt[spellName];
+   const spell = SPELLS[spellName];
+-  if (!spell) return false;
+-  if (state.player.spells[spellName]) return false;
+-  state.player.spells[spellName] = true;
+-  state.spellReadyAt[spellName] = state.activeTime;
+   log(`You learned ${spell.name}! Press ${spell.key} to cast it.`);
+   return true;
+ }
+@@ -2338,30 +2338,18 @@
+ function treasureAt(x, y) {
+   return state.treasures.find(t => t.x === x && t.y === y);
+ }
+-function equipmentBonus(stat) {
+-  return Object.values(state.equipment).reduce((sum, item) => sum + (item ? item[stat] || 0 : 0), 0);
+-}
++function equipmentBonus(stat) { return equipmentBonusFor(state.equipment, stat); }
+ function equipItem(slot, item) {
+-  const oldHealthBonus = equipmentBonus('maxHp');
+-  state.equipment[slot] = item;
+-  const healthChange = equipmentBonus('maxHp') - oldHealthBonus;
+-  state.player.maxHp += healthChange;
+-  state.player.hp = Math.min(state.player.maxHp, state.player.hp + Math.max(0, healthChange));
++  const change = equipmentTransition(state.player, state.equipment, slot, item);
++  state.equipment[slot] = change.equipment[slot];
++  state.player.maxHp = change.maxHp; state.player.hp = change.hp;
+   freezePlayerStats();
+ }
+ 
+-function effectiveStr() {
+-  return state.player.str + equipmentBonus('str');
+-}
+-function effectiveDex() {
+-  return state.player.dex + equipmentBonus('dex');
+-}
+-function effectiveAtk() {
+-  return effectiveStr() + equipmentBonus('atk');
+-}
+-function effectiveDef() {
+-  return state.player.def + equipmentBonus('def') + Math.floor(effectiveDex() / 5);
+-}
++function effectiveStr() { return equipmentStatsFor(state.player, state.equipment).str; }
++function effectiveDex() { return equipmentStatsFor(state.player, state.equipment).dex; }
++function effectiveAtk() { return equipmentStatsFor(state.player, state.equipment).atk; }
++function effectiveDef() { return equipmentStatsFor(state.player, state.equipment).def; }
+ function dodgeChance() {
+   return Math.min(0.45, Math.max(0, (effectiveDex() - 10) * 0.02));
+ }
+@@ -3260,8 +3248,184 @@
+ function merchantAt(x, y) {
+   return state.merchant && state.merchant.x === x && state.merchant.y === y ? state.merchant : null;
+ }
+-function tradePrice(it) { return Math.round(it.gold * (1.5 + Math.max(0, state.depth - 1) * 0.03)); }
+-function tradeSellPrice(it) { return Math.round(it.gold * 0.5); }
++// M1 model only: no DOM, live-state writes, RNG, notices, saving or commit here.
++function tradeRequire(condition, message) {
++  if (!condition) throw new Error(`Invalid trade: ${message}`);
++}
++
++function tradeAmount(value, name = 'amount') {
++  tradeRequire(Number.isSafeInteger(value) && value >= 0, `${name} must be a nonnegative safe integer`);
++  return value;
++}
++
++function buyPrice(item, depth) {
++  tradeRequire(item && typeof item === 'object', 'missing item');
++  tradeAmount(item.gold, 'item gold');
++  tradeRequire(Number.isInteger(depth) && depth >= 1 && depth <= FINAL_DEPTH, 'pricing depth');
++  return tradeAmount(Math.round(item.gold * (1.5 + Math.max(0, depth - 1) * 0.03)), 'buy price');
++}
++
++function sellPrice(item) {
++  tradeRequire(item && typeof item === 'object', 'missing item');
++  return tradeAmount(Math.round(tradeAmount(item.gold, 'item gold') * 0.5), 'sell price');
++}
++
++function equipmentBonusFor(equipment, stat) {
++  return Object.values(equipment).reduce((sum, item) =>
++    tradeAmount(sum + (item && item[stat] !== undefined ? tradeAmount(item[stat], stat) : 0), stat), 0);
++}
++
++function equipmentStatsFor(player, equipment) {
++  const str = tradeAmount(player.str + equipmentBonusFor(equipment, 'str'), 'strength');
++  const dex = tradeAmount(player.dex + equipmentBonusFor(equipment, 'dex'), 'dexterity');
++  return { hp: player.hp, maxHp: player.maxHp, str, dex,
++    atk: tradeAmount(str + equipmentBonusFor(equipment, 'atk'), 'attack'),
++    def: tradeAmount(player.def + equipmentBonusFor(equipment, 'def') + Math.floor(dex / 5), 'defense') };
++}
++
++function equipmentTransition(player, equipment, slot, item) {
++  tradeRequire(['weapon','armor','ring'].includes(slot) && (item === null || item.kind === slot), 'equipment slot');
++  const next = { ...equipment, [slot]:item };
++  const delta = equipmentBonusFor(next, 'maxHp') - equipmentBonusFor(equipment, 'maxHp');
++  const maxHp = tradeAmount(player.maxHp + delta, 'maximum HP');
++  tradeRequire(maxHp > 0, 'maximum HP');
++  return { equipment:next, maxHp, hp:Math.min(maxHp, tradeAmount(player.hp + Math.max(0, delta), 'HP')) };
++}
++
++function learnSpellState(spells, spellReadyAt, name, activeTime) {
++  if (!Object.prototype.hasOwnProperty.call(SPELLS, name) || spells[name]) return null;
++  tradeRequire(Number.isFinite(activeTime) && activeTime >= 0, 'spell time');
++  return { spells:{ ...spells, [name]:true }, spellReadyAt:{ ...spellReadyAt, [name]:activeTime } };
++}
++
++function freezeTradeData(value) {
++  if (value && typeof value === 'object' && !Object.isFrozen(value)) {
++    for (const child of Object.values(value)) freezeTradeData(child);
++    Object.freeze(value);
++  }
++  return value;
++}
++
++function validateTradeItem(item) {
++  tradeRequire(item && typeof item === 'object' && !Array.isArray(item), 'missing item');
++  tradeRequire(typeof item.name === 'string' && item.name.length > 0, 'item name');
++  tradeRequire(['heal','weapon','armor','ring','elixir','spellbook','scroll'].includes(item.kind), 'item kind');
++  tradeAmount(item.gold, 'item gold');
++  // Source items are flat records. Reject nested/executable values instead of retaining live references.
++  for (const value of Object.values(item)) tradeRequire(value === null || ['string','boolean','number'].includes(typeof value), 'item field');
++  for (const value of Object.values(item)) if (typeof value === 'number') tradeRequire(Number.isFinite(value), 'item number');
++  for (const stat of ['atk','def','str','dex','maxHp','range']) if (item[stat] !== undefined) tradeAmount(item[stat], stat);
++  if (item.kind === 'heal') tradeRequire(Number.isFinite(item.heal) && item.heal > 0 && item.heal <= 1, 'potion healing');
++  if (item.kind === 'spellbook') tradeRequire(Object.prototype.hasOwnProperty.call(SPELLS, item.spell), 'spellbook');
++  if (item.kind === 'scroll') tradeRequire(item.scroll === 'town', 'scroll');
++}
++
++function validateTradeDraft(draft) {
++  tradeAmount(draft.gold, 'gold'); tradeAmount(draft.townScrolls, 'Town Scrolls');
++  const p = draft.player;
++  for (const field of GOD_STAT_FIELDS) tradeRequire(Number.isFinite(p[field]) && p[field] >= 0, `player ${field}`);
++  for (const field of ['hp','maxHp','mp','maxMp','str','dex','def','lvl']) tradeAmount(p[field], field);
++  tradeRequire(p.maxHp > 0 && p.hp <= p.maxHp && p.mp <= p.maxMp, 'player health/mana');
++  tradeRequire(p.lvl >= 1 && p.lvl <= MAX_LEVEL, 'player level');
++  for (const [name, known] of Object.entries(p.spells)) tradeRequire(Object.prototype.hasOwnProperty.call(SPELLS,name) && typeof known === 'boolean', 'spell knowledge');
++  for (const [name, time] of Object.entries(draft.spellReadyAt)) tradeRequire(Object.prototype.hasOwnProperty.call(SPELLS,name) && Number.isFinite(time) && time >= 0, 'spell readiness');
++  for (const name of Object.keys(SPELLS)) tradeRequire(Number.isFinite(draft.spellReadyAt[name]), 'missing spell readiness');
++  for (const slot of ['weapon','armor','ring']) {
++    const item = draft.equipment[slot];
++    if (item !== null) { validateTradeItem(item); tradeRequire(item.kind === slot, 'equipped item'); }
++  }
++  equipmentStatsFor(p, draft.equipment);
++  for (const potion of draft.inventory) tradeRequire(Object.keys(potion).length === 3 && potion.name === 'Potion' && potion.kind === 'heal'
++    && Number.isFinite(potion.heal) && potion.heal > 0 && potion.heal <= 1, 'stored potion');
++  const rows = new Set();
++  for (const row of draft.stock) {
++    tradeRequire(typeof row.rowId === 'string' && !rows.has(row.rowId), 'stock row identity');
++    rows.add(row.rowId); validateTradeItem(row.item);
++  }
++}
++
++function createTradeDraft(source, merchant) {
++  tradeRequire(source && merchant && Array.isArray(merchant.stock), 'trade source');
++  const player = Object.fromEntries(GOD_STAT_FIELDS.map(key => [key, source.player[key]]));
++  player.spells = { ...source.player.spells };
++  const original = { gold:source.gold, townScrolls:source.townScrolls, player,
++    spellReadyAt:{ ...source.spellReadyAt }, inventory:source.inventory.map(item => ({ ...item })),
++    equipment:Object.fromEntries(['weapon','armor','ring'].map(slot => [slot, source.equipment[slot] === null ? null : { ...source.equipment[slot] }])),
++    stock:merchant.stock.map((item, index) => ({ rowId:`stock:${index}`, item:{ ...item } })), operations:[] };
++  validateTradeDraft(original);
++  const rules = { pricingDepth:source.depth, activeTime:source.activeTime,
++    godModeStats:source.godMode && source.godModeStats ? Object.fromEntries(GOD_STAT_FIELDS.map(key => [key, source.godModeStats[key]])) : null };
++  tradeRequire(Number.isInteger(rules.pricingDepth) && rules.pricingDepth >= 1 && rules.pricingDepth <= FINAL_DEPTH, 'pricing depth');
++  tradeRequire(Number.isFinite(rules.activeTime) && rules.activeTime >= 0, 'trade time');
++  if (rules.godModeStats) {
++    const frozen = { ...original, player:{ ...player, ...rules.godModeStats } };
++    validateTradeDraft(frozen);
++  }
++  // Opening values/rules/history are immutable; no live item, spell, potion or stock reference escapes.
++  return freezeTradeData({ original, draft:original, rules, history:[] });
++}
++
++function equipDraft(draft, slot, item, rules) {
++  const change = equipmentTransition(draft.player, draft.equipment, slot, item);
++  const player = { ...draft.player, hp:change.hp, maxHp:change.maxHp };
++  if (rules.godModeStats) Object.assign(player, rules.godModeStats);
++  return { ...draft, player, equipment:change.equipment };
++}
++
++// Returns a new immutable draft or throws Invalid trade; rejected actions never enter the journal.
++function applyTradeAction(draft, action, rules) {
++  tradeRequire(action && typeof action === 'object', 'action');
++  let next = { ...draft }, operation;
++  if (action.type === 'buy') {
++    const index = draft.stock.findIndex(row => row.rowId === action.rowId);
++    tradeRequire(index >= 0, 'stock row is unavailable');
++    const row = draft.stock[index], item = row.item, price = buyPrice(item, rules.pricingDepth);
++    validateTradeItem(item);
++    tradeRequire(item.kind !== 'spellbook' || !draft.player.spells[item.spell], 'spell already learned');
++    tradeRequire(draft.gold >= price, 'not enough gold');
++    next.gold = tradeAmount(draft.gold - price, 'gold');
++    next.stock = draft.stock.filter((_, i) => i !== index);
++    const replaced = ['weapon','armor','ring'].includes(item.kind) ? draft.equipment[item.kind] : null;
++    if (item.kind === 'heal') next.inventory = [...draft.inventory, { name:'Potion', kind:'heal', heal:item.heal }];
++    else if (['weapon','armor','ring'].includes(item.kind)) next = equipDraft(next, item.kind, item, rules);
++    else if (item.kind === 'elixir') next.gold = tradeAmount(next.gold + item.gold, 'gold');
++    else if (item.kind === 'scroll') next.townScrolls = tradeAmount(next.townScrolls + 1, 'Town Scrolls');
++    else if (item.kind === 'spellbook') {
++      const learned = learnSpellState(draft.player.spells, draft.spellReadyAt, item.spell, rules.activeTime);
++      next.player = { ...draft.player, spells:learned.spells }; next.spellReadyAt = learned.spellReadyAt;
++    }
++    operation = { type:'buy', rowId:row.rowId, item, price, replaced };
++  } else if (action.type === 'sell') {
++    tradeRequire(['weapon','armor','ring'].includes(action.slot), 'sell slot');
++    const item = draft.equipment[action.slot];
++    tradeRequire(!!item, 'slot is empty');
++    validateTradeItem(item);
++    const price = sellPrice(item);
++    next = equipDraft(next, action.slot, null, rules);
++    next.gold = tradeAmount(draft.gold + price, 'gold');
++    operation = { type:'sell', slot:action.slot, item, price };
++  } else tradeRequire(false, 'unknown action');
++  next.operations = [...draft.operations, operation];
++  validateTradeDraft(next);
++  return freezeTradeData(next);
++}
++
++function stageTradeAction(cart, action) {
++  const draft = applyTradeAction(cart.draft, action, cart.rules);
++  return freezeTradeData({ ...cart, draft, history:[...cart.history, cart.draft] });
++}
++
++function undoTradeAction(cart) {
++  if (!cart.history.length) return cart;
++  return freezeTradeData({ ...cart, draft:cart.history[cart.history.length - 1], history:cart.history.slice(0,-1) });
++}
++
++function resetTradeDraft(cart) {
++  return freezeTradeData({ ...cart, draft:cart.original, history:[] });
++}
++
++function tradePrice(it) { return buyPrice(it, state.depth); }
++function tradeSellPrice(it) { return sellPrice(it); }
+ function tradeSnapshot() {
+   const m = state.merchant;
+   return {

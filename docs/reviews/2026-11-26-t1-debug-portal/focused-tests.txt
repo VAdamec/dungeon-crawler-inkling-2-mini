@@ -1,0 +1,28 @@
+✔ retreat confirms/cancels, returns to town with full HP, and preserves progression and loot (644.615333ms)
+✔ depth 1 retreat returns to town and lethal damage wins over health pause (394.796ms)
+✔ retreat closes an open portal and blocked return points resolve safely (340.205917ms)
+✔ retreat cooldown counts only active time, pauses in town, and cancellation does not consume it (1035.441875ms)
+✔ help on launch does not start play and preserves health or retreat dialogs underneath (559.012542ms)
+✔ Town Scroll can be bought, found, and counted without mixing with potions (253.798333ms)
+✔ J opens a one-shot Town Scroll portal and returns to the exact dungeon tile (342.383958ms)
+✔ Town Scroll return reuses the saved floor instead of regenerating it (357.847291ms)
+✔ Town Scroll return resolves blocked exit tiles safely (306.36675ms)
+✔ Town Scroll portal survives dungeon travel but clears on retreat, death, ending, and restart (465.508541ms)
+✔ help and HUD describe Town Scroll availability and portal state (243.958083ms)
+✔ teleportTown creates a debug portal without consuming scrolls and returns through it (315.141875ms)
+✔ teleportTown rejects when portal open, in town, or blocked states (340.07025ms)
+✔ T1 debug portal rejects extra arguments atomically and accepts case-insensitive zero-argument commands (290.472291ms)
+✔ T1 debug portal rejects hidden, dead, paused, cinematic and player-menu contexts without changing gameplay (2764.154375ms)
+✔ T1 debug travel saves the current floor without healing, RNG, rewards or resource changes (304.838958ms)
+✔ T1 debug portal cannot replace a return point after loadLevel or repeated town commands (354.616167ms)
+✔ T1 J and Space return through the saved debug portal once without regenerating its floor (628.012ms)
+✔ T1 debug portal uses the existing safe fallback when its return tile becomes blocked (293.764041ms)
+✔ console help lists teleportTown and addScrolls (196.057417ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10667.519917

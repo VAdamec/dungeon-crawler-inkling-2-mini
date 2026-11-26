@@ -1,0 +1,200 @@
+✖ S3 save requests portable JSON without progress/RNG/audio changes and cleans each URL independently (166.393917ms)
+✖ S3 unsupported/failed export leaves adventure and URLs intact or cleaned with honest feedback (57.779875ms)
+✖ S3 Help/launch/death Load opens one frozen accessible dialog and Cancel restores focus/inert context (57.849208ms)
+✖ S3 real read phases validate before preview and only explicit deferred confirmation loads (232.55175ms)
+✖ S3 file size is checked before reading and corrupt/future/read errors remain reversible (65.556625ms)
+✖ S3 replacement reads, same-file reselection and native cancel ignore old results (231.783417ms)
+✖ S3 stale file events and queued validation/confirmation cannot affect a newer session or run (225.196125ms)
+✖ S3 deferred validation while hidden stays owned and permits confirmation only after visibility returns (242.943208ms)
+✖ S3 failed commit returns to the origin with error feedback and releases read/UI resources (295.999125ms)
+✖ S3 cancel aborts an active reader and R clears dialog/status without serializing UI (57.257708ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 0
+ℹ fail 10
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1751.412959
+
+✖ failing tests:
+
+test at ../../../../../private/tmp/dungeon-s3-before/tests/game.test.cjs:4800:1
+✖ S3 save requests portable JSON without progress/RNG/audio changes and cleans each URL independently (166.393917ms)
+  evalmachine.<anonymous>:19
+      updateSaveFileButtons();
+      ^
+  
+  ReferenceError: updateSaveFileButtons is not defined
+      at evalmachine.<anonymous>:19:5
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/private/tmp/dungeon-s3-before/tests/game.test.cjs:139:21)
+      at s3Files (/private/tmp/dungeon-s3-before/tests/game.test.cjs:4770:5)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s3-before/tests/game.test.cjs:4801:37)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17)
+
+test at ../../../../../private/tmp/dungeon-s3-before/tests/game.test.cjs:4813:1
+✖ S3 unsupported/failed export leaves adventure and URLs intact or cleaned with honest feedback (57.779875ms)
+  evalmachine.<anonymous>:19
+      updateSaveFileButtons();
+      ^
+  
+  ReferenceError: updateSaveFileButtons is not defined
+      at evalmachine.<anonymous>:19:5
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/private/tmp/dungeon-s3-before/tests/game.test.cjs:139:21)
+      at s3Files (/private/tmp/dungeon-s3-before/tests/game.test.cjs:4770:5)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s3-before/tests/game.test.cjs:4815:39)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+
+test at ../../../../../private/tmp/dungeon-s3-before/tests/game.test.cjs:4825:1
+✖ S3 Help/launch/death Load opens one frozen accessible dialog and Cancel restores focus/inert context (57.849208ms)
+  evalmachine.<anonymous>:19
+      updateSaveFileButtons();
+      ^
+  
+  ReferenceError: updateSaveFileButtons is not defined
+      at evalmachine.<anonymous>:19:5
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/private/tmp/dungeon-s3-before/tests/game.test.cjs:139:21)
+      at s3Files (/private/tmp/dungeon-s3-before/tests/game.test.cjs:4770:5)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s3-before/tests/game.test.cjs:4827:52)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+
+test at ../../../../../private/tmp/dungeon-s3-before/tests/game.test.cjs:4845:1
+✖ S3 real read phases validate before preview and only explicit deferred confirmation loads (232.55175ms)
+  evalmachine.<anonymous>:19
+      updateSaveFileButtons();
+      ^
+  
+  ReferenceError: updateSaveFileButtons is not defined
+      at evalmachine.<anonymous>:19:5
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/private/tmp/dungeon-s3-before/tests/game.test.cjs:139:21)
+      at s3Files (/private/tmp/dungeon-s3-before/tests/game.test.cjs:4770:5)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s3-before/tests/game.test.cjs:4846:76)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+
+test at ../../../../../private/tmp/dungeon-s3-before/tests/game.test.cjs:4861:1
+✖ S3 file size is checked before reading and corrupt/future/read errors remain reversible (65.556625ms)
+  evalmachine.<anonymous>:19
+      updateSaveFileButtons();
+      ^
+  
+  ReferenceError: updateSaveFileButtons is not defined
+      at evalmachine.<anonymous>:19:5
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/private/tmp/dungeon-s3-before/tests/game.test.cjs:139:21)
+      at s3Files (/private/tmp/dungeon-s3-before/tests/game.test.cjs:4770:5)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s3-before/tests/game.test.cjs:4862:37)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+
+test at ../../../../../private/tmp/dungeon-s3-before/tests/game.test.cjs:4875:1
+✖ S3 replacement reads, same-file reselection and native cancel ignore old results (231.783417ms)
+  evalmachine.<anonymous>:19
+      updateSaveFileButtons();
+      ^
+  
+  ReferenceError: updateSaveFileButtons is not defined
+      at evalmachine.<anonymous>:19:5
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/private/tmp/dungeon-s3-before/tests/game.test.cjs:139:21)
+      at s3Files (/private/tmp/dungeon-s3-before/tests/game.test.cjs:4770:5)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s3-before/tests/game.test.cjs:4877:37)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+
+test at ../../../../../private/tmp/dungeon-s3-before/tests/game.test.cjs:4888:1
+✖ S3 stale file events and queued validation/confirmation cannot affect a newer session or run (225.196125ms)
+  evalmachine.<anonymous>:19
+      updateSaveFileButtons();
+      ^
+  
+  ReferenceError: updateSaveFileButtons is not defined
+      at evalmachine.<anonymous>:19:5
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/private/tmp/dungeon-s3-before/tests/game.test.cjs:139:21)
+      at s3Files (/private/tmp/dungeon-s3-before/tests/game.test.cjs:4770:5)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s3-before/tests/game.test.cjs:4891:39)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+
+test at ../../../../../private/tmp/dungeon-s3-before/tests/game.test.cjs:4902:1
+✖ S3 deferred validation while hidden stays owned and permits confirmation only after visibility returns (242.943208ms)
+  evalmachine.<anonymous>:19
+      updateSaveFileButtons();
+      ^
+  
+  ReferenceError: updateSaveFileButtons is not defined
+      at evalmachine.<anonymous>:19:5
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/private/tmp/dungeon-s3-before/tests/game.test.cjs:139:21)
+      at s3Files (/private/tmp/dungeon-s3-before/tests/game.test.cjs:4770:5)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s3-before/tests/game.test.cjs:4903:76)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+
+test at ../../../../../private/tmp/dungeon-s3-before/tests/game.test.cjs:4911:1
+✖ S3 failed commit returns to the origin with error feedback and releases read/UI resources (295.999125ms)
+  evalmachine.<anonymous>:19
+      updateSaveFileButtons();
+      ^
+  
+  ReferenceError: updateSaveFileButtons is not defined
+      at evalmachine.<anonymous>:19:5
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/private/tmp/dungeon-s3-before/tests/game.test.cjs:139:21)
+      at s3Files (/private/tmp/dungeon-s3-before/tests/game.test.cjs:4770:5)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s3-before/tests/game.test.cjs:4912:64)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+
+test at ../../../../../private/tmp/dungeon-s3-before/tests/game.test.cjs:4922:1
+✖ S3 cancel aborts an active reader and R clears dialog/status without serializing UI (57.257708ms)
+  evalmachine.<anonymous>:19
+      updateSaveFileButtons();
+      ^
+  
+  ReferenceError: updateSaveFileButtons is not defined
+      at evalmachine.<anonymous>:19:5
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/private/tmp/dungeon-s3-before/tests/game.test.cjs:139:21)
+      at s3Files (/private/tmp/dungeon-s3-before/tests/game.test.cjs:4770:5)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s3-before/tests/game.test.cjs:4923:37)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)

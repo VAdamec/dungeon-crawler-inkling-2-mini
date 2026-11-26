@@ -1,0 +1,45 @@
+{
+  "results": [
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "mobileTouchEmulation": false,
+      "protocol": "file:",
+      "nativeConsoleEnter": true,
+      "discovery": true,
+      "exactDeltaAndHud": true,
+      "strictInput": true,
+      "safeBoundary": true,
+      "townDungeonGodMode": true,
+      "semanticSnapshotUnchangedExceptGold": true,
+      "noRngOrSound": true,
+      "tradeBlocked": true,
+      "hiddenCheck": "explicit document.hidden fixture; not native background observation",
+      "errors": [],
+      "remote": []
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "mobileTouchEmulation": true,
+      "protocol": "file:",
+      "nativeConsoleEnter": true,
+      "discovery": true,
+      "exactDeltaAndHud": true,
+      "strictInput": true,
+      "safeBoundary": true,
+      "townDungeonGodMode": true,
+      "semanticSnapshotUnchangedExceptGold": true,
+      "noRngOrSound": true,
+      "tradeBlocked": true,
+      "hiddenCheck": "explicit document.hidden fixture; not native background observation",
+      "errors": [],
+      "remote": []
+    }
+  ],
+  "nativeBackgroundObserved": "unverified"
+}

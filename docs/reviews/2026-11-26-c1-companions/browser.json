@@ -1,0 +1,150 @@
+{
+  "results": [
+    {
+      "width": 1440,
+      "protocol": "file:",
+      "realLaunchChoice": true,
+      "manualRecruitment": "staged model helper, not C2 Space UI acceptance",
+      "firstDescentIdempotent": true,
+      "bosses": [
+        {
+          "depth": 3,
+          "id": "cook",
+          "sprite": "cook",
+          "validFrames": true
+        },
+        {
+          "depth": 5,
+          "id": "mimic",
+          "sprite": "mimic",
+          "validFrames": true
+        },
+        {
+          "depth": 7,
+          "id": "bartender",
+          "sprite": "bartender",
+          "validFrames": true
+        },
+        {
+          "depth": 10,
+          "id": "hydra",
+          "sprite": "hydra",
+          "validFrames": true
+        },
+        {
+          "depth": 20,
+          "id": "boar",
+          "sprite": "boar",
+          "validFrames": true
+        },
+        {
+          "depth": 30,
+          "id": "medusa",
+          "sprite": "medusa",
+          "validFrames": true
+        },
+        {
+          "depth": 40,
+          "id": "wizard",
+          "sprite": "darkWizard",
+          "validFrames": true
+        },
+        {
+          "depth": 50,
+          "id": "skeletonKing",
+          "sprite": "skeletonKing",
+          "validFrames": true
+        },
+        {
+          "depth": 100,
+          "id": "dragon",
+          "sprite": "dragonBoss",
+          "validFrames": true
+        }
+      ],
+      "endingPhases": [
+        "heal",
+        "escape",
+        "sunset",
+        "done"
+      ],
+      "restartDefaultWithoutLaunch": true,
+      "errors": [],
+      "remote": []
+    },
+    {
+      "width": 390,
+      "protocol": "file:",
+      "realLaunchChoice": true,
+      "manualRecruitment": "staged model helper, not C2 Space UI acceptance",
+      "firstDescentIdempotent": true,
+      "bosses": [
+        {
+          "depth": 3,
+          "id": "cook",
+          "sprite": "cook",
+          "validFrames": true
+        },
+        {
+          "depth": 5,
+          "id": "mimic",
+          "sprite": "mimic",
+          "validFrames": true
+        },
+        {
+          "depth": 7,
+          "id": "bartender",
+          "sprite": "bartender",
+          "validFrames": true
+        },
+        {
+          "depth": 10,
+          "id": "hydra",
+          "sprite": "hydra",
+          "validFrames": true
+        },
+        {
+          "depth": 20,
+          "id": "boar",
+          "sprite": "boar",
+          "validFrames": true
+        },
+        {
+          "depth": 30,
+          "id": "medusa",
+          "sprite": "medusa",
+          "validFrames": true
+        },
+        {
+          "depth": 40,
+          "id": "wizard",
+          "sprite": "darkWizard",
+          "validFrames": true
+        },
+        {
+          "depth": 50,
+          "id": "skeletonKing",
+          "sprite": "skeletonKing",
+          "validFrames": true
+        },
+        {
+          "depth": 100,
+          "id": "dragon",
+          "sprite": "dragonBoss",
+          "validFrames": true
+        }
+      ],
+      "endingPhases": [
+        "heal",
+        "escape",
+        "sunset",
+        "done"
+      ],
+      "restartDefaultWithoutLaunch": true,
+      "errors": [],
+      "remote": []
+    }
+  ],
+  "method": "real launch/console/R keys; stopped enemy intervals; staged kills/directions/ending advances; browser rAF API present",
+  "nativeBackgroundVerified": false
+}

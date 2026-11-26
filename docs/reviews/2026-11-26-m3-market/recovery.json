@@ -1,0 +1,68 @@
+{
+  "rows": [
+    {
+      "profile": "desktop",
+      "layout": {
+        "fits": true,
+        "footer": true,
+        "body": 457
+      },
+      "disabledFocus": true,
+      "openPaintRecovery": true,
+      "saveFailureRetry": true,
+      "controlledHiddenRetention": true,
+      "portalCompanionAndCooldown": true,
+      "healthHelpRestore": true,
+      "restart": true
+    },
+    {
+      "profile": "touch",
+      "layout": {
+        "fits": true,
+        "footer": true,
+        "body": 514
+      },
+      "disabledFocus": true,
+      "openPaintRecovery": true,
+      "saveFailureRetry": true,
+      "controlledHiddenRetention": true,
+      "portalCompanionAndCooldown": true,
+      "healthHelpRestore": true,
+      "restart": true
+    },
+    {
+      "profile": "narrow",
+      "layout": {
+        "fits": true,
+        "footer": true,
+        "body": 123
+      },
+      "disabledFocus": true,
+      "openPaintRecovery": true,
+      "saveFailureRetry": true,
+      "controlledHiddenRetention": true,
+      "portalCompanionAndCooldown": true,
+      "healthHelpRestore": true,
+      "restart": true
+    },
+    {
+      "profile": "landscape",
+      "layout": {
+        "fits": true,
+        "footer": true,
+        "body": 119
+      },
+      "disabledFocus": true,
+      "openPaintRecovery": true,
+      "saveFailureRetry": true,
+      "controlledHiddenRetention": true,
+      "portalCompanionAndCooldown": true,
+      "healthHelpRestore": true,
+      "restart": true
+    }
+  ],
+  "errors": [],
+  "remote": [],
+  "nativeGR09": "unverified",
+  "note": "Actual Chrome file:// keyboard/click/tap with staged world/progression and injected failure/visibility fixtures. Emulated touch sizes are not physical devices."
+}

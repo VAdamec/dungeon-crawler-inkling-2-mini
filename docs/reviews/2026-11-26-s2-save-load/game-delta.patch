@@ -1,0 +1,509 @@
+diff --git a/tmp/dungeon-s2-before/game.js b/js/game.js
+index 8dd3023..d9faf55 100644
+--- a/tmp/dungeon-s2-before/game.js
++++ b/js/game.js
+@@ -374,7 +374,7 @@ function companionTalk(kind) {
+ 
+ function simulationBlocked() {
+   return !state.started || state.gameOver || state.helpOpen || state.consoleOpen || state.pause
+-    || state.trade || state.companionPicker || document.hidden || state.ending || bossCinematicActive();
++    || state.trade || state.companionPicker || state.loadSession || document.hidden || state.ending || bossCinematicActive();
+ }
+ 
+ function companionTick() {
+@@ -805,7 +805,7 @@ function captureSaveData(source, context) {
+   saveFields(context,['createdAt','hidden','tradeOpen','companionOpen']);
+   for (const key of ['hidden','tradeOpen','companionOpen']) saveBoolean(context[key]);
+   saveRequire(source && source.started && !source.gameOver && !source.won && source.player.hp>0
+-    && !source.godMode && !source.consoleOpen && !source.pause && !source.trade && !source.companionPicker
++    && !source.loadSession && !source.godMode && !source.consoleOpen && !source.pause && !source.trade && !source.companionPicker
+     && !source.ending && !(source.bossIntro && !source.bossIntro.completed) && !(source.bossDefeat && !source.bossDefeat.completed)
+     && !context.hidden && !context.tradeOpen && !context.companionOpen,'snapshot context is not stable living play');
+   const run=savePick(source,SAVE_RUN_FIELDS);
+@@ -840,9 +840,174 @@ function captureSaveData(source, context) {
+ 
+ function serializeSaveData(source, context) { return JSON.stringify(captureSaveData(source,context)); }
+ 
++// S2 model hydration: validated detached data only; resources are attached at the commit boundary.
++function hydrateSaveData(value) {
++  const run = validateSaveData(value).run;
++  const town = run.town;
++  for (const floor of Object.values(run.floors)) floor.visited = new Set(floor.visited);
++  town.visited = new Set(town.visited); town.speech = null;
++  town.landmarks = { inn:town.landmarks.inn, store:town.store, gate:town.landmarks.gate,
++    companionBoard:town.props[town.landmarks.companionBoardIndex] };
++  const candidate = {
++    ...savePick(run,SAVE_RUN_FIELDS), floors:run.floors, town,
++    companion:run.companion ? makeCompanion(run.companion.id,run.companion.x,run.companion.y) : null,
++    inn:town.landmarks.inn, townGate:town.landmarks.gate,
++    started:true, gameOver:false, won:false, helpOpen:false, helpFocus:null,
++    consoleOpen:false, consoleLines:[], consoleHistory:[], consoleHistoryIndex:0,
++    godMode:false, godModeStats:null, trade:null, companionPicker:null, loadSession:null, pause:null,
++    ending:null, bossIntro:null, bossDefeat:null, bubble:null, monsterSpeech:null, companionSpeech:null,
++    lastTick:0, audio:null, art:null, motion:freshMotionState(),
++    camera:{ x:Math.max(0,Math.min(W-VIEW_W,run.player.x-Math.floor(VIEW_W/2))),
++      y:Math.max(0,Math.min(H-VIEW_H,run.player.y-Math.floor(VIEW_H/2))) },
++  };
++  if (run.area === 'dungeon') {
++    for (const field of FLOOR_FIELDS) candidate[field] = run.floors[run.depth][field];
++    candidate.monsters = run.encounter.monsters;
++    candidate.boss = candidate.monsters.find(m=>m.id===run.encounter.bossId) || null;
++    candidate.bossIntroSeen = run.encounter.bossIntroSeen;
++    candidate.bossSummonAt = run.encounter.bossSummonAt;
++  } else {
++    candidate.map=town.map; candidate.visited=town.visited; candidate.props=town.props;
++    candidate.merchant=town.store; candidate.rooms=[]; candidate.potions=[]; candidate.treasures=[];
++    candidate.stairs=null; candidate.upstairs=null; candidate.prisoner=null; candidate.princess=null;
++    candidate.monsterSpawns=[]; candidate.monsters=[]; candidate.boss=null; candidate.bossDefeated=false;
++    candidate.floorKey=null; candidate.obstacles=[]; candidate.hazards=[]; candidate.hazardTime=0;
++    candidate.biome='town'; candidate.bossIntroSeen=false; candidate.bossSummonAt=0;
++  }
++  return candidate;
++}
++
++function saveLoadAllowed() {
++  const roster=document.getElementById('companionOverlay'), trade=document.getElementById('tradeOverlay');
++  if (!state || document.hidden || state.won || state.ending || state.pause || state.consoleOpen
++    || state.trade || state.companionPicker || bossCinematicActive()
++    || (roster && !roster.hidden) || (trade && !trade.hidden)) return false;
++  return state.gameOver ? state.started && state.player.hp<=0 : state.player.hp>0;
++}
++
++function beginSaveLoad() {
++  if (!saveLoadAllowed()) return null;
++  const session={ owner:state, map:state.map, area:state.area, depth:state.depth,
++    started:state.started, gameOver:state.gameOver };
++  state.loadSession=session; // Replacing this identity invalidates every older read/confirmation.
++  stopMotionAnimation();
++  return session;
++}
++
++function saveLoadSessionCurrent(session) {
++  return !!session && state.loadSession===session && session.owner===state && session.map===state.map
++    && session.area===state.area && session.depth===state.depth && session.started===state.started
++    && session.gameOver===state.gameOver && saveLoadAllowed();
++}
++
++function cancelSaveLoad(session = state && state.loadSession, resume = true) {
++  if (!session || !state || state.loadSession!==session) return false;
++  state.loadSession=null;
++  resetHelpClock();
++  if (resume) requestMotionFrame();
++  return true;
++}
++
++// Only existing presentation nodes are touched. Snapshots retain nodes/listeners and canvas pixels.
++const SAVE_LOAD_UI_IDS = ['launchScreen','gameLayout','overlay','pauseOverlay','helpOverlay','helpToggle',
++  'tradeOverlay','companionOverlay','devConsole','consoleInput','consoleOutput','endingControls','skipEnding',
++  'log','hpText','hpfill','mpText','mpfill','lvl','xpfill','depth','kills','turn','gold','potions','scrolls',
++  'keyStatus','posText','retreatStatus','companionStat','companionName','companionPostAction','companionAudioToggle',
++  'godModeStat','objective','musicVolume','musicVolumeText','effectsVolume','effectsVolumeText','audioToggle',
++  'weaponSlot','weaponName','weaponBonuses','armorSlot','armorName','armorBonuses','ringSlot','ringName','ringBonuses',
++  'gearHpBonus','gearStrBonus','heroMaxHp','heroStrength','heroAttack','heroDefense','heroDexterity','spellList',
++  'merchantStock','minimapDepth'];
++
++function captureLoadPresentation() {
++  const nodes=SAVE_LOAD_UI_IDS.map(id=>{
++    const node=document.getElementById(id);
++    return {node, text:node.children && node.children.length ? null : node.textContent,
++      hidden:node.hidden, disabled:node.disabled, inert:node.inert, value:node.value,
++      ariaPressed:node.ariaPressed, ariaExpanded:node.ariaExpanded, className:node.className,
++      css:node.style.cssText, display:node.style.display, width:node.style.width, scrollTop:node.scrollTop};
++  });
++  const canvases=[];
++  for (const id of ['game','minimap','weaponIcon','armorIcon','ringIcon']) {
++    const surface=document.getElementById(id);
++    if (surface.width && surface.height) canvases.push({surface,width:surface.width,height:surface.height,
++      pixels:surface.getContext('2d').getImageData(0,0,surface.width,surface.height)});
++  }
++  return {nodes,canvases,focus:document.activeElement};
++}
++
++function restoreLoadPresentation(saved) {
++  for (const row of saved.nodes) {
++    const node=row.node;
++    if (row.text!==null) node.textContent=row.text;
++    for (const key of ['hidden','disabled','inert','value','ariaPressed','ariaExpanded','className','scrollTop']) node[key]=row[key];
++    if (row.css!==undefined) node.style.cssText=row.css;
++    else { node.style.display=row.display; node.style.width=row.width; }
++  }
++  for (const row of saved.canvases) {
++    // Width reset also unwinds any canvas transform/save stack left by a failed painter.
++    row.surface.width=row.width; row.surface.height=row.height;
++    const context=row.surface.getContext('2d'); context.imageSmoothingEnabled=false;
++    context.putImageData(row.pixels,0,0);
++  }
++  saved.focus?.focus?.();
++}
++
++function cancelSaveLoadFrames(owner) {
++  for (const item of [owner.motion,owner.ending,owner.bossIntro,owner.bossDefeat]) {
++    if (!item) continue;
++    if (item.frameId!==null && typeof window.cancelAnimationFrame==='function') {
++      try { window.cancelAnimationFrame(item.frameId); } catch (error) { /* Identity guards still reject stale frames. */ }
++    }
++    item.frameId=null;
++  }
++}
++
++function commitSaveLoad(session, value) {
++  if (!saveLoadSessionCurrent(session)) return false;
++  const candidate=hydrateSaveData(value); // All validation/allocation happens before changing the old run/UI.
++  if (!saveLoadSessionCurrent(session)) return false;
++  const previous=state, presentation=captureLoadPresentation();
++  if (!saveLoadSessionCurrent(session)) return false;
++  candidate.audio=previous.audio; candidate.art=previous.art;
++  candidate.lastTick=Date.now();
++  previous.loadSession=null; // Invalidate the confirmation before swapping; a consumed token never retries.
++  state=candidate;
++  try {
++    for (const id of ['helpOverlay','tradeOverlay','companionOverlay','devConsole','endingControls']) document.getElementById(id).hidden=true;
++    document.getElementById('overlay').style.display='none';
++    document.getElementById('pauseOverlay').style.display='none';
++    document.getElementById('helpToggle').ariaExpanded='false';
++    document.getElementById('gameLayout').inert=false;
++    document.getElementById('launchScreen').inert=false;
++    document.getElementById('launchScreen').hidden=true;
++    document.getElementById('gameLayout').hidden=false;
++    document.getElementById('consoleInput').value='';
++    document.getElementById('consoleOutput').textContent='';
++    const journal=document.getElementById('log');
++    journal.textContent=[...candidate.messages].reverse().join('\n\n'); journal.scrollTop=0;
++    render(true); // Presentation-only: preserve saved warning latches/HP rather than running checkHealth.
++    if (state!==candidate) return false;
++    canvas.focus?.();
++    if (state!==candidate) return false;
++    candidate.lastTick=Date.now();
++    cancelSaveLoadFrames(previous);
++    return true;
++  } catch (error) {
++    cancelSaveLoadFrames(candidate);
++    if (state===candidate) {
++      state=previous;
++      state.lastTick=Date.now(); // Failed presentation/cancel time earns no active-time credit.
++      restoreLoadPresentation(presentation);
++      try { requestMotionFrame(); } catch (ignored) { /* Original render error remains the reported failure. */ }
++    }
++    throw error;
++  }
++}
++
+ let state;
+ 
+ function newGame() {
++  cancelSaveLoad(state && state.loadSession, false);
+   closeCompanionBoard(state && state.companionPicker, false);
+   stopMotionAnimation();
+   stopEndingAnimation();
+@@ -858,7 +1023,7 @@ function newGame() {
+     selectedCompanion: 'marmalade',
+     unlockedCompanions: ['marmalade', 'pip'],
+     companionChoice: 'marmalade', companionEntryDone: false, companionPicker: null,
+-    trade: null,
++    trade: null, loadSession: null,
+     player: { x: 0, y: 0, hp: 60, maxHp: 60, mp: 20, maxMp: 20, str: 12, dex: 10, def: 3, lvl: 1, xp: 0, xpNext: 40, spells: { fireball: true, heal: true } },
+     spellReadyAt: { fireball: 0, heal: 0, frostbolt: 0, greaterHeal: 0, magicBarrier: 0 },
+     inventory: [], townScrolls: 0,
+@@ -891,6 +1056,7 @@ function newGame() {
+ }
+ 
+ function setCompanionChoice(id) {
++  if (state.loadSession) return;
+   const def = companionDef(id);
+   if (!def || def.unlock !== 'start' || state.companionEntryDone) return false;
+   state.companionChoice = id;
+@@ -903,6 +1069,7 @@ function setCompanionChoice(id) {
+ }
+ 
+ function startGame() {
++  if (state.loadSession) return;
+   if (state.started) return;
+   state.selectedCompanion = state.companionChoice || state.selectedCompanion || 'marmalade';
+   state.started = true;
+@@ -1211,6 +1378,7 @@ function saveTown() {
+ }
+ 
+ function enterTown() {
++  cancelSaveLoad(state && state.loadSession, false);
+   closeCompanionBoard(state && state.companionPicker, false);
+   if (state.area === 'town' || !state.town) return;
+   saveFloor();
+@@ -1311,6 +1479,7 @@ function returnThroughTownPortal() {
+ }
+ 
+ function useTownScroll() {
++  if (state.loadSession) return;
+   if (state.companionPicker) return;
+   if (state.gameOver || state.helpOpen || state.consoleOpen || state.trade || state.pause || state.ending || bossCinematicActive()) return;
+   if (state.area === 'town') {
+@@ -1335,6 +1504,7 @@ function useTownScroll() {
+ }
+ 
+ function townTick() {
++  if (state.loadSession) return;
+   const companionOverlayOpen = typeof document !== 'undefined' && document.getElementById && document.getElementById('companionOverlay') && !document.getElementById('companionOverlay').hidden;
+   if (!state.started || state.gameOver || state.helpOpen || state.consoleOpen || state.trade || companionOverlayOpen || state.pause || document.hidden) return false;
+   const town = state.town;
+@@ -1378,6 +1548,7 @@ function townNpcTalk(npc) {
+ }
+ 
+ function townInteract() {
++  if (state.loadSession) return;
+   if (state.companionPicker) return;
+   if (state.area !== 'town') return false;
+   const p = state.player;
+@@ -1907,6 +2078,7 @@ function damageMonster(m, dmg) {
+ }
+ 
+ function attackMonster(m) {
++  if (state.loadSession) return;
+   if (state.gameOver || state.helpOpen || state.pause) return;
+   markCombat();
+   playSound('slash');
+@@ -1958,6 +2130,7 @@ function spawnProjectile(kind, source, target, duration = 0.35) {
+ }
+ 
+ function shootBow() {
++  if (state.loadSession) return;
+   if (state.companionPicker) return;
+   if (state.area === 'town') return;
+   if (!state.started || state.gameOver || state.helpOpen || state.pause || bossCinematicActive()) return;
+@@ -1979,6 +2152,7 @@ function shootBow() {
+ }
+ 
+ function castSpell(spellName) {
++  if (state.loadSession) return;
+   if (state.companionPicker) return;
+   if (state.area === 'town') return;
+   if (!state.started || state.gameOver || state.helpOpen || state.pause || bossCinematicActive()) return;
+@@ -2185,6 +2359,7 @@ function drawMonsterSpeech() {
+ }
+ 
+ function gameOver(won) {
++  cancelSaveLoad(state.loadSession, false);
+   if (won) { startEnding(); return; }
+   clearBossIntro();
+   clearBossDefeat();
+@@ -2293,6 +2468,7 @@ function playBossIntroSound(kind) {
+ }
+ 
+ function checkBossIntro() {
++  if (state.loadSession) return;
+   if (state.area === 'town') return;
+   const m = state && state.boss;
+   if (!m || m.hp <= 0 || state.bossIntroSeen || !state.started || state.gameOver || state.helpOpen || state.pause || bossCinematicActive()) return;
+@@ -2535,6 +2711,7 @@ function bossDefeatScene() {
+ }
+ 
+ function movePlayer(dx, dy) {
++  if (state.loadSession) return;
+   if (state.companionPicker) return;
+   if (state.gameOver || state.helpOpen || state.pause || bossCinematicActive()) return;
+   const p = state.player;
+@@ -2622,6 +2799,7 @@ function recreateMonsters() {
+ 
+ function enterFloor(depth, fromBelow, fresh = false, arrivalTile = null) {
+   if (depth < 1 || depth > FINAL_DEPTH) return;
++  cancelSaveLoad(state.loadSession, false);
+   closeCompanionBoard(state.companionPicker, false);
+   clearBossIntro();
+   clearBossDefeat();
+@@ -2652,6 +2830,7 @@ function enterFloor(depth, fromBelow, fresh = false, arrivalTile = null) {
+ }
+ 
+ function descendStairs() {
++  if (state.loadSession) return;
+   if (state.gameOver || state.helpOpen || state.pause) return;
+   const p = state.player;
+   if (p.x !== state.stairs.x || p.y !== state.stairs.y) return;
+@@ -2675,6 +2854,7 @@ function descendStairs() {
+ }
+ 
+ function ascendStairs() {
++  if (state.loadSession) return;
+   if (state.gameOver || state.helpOpen || state.pause) return;
+   const p = state.player;
+   if (!state.upstairs || p.x !== state.upstairs.x || p.y !== state.upstairs.y) {
+@@ -2733,6 +2913,7 @@ function restoreCompanionFocus(session) {
+ }
+ 
+ function openCompanionBoard() {
++  if (state.loadSession) return;
+   const board = companionPostContext();
+   if (!board || state.companionPicker) return false;
+   const overlay = document.getElementById('companionOverlay'), list = document.getElementById('companionBoardList');
+@@ -2785,6 +2966,7 @@ function selectCompanion(id, session) {
+ }
+ 
+ function openTrade() {
++  if (state.loadSession) return;
+   if (state.companionPicker) return;
+   if (state.gameOver || state.helpOpen || state.consoleOpen || state.trade || state.pause || state.ending || bossCinematicActive()) return;
+   const m = merchantAt(state.player.x, state.player.y);
+@@ -2874,6 +3056,7 @@ function tradeSell(slot) {
+   renderTrade(); render();
+ }
+ function buyFromMerchant() {
++  if (state.loadSession) return;
+   const m = merchantAt(state.player.x, state.player.y);
+   if (!m) { log('No merchant here.'); render(); return; }
+   if (state.trade) { tradeBuy(0); return; }
+@@ -2897,6 +3080,7 @@ function buyFromMerchant() {
+   render();
+ }
+ function sellToMerchant() {
++  if (state.loadSession) return;
+   const m = merchantAt(state.player.x, state.player.y);
+   if (!m) { log('No merchant here.'); render(); return; }
+   if (state.trade) { const slot = ['weapon','armor','ring'].find(s => state.equipment[s]); if (slot) tradeSell(slot); else { log('You have no gear to sell.'); renderTrade(); render(); } return; }
+@@ -2916,6 +3100,7 @@ function prisonerAt(x, y) {
+   return state.prisoner && state.prisoner.x === x && state.prisoner.y === y ? state.prisoner : null;
+ }
+ function rescuePrisoner() {
++  if (state.loadSession) return;
+   if (state.gameOver || state.helpOpen || state.pause) return;
+   const p = state.player;
+   const pr = prisonerAt(p.x, p.y);
+@@ -2936,6 +3121,7 @@ function princessAt(x, y) {
+   return state.princess && state.princess.x === x && state.princess.y === y ? state.princess : null;
+ }
+ function rescuePrincess() {
++  if (state.loadSession) return;
+   if (state.gameOver || state.helpOpen || state.pause) return;
+   const p = state.player;
+   const pr = princessAt(p.x, p.y);
+@@ -2955,6 +3141,7 @@ function rescuePrincess() {
+ }
+ 
+ function pickup() {
++  if (state.loadSession) return;
+   if (state.companionPicker) return;
+   if (state.gameOver || state.helpOpen || state.pause) return;
+   if (state.area === 'town') { townInteract(); return; }
+@@ -3018,6 +3205,7 @@ function storePotion(item) {
+ }
+ 
+ function drinkPotion() {
++  if (state.loadSession) return;
+   if (state.companionPicker) return;
+   if (state.gameOver || state.helpOpen || state.trade || (state.pause && state.pause.kind !== 'health')) return;
+   const p = state.player;
+@@ -3054,6 +3242,7 @@ function hurtPlayer(damage, message) {
+ }
+ 
+ function checkHealth() {
++  if (state.loadSession) return;
+   freezePlayerStats();
+   if (state.area === 'town' || state.gameOver || state.helpOpen || state.trade || state.godMode) return;
+   const ratio = state.player.hp / state.player.maxHp;
+@@ -3088,6 +3277,7 @@ function advanceActiveTime(elapsed) {
+ }
+ 
+ function retreat() {
++  if (state.loadSession) return;
+   if (!state.started || state.companionPicker || state.trade || state.consoleOpen || state.helpOpen || document.hidden || state.ending || bossCinematicActive()) return;
+   if (state.area === 'town') { log('No need to retreat while you are in town.'); render(); return; }
+   if (state.gameOver || state.helpOpen || (state.pause && state.pause.kind === 'retreat')) return;
+@@ -3823,6 +4013,7 @@ function endingCaption() {
+ }
+ 
+ function startEnding() {
++  cancelSaveLoad(state && state.loadSession, false);
+   if (state.ending || state.depth !== FINAL_DEPTH || !state.bossDefeated || !state.princess || !state.princess.rescued) return;
+   const dragon = state.boss || state.monsterSpawns.find(m => m.isDragon);
+   state.ending = { elapsed: 0, phase: 'reveal', completed: false, frameId: null,
+@@ -4213,6 +4404,7 @@ function consoleMessage(text) {
+ }
+ 
+ function openConsole() {
++  if (state.loadSession) return;
+   if (state.consoleOpen || state.helpOpen || state.trade || state.companionPicker) return;
+   state.consoleOpen = true;
+   state.consoleLines = [];
+@@ -4247,6 +4439,7 @@ function loadLevel(raw) {
+     consoleMessage(`Usage: loadLevel <1-${FINAL_DEPTH}>`);
+     return;
+   }
++  cancelSaveLoad(state.loadSession, false);
+   closeCompanionBoard(state.companionPicker, false);
+   if (!state.started) startGame();
+   clearBossIntro();
+@@ -4272,6 +4465,7 @@ function loadLevel(raw) {
+ }
+ 
+ function setGodMode(raw) {
++  if (state.loadSession) return;
+   const value = String(raw ?? '').toLowerCase();
+   const enabled = value === '1' || value === 'on' || value === 'true' ? true
+     : value === '0' || value === 'off' || value === 'false' ? false
+@@ -4293,7 +4487,7 @@ function teleportTown(...args) {
+   const trade = document.getElementById('tradeOverlay');
+   if (!state.started || state.gameOver || state.player.hp <= 0 || document.hidden
+     || state.ending || state.helpOpen || state.pause || bossCinematicActive()
+-    || state.trade || state.companionPicker || (roster && !roster.hidden) || (trade && !trade.hidden)) {
++    || state.trade || state.companionPicker || state.loadSession || (roster && !roster.hidden) || (trade && !trade.hidden)) {
+     consoleMessage('Cannot teleport now.'); return;
+   }
+   if (state.area === 'town') { consoleMessage('Already in town.'); return; }
+@@ -4319,7 +4513,7 @@ function addScrolls(...args) {
+   const trade = document.getElementById('tradeOverlay');
+   if (!state.started || state.gameOver || state.player.hp <= 0 || document.hidden
+     || state.ending || state.helpOpen || state.pause || bossCinematicActive()
+-    || state.trade || state.companionPicker || (roster && !roster.hidden) || (trade && !trade.hidden)) {
++    || state.trade || state.companionPicker || state.loadSession || (roster && !roster.hidden) || (trade && !trade.hidden)) {
+     consoleMessage('Cannot add scrolls now.'); return;
+   }
+   state.townScrolls += count;
+@@ -4341,7 +4535,7 @@ function addGold(...args) {
+   if (!state.started || state.gameOver || state.player.hp <= 0 || document.hidden
+     || (state.area !== 'town' && state.area !== 'dungeon')
+     || state.ending || state.helpOpen || state.pause || bossCinematicActive()
+-    || state.trade || state.companionPicker || (roster && !roster.hidden) || (trade && !trade.hidden)) {
++    || state.trade || state.companionPicker || state.loadSession || (roster && !roster.hidden) || (trade && !trade.hidden)) {
+     consoleMessage('Cannot add gold now.'); return;
+   }
+   state.gold += amount;
+@@ -4376,6 +4570,7 @@ function consoleHistoryStep(delta) {
+ }
+ 
+ function openHelp() {
++  if (state.loadSession) return;
+   if (state.helpOpen || state.trade || state.companionPicker) return;
+   state.helpFocus = document.activeElement;
+   state.helpOpen = true;
+@@ -4389,6 +4584,7 @@ function openHelp() {
+ }
+ 
+ function closeHelp() {
++  cancelSaveLoad(state.loadSession, false);
+   if (!state.helpOpen) return;
+   const focus = state.helpFocus;
+   state.helpOpen = false; state.helpFocus = null;
+@@ -4407,9 +4603,8 @@ function toggleHelp() {
+   if (state.helpOpen) closeHelp(); else openHelp();
+ }
+ 
+-function render() {
+-  freezePlayerStats();
+-  checkHealth();
++function render(preserveSaveState = false) {
++  if (!preserveSaveState && !state.loadSession) { freezePlayerStats(); checkHealth(); }
+   renderPause();
+   const p = state.player;
+   draw();
+@@ -4455,6 +4650,15 @@ function render() {
+ 
+ document.addEventListener('keydown', e => {
+   const k = e.key.toLowerCase();
++  if (state.loadSession) {
++    if (k==='escape') { e.preventDefault(); cancelSaveLoad(); return; }
++    if (k==='r' && !e.repeat) { e.preventDefault(); restartFromEnding(); return; }
++    if (k==='m' && !e.repeat) { e.preventDefault(); toggleAudio(); return; }
++    if (k!=='tab') {
++      if (!(e.target && e.target.tagName==='BUTTON' && ['enter',' '].includes(k))) e.preventDefault();
++      return;
++    }
++  }
+   const consoleInput = document.getElementById('consoleInput');
+   if (state.consoleOpen) {
+     if (k === '`' || k === '~' || k === 'escape') { e.preventDefault(); closeConsole(); return; }

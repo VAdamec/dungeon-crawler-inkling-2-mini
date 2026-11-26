@@ -1,0 +1,43 @@
+{
+  "review": "S0 complete",
+  "implementation": "S1\u2013S4 pending; not authorized by review",
+  "stateKeysClassified": 82,
+  "diagnosticAssertions": "pass",
+  "focusedExistingTests": {
+    "pass": 12,
+    "fail": 0
+  },
+  "generatedFloorFixtures": {
+    "seeds": [
+      713,
+      42
+    ],
+    "floorsPerFixture": 100,
+    "dungeonVisitedCellsPerFixture": 614400,
+    "townVisitedCellsPerFixture": 6144,
+    "maximumMeasuredBytes": 8381362,
+    "maximumWith10000ExtraPotionsBytes": 8961361,
+    "absoluteLifetimeMaximumClaimed": false
+  },
+  "syntax": {
+    "js/art-runtime.js": "pass",
+    "js/sprites.js": "pass",
+    "js/game.js": "pass",
+    "check-state.cjs": "pass"
+  },
+  "protectedFilesUnchanged": 10,
+  "matchesC3": true,
+  "fullSuiteRerun": false,
+  "previewBakeSmokeRerun": false,
+  "browserAcceptanceRun": false,
+  "nativeBackgroundVerified": false,
+  "stagedFiles": [],
+  "newRuntimeOrGameTests": false,
+  "localLinksChecked": 131,
+  "brokenLinks": [],
+  "documentationWhitespace": "pass",
+  "notes": [
+    "Review runner wrapper initially executed its body twice; corrected before recorded successful output.",
+    "Source/test checks are current; C3 full224/preview27 are historical, not save/load acceptance."
+  ]
+}

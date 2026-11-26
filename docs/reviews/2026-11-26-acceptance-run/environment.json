@@ -1,0 +1,6 @@
+{
+  "host": "ProductName:\t\tmacOS\nProductVersion:\t\t26.7.3\nBuildVersion:\t\t25G342\n",
+  "hardware": "arm64",
+  "date": "2026-11-26",
+  "packageManifest": "../2026-11-26-release-readiness/package.json"
+}

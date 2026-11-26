@@ -1,0 +1,53 @@
+diff --git a/tmp/dungeon-g1-before/game.js b/js/game.js
+index a1f2044..3641516 100644
+--- a/tmp/dungeon-g1-before/game.js
++++ b/js/game.js
+@@ -3802,7 +3802,7 @@ function openConsole() {
+   document.getElementById('devConsole').hidden = false;
+   const input = document.getElementById('consoleInput');
+   input.value = '';
+-  consoleMessage('Commands: loadLevel <1-100> · godMode 0|1 · teleportTown · addScrolls <n> · help · clear');
++  consoleMessage('Commands: loadLevel <1-100> · godMode 0|1 · teleportTown · addScrolls <n> · goldADD <amount> · help · clear');
+   stopMotionAnimation();
+   input.focus?.();
+ }
+@@ -3909,6 +3909,28 @@ function addScrolls(...args) {
+   consoleMessage(`Added ${count} Town Scroll(s); total ${state.townScrolls}.`);
+ }
+ 
++function addGold(...args) {
++  const raw = args[0];
++  const amount = typeof raw === 'string' && raw.length > 0 && !/[^0-9]/.test(raw) ? Number(raw) : NaN;
++  if (args.length !== 1 || !Number.isSafeInteger(amount) || amount <= 0
++    || !Number.isSafeInteger(state.gold) || state.gold < 0
++    || !Number.isSafeInteger(state.gold + amount)) {
++    consoleMessage('Usage: goldADD <positive integer>'); return;
++  }
++  // Allow the console and god mode, but never change a pending player transaction.
++  const roster = document.getElementById('companionOverlay');
++  const trade = document.getElementById('tradeOverlay');
++  if (!state.started || state.gameOver || state.player.hp <= 0 || document.hidden
++    || (state.area !== 'town' && state.area !== 'dungeon')
++    || state.ending || state.helpOpen || state.pause || bossCinematicActive()
++    || state.trade || state.companionPicker || (roster && !roster.hidden) || (trade && !trade.hidden)) {
++    consoleMessage('Cannot add gold now.'); return;
++  }
++  state.gold += amount;
++  render();
++  consoleMessage(`Added ${amount} gold; total ${state.gold}.`);
++}
++
+ function submitConsole() {
+   const input = document.getElementById('consoleInput');
+   const text = input.value.trim();
+@@ -3923,8 +3945,9 @@ function submitConsole() {
+   else if (command === 'godmode') setGodMode(args[0]);
+   else if (command === 'teleporttown') teleportTown(...args);
+   else if (command === 'addscrolls') addScrolls(...args);
++  else if (command === 'goldadd') addGold(...args);
+   else if (command === 'clear') { state.consoleLines = []; document.getElementById('consoleOutput').textContent = ''; }
+-  else if (command === 'help') consoleMessage('loadLevel <1-100> · godMode 0|1 · teleportTown · addScrolls <n> · help · clear');
++  else if (command === 'help') consoleMessage('loadLevel <1-100> · godMode 0|1 · teleportTown · addScrolls <n> · goldADD <amount> · help · clear');
+   else consoleMessage(`Unknown command: ${name}`);
+ }
+ 

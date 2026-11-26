@@ -1,0 +1,294 @@
+✖ S2 detached hydration reconstructs every alias without touching source, live state or action helpers (330.539167ms)
+✖ S2 atomic load restores exact progression/world/deadlines and retains receiver audio/art (337.574458ms)
+✖ S2 load is allowed from launch, Help, stable god mode and ordinary death with correct focus/overlays (253.568916ms)
+✖ S2 pending load freezes simulation, player actions and launch choices without charging time (154.604916ms)
+✖ S2 stale or cancelled confirmations cannot replace restart, travel, death or a newer session (375.906833ms)
+✖ S2 conflicting load contexts and changed bindings reject without state or focus changes (428.55925ms)
+✖ S2 malformed or failed hydration preserves the exact old run and retryable session (76.0225ms)
+✖ S2 failed commit presentation restores old state, HUD, Help and focus without replaying render (287.9465ms)
+✖ S2 active encounter, guards and final dragon restore exactly while later revisits retain respawn rules (498.870708ms)
+✖ S2 restored portal returns once and ring HP, stock, keys, loot and descent rewards stay once-only (520.371792ms)
+✖ S2 stale motion/cinematic callbacks and reentrant reset cannot overwrite a loaded or newer run (362.068ms)
+✖ S2 all companions and high-level XP hydrate with exact positions, static roles and readiness (365.560041ms)
+✖ S2 restored hazard warnings and cooldowns use saved active time without replay or catch-up (455.30625ms)
+✖ S2 presentation preparation errors and reentrant commits reject before touching the current run (271.449083ms)
+✖ S2 hydrates and atomically loads the final fully explored 100-floor DTO without mutation or RNG (5499.0685ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 0
+ℹ fail 15
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10433.5725
+
+✖ failing tests:
+
+test at ../../../../../private/tmp/dungeon-s2-before/tests/game.test.cjs:4515:1
+✖ S2 detached hydration reconstructs every alias without touching source, live state or action helpers (330.539167ms)
+  evalmachine.<anonymous>:4
+        window.s2Candidate=hydrateSaveData(window.s2Dto);
+        ^
+  
+  ReferenceError: hydrateSaveData is not defined
+      at evalmachine.<anonymous>:4:7
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/private/tmp/dungeon-s2-before/tests/game.test.cjs:139:21)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s2-before/tests/game.test.cjs:4519:7)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17)
+
+test at ../../../../../private/tmp/dungeon-s2-before/tests/game.test.cjs:4534:1
+✖ S2 atomic load restores exact progression/world/deadlines and retains receiver audio/art (337.574458ms)
+  evalmachine.<anonymous>:1
+  commitSaveLoad(beginSaveLoad(),window.s2Dto)
+  ^
+  
+  ReferenceError: commitSaveLoad is not defined
+      at evalmachine.<anonymous>:1:1
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/private/tmp/dungeon-s2-before/tests/game.test.cjs:139:21)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s2-before/tests/game.test.cjs:4551:20)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+
+test at ../../../../../private/tmp/dungeon-s2-before/tests/game.test.cjs:4566:1
+✖ S2 load is allowed from launch, Help, stable god mode and ordinary death with correct focus/overlays (253.568916ms)
+  evalmachine.<anonymous>:1
+  commitSaveLoad(beginSaveLoad(),window.s2Dto)
+  ^
+  
+  ReferenceError: commitSaveLoad is not defined
+      at evalmachine.<anonymous>:1:1
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/private/tmp/dungeon-s2-before/tests/game.test.cjs:139:21)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s2-before/tests/game.test.cjs:4573:20)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+
+test at ../../../../../private/tmp/dungeon-s2-before/tests/game.test.cjs:4583:1
+✖ S2 pending load freezes simulation, player actions and launch choices without charging time (154.604916ms)
+  evalmachine.<anonymous>:1
+  window.s2Session=beginSaveLoad()
+  ^
+  
+  ReferenceError: beginSaveLoad is not defined
+      at evalmachine.<anonymous>:1:1
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/private/tmp/dungeon-s2-before/tests/game.test.cjs:139:21)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s2-before/tests/game.test.cjs:4585:34)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+
+test at ../../../../../private/tmp/dungeon-s2-before/tests/game.test.cjs:4601:1
+✖ S2 stale or cancelled confirmations cannot replace restart, travel, death or a newer session (375.906833ms)
+  evalmachine.<anonymous>:1
+  window.s2Old=beginSaveLoad();cancelSaveLoad()
+  ^
+  
+  ReferenceError: beginSaveLoad is not defined
+      at evalmachine.<anonymous>:1:1
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/private/tmp/dungeon-s2-before/tests/game.test.cjs:139:21)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s2-before/tests/game.test.cjs:4606:42)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+
+test at ../../../../../private/tmp/dungeon-s2-before/tests/game.test.cjs:4622:1
+✖ S2 conflicting load contexts and changed bindings reject without state or focus changes (428.55925ms)
+  evalmachine.<anonymous>:1
+  beginSaveLoad()
+  ^
+  
+  ReferenceError: beginSaveLoad is not defined
+      at evalmachine.<anonymous>:1:1
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/private/tmp/dungeon-s2-before/tests/game.test.cjs:139:21)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s2-before/tests/game.test.cjs:4629:20)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+
+test at ../../../../../private/tmp/dungeon-s2-before/tests/game.test.cjs:4638:1
+✖ S2 malformed or failed hydration preserves the exact old run and retryable session (76.0225ms)
+  evalmachine.<anonymous>:1
+  openHelp();window.s2Token=beginSaveLoad();window.s2OldState=state;window.s2Focus=document.activeElement
+             ^
+  
+  ReferenceError: beginSaveLoad is not defined
+      at evalmachine.<anonymous>:1:12
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/private/tmp/dungeon-s2-before/tests/game.test.cjs:139:21)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s2-before/tests/game.test.cjs:4640:5)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+
+test at ../../../../../private/tmp/dungeon-s2-before/tests/game.test.cjs:4651:1
+✖ S2 failed commit presentation restores old state, HUD, Help and focus without replaying render (287.9465ms)
+  evalmachine.<anonymous>:1
+  state.gold=42;render();openHelp();window.s2Token=beginSaveLoad();window.s2OldState=state;
+                                    ^
+  
+  ReferenceError: beginSaveLoad is not defined
+      at evalmachine.<anonymous>:1:35
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/private/tmp/dungeon-s2-before/tests/game.test.cjs:139:21)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s2-before/tests/game.test.cjs:4653:5)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+
+test at ../../../../../private/tmp/dungeon-s2-before/tests/game.test.cjs:4665:1
+✖ S2 active encounter, guards and final dragon restore exactly while later revisits retain respawn rules (498.870708ms)
+  evalmachine.<anonymous>:1
+  commitSaveLoad(beginSaveLoad(),window.s2Dto)
+  ^
+  
+  ReferenceError: commitSaveLoad is not defined
+      at evalmachine.<anonymous>:1:1
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/private/tmp/dungeon-s2-before/tests/game.test.cjs:139:21)
+      at s2Load (/private/tmp/dungeon-s2-before/tests/game.test.cjs:4506:57)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s2-before/tests/game.test.cjs:4669:55)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+
+test at ../../../../../private/tmp/dungeon-s2-before/tests/game.test.cjs:4683:1
+✖ S2 restored portal returns once and ring HP, stock, keys, loot and descent rewards stay once-only (520.371792ms)
+  evalmachine.<anonymous>:1
+  commitSaveLoad(beginSaveLoad(),window.s2Dto)
+  ^
+  
+  ReferenceError: commitSaveLoad is not defined
+      at evalmachine.<anonymous>:1:1
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/private/tmp/dungeon-s2-before/tests/game.test.cjs:139:21)
+      at s2Load (/private/tmp/dungeon-s2-before/tests/game.test.cjs:4506:57)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s2-before/tests/game.test.cjs:4687:55)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+
+test at ../../../../../private/tmp/dungeon-s2-before/tests/game.test.cjs:4699:1
+✖ S2 stale motion/cinematic callbacks and reentrant reset cannot overwrite a loaded or newer run (362.068ms)
+  evalmachine.<anonymous>:5
+      window.s2Session=beginSaveLoad();
+      ^
+  
+  ReferenceError: beginSaveLoad is not defined
+      at evalmachine.<anonymous>:5:5
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/private/tmp/dungeon-s2-before/tests/game.test.cjs:139:21)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s2-before/tests/game.test.cjs:4701:5)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+
+test at ../../../../../private/tmp/dungeon-s2-before/tests/game.test.cjs:4716:1
+✖ S2 all companions and high-level XP hydrate with exact positions, static roles and readiness (365.560041ms)
+  evalmachine.<anonymous>:1
+  commitSaveLoad(beginSaveLoad(),window.s2Dto)
+  ^
+  
+  ReferenceError: commitSaveLoad is not defined
+      at evalmachine.<anonymous>:1:1
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/private/tmp/dungeon-s2-before/tests/game.test.cjs:139:21)
+      at s2Load (/private/tmp/dungeon-s2-before/tests/game.test.cjs:4506:57)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s2-before/tests/game.test.cjs:4724:48)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+
+test at ../../../../../private/tmp/dungeon-s2-before/tests/game.test.cjs:4731:1
+✖ S2 restored hazard warnings and cooldowns use saved active time without replay or catch-up (455.30625ms)
+  evalmachine.<anonymous>:1
+  commitSaveLoad(beginSaveLoad(),window.s2Dto)
+  ^
+  
+  ReferenceError: commitSaveLoad is not defined
+      at evalmachine.<anonymous>:1:1
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/private/tmp/dungeon-s2-before/tests/game.test.cjs:139:21)
+      at s2Load (/private/tmp/dungeon-s2-before/tests/game.test.cjs:4506:57)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s2-before/tests/game.test.cjs:4735:55)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+
+test at ../../../../../private/tmp/dungeon-s2-before/tests/game.test.cjs:4744:1
+✖ S2 presentation preparation errors and reentrant commits reject before touching the current run (271.449083ms)
+  evalmachine.<anonymous>:1
+  openHelp();window.s2Session=beginSaveLoad();window.s2Presentation=captureLoadPresentation;captureLoadPresentation=()=>{throw new Error("canvas read failure");}
+             ^
+  
+  ReferenceError: beginSaveLoad is not defined
+      at evalmachine.<anonymous>:1:12
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/private/tmp/dungeon-s2-before/tests/game.test.cjs:139:21)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s2-before/tests/game.test.cjs:4746:5)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+
+test at ../../../../../private/tmp/dungeon-s2-before/tests/game.test.cjs:4755:1
+✖ S2 hydrates and atomically loads the final fully explored 100-floor DTO without mutation or RNG (5499.0685ms)
+  evalmachine.<anonymous>:2
+      window.s2Detached=hydrateSaveData(window.s2Dto);
+      ^
+  
+  ReferenceError: hydrateSaveData is not defined
+      at evalmachine.<anonymous>:2:5
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/private/tmp/dungeon-s2-before/tests/game.test.cjs:139:21)
+      at TestContext.<anonymous> (/private/tmp/dungeon-s2-before/tests/game.test.cjs:4759:5)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)

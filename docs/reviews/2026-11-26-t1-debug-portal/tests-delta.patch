@@ -1,0 +1,150 @@
+--- before/tests/game.test.cjs
++++ after/tests/game.test.cjs
+@@ -83,7 +83,7 @@
+     set: (t, name, value) => { t[name] = value; recordCall(minimapCalls, 'set', [name, value]); return true; },
+   });
+   function element(id) {
+-    return elements[id] ||= { style: {}, hidden: false, disabled: false,
++    return elements[id] ||= { style: {}, hidden: ['tradeOverlay', 'companionOverlay'].includes(id), disabled: false,
+       textContent: '', value: '', ariaPressed: '', addEventListener: (name, fn) => { listeners[`${id}:${name}`] = fn; },
+       getContext: () => id === 'minimap' ? minimapCtx : ctx, focus: noop };
+   }
+@@ -2341,6 +2341,138 @@
+   assert.ok(g.elements.consoleOutput.textContent.includes('Cannot teleport now.'));
+ });
+ 
++function debugPortalSnapshot(g) {
++  return g.json(`({ area:state.area, depth:state.depth, player:state.player,
++    exit:state.townExit, portal:state.townPortalOpen, scrolls:state.townScrolls,
++    gold:state.gold, inventory:state.inventory, equipment:state.equipment, spells:state.spellReadyAt,
++    companion:state.companion, selected:state.selectedCompanion, unlocked:state.unlockedCompanions,
++    floors:state.floors, visited:[...state.visited], map:state.map, hazards:state.hazards,
++    active:state.activeTime, retreat:state.retreatReadyAt, recovery:[state.healElapsed,state.combatElapsed,state.manaRegenAt],
++    pause:state.pause, messages:state.messages, kills:state.kills, turn:state.turn })`);
++}
++
++test('T1 debug portal rejects extra arguments atomically and accepts case-insensitive zero-argument commands', () => {
++  const g = game();
++  g.key('`');
++  for (const command of ['teleportTown extra', 'teleportTown 1 2']) {
++    const before = debugPortalSnapshot(g);
++    g.elements.consoleInput.value = command;
++    g.key('Enter', { target:g.elements.consoleInput });
++    assert.deepEqual(debugPortalSnapshot(g), before, command);
++    assert.match(g.elements.consoleOutput.textContent, /Usage: teleportTown/);
++  }
++  const before = debugPortalSnapshot(g);
++  g.run('teleportTown("extra")');
++  assert.deepEqual(debugPortalSnapshot(g), before, 'direct calls must not ignore arguments either');
++  g.elements.consoleInput.value = '  TeLePoRtToWn  ';
++  g.key('Enter', { target:g.elements.consoleInput });
++  assert.equal(g.run('state.area'), 'town');
++  assert.equal(g.run('state.townExit.reason'), 'cheat');
++});
++
++test('T1 debug portal rejects hidden, dead, paused, cinematic and player-menu contexts without changing gameplay', () => {
++  const cases = [
++    'state.started=false', 'state.gameOver=true', 'state.player.hp=0', 'document.hidden=true',
++    'state.helpOpen=true', 'state.pause={kind:"health"}', 'state.pause={kind:"retreat"}',
++    'state.ending={completed:false}', 'state.bossIntro={completed:false}', 'state.bossDefeat={completed:false}',
++    'state.trade={snapshot:{gold:123}}', 'state.companionPicker={id:123}',
++    'document.getElementById("companionOverlay").hidden=false',
++    'document.getElementById("tradeOverlay").hidden=false',
++  ];
++  for (const setup of cases) {
++    const g = game();
++    g.key('`');
++    g.run(`state.consoleOpen=true; window.t1Sounds=[]; playSound=name=>window.t1Sounds.push(name); ${setup}`);
++    const before = debugPortalSnapshot(g);
++    g.elements.consoleInput.value = 'teleportTown';
++    g.key('Enter', { target:g.elements.consoleInput });
++    assert.deepEqual(debugPortalSnapshot(g), before, setup);
++    assert.match(g.elements.consoleOutput.textContent, /Cannot teleport now/, setup);
++    assert.deepEqual(g.json('window.t1Sounds'), [], setup);
++  }
++});
++
++test('T1 debug travel saves the current floor without healing, RNG, rewards or resource changes', () => {
++  const g = game();
++  g.run(`enterFloor(2,false); state.player.hp=37;state.player.mp=7;state.player.xp=19;
++    state.gold=123;state.townScrolls=3;state.inventory=[{...ITEM_TABLE.find(i=>i.kind==='heal')}];
++    state.activeTime=15;state.retreatReadyAt=72;state.floorKey.collected=true;
++    state.potions=state.potions.slice(1);state.treasures=state.treasures.slice(1);state.visited.add('12,9');
++    window.t1Map=state.map;window.t1World=JSON.stringify([state.map,state.potions,state.treasures,state.merchant,state.floorKey,state.hazards]);
++    window.t1Progress=JSON.stringify([snapshotPlayerStats(),state.equipment,state.inventory,state.gold,state.townScrolls,
++      state.activeTime,state.retreatReadyAt,state.selectedCompanion,state.unlockedCompanions,state.kills,state.turn,
++      state.companion&&[state.companion.id,state.companion.name,state.companion.kind],state.spellReadyAt]);
++    window.t1Sounds=[];playSound=name=>window.t1Sounds.push(name);window.t1Rng=0;
++    const t1Random=Math.random;Math.random=()=>{window.t1Rng++;return t1Random();};`);
++  const exit = g.json('({depth:state.depth,x:state.player.x,y:state.player.y,reason:"cheat"})');
++  g.key('`');
++  g.elements.consoleInput.value = 'teleportTown';
++  g.key('Enter', { target:g.elements.consoleInput });
++  assert.equal(g.run('state.area'), 'town');
++  assert.equal(g.run('state.consoleOpen'), true, 'the command must work with its console open');
++  assert.deepEqual(g.json('state.townExit'), exit);
++  assert.equal(g.run('state.townPortalOpen'), true);
++  assert.equal(g.run('state.floors[2].map===window.t1Map'), true);
++  assert.equal(g.run(`JSON.stringify([state.floors[2].map,state.floors[2].potions,state.floors[2].treasures,
++    state.floors[2].merchant,state.floors[2].floorKey,state.floors[2].hazards])===window.t1World`), true);
++  assert.equal(g.run("state.floors[2].visited.has('12,9')"), true);
++  assert.equal(g.run(`JSON.stringify([snapshotPlayerStats(),state.equipment,state.inventory,state.gold,state.townScrolls,
++    state.activeTime,state.retreatReadyAt,state.selectedCompanion,state.unlockedCompanions,state.kills,state.turn,
++    state.companion&&[state.companion.id,state.companion.name,state.companion.kind],state.spellReadyAt])===window.t1Progress`), true);
++  assert.equal(g.run('window.t1Rng'), 0);
++  assert.equal(g.json('window.t1Sounds').filter(name=>name==='magic').length, 1);
++  assert.equal(g.json('state.messages').filter(line=>line.includes('A debug portal snaps open')).length, 1);
++});
++
++test('T1 debug portal cannot replace a return point after loadLevel or repeated town commands', () => {
++  const g = game();
++  g.key('`');
++  for (const command of ['teleportTown', 'teleportTown', 'loadLevel 2']) {
++    g.elements.consoleInput.value = command;g.key('Enter', { target:g.elements.consoleInput });
++  }
++  const before = debugPortalSnapshot(g);
++  g.elements.consoleInput.value = 'teleportTown';g.key('Enter', { target:g.elements.consoleInput });
++  assert.deepEqual(debugPortalSnapshot(g), before);
++  assert.match(g.elements.consoleOutput.textContent, /already open/);
++  assert.equal(g.run('state.townExit.depth'), 1);
++});
++
++test('T1 J and Space return through the saved debug portal once without regenerating its floor', () => {
++  for (const key of ['j', ' ']) {
++    const g = game();
++    g.run(`enterFloor(2,false);state.townScrolls=3;state.floorKey.collected=true;
++      state.player.x=12;state.player.y=9;state.map[9][12]=0;
++      state.hazards=state.hazards.filter(h=>h.x!==12||h.y!==9);
++      state.merchant=null;state.prisoner=null;state.princess=null;
++      state.potions=state.potions.slice(1);state.treasures=state.treasures.slice(1);
++      window.t1World=JSON.stringify([state.map,state.potions,state.treasures,state.floorKey]);window.t1Map=state.map;`);
++    g.key('`');g.elements.consoleInput.value='teleportTown';g.key('Enter',{target:g.elements.consoleInput});
++    g.key('Escape');
++    g.run('state.player.x=state.townGate.x;state.player.y=state.townGate.y');
++    g.key(key);
++    assert.deepEqual(g.json('[state.area,state.depth,state.player.x,state.player.y]'), ['dungeon',2,12,9], key);
++    assert.equal(g.run('state.map===window.t1Map'), true);
++    assert.equal(g.run('JSON.stringify([state.map,state.potions,state.treasures,state.floorKey])===window.t1World'), true);
++    assert.deepEqual(g.json('[state.townExit,state.townPortalOpen,state.townScrolls]'), [null,false,3]);
++    const before = debugPortalSnapshot(g);
++    assert.equal(g.run('returnThroughTownPortal()'), false);
++    assert.deepEqual(debugPortalSnapshot(g), before);
++  }
++});
++
++test('T1 debug portal uses the existing safe fallback when its return tile becomes blocked', () => {
++  const g = game();
++  g.run(`state.player.x=12;state.player.y=9;state.map[9][12]=0;teleportTown();
++    state.floors[1].map[9][12]=1;window.t1Safe=safeTownExitTile(state.townExit);
++    state.player.x=state.townGate.x;state.player.y=state.townGate.y;`);
++  const safe = g.json('window.t1Safe');
++  assert.notDeepEqual(safe, {x:12,y:9});
++  g.key(' ');
++  assert.deepEqual(g.json('({x:state.player.x,y:state.player.y})'), safe);
++  assert.equal(g.run('state.map[state.player.y][state.player.x]'), 0);
++  assert.deepEqual(g.json('[state.townExit,state.townPortalOpen]'), [null,false]);
++});
++
+ test('addScrolls validates input and updates HUD', () => {
+   const g = game();
+   g.key('`'); const input = g.elements.consoleInput;

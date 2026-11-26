@@ -1,0 +1,261 @@
+diff --git a/tmp/dungeon-s1-before/game.test.cjs b/tests/game.test.cjs
+index bea9d64..f53e295 100644
+--- a/tmp/dungeon-s1-before/game.test.cjs
++++ b/tests/game.test.cjs
+@@ -4242,3 +4242,256 @@ test('GR-09 continuously scaled cinematic poses reuse source-resolution sprite c
+   g.run(`for(let i=0;i<200;i++)drawSprite('knight',100,100,4+i/100,i%4,'back')`);
+   assert.equal(g.run('window.gr09Surfaces'),4,'restarts and new scale values do not grow the cache');
+ });
++
++const SAVE_TEST_CONTEXT = {createdAt:'2026-11-26T12:00:00.000Z',hidden:false,tradeOpen:false,companionOpen:false};
++function saveFixture(g) { return g.json(`captureSaveData(state,${JSON.stringify(SAVE_TEST_CONTEXT)})`); }
++function saveParse(g, dto) { return g.json(`parseSaveData(${JSON.stringify(JSON.stringify(dto))})`); }
++function saveReject(g, dto, message) {
++  const before=goldSnapshot(g);
++  assert.throws(()=>saveParse(g,dto),/Invalid save:/,message);
++  assert.equal(goldSnapshot(g),before,message);
++}
++
++test('S1 snapshot is detached, deterministic and pure in town/dungeon, overlaying stale caches', () => {
++  for (const area of ['town','dungeon']) {
++    const g=game(713,true,area);
++    g.run(`state.gold=293;state.player.hp=37;state.player.mp=7;state.activeTime=14.75;
++      state.warnedLow=true;state.retreatReadyAt=72.5;state.inventory=[{name:'Potion',kind:'heal',heal:.499}];
++      state.spellReadyAt.fireball=17.25;state.monsterQuoteIndex=7;state.companionQuoteIndex=3;
++      state.helpOpen=true;state.bubble={text:'omit',ttl:5};`);
++    if (area==='dungeon') g.run('state.potions=state.potions.slice(1);state.hazardTime=3.75;state.monsters[0].hp=4;state.monsters[0].nextAttackAt=16.25');
++    else g.run('state.visited=new Set(["38,26"]);state.props=state.props.slice();state.merchant={...state.merchant,stock:state.merchant.stock.slice(1)}');
++    const before=goldSnapshot(g);
++    g.run(`Math.random=()=>{throw new Error('save consumed RNG');};
++      for(const name of ['render','log','playSound','saveFloor','saveTown','equipItem','revealAroundPlayer','activateCompanion','newGame','genLevel','genTown','enterFloor','recreateMonsters'])
++        globalThis[name]=()=>{throw new Error('save called '+name);};`);
++    const dto=saveFixture(g),again=saveFixture(g);
++    assert.deepEqual(dto,again); assert.equal(goldSnapshot(g),before);
++    assert.deepEqual(saveParse(g,dto),dto);
++    assert.equal(dto.run.player.hp,37);assert.equal(dto.run.gold,293);
++    assert.equal('helpOpen' in dto.run,false);assert.equal('art' in dto.run,false);
++    if (area==='dungeon') {
++      assert.equal(dto.run.floors[1].potions.length,g.run('state.potions.length'));
++      assert.notEqual(dto.run.floors[1].potions.length,g.run('state.floors[1].potions.length'));
++      assert.equal(dto.run.floors[1].hazardTime,3.75);
++      assert.equal(dto.run.encounter.monsters[0].hp,4);
++      assert.equal(dto.run.encounter.monsters[0].nextAttackAt,16.25);
++    } else {
++      assert.equal(dto.run.encounter,null);assert.deepEqual(dto.run.town.visited,['38,26']);
++      assert.equal(dto.run.town.store.stock.length,5);
++      assert.equal(g.run('state.town.store.stock.length'),6);
++      assert.equal(dto.run.town.props[dto.run.town.landmarks.companionBoardIndex].isCompanionBoard,true);
++      assert.equal('store' in dto.run.town.landmarks,false);
++    }
++    dto.run.player.hp=1;dto.run.floors[1].map[0][0]=0;
++    assert.equal(g.run('state.player.hp'),37);assert.equal(g.run('state.floors[1].map[0][0]'),1);
++  }
++});
++
++test('S1 XP round trips preserve levels 1 through 100 including unsafe integer thresholds', () => {
++  const g=game(42,true,'town');
++  let threshold=40;
++  for(let level=1;level<=100;level++) {
++    const xpNext=level===100?1:threshold;
++    g.run(`state.player.lvl=${level};state.player.xpNext=${xpNext};state.player.xp=${level===100?0:Math.floor(xpNext/2)}`);
++    const dto=saveFixture(g);assert.deepEqual(saveParse(g,dto),dto);
++    if(level===83||level===99)assert.equal(Number.isSafeInteger(dto.run.player.xpNext),false);
++    threshold=Math.round(threshold*1.5);
++  }
++  const dto=saveFixture(g);dto.run.player.xp=1;saveReject(g,dto,'level cap XP');
++  dto.run.player.xp=0;dto.run.player.xpNext=40;saveReject(g,dto,'threshold mismatch');
++});
++
++test('S1 current encounter keeps corpse order, dead guard history, boss links and negative HP', () => {
++  const g=game();g.run(`render=()=>{};playSound=()=>{};enterFloor(50,false,true);
++    for(let i=0;i<100;i++){for(const m of state.monsters)if(m.isGuard)m.hp=-7;state.activeTime+=6;summonThroneGuards();}
++    state.bossIntroSeen=true;state.player.hp=37;state.monsters[0].hp=-43;`);
++  const before=goldSnapshot(g),dto=saveFixture(g);
++  assert.equal(dto.run.encounter.monsters.filter(m=>m.isGuard).length,200);
++  assert.equal(dto.run.floors[50].monsterSpawns.some(m=>m.isGuard),false);
++  assert.deepEqual(dto.run.encounter.monsters,g.json('state.monsters'));
++  assert.equal(dto.run.encounter.bossId,g.run('state.boss.id'));
++  assert.equal(dto.run.encounter.bossSummonAt,g.run('state.bossSummonAt'));
++  assert.deepEqual(saveParse(g,dto),dto);assert.equal(goldSnapshot(g),before);
++  const bad=structuredClone(dto);bad.run.encounter.bossId=12;saveReject(g,bad,'boss alias');
++  bad.run.encounter.bossId=999;bad.run.encounter.monsters[0].id=bad.run.encounter.monsters[1].id;saveReject(g,bad,'duplicate encounter ID');
++});
++
++test('S1 all eleven companions, ring stats, portals and exact town patrol state round trip', () => {
++  for(const id of ['marmalade','pip','mimic','hydra','boar','medusa','wizard','skeletonKing','dragon','cook','bartender']) {
++    const g=game(42,true,'town');
++    g.run(`unlockCompanion('${id}');activateCompanion('${id}');equipItem('ring',{...ITEM_TABLE[5]});
++      state.player.hp=37;state.townExit={depth:1,x:0,y:0,reason:'cheat'};state.townPortalOpen=true;
++      state.town.npcs[0].pathIndex=2;state.companionAttackAt=12.75;state.retreatReadyAt=80.5;`);
++    const dto=saveFixture(g);assert.deepEqual(saveParse(g,dto),dto);
++    assert.equal(dto.run.player.maxHp,80);assert.equal(dto.run.player.hp,37);
++    assert.equal(dto.run.townExit.x,0);assert.equal(dto.run.town.map[0][0],1);
++    assert.equal(dto.run.companion.id,id);assert.equal(dto.run.companionAttackAt,12.75);
++    assert.equal(dto.run.town.npcs[0].pathIndex,2);assert.equal(dto.run.town.npcs[0].x,34);
++  }
++  const g=game();g.run(`state.townExit={depth:1,x:0,y:0,reason:'scroll'};state.townPortalOpen=true;enterFloor(2,false,true)`);
++  const dto=saveFixture(g);assert.deepEqual(saveParse(g,dto),dto);
++  assert.equal(dto.run.depth,2);assert.equal(dto.run.townExit.depth,1);
++  g.run('enterTown();state.townExit.reason="retreat";state.townPortalOpen=false');
++  const town=saveFixture(g);assert.equal(town.run.depth,2);assert.deepEqual(saveParse(g,town),town);
++});
++
++test('S1 snapshot refuses conflicting contexts but allows own Help and leaves state unchanged', () => {
++  const setups=['state.started=false','state.gameOver=true','state.won=true','state.player.hp=0','state.godMode=true',
++    'state.consoleOpen=true','state.pause={kind:"health"}','state.pause={kind:"retreat"}',
++    'state.trade={}','state.companionPicker={}','state.ending={completed:true}',
++    'state.bossIntro={completed:false}','state.bossDefeat={completed:false}'];
++  for(const setup of setups) {
++    const g=game(42,true,'town');g.run(setup);const before=goldSnapshot(g);
++    assert.throws(()=>saveFixture(g),/Invalid save:/,setup);assert.equal(goldSnapshot(g),before);
++  }
++  const g=game();
++  for(const key of ['hidden','tradeOpen','companionOpen']) {
++    const before=goldSnapshot(g),context={...SAVE_TEST_CONTEXT,[key]:true};
++    assert.throws(()=>g.run(`captureSaveData(state,${JSON.stringify(context)})`),/Invalid save:/,key);
++    assert.equal(goldSnapshot(g),before);
++  }
++  g.run('state.helpOpen=true');assert.ok(saveFixture(g));
++  assert.throws(()=>g.run('captureSaveData(state,{})'),/Invalid save:/);
++});
++
++test('S1 validator rejects malformed, unknown and cross-field data without mutating DTO or game', () => {
++  const g=game(),base=saveFixture(g);
++  const cases=[
++    d=>{d.format='other';},d=>{d.formatVersion=2;},d=>{d.extra=true;},d=>{delete d.run.gold;},
++    d=>{d.run.gold=-1;},d=>{d.run.gold=1.5;},d=>{d.run.gold=Number.MAX_SAFE_INTEGER+1;},
++    d=>{d.gameVersion='x'.repeat(129);},d=>{d.createdAt='2026-02-31T00:00:00.000Z';},
++    d=>{d.run.player.hp=0;},d=>{d.run.player.hp=d.run.player.maxHp+1;},
++    d=>{d.run.player.xpNext=41;},d=>{d.run.player.spells.fake=true;},
++    d=>{d.run.equipment.weapon={...d.run.floors[1].treasures[0],atk:999};},
++    d=>{d.run.inventory=[{name:'Potion',kind:'heal',heal:1}];},
++    d=>{d.run.floors[1].map.pop();},d=>{d.run.floors[1].map[0][0]=3;},
++    d=>{d.run.floors[1].visited=['01,2'];},d=>{d.run.floors[1].visited=['1,2','1,2'];},
++    d=>{d.run.floors[1].visited=['96,0'];},d=>{d.run.floors['01']=d.run.floors[1];},
++    d=>{d.run.floors[1].floorKey.carrierId=999;},
++    d=>{d.run.floors[1].floorKey.collected=true;},
++    d=>{d.run.floors[1].hazards.find(h=>h.type==='spikes').revealed=true;},
++    d=>{d.run.floors[1].hazards.find(h=>h.type==='rocks').stage='warning';},
++    d=>{d.run.floors[1].monsterSpawns[0].hp=1;},
++    d=>{d.run.encounter.monsters[0].sprite='knight';},
++    d=>{d.run.encounter.monsters[0].atk+=1;},
++    d=>{d.run.encounter.monsters[0].id=999;},
++    d=>{d.run.town.landmarks.companionBoardIndex=0;},
++    d=>{d.run.town.props.find(p=>p.sprite==='water').scale=3;},
++    d=>{d.run.town.animals[0].name='Unknown';},
++    d=>{d.run.town.npcs[0].pathIndex=4;},
++    d=>{d.run.selectedCompanion='hydra';},d=>{d.run.companion.id='fake';},
++    d=>{d.run.unlockedCompanions.push('pip');},
++    d=>{d.run.townPortalOpen=true;},
++    d=>{d.run.townExit={depth:2,x:1,y:1,reason:'cheat'};d.run.townPortalOpen=true;},
++    d=>{d.run.messages=['a'.repeat(513)];},d=>{d.run.messages=Array(81).fill('x');}
++  ];
++  for(const [index,mutate] of cases.entries()) {
++    const dto=structuredClone(base);mutate(dto);const text=JSON.stringify(dto);
++    saveReject(g,dto,`case ${index}`);assert.equal(JSON.stringify(dto),text);
++  }
++  for(const text of ['','{','null','[]','{"format":"dungeon-crawler-save"}',
++    '{"__proto__":{"polluted":true}}','{"constructor":{}}','{"prototype":{}}']) {
++    assert.throws(()=>g.run(`parseSaveData(${JSON.stringify(text)})`),/Invalid save:/,text);
++  }
++  assert.equal(g.run('({}).polluted'),undefined);
++});
++
++test('S1 parser bounds bytes and nesting, rejecting non-JSON object hazards without executing code', () => {
++  const g=game(),before=goldSnapshot(g);
++  for(const expression of [
++    '" ".repeat(SAVE_MAX_BYTES+1)',
++    '" ".repeat(SAVE_MAX_BYTES-1)+"é"',
++    '"[".repeat(17)+"0"+"]".repeat(17)'
++  ]) assert.throws(()=>g.run(`parseSaveData(${expression})`),/Invalid save:/,expression);
++  for(const expression of [
++    '({run:NaN})','({run:Infinity})','({run:undefined})','({run:()=>1})','({run:1n})',
++    '({run:new Date()})','({run:new Set()})','(()=>{const a={};a.a=a;return a;})()',
++    '({get run(){throw new Error("getter executed");}})',
++    '({toJSON(){throw new Error("toJSON executed");}})',
++    '({run:Array(3)})','({run:Object.create({gold:2})})',
++    '({run:new Array(4000000).fill(null)})'
++  ]) assert.throws(()=>g.run(`validateSaveData(${expression})`),/Invalid save:/,expression);
++  assert.equal(goldSnapshot(g),before);
++  assert.equal(g.run('saveTextBudget(JSON.stringify("😀é"))'),8);
++  assert.equal(g.run('saveTextBudget(JSON.stringify("[not nesting]"))'),15);
++});
++
++test('S1 valid revealed/spent hazards, key collection, rescue and final boss defeat retain once-only data', () => {
++  const g=game();g.run(`render=()=>{};playSound=()=>{};enterFloor(2,false,true);
++    state.prisoner.rescued=true;state.merchant.stock=state.merchant.stock.slice(2);
++    state.floorKey.dropped=true;state.floorKey.collected=true;state.floorKey.drop=null;
++    state.floors[2].descentRewarded=true;
++    const spikes=state.hazards.find(h=>h.type==='spikes');spikes.triggered=true;spikes.revealed=true;
++    const rocks=state.hazards.find(h=>h.type==='rocks');rocks.triggered=true;rocks.stage='spent';rocks.impactAt=2.75;
++    state.hazardTime=4.5;`);
++  let dto=saveFixture(g);assert.deepEqual(saveParse(g,dto),dto);
++  assert.equal(dto.run.floors[2].descentRewarded,true);assert.equal(dto.run.floors[2].prisoner.rescued,true);
++  g.run(`enterFloor(100,false,true);damageMonster(state.boss,state.boss.hp+7);clearBossDefeat();`);
++  dto=saveFixture(g);assert.deepEqual(saveParse(g,dto),dto);
++  assert.equal(dto.run.floors[100].bossDefeated,true);assert.equal(dto.run.floors[100].princess.rescued,false);
++  assert.equal(dto.run.encounter.monsters.find(m=>m.id===dto.run.encounter.bossId).hp,-7);
++  const gold=dto.run.gold,kills=dto.run.kills;
++  assert.equal(saveParse(g,dto).run.gold,gold);assert.equal(g.run('state.kills'),kills);
++  dto.run.floors[100].princess.rescued=true;saveReject(g,dto,'rescue already ended run');
++  g.run('enterTown();enterFloor(100,false)');
++  dto=saveFixture(g);assert.equal(dto.run.encounter.bossId,null);assert.deepEqual(saveParse(g,dto),dto);
++});
++
++test('S1 structural validator rejects null/wrong record types and hidden executable array properties', () => {
++  const g=game(),base=saveFixture(g);
++  for(const path of ['run.floors','run.town','run.player','run.equipment','run.entranceCat','run.companion',
++    'run.floors.1.rooms.0','run.floors.1.floorKey','run.floors.1.monsterSpawns.0',
++    'run.floors.1.hazards.0','run.floors.1.props.0','run.town.props.0','run.town.animals.0',
++    'run.town.landmarks','run.town.store.stock.0','run.encounter']) {
++    for(const value of [null,1,[],true]) {
++      const dto=structuredClone(base),parts=path.split('.');let parent=dto;
++      for(const key of parts.slice(0,-1))parent=parent[key];parent[parts.at(-1)]=value;
++      // Null companion is an intentionally supported empty party.
++      if(path==='run.companion' && value===null)continue;
++      saveReject(g,dto,`${path}=${JSON.stringify(value)}`);
++    }
++  }
++  assert.throws(()=>g.run(`validateSaveData({run:Object.defineProperty([],'toJSON',{value:()=>{throw new Error('executed');}})})`),/Invalid save:/);
++  assert.throws(()=>g.run('saveStructure(Array.from({length:65},()=>Array(65536).fill(0)))'),/Invalid save: structure exceeds 4000000 nodes/);
++});
++
++test('S1 actual DTO accepts a fully explored 100-floor content-retention fixture below format limits', () => {
++  const g=game(713,true,'town');
++  g.run(`render=()=>{};playSound=()=>{};state.visited=new Set(Array.from({length:W*H},(_,i)=>(i%W)+','+Math.floor(i/W)));saveTown();`);
++  for(let depth=1;depth<=100;depth++)g.run(`enterFloor(${depth},false);state.visited=new Set(Array.from({length:W*H},(_,i)=>(i%W)+','+Math.floor(i/W)));saveFloor()`);
++  g.run(`state.inventory=Array.from({length:10000},()=>({name:'Potion',kind:'heal',heal:0.5999999999999999}));
++    Math.random=()=>{throw new Error('size fixture RNG');};
++    window.s1Text=serializeSaveData(state,${JSON.stringify(SAVE_TEST_CONTEXT)});
++    window.s1Parsed=parseSaveData(window.s1Text);`);
++  assert.equal(g.run('Object.keys(window.s1Parsed.run.floors).length'),100);
++  assert.equal(g.run('window.s1Parsed.run.inventory.length'),10000);
++  assert.ok(g.run('saveTextBudget(window.s1Text)')<32*2**20);
++  assert.ok(g.run('saveStructure(window.s1Parsed)')<4000000);
++  assert.equal(g.run('JSON.stringify(window.s1Parsed)===window.s1Text'),true);
++  assert.equal(g.run('window.s1Parsed.run.floors[50].rooms.some(r=>r.isThroneRoom)'),true);
++});
++
++test('S1 over-limit histories and inventory refuse losslessly rather than pruning live data', () => {
++  for(const field of ['inventory','monsters']) {
++    const g=game();
++    if(field==='inventory')g.run("state.inventory=Array.from({length:65537},()=>({name:'Potion',kind:'heal',heal:.35}))");
++    else g.run('state.monsters=Array.from({length:65537},(_,id)=>({...state.monsters[0],id,hp:-3}))');
++    const before=goldSnapshot(g);
++    assert.throws(()=>saveFixture(g),/Invalid save:/,field);
++    assert.equal(goldSnapshot(g),before);assert.equal(g.run(`state.${field}.length`),65537);
++  }
++});
++
++test('S1 keeps the S0 state inventory explicit and Unicode journal text lossless', () => {
++  const g=game(42,true,'town');
++  const classified=JSON.parse(fs.readFileSync(path.join(__dirname,'../docs/reviews/2026-11-26-s0-save-load/state-classification.json'),'utf8'));
++  assert.deepEqual(g.json('Object.keys(state).sort()'),Object.keys(classified).sort());
++  g.run(`state.messages=['A dragon says: "[hello]" 🐉 é <script>plain text</script>'];`);
++  const dto=saveFixture(g);assert.deepEqual(saveParse(g,dto),dto);
++  assert.deepEqual(dto.run.messages,g.json('state.messages'));
++  assert.equal(g.run('saveTextBudget(" ".repeat(SAVE_MAX_BYTES))'),32*2**20);
++  const detached=g.run(`(()=>{const d=captureSaveData(state,${JSON.stringify(SAVE_TEST_CONTEXT)});const v=validateSaveData(d);
++    v.run.messages[0]='changed';return d.run.messages[0]!==v.run.messages[0];})()`);
++  assert.equal(detached,true);
++});

@@ -1,0 +1,101 @@
+[
+  {
+    "name": "ring sale + Cancel",
+    "observed": {
+      "before": [
+        75,
+        80,
+        true
+      ],
+      "after": [
+        60,
+        60,
+        true
+      ]
+    }
+  },
+  {
+    "name": "spell buy + Cancel",
+    "observed": {
+      "staged": [
+        true,
+        895,
+        0
+      ],
+      "after": [
+        true,
+        1000,
+        1
+      ]
+    }
+  },
+  {
+    "name": "strict command rejection gaps",
+    "observed": [
+      [
+        "addScrolls 1e2",
+        100
+      ],
+      [
+        "addScrolls 0x10",
+        16
+      ],
+      [
+        "addScrolls 3 extra",
+        3
+      ],
+      [
+        "addScrolls 9007199254740992",
+        9007199254740992
+      ],
+      [
+        "while gameOver",
+        2
+      ]
+    ]
+  },
+  {
+    "name": "hidden teleport with extra args",
+    "observed": [
+      "town",
+      "cheat"
+    ]
+  },
+  {
+    "name": "restart keeps locked previous boss selection",
+    "observed": [
+      "mimic",
+      [
+        "marmalade",
+        "pip"
+      ]
+    ]
+  },
+  {
+    "name": "companion board leaves motion playable and permits Help",
+    "observed": [
+      true,
+      false
+    ]
+  },
+  {
+    "name": "shop leaves motion playable",
+    "observed": true
+  },
+  {
+    "name": "stale select works without board session/range",
+    "observed": [
+      "pip",
+      "Pip"
+    ]
+  },
+  {
+    "name": "town board footprint and prepared role",
+    "observed": {
+      "tile": 0,
+      "role": "noticeBoard",
+      "legacy": false,
+      "prepared": false
+    }
+  }
+]

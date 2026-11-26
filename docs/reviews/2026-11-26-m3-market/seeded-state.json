@@ -1,0 +1,125 @@
+{
+  "scenarios": [
+    {
+      "seed": 42,
+      "name": "town",
+      "equal": true
+    },
+    {
+      "seed": 42,
+      "name": "gear",
+      "equal": true
+    },
+    {
+      "seed": 42,
+      "name": "spells",
+      "equal": true
+    },
+    {
+      "seed": 42,
+      "name": "travel",
+      "equal": true
+    },
+    {
+      "seed": 42,
+      "name": "retreat",
+      "equal": true
+    },
+    {
+      "seed": 42,
+      "name": "marketCancel",
+      "equal": true
+    },
+    {
+      "seed": 42,
+      "name": "marketConfirm",
+      "equal": true
+    },
+    {
+      "seed": 42,
+      "name": "god",
+      "equal": true
+    },
+    {
+      "seed": 713,
+      "name": "town",
+      "equal": true
+    },
+    {
+      "seed": 713,
+      "name": "gear",
+      "equal": true
+    },
+    {
+      "seed": 713,
+      "name": "spells",
+      "equal": true
+    },
+    {
+      "seed": 713,
+      "name": "travel",
+      "equal": true
+    },
+    {
+      "seed": 713,
+      "name": "retreat",
+      "equal": true
+    },
+    {
+      "seed": 713,
+      "name": "marketCancel",
+      "equal": true
+    },
+    {
+      "seed": 713,
+      "name": "marketConfirm",
+      "equal": true
+    },
+    {
+      "seed": 713,
+      "name": "god",
+      "equal": true
+    },
+    {
+      "seed": 123456,
+      "name": "town",
+      "equal": true
+    },
+    {
+      "seed": 123456,
+      "name": "gear",
+      "equal": true
+    },
+    {
+      "seed": 123456,
+      "name": "spells",
+      "equal": true
+    },
+    {
+      "seed": 123456,
+      "name": "travel",
+      "equal": true
+    },
+    {
+      "seed": 123456,
+      "name": "retreat",
+      "equal": true
+    },
+    {
+      "seed": 123456,
+      "name": "marketCancel",
+      "equal": true
+    },
+    {
+      "seed": 123456,
+      "name": "marketConfirm",
+      "equal": true
+    },
+    {
+      "seed": 123456,
+      "name": "god",
+      "equal": true
+    }
+  ],
+  "note": "Pre-M3 source backup vs current source; ordinary model semantics and next8 RNG samples. Cancelled and confirmed market paths are compared alongside ordinary gameplay."
+}

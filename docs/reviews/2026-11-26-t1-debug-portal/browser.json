@@ -1,0 +1,31 @@
+{
+  "results": [
+    {
+      "width": 1440,
+      "protocol": "file:",
+      "consoleKeyboard": true,
+      "invalidArity": true,
+      "explicitHiddenFixture": true,
+      "preservesResources": true,
+      "jAndSpaceReturns": true,
+      "loadLevelCannotReplacePortal": true,
+      "normalScrollCost": true,
+      "errors": [],
+      "remote": []
+    },
+    {
+      "width": 390,
+      "protocol": "file:",
+      "consoleKeyboard": true,
+      "invalidArity": true,
+      "explicitHiddenFixture": true,
+      "preservesResources": true,
+      "jAndSpaceReturns": true,
+      "loadLevelCannotReplacePortal": true,
+      "normalScrollCost": true,
+      "errors": [],
+      "remote": []
+    }
+  ],
+  "nativeBackgroundObserved": "unverified; not attempted"
+}

@@ -1,0 +1,15 @@
+✔ S4 chunked UTF-8/nesting scanner matches native byte lengths across escapes and surrogate boundaries (336.484167ms)
+✔ S4 cooperative validation never commits before explicit Load and reconstructs exact detached data (310.103375ms)
+✔ S4 cancel/replacement/restart reject an already queued validation task without changing either run (487.960667ms)
+✔ S4 cooperative confirmation cancellation and late schema errors preserve atomicity (683.819417ms)
+✔ S4 large export freezes source, stays cancellable and emits no late download after cancellation (234.0655ms)
+✔ S4 cooperative export is lossless and refuses malformed history without pruning it (139.071583ms)
+✔ S4 bounded format accepts 65536 stored potions losslessly and refuses the next row (1222.722792ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3542.260291

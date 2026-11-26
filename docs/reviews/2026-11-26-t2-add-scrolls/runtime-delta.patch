@@ -1,0 +1,35 @@
+--- before/js/game.js
++++ after/js/game.js
+@@ -3757,10 +3757,20 @@
+   render();
+ }
+ 
+-function addScrolls(raw) {
+-  const count = Number(raw);
+-  if (!Number.isInteger(count) || count <= 0 || String(raw ?? '').trim() === '') {
++function addScrolls(...args) {
++  const raw = args[0];
++  const count = typeof raw === 'string' && /^[0-9]+$/.test(raw) ? Number(raw) : NaN;
++  if (args.length !== 1 || !Number.isSafeInteger(count) || count <= 0
++    || !Number.isSafeInteger(state.townScrolls) || state.townScrolls < 0
++    || !Number.isSafeInteger(state.townScrolls + count)) {
+     consoleMessage('Usage: addScrolls <positive integer>'); return;
++  }
++  const roster = document.getElementById('companionOverlay');
++  const trade = document.getElementById('tradeOverlay');
++  if (!state.started || state.gameOver || state.player.hp <= 0 || document.hidden
++    || state.ending || state.helpOpen || state.pause || bossCinematicActive()
++    || state.trade || state.companionPicker || (roster && !roster.hidden) || (trade && !trade.hidden)) {
++    consoleMessage('Cannot add scrolls now.'); return;
+   }
+   state.townScrolls += count;
+   render();
+@@ -3780,7 +3790,7 @@
+   if (command === 'loadlevel') loadLevel(args[0]);
+   else if (command === 'godmode') setGodMode(args[0]);
+   else if (command === 'teleporttown') teleportTown(...args);
+-  else if (command === 'addscrolls') addScrolls(args[0]);
++  else if (command === 'addscrolls') addScrolls(...args);
+   else if (command === 'clear') { state.consoleLines = []; document.getElementById('consoleOutput').textContent = ''; }
+   else if (command === 'help') consoleMessage('loadLevel <1-100> · godMode 0|1 · teleportTown · addScrolls <n> · help · clear');
+   else consoleMessage(`Unknown command: ${name}`);

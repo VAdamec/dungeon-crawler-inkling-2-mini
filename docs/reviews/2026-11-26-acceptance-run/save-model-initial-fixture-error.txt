@@ -1,0 +1,24 @@
+node:internal/assert/utils:146
+  throw error;
+  ^
+
+AssertionError [ERR_ASSERTION]: Missing expected exception.
+    at runModel (/Users/vadamec/workspace/ai_tmp/opencode_testing/docs/reviews/2026-11-26-acceptance-run/check-save-model.cjs:170:34)
+    at /Users/vadamec/workspace/ai_tmp/opencode_testing/docs/reviews/2026-11-26-acceptance-run/check-save-model.cjs:178:1
+    at Object.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/docs/reviews/2026-11-26-acceptance-run/check-save-model.cjs:6:109)
+    at Module._compile (node:internal/modules/cjs/loader:1968:14)
+    at Object..js (node:internal/modules/cjs/loader:2108:10)
+    at Module.load (node:internal/modules/cjs/loader:1690:32)
+    at Module._load (node:internal/modules/cjs/loader:1480:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+    at node:internal/main/run_main_module:33:47 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: undefined,
+  expected: undefined,
+  operator: 'throws',
+  diff: 'simple'
+}
+
+Node.js v26.12.1

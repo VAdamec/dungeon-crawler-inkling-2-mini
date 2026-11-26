@@ -1,0 +1,408 @@
+✖ M2 Space and X open Buy/Sell carts with nearby town and exact dungeon access, never an immediate trade (179.385041ms)
+✖ M2 selecting rows and staging purchases/sales/Undo/Reset/Cancel leaves live state, aliases, HUD and notices unchanged (66.23875ms)
+✖ M2 Confirm applies retained operations once, defers spell/purchase/sale notices and companion sold-out remarks (62.30425ms)
+✖ M2 committed ring/god-mode HP equals the path-dependent preview including same-bonus replacements (63.7485ms)
+✖ M2 known/unaffordable/pending rows remain visible and disabled; no invalid or empty sale enters the cart (60.289542ms)
+✖ M2 staged sales fund selected purchases and removed/undone operations emit no notices (68.462792ms)
+✖ M2 Confirm rejects changed context, source values and forged cart results without overwriting newer progress (62.515625ms)
+✖ M2 callbacks capture session identity so stale select/add/Confirm/Cancel cannot affect another shop (64.268458ms)
+✖ M2 failed equipment application or save restores exact scoped values and cached town/floor aliases before notices (63.901208ms)
+✖ M2 confirmed store/merchant stock, gear and spell knowledge persist across revisits and portable snapshots (59.37975ms)
+✖ M2 keyboard selection/shortcuts, trapped focus, audio, hidden retention and restart have guarded behavior (59.478ms)
+✖ M2 forced travel, death and restart discard drafts without spell/HP/item/currency effects or stale commits (119.73425ms)
+✖ M2 item details warn about gear replacement, label elixir honestly and render names as plain text (58.823709ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 0
+ℹ fail 13
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1106.956417
+
+✖ failing tests:
+
+test at tests/game.test.cjs:5206:1
+✖ M2 Space and X open Buy/Sell carts with nearby town and exact dungeon access, never an immediate trade (179.385041ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - true
+  
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5209:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/game.test.cjs:5222:1
+✖ M2 selecting rows and staging purchases/sales/Undo/Reset/Cancel leaves live state, aliases, HUD and notices unchanged (66.23875ms)
+  evalmachine.<anonymous>:1
+  selectTradeRow(state.trade,"buy","stock:3")
+  ^
+  
+  ReferenceError: selectTradeRow is not defined
+      at evalmachine.<anonymous>:1:1
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:141:21)
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5227:18)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+
+test at tests/game.test.cjs:5236:1
+✖ M2 Confirm applies retained operations once, defers spell/purchase/sale notices and companion sold-out remarks (62.30425ms)
+  evalmachine.<anonymous>:1
+  confirmTrade(window.m2Session)
+  ^
+  
+  ReferenceError: confirmTrade is not defined
+      at evalmachine.<anonymous>:1:1
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:141:21)
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5241:18)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+
+test at tests/game.test.cjs:5252:1
+✖ M2 committed ring/god-mode HP equals the path-dependent preview including same-bonus replacements (63.7485ms)
+  evalmachine.<anonymous>:1
+  tradeBuy('stock:2');window.m2Expected=state.trade.cart.draft.player
+                                                         ^
+  
+  TypeError: Cannot read properties of undefined (reading 'draft')
+      at evalmachine.<anonymous>:1:56
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:141:21)
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5256:42)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+
+test at tests/game.test.cjs:5263:1
+✖ M2 known/unaffordable/pending rows remain visible and disabled; no invalid or empty sale enters the cart (60.289542ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5265:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/game.test.cjs:5273:1
+✖ M2 staged sales fund selected purchases and removed/undone operations emit no notices (68.462792ms)
+  evalmachine.<anonymous>:2
+      tradeSell('weapon');tradeSell('armor');tradeBuy('stock:0');editTradeCart(state.trade,false);tradeBuy('stock:1')
+                                                                 ^
+  
+  ReferenceError: editTradeCart is not defined
+      at evalmachine.<anonymous>:2:64
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:141:21)
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5274:23)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+
+test at tests/game.test.cjs:5282:1
+✖ M2 Confirm rejects changed context, source values and forged cart results without overwriting newer progress (62.515625ms)
+  evalmachine.<anonymous>:1
+  confirmTrade()
+  ^
+  
+  ReferenceError: confirmTrade is not defined
+      at evalmachine.<anonymous>:1:1
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:141:21)
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5289:20)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+
+test at tests/game.test.cjs:5295:1
+✖ M2 callbacks capture session identity so stale select/add/Confirm/Cancel cannot affect another shop (64.268458ms)
+  evalmachine.<anonymous>:1
+  window.m2OldSelect();window.m2OldAdd();window.m2OldConfirm();window.m2OldCancel()
+                              ^
+  
+  TypeError: window.m2OldAdd is not a function
+      at evalmachine.<anonymous>:1:29
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:141:21)
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5299:32)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+
+test at tests/game.test.cjs:5303:1
+✖ M2 failed equipment application or save restores exact scoped values and cached town/floor aliases before notices (63.901208ms)
+  evalmachine.<anonymous>:1
+  confirmTrade()
+  ^
+  
+  ReferenceError: confirmTrade is not defined
+      at evalmachine.<anonymous>:1:1
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:141:21)
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5312:20)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+
+test at tests/game.test.cjs:5318:1
+✖ M2 confirmed store/merchant stock, gear and spell knowledge persist across revisits and portable snapshots (59.37975ms)
+  evalmachine.<anonymous>:1
+  window.m2Merchant=state.merchant;openTrade();tradeBuy('stock:1');tradeBuy('stock:3');confirmTrade()
+                                                                                       ^
+  
+  ReferenceError: confirmTrade is not defined
+      at evalmachine.<anonymous>:1:86
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:141:21)
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5320:29)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+
+test at tests/game.test.cjs:5328:1
+✖ M2 keyboard selection/shortcuts, trapped focus, audio, hidden retention and restart have guarded behavior (59.478ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - 'stock:1'
+  
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5329:68)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: 'stock:1',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/game.test.cjs:5341:1
+✖ M2 forced travel, death and restart discard drafts without spell/HP/item/currency effects or stale commits (119.73425ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + {
+  +   actor: {
+  +     isMerchant: true,
+  +     stock: [
+  +       {
+  +         gold: 15,
+  +         heal: 0.35,
+  +         id: 100,
+  +         kind: 'heal',
+  +         name: 'Potion',
+  +         sprite: 'potion'
+  +       },
+  +       {
+  +         atk: 6,
+  +         gold: 40,
+  +         id: 101,
+  +         kind: 'weapon',
+  +         name: 'Sword',
+  +         sprite: 'sword',
+  +         str: 2
+  +       },
+  +       {
+  +         atk: 3,
+  +         def: 2,
+  +         dex: 2,
+  +         gold: 80,
+  +         id: 102,
+  +         kind: 'ring',
+  +         maxHp: 20,
+  +         name: 'Ring',
+  +         sprite: 'ring',
+  +         str: 1
+  +       },
+  +       {
+  +         gold: 70,
+  +         id: 103,
+  +         kind: 'spellbook',
+  +         minDepth: 2,
+  +         name: 'Frostbolt Tome',
+  +         spell: 'frostbolt',
+  +         sprite: 'frostboltTome'
+  +       },
+  +       {
+  +         gold: 55,
+  +         id: 104,
+  +         kind: 'scroll',
+  +         lootWeight: 1,
+  +         minDepth: 1,
+  +         name: 'Town Scroll',
+  +         scroll: 'town',
+  +         sprite: 'townScroll'
+  +       },
+  +       {
+  +         dex: 2,
+  +         gold: 60,
+  +         id: 105,
+  +         kind: 'elixir',
+  +         name: 'Elixir',
+  +         sprite: 'elixir',
+  +         str: 2
+  +       }
+  +     ],
+  +     x: 53,
+  +     y: 15
+  +   },
+  +   kind: 'merchant',
+  +   snapshot: {
+  +     equipment: {
+  +       armor: null,
+  +       ring: null,
+  +       weapon: null
+  +     },
+  +     gold: 1000,
+  +     inventory: [],
+  +     stock: [
+  +       {
+  +         gold: 15,
+  +         heal: 0.35,
+  +         id: 100,
+  +         kind: 'heal',
+  +         name: 'Potion',
+  +         sprite: 'potion'
+  +       },
+  +       {
+  +         atk: 6,
+  +         gold: 40,
+  +         id: 101,
+  +         kind: 'weapon',
+  +         name: 'Sword',
+  +         sprite: 'sword',
+  +         str: 2
+  +       },
+  +       {
+  +         atk: 3,
+  +         def: 2,
+  +         dex: 2,
+  +         gold: 80,
+  +         id: 102,
+  +         kind: 'ring',
+  +         maxHp: 20,
+  +         name: 'Ring',
+  +         sprite: 'ring',
+  +         str: 1
+  +       },
+  +       {
+  +         gold: 70,
+  +         id: 103,
+  +         kind: 'spellbook',
+  +         minDepth: 2,
+  +         name: 'Frostbolt Tome',
+  +         spell: 'frostbolt',
+  +         sprite: 'frostboltTome'
+  +       },
+  +       {
+  +         gold: 55,
+  +         id: 104,
+  +         kind: 'scroll',
+  +         lootWeight: 1,
+  +         minDepth: 1,
+  +         name: 'Town Scroll',
+  +         scroll: 'town',
+  +         sprite: 'townScroll'
+  +       },
+  +       {
+  +         dex: 2,
+  +         gold: 60,
+  +         id: 105,
+  +         kind: 'elixir',
+  +         name: 'Elixir',
+  +         sprite: 'elixir',
+  +         str: 2
+  +       }
+  +     ],
+  +     townScrolls: 0
+  +   }
+  + }
+  - null
+  
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5345:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { actor: { x: 53, y: 15, isMerchant: true, stock: [Array] }, kind: 'merchant', snapshot: { gold: 1000, townScrolls: 0, inventory: [], equipment: [Object], stock: [Array] } },
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/game.test.cjs:5351:1
+✖ M2 item details warn about gear replacement, label elixir honestly and render names as plain text (58.823709ms)
+  evalmachine.<anonymous>:1
+  equipItem('weapon',{...ITEM_TABLE[2]});state.merchant.stock[1].name='Sword <img src=x>';openTrade();selectTradeRow(state.trade,'buy','stock:1')
+                                                                                                      ^
+  
+  ReferenceError: selectTradeRow is not defined
+      at evalmachine.<anonymous>:1:101
+      at Script.runInContext (node:vm:150:12)
+      at Object.runInContext (node:vm:302:6)
+      at Object.run (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:141:21)
+      at TestContext.<anonymous> (/Users/vadamec/workspace/ai_tmp/opencode_testing/tests/game.test.cjs:5352:23)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)

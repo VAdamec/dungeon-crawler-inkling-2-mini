@@ -1,0 +1,19 @@
+{
+  "focused": {
+    "pass": 25,
+    "fail": 0
+  },
+  "full": {
+    "pass": 193,
+    "fail": 6,
+    "sameFailureNamesAsBaseline": true
+  },
+  "preview": {
+    "pass": 27,
+    "fail": 0
+  },
+  "sourceHashesMatch": true,
+  "localLinksChecked": 36,
+  "brokenLinks": [],
+  "nativeBackgroundVerified": false
+}

@@ -1,0 +1,41 @@
+--- /tmp/dungeon-m1-before/DOCUMENTATION.md	2026-11-26 17:34:49
++++ DOCUMENTATION.md	2026-11-26 17:49:57
+@@ -171,12 +171,37 @@
+ 
+ Implementation evidence: [T1 debug portal](docs/reviews/2026-11-26-t1-debug-portal/README.md) and [T2 scroll command](docs/reviews/2026-11-26-t2-add-scrolls/README.md). Their historical six-failure baseline is resolved by [C1 companion corrections](docs/reviews/2026-11-26-c1-companions/README.md); the native GR-09 check remains unverified.
+ 
++## Market draft core (M1)
++
++M1 implements the pure economy/cart model; it is **not wired into player trading yet**. [M1 evidence](docs/reviews/2026-11-26-m1-market/README.md) · [canonical design](docs/plans/2026-11-26-market-transactions-design.md). The existing live-mutation menu and immediate-buy/sell-all compatibility paths remain unaccepted prototype behavior for M2 to replace. Do not describe Cancel in that prototype as safe: its documented ring/spell leaks are not repaired by adding the detached core.
++
++`createTradeDraft(source, merchant)` reads only explicit affected values and returns a deeply frozen cart `{ original, draft, rules, history }`. It copies gold, stored potions/scrolls, equipment, scoped hero fields/spells/readiness and this merchant's stock, with no live merchant/map/floor/DOM references. The hero snapshot includes `GOD_STAT_FIELDS` for exact god-mode preview; unsafe-integer XP/threshold values at high levels remain finite numbers, not rounded/repaired. It does not copy position, journal, progression history, portal, companion or resources. Rules capture remembered `source.depth` (including town), active time and a detached god-mode stat snapshot. Actual modal context/identity/staleness checks belong to M2.
++
++```js
++const cart = createTradeDraft(source, merchant);
++const staged = stageTradeAction(cart, { type: 'buy', rowId: 'stock:1' });
++const withSale = stageTradeAction(staged, { type: 'sell', slot: 'ring' });
++const undone = undoTradeAction(withSale);
++const reset = resetTradeDraft(undone);
++// No live commit API in M1. Discarding these values has no gameplay effects.
++```
++
++Each cloned stock row has `{ rowId: 'stock:<opening index>', item }`. IDs are session-local and stay stable after removal/Undo; duplicate merchant IDs/names stay separate. Never write these IDs to saved stock or treat them as cross-session identity. `draft.operations` contains only accepted, retained buys/sales (item, row/slot, captured price and replaced equipment for buys). `history` retains prior immutable drafts. Undo restores exact prior HP/stock/spells/currency/operation journal; Reset returns the same immutable opening values and clears all operations/history. No empty/rejected action enters history; validation errors throw `Invalid trade: ...`, leaving the supplied cart unchanged. M1 never emits game logs/audio/bubbles, saves, consumes RNG, paints or writes `state.trade`.
++
++`applyTradeAction(draft, action, rules)` returns a new frozen draft. Buy accepts an available row, checks known spells and affordability before payment, and applies the item's current effect. Sell accepts just an equipped weapon/armor/ring slot; no backpack sales, restocking or buyback. Provisional sale proceeds can fund a later purchase. Potions stay stored; scrolls increment the count; tomes learn in the draft and become ready at captured active time. Elixir refunds its base `item.gold` after payment, preserving the actual existing behavior; it adds no strength/dexterity. Replacement discards old gear without sale proceeds; the operation retains the old item for M2's replacement warning. Buy then sell is two retained operations; undone actions must produce no eventual notices.
++
++Shared helpers: `buyPrice(item, depth)` uses `round(gold*(1.5+max(0,depth-1)*.03))`, `sellPrice(item)` uses `round(gold*.5)`; legacy price wrappers delegate. `equipmentBonusFor`, `equipmentStatsFor` and `equipmentTransition` accept explicit inputs; live `equipmentBonus`, effective-stat helpers and `equipItem` delegate while keeping equipment object/item identities and the existing `freezePlayerStats()` call. `equipDraft` applies the same HP delta/clipping and then captured god-mode fields, preserving path-dependent HP. A same-bonus ring replacement does not heal; removing at75/80 clips to60/60, buying again yields80/80, and Undo restores the exact preceding values. This cannot be reconstructed from only the final gear diff.
++
++`learnSpellState` returns a pure spells/readiness transition (or null for unknown/already-known); live `learnSpell` keeps its existing in-place field updates and one learning log. Currency/counts, item bonuses and derived stats reject negative/nonfinite/unsafe values and overflow; the source must contain ordinary game records. This is not a replacement for S1's untrusted-file schema/parser.
++
++**Next M2:** bind a cart to run/map/area/depth/live-merchant/original-affected data, build selected Buy/Sell UI with replacement/effect details, remove destructive entry bypasses, validate and apply a once-only atomic commit through `equipItem` plus final path-correct HP, preserve town/floor aliases, then emit only retained operation notices. M3 owns the remaining lifecycle/mobile/recovery matrix. Player Help/README stay unchanged until this is playable. **Native GR-09 background-tab/minimize remains unverified.**
++
+ ## Companion picker
+ 
+ Choose Marmalade or Pip on launch; arrows change/focus the card without starting, Enter/Space starts. Space beside the selected starter recruits it; first descent still auto-recruits if needed. The wood companion post near the Inn supports Space or its nearby **Companions** button, including touch input. The fixed picker shows active/unlocked/locked entries; Tab stays inside, Up/Down/Home/End move focus, and native Enter/Space or click/tap selects. Cancel/Esc and Keep preserve the actor and attack/speech readiness. M or the dialog sound button toggles audio; R restarts without launch branding.
+ 
+ `state.companionPicker` is a transient identity-bound session containing town/map/post identity, prior focus and inert flags. Row handlers capture their opening session and call `selectCompanion(id, session)`; a missing, closed, stale, distant or ineligible session cannot select. Open/close reset existing clocks and restore focus/inert state; forced travel/loadLevel/reset/death dismiss before context switches. No picker data enters floor/town saves. `companionPostTile` validates reachability and avoids actors/patrol tiles and other interaction landmarks; `drawCompanionPost` paints directly without a missing sprite or art bake.
+ 
+-[C2 verification and screenshots](docs/reviews/2026-11-26-c2-picker/README.md) covers desktop and touch-emulated mobile interactions. [C3 integration audit](docs/reviews/2026-11-26-c3-integration/README.md) is complete; market cart work and native GR-09 visibility verification remain separate.
++[C2 verification and screenshots](docs/reviews/2026-11-26-c2-picker/README.md) covers desktop and touch-emulated mobile interactions. [C3 integration audit](docs/reviews/2026-11-26-c3-integration/README.md) is complete; M1 cart core is implemented above; M2 UI/commit and M3 integration remain pending. Native GR-09 visibility verification remains unverified.
+ 
+ C3 uses `simulationBlocked()` for timed companion/hazard/recovery/mana/active-time and motion paths. `enemyTick` rechecks it immediately after a companion attack, so starting a boss-defeat scene cannot leave surviving monsters an extra action in that tick. Forced travel and health-dialog actions keep their own eligibility rules.

@@ -1,0 +1,36 @@
+{
+  "results": [
+    {
+      "mobile": false,
+      "phase": "validation",
+      "cancelMs": 73
+    },
+    {
+      "mobile": false,
+      "phase": "hydration",
+      "cancelMs": 15
+    },
+    {
+      "mobile": false,
+      "phase": "export",
+      "cancelMs": 63
+    },
+    {
+      "mobile": true,
+      "phase": "validation",
+      "cancelMs": 43
+    },
+    {
+      "mobile": true,
+      "phase": "hydration",
+      "cancelMs": 16
+    },
+    {
+      "mobile": true,
+      "phase": "export",
+      "cancelMs": 95
+    }
+  ],
+  "errors": [],
+  "note": "Chrome desktop/touch viewport,4x CPU slowdown; native UI Cancel/Esc/R during real cooperative file work, no synthetic visibility."
+}

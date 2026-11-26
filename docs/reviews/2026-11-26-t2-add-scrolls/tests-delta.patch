@@ -1,0 +1,94 @@
+--- before/tests/game.test.cjs
++++ after/tests/game.test.cjs
+@@ -2488,6 +2488,91 @@
+   }
+ });
+ 
++test('T2 addScrolls rejects non-decimal text and wrong arity without changing gameplay', () => {
++  const g = game();
++  g.key('`');
++  const invalid = ['', '0', '-1', '+3', '1.5', '3.0', '1e2', '1E2', '0x10', '0b10',
++    'NaN', 'Infinity', 'abc', '1_000', '1,000', '3 extra', '1 2',
++    '9007199254740992', '9999999999999999999999999999999999999999'];
++  for (const text of invalid) {
++    const before = debugPortalSnapshot(g);
++    g.elements.consoleInput.value = `addScrolls ${text}`;
++    g.key('Enter', {target:g.elements.consoleInput});
++    assert.deepEqual(debugPortalSnapshot(g), before, text);
++    assert.match(g.elements.consoleOutput.textContent, /Usage: addScrolls <positive integer>/, text);
++  }
++  for (const args of ['"3","extra"', '', 'null', 'true', '3', '[3]', '{}', '" 3 "']) {
++    const before = debugPortalSnapshot(g);
++    g.run(`addScrolls(${args})`);
++    assert.deepEqual(debugPortalSnapshot(g), before, `direct helper: ${args}`);
++    assert.match(g.elements.consoleOutput.textContent, /Usage: addScrolls <positive integer>/);
++  }
++});
++
++test('T2 addScrolls rejects unsafe totals without losing the exact safe-integer boundary', () => {
++  const g = game();
++  g.key('`');
++  g.run('state.townScrolls=Number.MAX_SAFE_INTEGER-1');
++  g.elements.consoleInput.value='addScrolls 1';g.key('Enter',{target:g.elements.consoleInput});
++  assert.equal(g.run('state.townScrolls'), Number.MAX_SAFE_INTEGER);
++  for (const total of ['Number.MAX_SAFE_INTEGER', 'Number.MAX_SAFE_INTEGER-1', '-1', 'NaN', 'Infinity', '1.5']) {
++    g.run(`state.townScrolls=${total}`);
++    const before = debugPortalSnapshot(g);
++    g.elements.consoleInput.value='addScrolls 2';g.key('Enter',{target:g.elements.consoleInput});
++    assert.deepEqual(debugPortalSnapshot(g), before, total);
++    assert.match(g.elements.consoleOutput.textContent, /Usage: addScrolls <positive integer>/);
++  }
++  g.run('state.townScrolls=0');
++  g.elements.consoleInput.value=`addScrolls ${Number.MAX_SAFE_INTEGER}`;
++  g.key('Enter',{target:g.elements.consoleInput});
++  assert.equal(g.run('state.townScrolls'), Number.MAX_SAFE_INTEGER);
++});
++
++test('T2 addScrolls rejects inactive, hidden, dead, paused, cinematic and player-menu contexts', () => {
++  const cases = ['state.started=false', 'state.gameOver=true', 'state.player.hp=0', 'document.hidden=true',
++    'state.helpOpen=true', 'state.pause={kind:"health"}', 'state.pause={kind:"retreat"}',
++    'state.ending={completed:false}', 'state.bossIntro={completed:false}', 'state.bossDefeat={completed:false}',
++    'state.trade={snapshot:{gold:123}}', 'state.companionPicker={id:123}',
++    'document.getElementById("companionOverlay").hidden=false',
++    'document.getElementById("tradeOverlay").hidden=false'];
++  for (const [index,setup] of cases.entries()) {
++    const g=game(42,true,index%2?'town':'dungeon');
++    g.key('`');
++    g.run(`window.t2Sounds=[];playSound=name=>window.t2Sounds.push(name);${setup}`);
++    const before=debugPortalSnapshot(g);
++    g.elements.consoleInput.value='addScrolls 3';g.key('Enter',{target:g.elements.consoleInput});
++    assert.deepEqual(debugPortalSnapshot(g),before,setup);
++    assert.match(g.elements.consoleOutput.textContent,/Cannot add scrolls now/,setup);
++    assert.deepEqual(g.json('window.t2Sounds'),[],setup);
++  }
++});
++
++test('T2 addScrolls changes only the count in town or dungeon, including with an existing portal and god mode', () => {
++  for (const area of ['town','dungeon']) {
++    const g=game(42,true,area);
++    g.run(`state.townScrolls=2;state.gold=123;state.player.hp=37;state.player.mp=7;
++      state.activeTime=15;state.retreatReadyAt=72;state.townPortalOpen=true;
++      state.townExit={depth:1,x:12,y:9,reason:'cheat'};setGodMode('1');`);
++    g.key('`');
++    const before=debugPortalSnapshot(g);
++    const godStats=g.json('state.godModeStats');
++    g.run(`window.t2Sounds=[];playSound=name=>window.t2Sounds.push(name);
++      Math.random=()=>{throw new Error('addScrolls must not consume RNG');};`);
++    g.elements.consoleInput.value='  AdDsCrOlLs   0003  ';
++    g.key('Enter',{target:g.elements.consoleInput});
++    const after=debugPortalSnapshot(g);
++    assert.equal(after.scrolls,5);
++    after.scrolls=before.scrolls;
++    assert.deepEqual(after,before,area);
++    assert.deepEqual(g.json('state.godModeStats'),godStats);
++    assert.equal(g.run('state.consoleOpen'),true);
++    assert.equal(String(g.elements.scrolls.textContent),'5');
++    assert.match(g.elements.spellList.textContent,/J Town Portal \(ready\)/);
++    assert.match(g.elements.consoleOutput.textContent,/Added 3 Town Scroll\(s\); total 5\./);
++    assert.deepEqual(g.json('window.t2Sounds'),[]);
++  }
++});
++
+ test('console help lists teleportTown and addScrolls', () => {
+   const g = game();
+   g.key('`'); const input = g.elements.consoleInput;
